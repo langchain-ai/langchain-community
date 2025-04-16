@@ -375,7 +375,7 @@ def test_vectara_rerankers(vectara3: Vectara) -> None:
     assert len(output2) > 0
 
 
-def test_vectara_with_summary(vectara3) -> None:  # type: ignore[no-untyped-def]
+def test_vectara_with_summary(vectara3: Vectara) -> None:
     """Test vectara summary."""
     # test summarization
     num_results = 10
