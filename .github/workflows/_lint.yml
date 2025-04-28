@@ -30,7 +30,7 @@ jobs:
         # so linting on fewer versions makes CI faster.
         python-version:
           - "3.9"
-          - "3.12"
+          - "3.13"
     steps:
       - uses: actions/checkout@v4
 
