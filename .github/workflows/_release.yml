@@ -12,7 +12,7 @@ on:
       working-directory:
         required: true
         type: string
-        default: 'libs/{lib}'
+        default: 'libs/community'
       dangerous-nonmaster-release:
         required: false
         type: boolean
