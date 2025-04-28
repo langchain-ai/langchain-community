@@ -1512,7 +1512,7 @@ dependencies = [
 
 [[package]]
 name = "langchain-community"
-version = "0.3.22"
+version = "0.3.23"
 source = { editable = "." }
 dependencies = [
     { name = "aiohttp" },
