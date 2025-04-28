@@ -46,6 +46,14 @@ if __name__ == "__main__":
             {"working-directory": "libs/community", "python-version": py_v}
             for py_v in ["3.9", "3.12"]
         ],
+        "test-pydantic": [
+            {
+                "working-directory": "libs/community",
+                "python-version": "3.11",
+                "pydantic-version": pydantic_version,
+            }
+            for pydantic_version in ["2.7.0", "2.11.0"]
+        ],
     }
     for key, value in outputs.items():
         json_output = json.dumps(value)

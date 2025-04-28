@@ -37,6 +37,7 @@ jobs:
       dirs-to-lint: ${{ steps.set-matrix.outputs.dirs-to-lint }}
       dirs-to-test: ${{ steps.set-matrix.outputs.dirs-to-test }}
       extended-tests: ${{ steps.set-matrix.outputs.extended-tests }}
+      test-pydantic: ${{ steps.set-matrix.outputs.test-pydantic }}
   lint:
     name: cd ${{ matrix.working-directory }}
     needs: [ build ]
@@ -59,6 +60,20 @@ jobs:
     uses: ./.github/workflows/_test.yml
     with:
       working-directory: ${{ matrix.working-directory }}
+    secrets: inherit
+
+  test-pydantic:
+    name: cd ${{ matrix.job-configs.working-directory }}
+    needs: [ build ]
+    if: ${{ needs.build.outputs.test-pydantic != '[]' }}
+    strategy:
+      matrix:
+        job-configs: ${{ fromJson(needs.build.outputs.test-pydantic) }}
+      fail-fast: false
+    uses: ./.github/workflows/_test_pydantic.yml
+    with:
+      working-directory: ${{ matrix.job-configs.working-directory }}
+      pydantic-version: ${{ matrix.job-configs.pydantic-version }}
     secrets: inherit
 
   compile-integration-tests:
@@ -118,7 +133,7 @@ jobs:
 
   ci_success:
     name: "CI Success"
-    needs: [build, lint, test, compile-integration-tests]
+    needs: [build, lint, test, test-pydantic, compile-integration-tests, extended-tests]
     if: |
       always()
     runs-on: ubuntu-latest
