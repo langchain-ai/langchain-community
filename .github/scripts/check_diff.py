@@ -42,6 +42,10 @@ if __name__ == "__main__":
     outputs = {
         "dirs-to-lint": list(dirs_to_run["lint"] | dirs_to_run["test"]),
         "dirs-to-test": list(dirs_to_run["test"]),
+        "extended-tests": [
+            {"working-directory": "libs/community", "python-version": py_v}
+            for py_v in ["3.9", "3.13"]
+        ],
     }
     for key, value in outputs.items():
         json_output = json.dumps(value)

@@ -36,6 +36,7 @@ jobs:
     outputs:
       dirs-to-lint: ${{ steps.set-matrix.outputs.dirs-to-lint }}
       dirs-to-test: ${{ steps.set-matrix.outputs.dirs-to-test }}
+      extended-tests: ${{ steps.set-matrix.outputs.extended-tests }}
   lint:
     name: cd ${{ matrix.working-directory }}
     needs: [ build ]
@@ -71,6 +72,50 @@ jobs:
     with:
       working-directory: ${{ matrix.working-directory }}
     secrets: inherit
+
+  extended-tests:
+    name: "cd ${{ matrix.job-configs.working-directory }} / make extended_tests #${{ matrix.job-configs.python-version }}"
+    needs: [ build ]
+    if: ${{ needs.build.outputs.extended-tests != '[]' }}
+    strategy:
+      matrix:
+        # note different variable for extended test dirs
+        job-configs: ${{ fromJson(needs.build.outputs.extended-tests) }}
+      fail-fast: false
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    defaults:
+      run:
+        working-directory: ${{ matrix.job-configs.working-directory }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Python ${{ matrix.job-configs.python-version }} + uv
+        uses: "./.github/actions/uv_setup"
+        with:
+          python-version: ${{ matrix.job-configs.python-version }}
+
+      - name: Install dependencies and run extended tests
+        shell: bash
+        run: |
+          echo "Running extended tests, installing dependencies with uv..."
+          uv venv
+          uv sync --group test
+          VIRTUAL_ENV=.venv uv pip install -r extended_testing_deps.txt
+          VIRTUAL_ENV=.venv make extended_tests
+
+      - name: Ensure the tests did not create any additional files
+        shell: bash
+        run: |
+          set -eu
+
+          STATUS="$(git status)"
+          echo "$STATUS"
+
+          # grep will exit non-zero if the target message isn't found,
+          # and `set -e` above will cause the step to fail.
+          echo "$STATUS" | grep 'nothing to commit, working tree clean'
+
   ci_success:
     name: "CI Success"
     needs: [build, lint, test, compile-integration-tests]
