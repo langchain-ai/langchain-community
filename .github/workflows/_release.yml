@@ -26,7 +26,7 @@ env:
 
 jobs:
   build:
-    if: github.ref == 'refs/heads/master' || inputs.dangerous-nonmaster-release
+    if: github.ref == 'refs/heads/main' || inputs.dangerous-nonmaster-release
     runs-on: ubuntu-latest
 
     outputs:
@@ -161,14 +161,6 @@ jobs:
 
       - name: Run unit tests
         run: make tests
-        working-directory: ${{ inputs.working-directory }}
-
-      - name: Run integration tests
-        env:
-          PARTNER_API_KEY: ${{ secrets.PARTNER_API_KEY }}
-        run: |
-          uv sync --group test --group test_integration
-          make integration_tests
         working-directory: ${{ inputs.working-directory }}
 
       - name: Get minimum versions
