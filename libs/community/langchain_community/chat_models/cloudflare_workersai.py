@@ -16,6 +16,7 @@ from uuid import uuid4
 
 import requests
 from langchain.schema import AIMessage, ChatGeneration, ChatResult, HumanMessage
+from langchain_core._api.deprecation import deprecated
 from langchain_core.callbacks import CallbackManagerForLLMRun
 from langchain_core.language_models import LanguageModelInput
 from langchain_core.language_models.chat_models import BaseChatModel
@@ -109,7 +110,11 @@ def _get_tool_calls_from_response(response: requests.Response) -> List[ToolCall]
             )
     return tool_calls
 
-
+@deprecated(
+     since="0.3.23",
+     removal="1.0",
+     alternative_import="langchain_cloudflare.ChatCloudflareWorkersAI",
+ )
 class ChatCloudflareWorkersAI(BaseChatModel):
     """Custom chat model for Cloudflare Workers AI"""
 
