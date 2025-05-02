@@ -210,6 +210,12 @@ if TYPE_CHECKING:
     from langchain_community.embeddings.sentence_transformer import (
         SentenceTransformerEmbeddings,
     )
+
+    from langchain_community.embeddings.snowflake_cortex_engine_embeddings import (
+        SnowflakeCortexEmbeddings,
+    )
+
+
     from langchain_community.embeddings.solar import (
         SolarEmbeddings,
     )
@@ -318,6 +324,7 @@ __all__ = [
     "SelfHostedHuggingFaceEmbeddings",
     "SelfHostedHuggingFaceInstructEmbeddings",
     "SentenceTransformerEmbeddings",
+    "SnowflakeCortexEmbeddings",
     "SolarEmbeddings",
     "SpacyEmbeddings",
     "SparkLLMTextEmbeddings",
@@ -402,6 +409,7 @@ _module_lookup = {
     "SelfHostedHuggingFaceEmbeddings": "langchain_community.embeddings.self_hosted_hugging_face",  # noqa: E501
     "SelfHostedHuggingFaceInstructEmbeddings": "langchain_community.embeddings.self_hosted_hugging_face",  # noqa: E501
     "SentenceTransformerEmbeddings": "langchain_community.embeddings.sentence_transformer",  # noqa: E501
+    "SnowflakeCortexEmbeddings": "langchain_community.embeddings.snowflake_cortex_engine_embeddings",
     "SolarEmbeddings": "langchain_community.embeddings.solar",
     "SpacyEmbeddings": "langchain_community.embeddings.spacy_embeddings",
     "SparkLLMTextEmbeddings": "langchain_community.embeddings.sparkllm",

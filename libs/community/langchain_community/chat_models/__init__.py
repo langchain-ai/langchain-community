@@ -194,6 +194,13 @@ if TYPE_CHECKING:
     from langchain_community.chat_models.zhipuai import (
         ChatZhipuAI,
     )
+
+
+    from langchain_community.chat_models.keyfile_chat_snowflake_cortex import (
+        KeyfileChatSnowflakeCortex,
+    )
+
+    
 __all__ = [
     "AzureChatOpenAI",
     "BedrockChat",
@@ -237,6 +244,7 @@ __all__ = [
     "ChatSambaStudio",
     "ChatSparkLLM",
     "ChatSnowflakeCortex",
+    "KeyfileChatSnowflakeCortex",
     "ChatTongyi",
     "ChatVertexAI",
     "ChatYandexGPT",
@@ -302,6 +310,7 @@ _module_lookup = {
     "ChatSambaNovaCloud": "langchain_community.chat_models.sambanova",
     "ChatSambaStudio": "langchain_community.chat_models.sambanova",
     "ChatSnowflakeCortex": "langchain_community.chat_models.snowflake",
+    "KeyfileChatSnowflakeCortex": "langchain_community.chat_models.keyfile_chat_snowflake_cortex",
     "ChatSparkLLM": "langchain_community.chat_models.sparkllm",
     "ChatTongyi": "langchain_community.chat_models.tongyi",
     "ChatVertexAI": "langchain_community.chat_models.vertexai",
