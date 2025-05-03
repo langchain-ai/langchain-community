@@ -169,11 +169,12 @@ class AzureAISearchRetriever(BaseRetriever):
         headers = {
             "Content-Type": "application/json",
         }
-        if not self.azure_ad_token:
+        if self.azure_ad_token:
             headers["Authorization"] = f"Bearer {self.azure_ad_token}"
-        else:
+        elif self.api_key:
             headers["api-key"] = f"{self.api_key}"
         return headers
+
 
     def _search(self, query: str) -> List[dict]:
         search_url = self._build_search_url(query)
@@ -224,3 +225,5 @@ class AzureCognitiveSearchRetriever(AzureAISearchRetriever):
     This version of the retriever will soon be
     depreciated. Please switch to AzureAISearchRetriever
     """
+
+Fix: use api_key when azure_ad_token is not provided or empty (#31010)
