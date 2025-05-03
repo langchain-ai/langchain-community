@@ -271,7 +271,8 @@ MODEL_COST_PER_1K_TOKENS = {
     "curie-finetuned-legacy": 0.012,
     "davinci-finetuned-legacy": 0.12,
     # Embedding models
-    "text-embedding-ada-002": 0.0001,
+    "text-embedding-ada-002": 0.0001,  # Azure OpenAI is returning this model key.
+    "text-embedding-ada-002-v2": 0.0001,  # OpenAI is returning this model key.
     "text-embedding-3-small": 0.00002,
     "text-embedding-3-large": 0.00013,
 }
