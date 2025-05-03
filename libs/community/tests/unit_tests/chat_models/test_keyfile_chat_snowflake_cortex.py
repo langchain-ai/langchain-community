@@ -1,10 +1,7 @@
-# libs/community/tests/unit_tests/chat_models/test_keyfile_chat_snowflake_cortex.py
 
 from langchain_community.chat_models import KeyfileChatSnowflakeCortex
-from langchain_core.messages import HumanMessage
-from langchain_community.chat_models import KeyfileChatSnowflakeCortex
 
-# ✅ Mocked dummy session and builder
+#  Mocked dummy session and builder
 class DummySession:
     def close(self):
         pass  # Prevent warning on __del__
@@ -16,7 +13,7 @@ class DummyBuilder:
         return DummySession()
 
 def test_chat_keyfile_snowflake_basic(monkeypatch):
-    # ✅ Monkeypatch the Session.builder to use DummyBuilder
+    # Monkeypatch the Session.builder to use DummyBuilder
     monkeypatch.setattr(
         "langchain_community.chat_models.keyfile_chat_snowflake_cortex.Session.builder",
         DummyBuilder()
