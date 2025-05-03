@@ -4,8 +4,8 @@ Deprecated LiteLLM wrapper.
 ⭐  Use `pip install langchain-litellm` and import
    `from langchain_litellm import ChatLiteLLM` instead.
 """
+
 from __future__ import annotations
-from langchain_core._api.deprecation import deprecated
 
 import json
 import logging
@@ -25,6 +25,7 @@ from typing import (
     Union,
 )
 
+from langchain_core._api.deprecation import deprecated
 from langchain_core.callbacks import (
     AsyncCallbackManagerForLLMRun,
     CallbackManagerForLLMRun,
@@ -246,6 +247,7 @@ _OPENAI_MODELS = [
     "gpt-4-32k-0314",
     "gpt-4-32k-0613",
 ]
+
 
 @deprecated(
     since="0.3.24",

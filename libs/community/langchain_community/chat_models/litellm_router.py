@@ -4,10 +4,10 @@ Deprecated LiteLLM wrapper.
 ⭐  Use `pip install langchain-litellm` and import
    `from langchain_litellm import ChatLiteLLMRouter` instead.
 """
-from langchain_core._api.deprecation import deprecated
 
 from typing import Any, AsyncIterator, Iterator, List, Mapping, Optional
 
+from langchain_core._api.deprecation import deprecated
 from langchain_core.callbacks.manager import (
     AsyncCallbackManagerForLLMRun,
     CallbackManagerForLLMRun,
@@ -39,6 +39,7 @@ def get_llm_output(usage: Any, **params: Any) -> dict:
             # if token usage in metadata, prefer metadata's copy of it
             llm_output[key] = metadata[key]
     return llm_output
+
 
 @deprecated(
     since="0.3.24",
