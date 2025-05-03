@@ -272,14 +272,14 @@ class FireCrawlLoader(BaseLoader):
         if self.mode == "scrape":
             firecrawl_docs = [
                 self.firecrawl.scrape_url(
-                    self.url
+                    self.url #TODO: Add FireCrawl v1 API compliant params later
                 )
             ]
         elif self.mode == "crawl":
             if not self.url:
                 raise ValueError("URL is required for crawl mode")
             crawl_response = self.firecrawl.crawl_url(
-                self.url
+                self.url #TODO: Add FireCrawl v1 API compliant params later
             )
             firecrawl_docs = crawl_response.get("data", [])
         elif self.mode == "map":
