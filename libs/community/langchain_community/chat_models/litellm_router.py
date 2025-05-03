@@ -1,4 +1,10 @@
-"""LiteLLM Router as LangChain Model."""
+"""
+Deprecated LiteLLM wrapper.
+
+⭐  Use `pip install langchain-litellm` and import
+   `from langchain_litellm import ChatLiteLLMRouter` instead.
+"""
+from langchain_core._api.deprecation import deprecated
 
 from typing import Any, AsyncIterator, Iterator, List, Mapping, Optional
 
@@ -34,9 +40,13 @@ def get_llm_output(usage: Any, **params: Any) -> dict:
             llm_output[key] = metadata[key]
     return llm_output
 
-
+@deprecated(
+    since="0.3.24",
+    removal="1.0",
+    alternative_import="langchain_litellm.ChatLiteLLMRouter",
+)
 class ChatLiteLLMRouter(ChatLiteLLM):
-    """LiteLLM Router as LangChain Model."""
+    """DEPRECATED – use `langchain_litellm.ChatLiteLLMRouter` instead."""
 
     router: Any
 
