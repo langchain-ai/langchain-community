@@ -110,11 +110,12 @@ def _get_tool_calls_from_response(response: requests.Response) -> List[ToolCall]
             )
     return tool_calls
 
+
 @deprecated(
-     since="0.3.23",
-     removal="1.0",
-     alternative_import="langchain_cloudflare.ChatCloudflareWorkersAI",
- )
+    since="0.3.23",
+    removal="1.0",
+    alternative_import="langchain_cloudflare.ChatCloudflareWorkersAI",
+)
 class ChatCloudflareWorkersAI(BaseChatModel):
     """Custom chat model for Cloudflare Workers AI"""
 

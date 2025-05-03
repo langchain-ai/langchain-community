@@ -7,11 +7,12 @@ from pydantic import BaseModel, ConfigDict
 
 DEFAULT_MODEL_NAME = "@cf/baai/bge-base-en-v1.5"
 
+
 @deprecated(
-     since="0.3.23",
-     removal="1.0",
-     alternative_import="langchain_cloudflare.CloudflareWorkersAIEmbeddings",
- )
+    since="0.3.23",
+    removal="1.0",
+    alternative_import="langchain_cloudflare.CloudflareWorkersAIEmbeddings",
+)
 class CloudflareWorkersAIEmbeddings(BaseModel, Embeddings):
     """Cloudflare Workers AI embedding model.
 
