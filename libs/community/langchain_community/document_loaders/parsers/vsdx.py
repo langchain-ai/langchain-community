@@ -169,12 +169,21 @@ class VsdxParser(BaseBlobParser, ABC):
         zfile: zipfile.ZipFile,
         filelist: List[str],
         pagexml_rels: List[dict],
+        visited: Set[str] = None,
     ) -> Set[str]:
         """Get the relationships of a page and the relationships of its relationships,
         etc... recursively.
         Pages are based on other pages (ex: background page),
         so we need to get all the relationships to get all the content of a single page.
         """
+
+        if visited is None:
+            visited = set()
+
+        if page in visited:
+            return set()
+
+        visited.add(page)
 
         name_path = Path(page).name
         parent_path = Path(page).parent
@@ -199,9 +208,9 @@ class VsdxParser(BaseBlobParser, ABC):
             [str(parent_path / target) for target in targets]
         ).intersection(filelist)
 
-        for rel in relationships:
-            relationships = relationships | self.get_relationships(
-                rel, zfile, filelist, pagexml_rels
+        for rel in relationships.copy():
+            relationships |= self.get_relationships(
+                rel, zfile, filelist, pagexml_rels, visited
             )
 
         return relationships
