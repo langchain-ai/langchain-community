@@ -225,5 +225,3 @@ class AzureCognitiveSearchRetriever(AzureAISearchRetriever):
     This version of the retriever will soon be
     depreciated. Please switch to AzureAISearchRetriever
     """
-
-Fix: use api_key when azure_ad_token is not provided or empty (#31010)
