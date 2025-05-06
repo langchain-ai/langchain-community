@@ -270,6 +270,11 @@ MODEL_COST_PER_1K_TOKENS = {
     "babbage-finetuned-legacy": 0.0024,
     "curie-finetuned-legacy": 0.012,
     "davinci-finetuned-legacy": 0.12,
+    # Embedding models
+    "text-embedding-ada-002": 0.0001,  # Azure OpenAI is returning this model key.
+    "text-embedding-ada-002-v2": 0.0001,  # OpenAI is returning this model key.
+    "text-embedding-3-small": 0.00002,
+    "text-embedding-3-large": 0.00013,
 }
 
 
@@ -387,6 +392,7 @@ def get_openai_token_cost_for_model(
 class OpenAICallbackHandler(BaseCallbackHandler):
     """Callback Handler that tracks OpenAI info."""
 
+    # LLM tracking (Keeping same variable names for backward compatibility)
     total_tokens: int = 0
     prompt_tokens: int = 0
     prompt_tokens_cached: int = 0
@@ -394,6 +400,10 @@ class OpenAICallbackHandler(BaseCallbackHandler):
     reasoning_tokens: int = 0
     successful_requests: int = 0
     total_cost: float = 0.0
+    # Embedding tracking
+    embedding_tokens: int = 0
+    embedding_successful_requests: int = 0
+    embedding_total_cost: float = 0.0
 
     def __init__(self) -> None:
         super().__init__()
@@ -406,8 +416,13 @@ class OpenAICallbackHandler(BaseCallbackHandler):
             f"\t\tPrompt Tokens Cached: {self.prompt_tokens_cached}\n"
             f"\tCompletion Tokens: {self.completion_tokens}\n"
             f"\t\tReasoning Tokens: {self.reasoning_tokens}\n"
-            f"Successful Requests: {self.successful_requests}\n"
-            f"Total Cost (USD): ${self.total_cost}"
+            f"\tEmbedding Tokens: {self.embedding_tokens}\n"
+            f"Successful Requests\n"
+            f"\tLLM Requests: {self.successful_requests}\n"
+            f"\tEmbedding Requests: {self.embedding_successful_requests}\n"
+            f"Cost (USD)\n"
+            f"\tLLM Cost (USD): ${self.total_cost:.6f}\n"
+            f"\tEmbedding Cost (USD): ${self.embedding_total_cost:.6f}"
         )
 
     @property
@@ -519,3 +534,19 @@ class OpenAICallbackHandler(BaseCallbackHandler):
     def __deepcopy__(self, memo: Any) -> "OpenAICallbackHandler":
         """Return a deep copy of the callback handler."""
         return self
+
+    def on_embedding_end(self, model_name: str, num_tokens: int) -> None:
+        """Collect embedding token usage.
+
+        Args:
+            model_name: Name of the embedding model used
+            num_tokens: Number of tokens used in the embedding
+        """
+
+        embedding_cost = get_openai_token_cost_for_model(model_name, num_tokens)
+
+        # Update shared state behind lock
+        with self._lock:
+            self.embedding_tokens += num_tokens
+            self.embedding_total_cost += embedding_cost
+            self.embedding_successful_requests += 1
