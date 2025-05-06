@@ -175,7 +175,6 @@ class AzureAISearchRetriever(BaseRetriever):
             headers["api-key"] = f"{self.api_key}"
         return headers
 
-
     def _search(self, query: str) -> List[dict]:
         search_url = self._build_search_url(query)
         response = requests.get(search_url, headers=self._headers)
