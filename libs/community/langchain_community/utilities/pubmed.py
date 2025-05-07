@@ -75,6 +75,7 @@ class PubMedAPIWrapper(BaseModel):
         try:
             # Retrieve the top-k results for the query
             docs = [
+                f"PMID: {result['uid']}\n"
                 f"Published: {result['Published']}\n"
                 f"Title: {result['Title']}\n"
                 f"Copyright Information: {result['Copyright Information']}\n"
