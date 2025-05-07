@@ -51,8 +51,6 @@ test = [
     "blockbuster<1.6,>=1.5.18",
     "cffi<1.17.1; python_version < \"3.10\"",
     "cffi; python_version >= \"3.10\"",
-    "langchain-core",
-    "langchain",
     "langchain-tests",
     "toml>=0.10.2",
 ]
@@ -77,12 +75,6 @@ typing = [
     "langchain-text-splitters",
     "langchain",
 ]
-
-[tool.uv.sources]
-langchain-core = { git = "https://github.com/langchain-ai/langchain", subdirectory = "libs/core" }
-langchain = { git = "https://github.com/langchain-ai/langchain", subdirectory = "libs/langchain" }
-langchain-tests = { git = "https://github.com/langchain-ai/langchain", subdirectory = "libs/standard-tests" }
-langchain-text-splitters = { git = "https://github.com/langchain-ai/langchain", subdirectory = "libs/text-splitters" }
 
 [tool.ruff]
 target-version = "py39"

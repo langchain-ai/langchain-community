@@ -169,9 +169,9 @@ class AzureAISearchRetriever(BaseRetriever):
         headers = {
             "Content-Type": "application/json",
         }
-        if not self.azure_ad_token:
+        if self.azure_ad_token:
             headers["Authorization"] = f"Bearer {self.azure_ad_token}"
-        else:
+        elif self.api_key:
             headers["api-key"] = f"{self.api_key}"
         return headers
 
