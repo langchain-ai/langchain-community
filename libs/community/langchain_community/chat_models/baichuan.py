@@ -366,8 +366,8 @@ class ChatBaichuan(BaseChatModel):
     """Maximum number of tokens to generate."""
     request_timeout: int = Field(default=60, alias="timeout")
     """request timeout for chat http requests"""
-    model: str = "Baichuan2-Turbo-192K"
-    """model name of Baichuan, default is `Baichuan2-Turbo-192K`,
+    model: str = "Baichuan2-Turbo"
+    """model name of Baichuan, default is `Baichuan2-Turbo`,
     other options include `Baichuan2-Turbo`"""
     temperature: Optional[float] = Field(default=0.3)
     """What sampling temperature to use."""
@@ -375,9 +375,6 @@ class ChatBaichuan(BaseChatModel):
     """What search sampling control to use."""
     top_p: float = 0.85
     """What probability mass to use."""
-    with_search_enhance: bool = False
-    """[DEPRECATED, keeping it for for backward compatibility], 
-    Whether to use search enhance, default is False."""
     model_kwargs: Dict[str, Any] = Field(default_factory=dict)
     """Holds any model parameters valid for API call not explicitly specified."""
 
@@ -585,7 +582,7 @@ class ChatBaichuan(BaseChatModel):
         model = parameters.pop("model")
         with_search_enhance = parameters.pop("with_search_enhance", False)
         stream = parameters.pop("stream", False)
-        tools = parameters.pop("tools", [])
+        tools = parameters.pop("tools", None)
 
         payload = {
             "model": model,
