@@ -264,30 +264,35 @@ class ChatSnowflakeCortex(BaseChatModel):
                 {"tool_output": str(tool_output)}
             )  # Ensure tool_output is a string
 
-        # JSON dump the message_dicts and options without additional escaping
+        # JSON dump the message_dicts and options
         message_json = json.dumps(message_dicts)
         options = {
             "temperature": self.temperature,
             "top_p": self.top_p if self.top_p is not None else 1.0,
             "max_tokens": self.max_tokens if self.max_tokens is not None else 2048,
         }
-        options_json = json.dumps(options)  # JSON string of options
-
-        # Form the SQL statement using JSON literals
-        sql_stmt = f"""
-            select snowflake.cortex.{self.cortex_function}(
-                '{self.model}',
-                parse_json('{message_json}'),
-                parse_json('{options_json}')
-            ) as llm_response;
-        """
+        options_json = json.dumps(options)
 
         try:
-            # Use the Snowflake Cortex Complete function
+            # Use the Snowflake Cortex Complete function with parameter binding
+            # First set the warehouse using parameter binding
             self.session.sql(
-                f"USE WAREHOUSE {self.session.get_current_warehouse()};"
+                "USE WAREHOUSE ?;"
+            ).bind_parameter(1, self.session.get_current_warehouse()).collect()
+            
+            # Use parameter binding to prevent SQL injection
+            sql_stmt = """
+                select snowflake.cortex.{}(
+                    ?,
+                    parse_json(?),
+                    parse_json(?)
+                ) as llm_response;
+            """.format(self.cortex_function)
+            
+            l_rows = self.session.sql(
+                sql_stmt, 
+                params=[self.model, message_json, options_json]
             ).collect()
-            l_rows = self.session.sql(sql_stmt).collect()
         except Exception as e:
             raise ChatSnowflakeCortexError(
                 f"Error while making request to Snowflake Cortex: {e}"
@@ -350,7 +355,7 @@ class ChatSnowflakeCortex(BaseChatModel):
                         additional_context
                     )  # Append tool result to message dicts
 
-        # JSON dump the message_dicts and options without additional escaping
+        # JSON dump the message_dicts and options
         message_json = json.dumps(message_dicts)
         options = {
             "temperature": self.temperature,
@@ -358,23 +363,28 @@ class ChatSnowflakeCortex(BaseChatModel):
             "max_tokens": self.max_tokens if self.max_tokens is not None else 2048,
             # "stream": True,
         }
-        options_json = json.dumps(options)  # JSON string of options
-
-        # Form the SQL statement using JSON literals
-        sql_stmt = f"""
-            select snowflake.cortex.{self.cortex_function}(
-                '{self.model}',
-                parse_json('{message_json}'),
-                parse_json('{options_json}')
-            ) as llm_stream_response;
-        """
+        options_json = json.dumps(options)
 
         try:
-            # Use the Snowflake Cortex Complete function
+            # Use the Snowflake Cortex Complete function with parameter binding
+            # First set the warehouse using parameter binding
             self.session.sql(
-                f"USE WAREHOUSE {self.session.get_current_warehouse()};"
+                "USE WAREHOUSE ?;"
+            ).bind_parameter(1, self.session.get_current_warehouse()).collect()
+            
+            # Use parameter binding to prevent SQL injection
+            sql_stmt = """
+                select snowflake.cortex.{}(
+                    ?,
+                    parse_json(?),
+                    parse_json(?)
+                ) as llm_stream_response;
+            """.format(self.cortex_function)
+            
+            result = self.session.sql(
+                sql_stmt, 
+                params=[self.model, message_json, options_json]
             ).collect()
-            result = self.session.sql(sql_stmt).collect()
 
             # Iterate over the generator to yield streaming responses
             for row in result:
