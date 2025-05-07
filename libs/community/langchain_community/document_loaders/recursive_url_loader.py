@@ -357,7 +357,7 @@ class RecursiveUrlLoader(BaseLoader):
         self.proxies = proxies
 
     def _get_child_links_recursive(
-        self, url: str, visited: Set[str], *, depth: int = 0
+        self, url: str, visited: Set[str], *, depth: int = 0, verify: bool = True
     ) -> Iterator[Document]:
         """Recursively get all child links starting with the path of the input URL.
 
@@ -365,6 +365,7 @@ class RecursiveUrlLoader(BaseLoader):
             url: The URL to crawl.
             visited: A set of visited URLs.
             depth: Current depth of recursion. Stop when depth >= max_depth.
+            verify: Whether to verify SSL certificates. Defaults to True.
         """
 
         if depth >= self.max_depth:
@@ -374,7 +375,7 @@ class RecursiveUrlLoader(BaseLoader):
         visited.add(url)
         try:
             response = requests.get(
-                url, timeout=self.timeout, headers=self.headers, proxies=self.proxies
+                url, timeout=self.timeout, headers=self.headers, proxies=self.proxies, verify=verify
             )
 
             if self.encoding is not None:
@@ -414,7 +415,7 @@ class RecursiveUrlLoader(BaseLoader):
             # Check all unvisited links
             if link not in visited:
                 yield from self._get_child_links_recursive(
-                    link, visited, depth=depth + 1
+                    link, visited, depth=depth + 1, verify=verify
                 )
 
     async def _async_get_child_links_recursive(
