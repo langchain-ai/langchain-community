@@ -77,6 +77,15 @@ class SurrealDBStore(VectorStore):
         self.embedding_function = embedding_function
         self.kwargs = kwargs
 
+    def _create_indexes(self, dim: int) -> None:
+        # TODO: check if it already exists
+        self.sdb.query(f"""
+        DEFINE INDEX embedding_vector_index
+            ON {self.collection}
+            FIELDS embedding
+            MTREE DIMENSION {dim} DIST COSINE TYPE F32;
+        """)
+
     def initialize(self) -> None:
         """
         Initialize connection to surrealdb database
@@ -88,6 +97,8 @@ class SurrealDBStore(VectorStore):
             password = self.kwargs.get("db_pass")
             self.sdb.signin({"username": user, "password": password})
         self.sdb.use(self.ns, self.db)
+        # TODO: parametrise vector dimension
+        self._create_indexes(6)
 
     @property
     def embeddings(self) -> Embeddings | None:
@@ -175,11 +186,11 @@ class SurrealDBStore(VectorStore):
             return True
         else:
             if isinstance(ids, str):
-                self.sdb.delete(ids)
+                self.sdb.delete(RecordID(self.collection, ids))
                 return True
             else:
                 if isinstance(ids, list) and len(ids) > 0:
-                    _ = [self.sdb.delete(id) for id in ids]
+                    _ = [self.sdb.delete(RecordID(self.collection,id)) for id in ids]
                     return True
         return False
 
@@ -227,14 +238,17 @@ class SurrealDBStore(VectorStore):
         Returns:
             List of Documents.
         """
-        results = self.sdb.query(
+        query_results = self.sdb.query(
             "SELECT * FROM type::table($collection) WHERE id IN array::combine([$collection], $ids).map(|$v| type::thing($v[0], $v[1]))",
             {"collection": self.collection, "ids": ids})
-        return [Document(
+        docs = {x.get("id").id: Document(
             page_content=x.get("text"),
             metadata=x.get("metadata", {}),
-            id=x.get("metadata").get("id"),
-        ) for x in results]
+            id=x.get("id").id,
+        ) for x in query_results}
+        # sort docs in the same order as the passed in IDs
+        return [docs.get(key) for key in ids if docs.get(key) is not None]
+
 
     async def _asimilarity_search_by_vector_with_score(
             self,
@@ -259,7 +273,7 @@ class SurrealDBStore(VectorStore):
             "collection": self.collection,
             "embedding": embedding,
             "k": k,
-            "score_threshold": kwargs.get("score_threshold", 0),
+            "score_threshold": kwargs.get("score_threshold", -1),
         }
 
         # build additional filter criteria
@@ -275,16 +289,25 @@ class SurrealDBStore(VectorStore):
                 custom_filter += f"and metadata.{key} = {filter_value} "
 
         query = f"""
-        select
-            id,
-            text,
-            metadata,
-            embedding,
-            vector::similarity::cosine(embedding, $embedding) as similarity
-        from ⟨{args["collection"]}⟩
-        where vector::similarity::cosine(embedding, $embedding) >= $score_threshold
-          {custom_filter}
-        order by similarity desc LIMIT $k;
+            SELECT
+                id,
+                text,
+                metadata,
+                embedding,
+                similarity
+            FROM (
+                SELECT
+                    id,
+                    text,
+                    metadata,
+                    embedding,
+                    vector::similarity::cosine(embedding, $embedding) as similarity
+                FROM type::table($collection)
+                WHERE embedding <|{k}|> $embedding
+                    {custom_filter}
+            )
+            WHERE similarity >= $score_threshold
+            ORDER BY similarity DESC
         """
         results = self.sdb.query(query, args)
 
@@ -294,7 +317,6 @@ class SurrealDBStore(VectorStore):
                     page_content=doc["text"],
                     # metadata={"id": doc["id"], **(doc.get("metadata") or {})},
                     metadata=doc.get("metadata", {}),
-                    # id=doc["id"].id
                     id=doc.get("metadata").get("id"),
                 ),
                 doc["similarity"],
