@@ -156,12 +156,12 @@ class ChatMLX(BaseChatModel):
         **kwargs: Any,
     ) -> Iterator[ChatGenerationChunk]:
         import mlx.core as mx
-        from mlx_lm.utils import generate_step
+        from mlx_lm.generate import generate_step
 
         try:
             import mlx.core as mx
+            from mlx_lm.generate import generate_step
             from mlx_lm.sample_utils import make_logits_processors, make_sampler
-            from mlx_lm.utils import generate_step
 
         except ImportError:
             raise ImportError(
