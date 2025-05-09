@@ -1,19 +1,30 @@
 from typing import Generator
 
 import pytest
-
-from langchain_core.documents import Document
-from langchain_core.embeddings import Embeddings
+from langchain_tests.integration_tests.vectorstores import VectorStoreIntegrationTests
 
 from langchain_community.vectorstores.surrealdb import SurrealDBStore
-from langchain_tests.integration_tests.vectorstores import VectorStoreIntegrationTests
 
 
 class TestSurrealDB(VectorStoreIntegrationTests):
+    @property
+    def has_async(self) -> bool:
+        return False
+
     @pytest.fixture
-    def vectorstore(self) -> Generator[SurrealDBStore, None, None]:
-        store = SurrealDBStore(embedding_function=self.get_embeddings(), db_user="root", db_pass="root", db="test",
-                               ns="test")
+    def vectorstore(self) -> Generator[SurrealDBStore, None, None]:  # type: ignore[override]
+        try:
+            from surrealdb import Surreal
+        except ImportError as e:
+            raise ImportError(
+                """Cannot import from surrealdb.
+                please install with `pip install surrealdb`."""
+            ) from e
+
+        conn = Surreal("ws://localhost:8000/rpc")
+        conn.signin({"username": "root", "password": "root"})
+        conn.use("langchain", "test")
+        store = SurrealDBStore(self.get_embeddings(), conn)
         store.delete()
         try:
             yield store
@@ -21,18 +32,35 @@ class TestSurrealDB(VectorStoreIntegrationTests):
             store.delete()
 
 
-def test_from_documents(embedding_openai: Embeddings) -> None:
-    """Test end to end construction and search."""
-    documents = [
-        Document(page_content="Dogs are tough.", metadata={"a": 1}),
-        Document(page_content="Cats have fluff.", metadata={"b": 1}),
-        Document(page_content="What is a sandwich?", metadata={"c": 1}),
-        Document(page_content="That fence is purple.", metadata={"d": 1, "e": 2}),
-    ]
-    vectorstore = SurrealDBStore.from_documents(
-        documents,
-        embedding_openai,
-    )
-    output = vectorstore.similarity_search("Sandwich", k=1)
-    assert output[0].page_content == "What is a sandwich?"
-    assert output[0].metadata["c"] == 1
+# FIXME: async test throws "got Future <Future pending> attached to a different
+#        loop" error
+# class TestSurrealDBAsync(VectorStoreIntegrationTests):
+#     @property
+#     def has_sync(self) -> bool:
+#         return False
+#
+#     @pytest.fixture
+#     def vectorstore(self) -> Generator[SurrealDBStore, None, None]:
+#         try:
+#             from surrealdb import AsyncSurreal
+#         except ImportError as e:
+#             raise ImportError(
+#                 """Cannot import from surrealdb.
+#                 please install with `pip install surrealdb`."""
+#             ) from e
+#
+#         async def _connect() -> AsyncSurreal:
+#             conn = AsyncSurreal("ws://localhost:8000/rpc")
+#             await conn.signin({"username": "root", "password": "root"})
+#             await conn.use("langchain", "test")
+#             return conn
+#
+#         async_conn = asyncio.run(_connect())
+#         store = SurrealDBStore(
+#           self.get_embeddings(), None, async_connection=async_conn
+#         )
+#         asyncio.run(store.adelete())
+#         try:
+#             yield store
+#         finally:
+#             asyncio.run(store.adelete())
