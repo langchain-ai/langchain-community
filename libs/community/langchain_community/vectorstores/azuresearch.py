@@ -263,6 +263,7 @@ def _get_search_client(
             cors_options=cors_options,
         )
         index_client.create_index(index)
+
     # Create the search client
     if not async_:
         return SearchClient(
@@ -358,6 +359,8 @@ class AzureSearch(VectorStore):
         user_agent = "langchain"
         if "user_agent" in kwargs and kwargs["user_agent"]:
             user_agent += " " + kwargs["user_agent"]
+
+        # Create sync client
         self.client = _get_search_client(
             azure_search_endpoint,
             index_name,
@@ -375,6 +378,8 @@ class AzureSearch(VectorStore):
             additional_search_client_options=additional_search_client_options,
             azure_credential=azure_credential,
         )
+
+        # Create async client
         self.async_client = _get_search_client(
             azure_search_endpoint,
             index_name,
@@ -390,6 +395,7 @@ class AzureSearch(VectorStore):
             user_agent=user_agent,
             cors_options=cors_options,
             async_=True,
+            additional_search_client_options=additional_search_client_options,
             azure_credential=azure_credential,
             azure_async_credential=azure_async_credential,
         )
