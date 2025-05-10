@@ -601,12 +601,14 @@ class ChatTongyi(BaseChatModel):
                 if prev_message.get("tool_calls"):
                     prev_function = prev_message["tool_calls"][index]["function"]
 
-                    function["name"] = function["name"].replace(
-                        prev_function["name"], ""
-                    )
-                    function["arguments"] = function["arguments"].replace(
-                        prev_function["arguments"], ""
-                    )
+                    if "name" in function:
+                        function["name"] = function["name"].replace(
+                            prev_function["name"], ""
+                        )
+                    if "arguments" in function:
+                        function["arguments"] = function["arguments"].replace(
+                            prev_function["arguments"], ""
+                        )
 
         return resp_copy
 
