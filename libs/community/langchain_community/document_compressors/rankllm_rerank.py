@@ -103,7 +103,7 @@ class RankLLMRerank(BaseDocumentCompressor):
             ],
         )
 
-        rerank_results = self.model_coordinator.rerank(
+        rerank_results = self.model_coordinator.rerank_batch(
             request,
             rank_end=len(documents),
             window_size=min(20, len(documents)),
