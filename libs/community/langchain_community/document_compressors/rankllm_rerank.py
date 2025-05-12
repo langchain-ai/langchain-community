@@ -28,21 +28,6 @@ else:
 class RankLLMRerank(BaseDocumentCompressor):
     """Document compressor using RankLLM with dynamic model coordinator creation."""
     
-    try:
-        from rank_llm.rerank.reranker import Reranker
-        from rank_llm.rerank import (
-            PromptMode,
-            get_azure_openai_args,
-            get_genai_api_key,
-            get_openai_api_key,
-        )
-        from rank_llm.rerank.listwise import SafeOpenai, SafeGenai
-    except ImportError as e:
-        raise ImportError(
-            "Could not import rank_llm python package. "
-            "Please install it with `pip install rank_llm`."
-        ) from e
-    
     model_path: str = Field(default="zephyr")
     """Model identifier/path (e.g., 'zephyr', 'gpt-3.5-turbo', 'castorini/monot5-3b-msmarco-10k')"""
     top_n: int = Field(default=3)
@@ -73,6 +58,21 @@ class RankLLMRerank(BaseDocumentCompressor):
     @classmethod
     def validate_environment(cls, values: Dict) -> Dict:
         """Create the appropriate RankLLM model coordinator based on model_path."""
+        
+        try:
+            from rank_llm.rerank.reranker import Reranker
+            from rank_llm.rerank import (
+                PromptMode,
+                get_azure_openai_args,
+                get_genai_api_key,
+                get_openai_api_key,
+            )
+            from rank_llm.rerank.listwise import SafeOpenai, SafeGenai
+        except ImportError as e:
+            raise ImportError(
+                "Could not import rank_llm python package. "
+                "Please install it with `pip install rank_llm`."
+            ) from e
     
         if values.get("model_coordinator") is None:
             model_path = values.get("model_path", "zephyr")
