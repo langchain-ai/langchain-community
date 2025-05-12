@@ -5,6 +5,7 @@ from enum import Enum
 from importlib.metadata import version
 from typing import TYPE_CHECKING, Any, Dict, Optional, Sequence
 
+from rank_llm.rerank import Reranker
 from rank_llm.rerank.pairwise.pairwise_rankllm import PromptMode
 
 from langchain.retrievers.document_compressors.base import BaseDocumentCompressor
@@ -102,8 +103,10 @@ class RankLLMRerank(BaseDocumentCompressor):
                 for index, doc in enumerate(documents)
             ],
         )
+        
+        reranker = Reranker(self.model_coordinator)
 
-        rerank_results = self.model_coordinator.rerank_batch(
+        rerank_results = reranker.rerank(
             request,
             rank_end=len(documents),
             window_size=min(20, len(documents)),
