@@ -5,9 +5,6 @@ from enum import Enum
 from importlib.metadata import version
 from typing import TYPE_CHECKING, Any, Dict, Optional, Sequence
 
-from rank_llm.rerank import Reranker
-from rank_llm.rerank.pairwise.pairwise_rankllm import PromptMode
-
 from langchain.retrievers.document_compressors.base import BaseDocumentCompressor
 from langchain_core.callbacks.manager import Callbacks
 from langchain_core.documents import Document
@@ -33,7 +30,7 @@ class RankLLMRerank(BaseDocumentCompressor):
     top_n: int = Field(default=3)
     window_size: int = Field(default=20)
     context_size: int = Field(default=4096)
-    prompt_mode: Any = Field(default=PromptMode.RANK_GPT)
+    prompt_mode: Any = Field()
     stride: int = Field(default=10)
     openai_api_key: Optional[str] = Field(default=None)
     genai_api_key: Optional[str] = Field(default=None)
