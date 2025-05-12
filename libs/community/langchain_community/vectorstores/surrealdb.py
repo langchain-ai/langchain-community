@@ -1,7 +1,16 @@
 from __future__ import annotations
 
 import asyncio
-from typing import TYPE_CHECKING, Any, Callable, Iterable, Optional, Sequence, Union
+from dataclasses import KW_ONLY, dataclass, field
+from typing import (
+    TYPE_CHECKING,
+    Any,
+    Callable,
+    Iterable,
+    Optional,
+    Sequence,
+    Union,
+)
 
 import numpy as np
 from langchain_core.documents import Document
@@ -40,10 +49,27 @@ GET_BY_ID_QUERY = """
 #
 # ```sh
 # surreal start -u root -p root -l debug
-# make integration_tests TEST_FILE=tests/integration_tests/vectorstores/test_surrealdb.py. # noqa: E501
+# make integration_tests TEST_FILE=tests/integration_tests/vectorstores/test_surrealdb.py  # noqa: E501
 # make format
 # make lint
 # ```
+
+
+@dataclass
+class SurrealDocument:
+    _: KW_ONLY
+    id: RecordID = field(hash=False)
+    text: str
+    embedding: list[float]
+    similarity: float | None = None
+    metadata: dict[str, Any] = field(default_factory=dict)
+
+    def into(self) -> Document:
+        return Document(
+            id=self.id.id,
+            page_content=self.text,
+            metadata=self.metadata,
+        )
 
 
 class SurrealDBStore(VectorStore):
@@ -118,42 +144,44 @@ class SurrealDBStore(VectorStore):
             raise ValueError("No connection provided")
 
     def _build_text_data(
-        self, text: str, embedding: list[float], metadata: dict | None, id: str | None
-    ) -> tuple[str, dict]:
+        self,
+        text: str,
+        embedding: list[float],
+        metadata: dict | None,
+        with_id: str | None,
+    ) -> tuple[RecordID | None, dict]:
         preferred_id = None
         data = {"text": text, "embedding": embedding, "metadata": {}}
         if metadata is not None:
             data["metadata"] = metadata
             preferred_id = metadata.get("id")
-        if id is not None:
-            preferred_id = id
+        if with_id is not None:
+            preferred_id = with_id
         record_id = (
-            RecordID(self.table, preferred_id)
-            if preferred_id is not None
-            else self.table
+            RecordID(self.table, preferred_id) if preferred_id is not None else None
         )
         return record_id, data
 
-    def _parse_documents(
-        self, ids: Sequence[str], results: list[dict]
-    ) -> list[Document]:
-        docs = {
-            x.get("id").id: Document(
-                page_content=x.get("text"),
-                metadata=x.get("metadata", {}),
-                id=x.get("id").id,
-            )
-            for x in results
-        }
+    @staticmethod
+    def _parse_documents(ids: Sequence[str], results: list[dict]) -> list[Document]:
+        docs = {}
+        for x in results:
+            doc = SurrealDocument(**x).into()
+            docs[doc.id] = doc
         # sort docs in the same order as the passed in IDs
-        return [docs.get(key) for key in ids if docs.get(key) is not None]
+        result: list[Document] = []
+        for key in ids:
+            d = docs.get(str(key))
+            if d is not None:
+                result.append(d)
+        return result
 
     def _build_search_query(
         self,
         embedding: list[float],
         k: int,
         score_threshold: float,
-        custom_filter: dict,
+        custom_filter: dict[str, str] | None,
     ) -> tuple[str, dict]:
         args = {
             "table": self.table,
@@ -198,24 +226,23 @@ class SurrealDBStore(VectorStore):
 
         return query, args
 
+    @staticmethod
     def _parse_results(
-        self, results: list[dict]
+        results: list[dict],
     ) -> list[tuple[Document, float, list[float]]]:
-        return [
-            (
-                Document(
-                    page_content=doc["text"],
-                    metadata=doc.get("metadata", {}),
-                    id=doc.get("metadata").get("id"),
+        parsed = []
+        for raw in results:
+            parsed.append(
+                (
+                    SurrealDocument(**raw).into(),
+                    raw["similarity"],
+                    raw["embedding"],
                 ),
-                doc["similarity"],
-                doc["embedding"],
             )
-            for doc in results
-        ]
+        return parsed
 
+    @staticmethod
     def _filter_documents_from_result(
-        self,
         search_result: list[tuple[Document, float, list[float]]],
         embedding: list[float],
         k: int = DEFAULT_K,
@@ -247,6 +274,8 @@ class SurrealDBStore(VectorStore):
         ids: list[str] | None = None,
         **kwargs: Any,
     ) -> list[str]:
+        if self.connection is None:
+            raise ValueError("No connection provided")
         embeddings = self.embedding.embed_documents(list(texts))
         results = []
         for idx, text in enumerate(texts):
@@ -256,7 +285,10 @@ class SurrealDBStore(VectorStore):
                 metadatas[idx] if metadatas is not None else None,
                 ids[idx] if ids is not None else None,
             )
-            results.append(self.connection.upsert(record_id, data))
+            if record_id is not None:
+                results.append(self.connection.upsert(record_id, data))
+            else:
+                results.append(self.connection.insert(self.table, data))
         result_ids = [x.get("id").id for x in results]
         return result_ids
 
@@ -269,6 +301,8 @@ class SurrealDBStore(VectorStore):
         ids: list[str] | None = None,
         **kwargs: Any,
     ) -> bool | None:
+        if self.connection is None:
+            raise ValueError("No connection provided")
         try:
             if ids is not None:
                 for id in ids:
@@ -280,6 +314,8 @@ class SurrealDBStore(VectorStore):
         return True
 
     def get_by_ids(self, ids: Sequence[str], /) -> list[Document]:
+        if self.connection is None:
+            raise ValueError("No connection provided")
         query_results = self.connection.query(
             GET_BY_ID_QUERY,
             {"table": self.table, "ids": ids},
@@ -287,6 +323,8 @@ class SurrealDBStore(VectorStore):
         return self._parse_documents(ids, query_results)
 
     async def aget_by_ids(self, ids: Sequence[str], /) -> list[Document]:
+        if self.async_connection is None:
+            raise ValueError("No async connection provided")
         query_results = await self.async_connection.query(
             GET_BY_ID_QUERY,
             {"table": self.table, "ids": ids},
@@ -296,6 +334,8 @@ class SurrealDBStore(VectorStore):
     async def adelete(
         self, ids: Optional[list[str]] = None, **kwargs: Any
     ) -> Optional[bool]:
+        if self.async_connection is None:
+            raise ValueError("No async connection provided")
         try:
             if ids is not None:
                 coroutines = [
@@ -316,6 +356,8 @@ class SurrealDBStore(VectorStore):
         ids: list[str] | None = None,
         **kwargs: Any,
     ) -> list[str]:
+        if self.async_connection is None:
+            raise ValueError("No async connection provided")
         embeddings = self.embedding.embed_documents(list(texts))
         coroutines = []
         for idx, text in enumerate(texts):
@@ -325,7 +367,10 @@ class SurrealDBStore(VectorStore):
                 metadatas[idx] if metadatas is not None else None,
                 ids[idx] if ids is not None else None,
             )
-            coroutines.append(self.async_connection.upsert(record_id, data))
+            if record_id is not None:
+                coroutines.append(self.async_connection.upsert(record_id, data))
+            else:
+                coroutines.append(self.async_connection.insert(self.table, data))
         results = await asyncio.gather(*coroutines)
         result_ids = [x.get("id") for x in results]
         return result_ids
@@ -335,12 +380,12 @@ class SurrealDBStore(VectorStore):
         query: str,
         k: int = 4,
         *,
-        filter: dict[str, str] | None = None,
+        custom_filter: dict[str, str] | None = None,
         **kwargs: Any,
     ) -> list[Document]:
         query_embedding = self.embedding.embed_query(query)
         return self.similarity_search_by_vector(
-            query_embedding, k, filter=filter, **kwargs
+            query_embedding, k, custom_filter=custom_filter, **kwargs
         )
 
     # TODO: implement
@@ -350,38 +395,32 @@ class SurrealDBStore(VectorStore):
     def similarity_search_with_score(
         self,
         *,
-        query: str,
-        k: int = DEFAULT_K,
-        filter: dict[str, str] | None = None,
-        **kwargs: Any,
-    ) -> list[tuple[Document, float]]:
-        # asimilarity_search_with_score
-        # TODO: HERE
-        ...
-
-    def _similarity_search_by_vector_with_score(
-        self,
         embedding: list[float],
         k: int = DEFAULT_K,
         score_threshold: float = -1,
-        filter: dict[str, str] | None = None,
-    ):
-        query, args = self._build_search_query(embedding, k, score_threshold, filter)
+        custom_filter: dict[str, str] | None = None,
+        **kwargs: Any,
+    ) -> list[tuple[Document, float]]:
+        if self.connection is None:
+            raise ValueError("No connection provided")
+        query, args = self._build_search_query(
+            embedding, k, score_threshold, custom_filter
+        )
         results = self.connection.query(query, args)
-        return self._parse_results(results)
+        return [(d, s) for d, s, _ in self._parse_results(results)]
 
     def similarity_search_by_vector(
         self,
         embedding: list[float],
         k: int = DEFAULT_K,
         *,
-        filter: dict[str, str] | None = None,
+        custom_filter: dict[str, str] | None = None,
         **kwargs: Any,
     ) -> list[Document]:
         return [
             document
-            for document, _, _ in self._similarity_search_by_vector_with_score(
-                embedding, k, filter=filter, **kwargs
+            for document, _ in self.similarity_search_with_score(
+                embedding=embedding, k=k, custom_filter=custom_filter, **kwargs
             )
         ]
 
@@ -392,12 +431,12 @@ class SurrealDBStore(VectorStore):
         fetch_k: int = 20,
         lambda_mult: float = 0.5,
         *,
-        filter: dict[str, str] | None = None,
+        custom_filter: dict[str, str] | None = None,
         **kwargs: Any,
     ) -> list[Document]:
         embedding = self.embedding.embed_query(query)
         docs = self.max_marginal_relevance_search_by_vector(
-            embedding, k, fetch_k, lambda_mult, filter=filter, **kwargs
+            embedding, k, fetch_k, lambda_mult, custom_filter=custom_filter, **kwargs
         )
         return docs
 
@@ -408,11 +447,11 @@ class SurrealDBStore(VectorStore):
         fetch_k: int = 20,
         lambda_mult: float = 0.5,
         *,
-        filter: dict[str, str] | None = None,
+        custom_filter: dict[str, str] | None = None,
         **kwargs: Any,
     ) -> list[Document]:
         result = self._similarity_search_by_vector_with_score(
-            embedding, fetch_k, filter=filter, **kwargs
+            embedding, fetch_k, custom_filter=custom_filter, **kwargs
         )
         return self._filter_documents_from_result(result, embedding, k, lambda_mult)
 
@@ -450,15 +489,34 @@ class SurrealDBStore(VectorStore):
     # =========================================================================
     # =========================================================================
 
+    def _similarity_search_by_vector_with_score(
+        self,
+        embedding: list[float],
+        k: int = DEFAULT_K,
+        score_threshold: float = -1,
+        custom_filter: dict[str, str] | None = None,
+    ) -> list[tuple[Document, float, list[float]]]:
+        if self.connection is None:
+            raise ValueError("No connection provided")
+        query, args = self._build_search_query(
+            embedding, k, score_threshold, custom_filter
+        )
+        results = self.connection.query(query, args)
+        return self._parse_results(results)
+
     async def _asimilarity_search_by_vector_with_score(
         self,
         embedding: list[float],
         k: int = DEFAULT_K,
         *,
-        filter: dict[str, str] | None = None,
+        custom_filter: dict[str, str] | None = None,
         score_threshold: float = -1,
     ) -> list[tuple[Document, float, list[float]]]:
-        query, args = self._build_search_query(embedding, k, score_threshold, filter)
+        if self.async_connection is None:
+            raise ValueError("No async connection provided")
+        query, args = self._build_search_query(
+            embedding, k, score_threshold, custom_filter
+        )
         results = await self.async_connection.query(query, args)
         return self._parse_results(results)
 
@@ -467,7 +525,7 @@ class SurrealDBStore(VectorStore):
         query: str,
         k: int = DEFAULT_K,
         *,
-        filter: dict[str, str] | None = None,
+        custom_filter: dict[str, str] | None = None,
         **kwargs: Any,
     ) -> list[tuple[Document, float]]:
         query_embedding = self.embedding.embed_query(query)
@@ -476,7 +534,7 @@ class SurrealDBStore(VectorStore):
             (document, similarity)
             for document, similarity, _ in (
                 await self._asimilarity_search_by_vector_with_score(
-                    query_embedding, k, filter=filter, **kwargs
+                    query_embedding, k, custom_filter=custom_filter, **kwargs
                 )
             )
         ]
@@ -486,7 +544,7 @@ class SurrealDBStore(VectorStore):
         query: str,
         k: int = DEFAULT_K,
         *,
-        filter: dict[str, str] | None = None,
+        custom_filter: dict[str, str] | None = None,
         **kwargs: Any,
     ) -> list[tuple[Document, float]]:
         query_embedding = self.embedding.embed_query(query)
@@ -494,7 +552,7 @@ class SurrealDBStore(VectorStore):
             (document, similarity)
             for document, similarity, _ in (
                 self._similarity_search_by_vector_with_score(
-                    query_embedding, k, filter=filter, **kwargs
+                    query_embedding, k, custom_filter=custom_filter, **kwargs
                 )
             )
         ]
@@ -504,14 +562,14 @@ class SurrealDBStore(VectorStore):
         embedding: list[float],
         k: int = DEFAULT_K,
         *,
-        filter: dict[str, str] | None = None,
+        custom_filter: dict[str, str] | None = None,
         **kwargs: Any,
     ) -> list[Document]:
         # TODO: improve using asyncio.gather
         return [
             document
             for document, _, _ in await self._asimilarity_search_by_vector_with_score(
-                embedding, k, filter=filter, **kwargs
+                embedding, k, custom_filter=custom_filter, **kwargs
             )
         ]
 
@@ -520,12 +578,12 @@ class SurrealDBStore(VectorStore):
         query: str,
         k: int = DEFAULT_K,
         *,
-        filter: dict[str, str] | None = None,
+        custom_filter: dict[str, str] | None = None,
         **kwargs: Any,
     ) -> list[Document]:
         query_embedding = self.embedding.embed_query(query)
         return await self.asimilarity_search_by_vector(
-            query_embedding, k, filter=filter, **kwargs
+            query_embedding, k, custom_filter=custom_filter, **kwargs
         )
 
     async def amax_marginal_relevance_search_by_vector(
@@ -535,11 +593,11 @@ class SurrealDBStore(VectorStore):
         fetch_k: int = 20,
         lambda_mult: float = 0.5,
         *,
-        filter: dict[str, str] | None = None,
+        custom_filter: dict[str, str] | None = None,
         **kwargs: Any,
     ) -> list[Document]:
         result = await self._asimilarity_search_by_vector_with_score(
-            embedding, fetch_k, filter=filter, **kwargs
+            embedding, fetch_k, custom_filter=custom_filter, **kwargs
         )
         return self._filter_documents_from_result(result, embedding, k, lambda_mult)
 
@@ -550,11 +608,11 @@ class SurrealDBStore(VectorStore):
         fetch_k: int = 20,
         lambda_mult: float = 0.5,
         *,
-        filter: dict[str, str] | None = None,
+        custom_filter: dict[str, str] | None = None,
         **kwargs: Any,
     ) -> list[Document]:
         embedding = self.embedding.embed_query(query)
         docs = await self.amax_marginal_relevance_search_by_vector(
-            embedding, k, fetch_k, lambda_mult, filter=filter, **kwargs
+            embedding, k, fetch_k, lambda_mult, custom_filter=custom_filter, **kwargs
         )
         return docs
