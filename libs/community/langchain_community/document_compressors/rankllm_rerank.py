@@ -5,6 +5,8 @@ from enum import Enum
 from importlib.metadata import version
 from typing import TYPE_CHECKING, Any, Dict, Optional, Sequence
 
+from rank_llm.rerank.reranker import Reranker
+
 from langchain.retrievers.document_compressors.base import BaseDocumentCompressor
 from langchain_core.callbacks.manager import Callbacks
 from langchain_core.documents import Document
@@ -82,7 +84,6 @@ class RankLLMRerank(BaseDocumentCompressor):
             elif "gemini" in model_path:
                 kwargs["genai_api_key"] = values.get("genai_api_key") or get_genai_api_key()
     
-            from rank_llm.rerank.reranker import Reranker
             values["model_coordinator"] = Reranker.create_model_coordinator(**kwargs)
     
         return values
