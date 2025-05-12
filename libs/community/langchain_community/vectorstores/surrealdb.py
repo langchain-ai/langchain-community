@@ -277,7 +277,7 @@ class SurrealDBStore(VectorStore):
         if self.connection is None:
             raise ValueError("No connection provided")
         embeddings = self.embedding.embed_documents(list(texts))
-        results = []
+        result_ids = []
         for idx, text in enumerate(texts):
             record_id, data = self._build_text_data(
                 text,
@@ -286,10 +286,14 @@ class SurrealDBStore(VectorStore):
                 ids[idx] if ids is not None else None,
             )
             if record_id is not None:
-                results.append(self.connection.upsert(record_id, data))
+                inserted = self.connection.upsert(record_id, data)
             else:
-                results.append(self.connection.insert(self.table, data))
-        result_ids = [x.get("id").id for x in results]
+                inserted = self.connection.insert(self.table, data)
+            if isinstance(inserted, list):
+                for record in inserted:
+                    result_ids.append(record["id"].id)
+            else:
+                result_ids.append(inserted["id"].id)
         return result_ids
 
     @property
@@ -392,22 +396,40 @@ class SurrealDBStore(VectorStore):
     def _select_relevance_score_fn(self) -> Callable[[float], float]:
         raise NotImplementedError
 
-    def similarity_search_with_score(
+    def aux(
         self,
-        *,
         embedding: list[float],
+        *,
         k: int = DEFAULT_K,
         score_threshold: float = -1,
         custom_filter: dict[str, str] | None = None,
-        **kwargs: Any,
-    ) -> list[tuple[Document, float]]:
+    ) -> list[tuple[Document, float, list[float]]]:
         if self.connection is None:
             raise ValueError("No connection provided")
         query, args = self._build_search_query(
             embedding, k, score_threshold, custom_filter
         )
         results = self.connection.query(query, args)
-        return [(d, s) for d, s, _ in self._parse_results(results)]
+        return self._parse_results(results)
+
+    def similarity_search_with_score(
+        self,
+        query: str,
+        *,
+        k: int = DEFAULT_K,
+        score_threshold: float = -1,
+        custom_filter: dict[str, str] | None = None,
+    ) -> list[tuple[Document, float]]:
+        embedding = self.embedding.embed_query(query)
+        return [
+            (d, s)
+            for d, s, _ in self.aux(
+                embedding,
+                k=k,
+                score_threshold=score_threshold,
+                custom_filter=custom_filter,
+            )
+        ]
 
     def similarity_search_by_vector(
         self,
@@ -419,8 +441,8 @@ class SurrealDBStore(VectorStore):
     ) -> list[Document]:
         return [
             document
-            for document, _ in self.similarity_search_with_score(
-                embedding=embedding, k=k, custom_filter=custom_filter, **kwargs
+            for document, _, _ in self.aux(
+                embedding=embedding, k=k, custom_filter=custom_filter
             )
         ]
 
