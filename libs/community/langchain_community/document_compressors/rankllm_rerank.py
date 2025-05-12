@@ -28,26 +28,16 @@ else:
 class RankLLMRerank(BaseDocumentCompressor):
     """Document compressor using RankLLM with dynamic model coordinator creation."""
     
-    model_path: str = Field(default="zephyr")
-    """Model identifier/path (e.g., 'zephyr', 'gpt-3.5-turbo', 'castorini/monot5-3b-msmarco-10k')"""
+    model_path: str = Field(default="rank_zephyr")
     top_n: int = Field(default=3)
-    """Number of top documents to return"""
     window_size: int = Field(default=20)
-    """Window size for sliding window reranking"""
     context_size: int = Field(default=4096)
-    """Context size for reranking documents"""
     prompt_mode: Any = Field(default=PromptMode.RANK_GPT)
-    """Prompt mode for reranking documents"""
     stride: int = Field(default=10)
-    """Stride for sliding window reranking"""
     openai_api_key: Optional[str] = Field(default=None)
-    """OpenAI API key for GPT models"""
     genai_api_key: Optional[str] = Field(default=None)
-    """GenAI API key for Gemini models"""
     use_azure_openai: bool = Field(default=False)
-    """Whether to use Azure OpenAI"""
     model_coordinator: Any = Field(default=None, exclude=True)
-    """The RankLLM model coordinator instance"""
     
     model_config = ConfigDict(
         arbitrary_types_allowed=True,
@@ -75,7 +65,7 @@ class RankLLMRerank(BaseDocumentCompressor):
             ) from e
     
         if values.get("model_coordinator") is None:
-            model_path = values.get("model_path", "zephyr")
+            model_path = values.get("model_path", "rank_zephyr")
             kwargs = {
                 "model_path": model_path,
                 "default_model_coordinator": None,
