@@ -5,6 +5,8 @@ from enum import Enum
 from importlib.metadata import version
 from typing import TYPE_CHECKING, Any, Dict, Optional, Sequence
 
+from rank_llm.rerank.pairwise.pairwise_rankllm import PromptMode
+
 from langchain.retrievers.document_compressors.base import BaseDocumentCompressor
 from langchain_core.callbacks.manager import Callbacks
 from langchain_core.documents import Document
@@ -24,20 +26,44 @@ else:
 
 
 class RankLLMRerank(BaseDocumentCompressor):
-    """Document compressor using Flashrank interface."""
-
-    client: Any = None
-    """RankLLM client to use for compressing documents"""
+    """Document compressor using RankLLM with dynamic model coordinator creation."""
+    
+    try:
+        from rank_llm.rerank.reranker import Reranker
+        from rank_llm.rerank import (
+            PromptMode,
+            get_azure_openai_args,
+            get_genai_api_key,
+            get_openai_api_key,
+        )
+        from rank_llm.rerank.listwise import SafeOpenai, SafeGenai
+    except ImportError as e:
+        raise ImportError(
+            "Could not import rank_llm python package. "
+            "Please install it with `pip install rank_llm`."
+        ) from e
+    
+    model_path: str = Field(default="zephyr")
+    """Model identifier/path (e.g., 'zephyr', 'gpt-3.5-turbo', 'castorini/monot5-3b-msmarco-10k')"""
     top_n: int = Field(default=3)
-    """Top N documents to return."""
-    model: str = Field(default="zephyr")
-    """Name of model to use for reranking."""
-    step_size: int = Field(default=10)
-    """Step size for moving sliding window."""
-    gpt_model: str = Field(default="gpt-3.5-turbo")
-    """OpenAI model name."""
-    _retriever: Any = PrivateAttr()
-
+    """Number of top documents to return"""
+    window_size: int = Field(default=20)
+    """Window size for sliding window reranking"""
+    context_size: int = Field(default=4096)
+    """Context size for reranking documents"""
+    prompt_mode: Any = Field(default=PromptMode.RANK_GPT)
+    """Prompt mode for reranking documents"""
+    stride: int = Field(default=10)
+    """Stride for sliding window reranking"""
+    openai_api_key: Optional[str] = Field(default=None)
+    """OpenAI API key for GPT models"""
+    genai_api_key: Optional[str] = Field(default=None)
+    """GenAI API key for Gemini models"""
+    use_azure_openai: bool = Field(default=False)
+    """Whether to use Azure OpenAI"""
+    model_coordinator: Any = Field(default=None, exclude=True)
+    """The RankLLM model coordinator instance"""
+    
     model_config = ConfigDict(
         arbitrary_types_allowed=True,
         extra="forbid",
@@ -45,67 +71,32 @@ class RankLLMRerank(BaseDocumentCompressor):
 
     @model_validator(mode="before")
     @classmethod
-    def validate_environment(cls, values: Dict) -> Any:
-        """Validate python package exists in environment."""
-
-        if not values.get("client"):
-            client_name = values.get("model", "zephyr")
-
-            is_pre_rank_llm_revamp = Version(version=version("rank_llm")) <= Version(
-                "0.12.8"
-            )
-
-            try:
-                model_enum = ModelType(client_name.lower())
-            except ValueError:
-                raise ValueError(
-                    "Unsupported model type. Please use 'vicuna', 'zephyr', or 'gpt'."
+    def validate_environment(cls, values: Dict) -> Dict:
+        """Create the appropriate RankLLM model coordinator based on model_path."""
+    
+        if values.get("model_coordinator") is None:
+            model_path = values.get("model_path", "zephyr")
+            kwargs = {
+                "model_path": model_path,
+                "default_model_coordinator": None,
+                "context_size": values.get("context_size", 4096),
+                "prompt_mode": values.get("prompt_mode", PromptMode.RANK_GPT),
+                "interactive": False,
+                "window_size": values.get("window_size", 20),
+                "stride": values.get("stride", 10),
+                "use_azure_openai": values.get("use_azure_openai", False),
+            }
+    
+            if "gpt" in model_path or kwargs["use_azure_openai"]:
+                kwargs["openai_api_key"] = values.get("openai_api_key") or get_from_dict_or_env(
+                    values, "openai_api_key", "OPENAI_API_KEY"
                 )
-
-            try:
-                if model_enum == ModelType.VICUNA:
-                    if is_pre_rank_llm_revamp:
-                        from rank_llm.rerank.vicuna_reranker import VicunaReranker
-                    else:
-                        from rank_llm.rerank.listwise.vicuna_reranker import (
-                            VicunaReranker,
-                        )
-
-                    values["client"] = VicunaReranker()
-                elif model_enum == ModelType.ZEPHYR:
-                    if is_pre_rank_llm_revamp:
-                        from rank_llm.rerank.zephyr_reranker import ZephyrReranker
-                    else:
-                        from rank_llm.rerank.listwise.zephyr_reranker import (
-                            ZephyrReranker,
-                        )
-
-                    values["client"] = ZephyrReranker()
-                elif model_enum == ModelType.GPT:
-                    if is_pre_rank_llm_revamp:
-                        from rank_llm.rerank.rank_gpt import SafeOpenai
-                    else:
-                        from rank_llm.rerank.listwise.rank_gpt import SafeOpenai
-
-                    from rank_llm.rerank.reranker import Reranker
-
-                    openai_api_key = get_from_dict_or_env(
-                        values, "open_api_key", "OPENAI_API_KEY"
-                    )
-
-                    agent = SafeOpenai(
-                        model=values["gpt_model"],
-                        context_size=4096,
-                        keys=openai_api_key,
-                    )
-                    values["client"] = Reranker(agent)
-
-            except ImportError:
-                raise ImportError(
-                    "Could not import rank_llm python package. "
-                    "Please install it with `pip install rank_llm`."
-                )
-
+            elif "gemini" in model_path:
+                kwargs["genai_api_key"] = values.get("genai_api_key") or get_genai_api_key()
+    
+            from rank_llm.rerank.reranker import Reranker
+            values["client"] = Reranker.create_model_coordinator(**kwargs)
+    
         return values
 
     def compress_documents(
@@ -129,23 +120,19 @@ class RankLLMRerank(BaseDocumentCompressor):
             step=10,
         )
 
+        # Handle results
+        reranked_candidates = rerank_results.candidates if hasattr(rerank_results, "candidates") else rerank_results
+        
+        # Create new Document objects with original metadata
         final_results = []
-        if hasattr(rerank_results, "candidates"):
-            # Old API format
-            for res in rerank_results.candidates:
-                doc = documents[int(res.docid)]
-                doc_copy = Document(doc.page_content, metadata=deepcopy(doc.metadata))
-                final_results.append(doc_copy)
-        else:
-            for res in rerank_results:
-                doc = documents[int(res.docid)]
-                doc_copy = Document(doc.page_content, metadata=deepcopy(doc.metadata))
-                final_results.append(doc_copy)
-
-        return final_results[: self.top_n]
-
-
-class ModelType(Enum):
-    VICUNA = "vicuna"
-    ZEPHYR = "zephyr"
-    GPT = "gpt"
+        for candidate in reranked_candidates[:self.top_n]:
+            orig_idx = int(candidate.docid)
+            if orig_idx < len(documents):
+                doc = documents[orig_idx]
+                new_doc = Document(
+                    page_content=doc.page_content,
+                    metadata=deepcopy(doc.metadata)
+                )
+                final_results.append(new_doc)
+        
+        return final_results
