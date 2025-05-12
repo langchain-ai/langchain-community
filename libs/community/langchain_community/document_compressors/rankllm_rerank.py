@@ -30,7 +30,7 @@ class RankLLMRerank(BaseDocumentCompressor):
     top_n: int = Field(default=3)
     window_size: int = Field(default=20)
     context_size: int = Field(default=4096)
-    prompt_mode: Any = Field(default=PromptMode.RANK_GPT)
+    prompt_mode: str = Field(default="rank_GPT")
     stride: int = Field(default=10)
     openai_api_key: Optional[str] = Field(default=None)
     genai_api_key: Optional[str] = Field(default=None)
