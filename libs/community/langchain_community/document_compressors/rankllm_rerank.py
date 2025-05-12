@@ -85,7 +85,7 @@ class RankLLMRerank(BaseDocumentCompressor):
                 kwargs["genai_api_key"] = values.get("genai_api_key") or get_genai_api_key()
     
             from rank_llm.rerank.reranker import Reranker
-            values["client"] = Reranker.create_model_coordinator(**kwargs)
+            values["model_coordinator"] = Reranker.create_model_coordinator(**kwargs)
     
         return values
 
@@ -103,7 +103,7 @@ class RankLLMRerank(BaseDocumentCompressor):
             ],
         )
 
-        rerank_results = self.client.rerank(
+        rerank_results = self.model_coordinator.rerank(
             request,
             rank_end=len(documents),
             window_size=min(20, len(documents)),
