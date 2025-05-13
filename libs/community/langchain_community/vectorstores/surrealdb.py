@@ -133,9 +133,7 @@ class SurrealDBStore(VectorStore):
         """
         if self.async_connection is not None:
             loop = asyncio.get_event_loop()
-            loop.create_task(
-                self.async_connection.query(query)
-            )
+            loop.create_task(self.async_connection.query(query))
         elif self.connection is not None:
             self.connection.query(query)
         else:
@@ -261,12 +259,12 @@ class SurrealDBStore(VectorStore):
         return [docs[i] for i in mmr_selected]
 
     def _aux(
-            self,
-            embedding: list[float],
-            *,
-            k: int = DEFAULT_K,
-            score_threshold: float = -1,
-            custom_filter: dict[str, str] | None = None,
+        self,
+        embedding: list[float],
+        *,
+        k: int = DEFAULT_K,
+        score_threshold: float = -1,
+        custom_filter: dict[str, str] | None = None,
     ) -> list[tuple[Document, float, list[float]]]:
         if self.connection is None:
             raise ValueError("No connection provided")
@@ -315,12 +313,12 @@ class SurrealDBStore(VectorStore):
         return result_ids
 
     async def aadd_texts(
-            self,
-            texts: Iterable[str],
-            metadatas: list[dict] | None = None,
-            *,
-            ids: list[str] | None = None,
-            **kwargs: Any,
+        self,
+        texts: Iterable[str],
+        metadatas: list[dict] | None = None,
+        *,
+        ids: list[str] | None = None,
+        **kwargs: Any,
     ) -> list[str]:
         if self.async_connection is None:
             raise ValueError("No async connection provided")
@@ -365,7 +363,7 @@ class SurrealDBStore(VectorStore):
         return True
 
     async def adelete(
-            self, ids: Optional[list[str]] = None, **kwargs: Any
+        self, ids: Optional[list[str]] = None, **kwargs: Any
     ) -> Optional[bool]:
         if self.async_connection is None:
             raise ValueError("No async connection provided")
