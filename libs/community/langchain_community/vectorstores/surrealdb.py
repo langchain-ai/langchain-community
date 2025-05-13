@@ -124,22 +124,20 @@ class SurrealDBStore(VectorStore):
         self._ensure_index()
 
     def _ensure_index(self) -> None:
+        query = f"""
+            DEFINE INDEX IF NOT EXISTS {self.index_name}
+                ON TABLE {self.table}
+                FIELDS embedding
+                MTREE DIMENSION {self.embedding_dimension} DIST COSINE TYPE F32
+                CONCURRENTLY;
+        """
         if self.async_connection is not None:
-            self.async_connection.query(f"""
-                DEFINE INDEX IF NOT EXISTS {self.index_name}
-                    ON TABLE {self.table}
-                    FIELDS embedding
-                    MTREE DIMENSION {self.embedding_dimension} DIST COSINE TYPE F32
-                    CONCURRENTLY;
-            """)
+            loop = asyncio.get_event_loop()
+            loop.create_task(
+                self.async_connection.query(query)
+            )
         elif self.connection is not None:
-            self.connection.query(f"""
-                DEFINE INDEX IF NOT EXISTS {self.index_name}
-                    ON TABLE {self.table}
-                    FIELDS embedding
-                    MTREE DIMENSION {self.embedding_dimension} DIST COSINE TYPE F32
-                    CONCURRENTLY;
-            """)
+            self.connection.query(query)
         else:
             raise ValueError("No connection provided")
 
@@ -262,9 +260,29 @@ class SurrealDBStore(VectorStore):
 
         return [docs[i] for i in mmr_selected]
 
+    def _aux(
+            self,
+            embedding: list[float],
+            *,
+            k: int = DEFAULT_K,
+            score_threshold: float = -1,
+            custom_filter: dict[str, str] | None = None,
+    ) -> list[tuple[Document, float, list[float]]]:
+        if self.connection is None:
+            raise ValueError("No connection provided")
+        query, args = self._build_search_query(
+            embedding, k, score_threshold, custom_filter
+        )
+        results = self.connection.query(query, args)
+        return self._parse_results(results)
+
     # =========================================================================
     # == Extended methods
     # =========================================================================
+
+    @property
+    def embeddings(self) -> Embeddings | None:
+        return self.embedding if isinstance(self.embedding, Embeddings) else None
 
     def add_texts(
         self,
@@ -296,9 +314,38 @@ class SurrealDBStore(VectorStore):
                 result_ids.append(inserted["id"].id)
         return result_ids
 
-    @property
-    def embeddings(self) -> Embeddings | None:
-        return self.embedding if isinstance(self.embedding, Embeddings) else None
+    async def aadd_texts(
+            self,
+            texts: Iterable[str],
+            metadatas: list[dict] | None = None,
+            *,
+            ids: list[str] | None = None,
+            **kwargs: Any,
+    ) -> list[str]:
+        if self.async_connection is None:
+            raise ValueError("No async connection provided")
+        embeddings = self.embedding.embed_documents(list(texts))
+        result_ids = []
+        coroutines = []
+        for idx, text in enumerate(texts):
+            record_id, data = self._build_text_data(
+                text,
+                embeddings[idx],
+                metadatas[idx] if metadatas is not None else None,
+                ids[idx] if ids is not None else None,
+            )
+            if record_id is not None:
+                coroutines.append(self.async_connection.upsert(record_id, data))
+            else:
+                coroutines.append(self.async_connection.insert(self.table, data))
+        results = await asyncio.gather(*coroutines)
+        for inserted in results:
+            if isinstance(inserted, list):
+                for record in inserted:
+                    result_ids.append(record["id"].id)
+            elif isinstance(inserted, dict):
+                result_ids.append(inserted["id"].id)
+        return result_ids
 
     def delete(
         self,
@@ -313,6 +360,23 @@ class SurrealDBStore(VectorStore):
                     self.connection.delete(RecordID(self.table, id))
             else:
                 self.connection.delete(self.table)
+        except Exception as _e:
+            return False
+        return True
+
+    async def adelete(
+            self, ids: Optional[list[str]] = None, **kwargs: Any
+    ) -> Optional[bool]:
+        if self.async_connection is None:
+            raise ValueError("No async connection provided")
+        try:
+            if ids is not None:
+                coroutines = [
+                    self.async_connection.delete(RecordID(self.table, id)) for id in ids
+                ]
+                await asyncio.gather(*coroutines)
+            else:
+                await self.async_connection.delete(self.table)
         except Exception as _e:
             return False
         return True
@@ -335,50 +399,6 @@ class SurrealDBStore(VectorStore):
         )
         return self._parse_documents(ids, query_results)
 
-    async def adelete(
-        self, ids: Optional[list[str]] = None, **kwargs: Any
-    ) -> Optional[bool]:
-        if self.async_connection is None:
-            raise ValueError("No async connection provided")
-        try:
-            if ids is not None:
-                coroutines = [
-                    self.async_connection.delete(RecordID(self.table, id)) for id in ids
-                ]
-                await asyncio.gather(*coroutines)
-            else:
-                await self.async_connection.delete(self.table)
-        except Exception as _e:
-            return False
-        return True
-
-    async def aadd_texts(
-        self,
-        texts: Iterable[str],
-        metadatas: list[dict] | None = None,
-        *,
-        ids: list[str] | None = None,
-        **kwargs: Any,
-    ) -> list[str]:
-        if self.async_connection is None:
-            raise ValueError("No async connection provided")
-        embeddings = self.embedding.embed_documents(list(texts))
-        coroutines = []
-        for idx, text in enumerate(texts):
-            record_id, data = self._build_text_data(
-                text,
-                embeddings[idx],
-                metadatas[idx] if metadatas is not None else None,
-                ids[idx] if ids is not None else None,
-            )
-            if record_id is not None:
-                coroutines.append(self.async_connection.upsert(record_id, data))
-            else:
-                coroutines.append(self.async_connection.insert(self.table, data))
-        results = await asyncio.gather(*coroutines)
-        result_ids = [x.get("id") for x in results]
-        return result_ids
-
     def similarity_search(
         self,
         query: str,
@@ -392,26 +412,6 @@ class SurrealDBStore(VectorStore):
             query_embedding, k, custom_filter=custom_filter, **kwargs
         )
 
-    # TODO: implement
-    def _select_relevance_score_fn(self) -> Callable[[float], float]:
-        raise NotImplementedError
-
-    def aux(
-        self,
-        embedding: list[float],
-        *,
-        k: int = DEFAULT_K,
-        score_threshold: float = -1,
-        custom_filter: dict[str, str] | None = None,
-    ) -> list[tuple[Document, float, list[float]]]:
-        if self.connection is None:
-            raise ValueError("No connection provided")
-        query, args = self._build_search_query(
-            embedding, k, score_threshold, custom_filter
-        )
-        results = self.connection.query(query, args)
-        return self._parse_results(results)
-
     def similarity_search_with_score(
         self,
         query: str,
@@ -423,7 +423,7 @@ class SurrealDBStore(VectorStore):
         embedding = self.embedding.embed_query(query)
         return [
             (d, s)
-            for d, s, _ in self.aux(
+            for d, s, _ in self._aux(
                 embedding,
                 k=k,
                 score_threshold=score_threshold,
@@ -441,7 +441,7 @@ class SurrealDBStore(VectorStore):
     ) -> list[Document]:
         return [
             document
-            for document, _, _ in self.aux(
+            for document, _, _ in self._aux(
                 embedding=embedding, k=k, custom_filter=custom_filter
             )
         ]
@@ -506,6 +506,10 @@ class SurrealDBStore(VectorStore):
         store = SurrealDBStore(embedding, None, async_connection=connection)
         await store.aadd_texts(texts, metadatas)
         return store
+
+    # TODO: implement
+    def _select_relevance_score_fn(self) -> Callable[[float], float]:
+        raise NotImplementedError
 
     # =========================================================================
     # =========================================================================
