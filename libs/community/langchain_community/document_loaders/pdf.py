@@ -434,6 +434,7 @@ class PyPDFium2Loader(BasePDFLoader):
     since="0.3.24",
     removal="1.0",
     alternative="langchain_community.document_loaders.generic.GenericLoader",
+    message="Use GenericLoader and PyPDFParser instead."
 )
 class PyPDFDirectoryLoader(BaseLoader):
     """Load and parse a directory of PDF files using 'pypdf' library.
