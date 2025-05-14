@@ -70,6 +70,7 @@ class SitemapLoader(WebBaseLoader):
         If the site map is a local file, no such risk mitigation is applied by default.
 
         Use the filter URLs argument to limit which URLs can be loaded.
+        Use the exclude URLs argument to prevent specific URLs from being loaded.
 
         See https://python.langchain.com/docs/security
     """
@@ -78,6 +79,7 @@ class SitemapLoader(WebBaseLoader):
         self,
         web_path: str,
         filter_urls: Optional[List[str]] = None,
+        exclude_urls: Optional[List[str]] = None,
         parsing_function: Optional[Callable] = None,
         blocksize: Optional[int] = None,
         blocknum: int = 0,
@@ -101,6 +103,9 @@ class SitemapLoader(WebBaseLoader):
                 `.` rather than any character.
                 restrict_to_same_domain takes precedence over filter_urls when
                 restrict_to_same_domain is True and the sitemap is not a local file.
+            exclude_urls: a list of regexes. If specified, URLs matching any of these
+                patterns will NOT be loaded, even if they match patterns in filter_urls.
+                Like filter_urls, these are interpreted as regular expressions.
             parsing_function: Function to parse bs4.Soup output
             blocksize: number of sitemap locations per block
             blocknum: the number of the block that should be loaded - zero indexed.
@@ -139,6 +144,7 @@ class SitemapLoader(WebBaseLoader):
         # restrict_to_same_domain takes precedence over filter_urls when
         # restrict_to_same_domain is True and the sitemap is not a local file.
         self.allow_url_patterns = filter_urls
+        self.exclude_url_patterns = exclude_urls
         self.restrict_to_same_domain = restrict_to_same_domain
         self.parsing_function = parsing_function or _default_parsing_function
         self.meta_function = meta_function or _default_meta_function
@@ -180,6 +186,12 @@ class SitemapLoader(WebBaseLoader):
             if self.allow_url_patterns and not any(
                 re.match(regexp_pattern, loc_text)
                 for regexp_pattern in self.allow_url_patterns
+            ):
+                continue
+
+            if self.exclude_url_patterns and any(
+                re.match(regexp_pattern, loc_text)
+                for regexp_pattern in self.exclude_url_patterns
             ):
                 continue
 

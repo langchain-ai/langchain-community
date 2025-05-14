@@ -84,6 +84,26 @@ def test_filter_sitemap() -> None:
     assert "LangChain Python API" in documents[0].page_content
 
 
+def test_exclude_sitemap() -> None:
+    """Test sitemap loader with exclude_urls parameter."""
+    # First load without exclusion to get total count
+    loader_all = SitemapLoader("https://api.python.langchain.com/sitemap.xml")
+    documents_all = loader_all.load()
+    total_count = len(documents_all)
+    
+    # Then load with exclusion of the main page
+    loader = SitemapLoader(
+        "https://api.python.langchain.com/sitemap.xml",
+        exclude_urls=["https://api.python.langchain.com/en/latest/"],
+    )
+    documents = loader.load()
+    assert len(documents) == total_count - 1
+    
+    # Verify the excluded URL is not in the results
+    for doc in documents:
+        assert doc.metadata["loc"] != "https://js.langchain.com/search"
+
+
 def test_sitemap_metadata() -> None:
     def sitemap_metadata_one(meta: dict, _content: None) -> dict:
         return {**meta, "mykey": "Super Important Metadata"}

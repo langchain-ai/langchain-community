@@ -27,7 +27,7 @@ class DocusaurusLoader(SitemapLoader):
             url: The base URL of the Docusaurus website.
             custom_html_tags: Optional custom html tags to extract content from pages.
             kwargs: Additional args to extend the underlying SitemapLoader, for example:
-                filter_urls, blocksize, meta_function, is_local, continue_on_failure
+                filter_urls, exclude_urls, blocksize, meta_function, is_local, continue_on_failure
         """
         if not kwargs.get("is_local"):
             url = f"{url}/sitemap.xml"
