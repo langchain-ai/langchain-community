@@ -33,6 +33,12 @@ class RankLLMRerank(BaseDocumentCompressor):
     window_size: int = Field(default=20)
     context_size: int = Field(default=4096)
     prompt_mode: str = Field(default="rank_GPT")
+    num_gpus: int = Field(default=1)
+    num_few_shot_examples: int = Field(default=0)
+    few_shot_file: Optional[str] = Field(default=None)
+    use_logits: bool = Field(default=False)
+    use_alpha: bool = Field(default=False)
+    variable_passages: bool = Field(default=False)
     stride: int = Field(default=10)
     openai_api_key: Optional[str] = Field(default=None)
     genai_api_key: Optional[str] = Field(default=None)
@@ -71,18 +77,17 @@ class RankLLMRerank(BaseDocumentCompressor):
                 "default_model_coordinator": None,
                 "context_size": values.get("context_size", 4096),
                 "prompt_mode": values.get("prompt_mode", PromptMode.RANK_GPT),
+                "num_gpus": values.get("num_gpus", 1),
+                "use_logits": values.get("use_logits", False),
+                "use_alpha": values.get("use_alpha", False),
+                "num_few_shot_examples": values.get("num_few_shot_examples", 0),
+                "few_shot_file": values.get("few_shot_file", None),
+                "variable_passages": values.get("variable_passages", False),
                 "interactive": False,
                 "window_size": values.get("window_size", 20),
                 "stride": values.get("stride", 10),
                 "use_azure_openai": values.get("use_azure_openai", False),
             }
-    
-            if "gpt" in model_path or kwargs["use_azure_openai"]:
-                kwargs["openai_api_key"] = values.get("openai_api_key") or get_from_dict_or_env(
-                    values, "openai_api_key", "OPENAI_API_KEY"
-                )
-            elif "gemini" in model_path:
-                kwargs["genai_api_key"] = values.get("genai_api_key") or get_genai_api_key()
     
             values["model_coordinator"] = Reranker.create_model_coordinator(**kwargs)
     
