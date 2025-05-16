@@ -40,8 +40,6 @@ class RankLLMRerank(BaseDocumentCompressor):
     use_alpha: bool = Field(default=False)
     variable_passages: bool = Field(default=False)
     stride: int = Field(default=10)
-    openai_api_key: Optional[str] = Field(default=None)
-    genai_api_key: Optional[str] = Field(default=None)
     use_azure_openai: bool = Field(default=False)
     model_coordinator: Any = Field(default=None, exclude=True)
     
