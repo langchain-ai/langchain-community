@@ -191,6 +191,7 @@ class AzureCosmosDBNoSqlVectorSearch(VectorStore):
         self,
         texts: Iterable[str],
         metadatas: Optional[List[dict]] = None,
+        ids: Optional[List[str]] = None,
         **kwargs: Any,
     ) -> List[str]:
         """Run more texts through the embeddings and add to the vectorstore.
@@ -203,11 +204,12 @@ class AzureCosmosDBNoSqlVectorSearch(VectorStore):
             List of ids from adding the texts into the vectorstore.
         """
         _metadatas = list(metadatas if metadatas is not None else ({} for _ in texts))
+        _ids = list(ids if ids is not None else (str(uuid.uuid4()) for _ in texts))
 
-        return self._insert_texts(list(texts), _metadatas)
+        return self._insert_texts(list(texts), _metadatas, _ids)
 
     def _insert_texts(
-        self, texts: List[str], metadatas: List[Dict[str, Any]]
+        self, texts: List[str], metadatas: List[Dict[str, Any]], ids: List[str]
     ) -> List[str]:
         """Used to Load Documents into the collection
 
@@ -228,12 +230,12 @@ class AzureCosmosDBNoSqlVectorSearch(VectorStore):
 
         to_insert = [
             {
-                "id": str(uuid.uuid4()),
+                "id": i,
                 text_key: t,
                 self._embedding_key: embedding,
                 "metadata": m,
             }
-            for t, m, embedding in zip(texts, metadatas, embeddings)
+            for i, t, m, embedding in zip(ids, texts, metadatas, embeddings)
         ]
         # insert the documents in CosmosDB No Sql
         doc_ids: List[str] = []
@@ -294,6 +296,7 @@ class AzureCosmosDBNoSqlVectorSearch(VectorStore):
         texts: List[str],
         embedding: Embeddings,
         metadatas: Optional[List[dict]] = None,
+        ids: Optional[List[str]] = None,
         **kwargs: Any,
     ) -> AzureCosmosDBNoSqlVectorSearch:
         """Create an AzureCosmosDBNoSqlVectorSearch vectorstore from raw texts.
@@ -314,6 +317,7 @@ class AzureCosmosDBNoSqlVectorSearch(VectorStore):
         vectorstore.add_texts(
             texts=texts,
             metadatas=metadatas,
+            ids=ids,
         )
         return vectorstore
 
@@ -325,6 +329,7 @@ class AzureCosmosDBNoSqlVectorSearch(VectorStore):
         texts: List[str],
         embedding: Embeddings,
         metadatas: Optional[List[dict]] = None,
+        ids: Optional[List[str]] = None,
         **kwargs: Any,
     ) -> AzureCosmosDBNoSqlVectorSearch:
         cosmos_client = CosmosClient(
@@ -335,6 +340,7 @@ class AzureCosmosDBNoSqlVectorSearch(VectorStore):
         vectorstore.add_texts(
             texts=texts,
             metadatas=metadatas,
+            ids=ids,
         )
         return vectorstore
 
@@ -354,6 +360,7 @@ class AzureCosmosDBNoSqlVectorSearch(VectorStore):
         vectorstore.add_texts(
             texts=texts,
             metadatas=metadatas,
+            ids=ids,
         )
         return vectorstore
 
