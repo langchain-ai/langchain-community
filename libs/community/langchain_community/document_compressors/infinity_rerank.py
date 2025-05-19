@@ -35,6 +35,9 @@ class InfinityRerank(BaseDocumentCompressor):
     model: Optional[str] = None
     """Model to use for reranking."""
 
+    score_threshold: float = 0.0
+    """Minimum relevance threshold to return."""
+
     top_n: Optional[int] = 3
     """Number of documents to return."""
 
@@ -131,8 +134,9 @@ class InfinityRerank(BaseDocumentCompressor):
         """
         compressed = []
         for res in self.rerank(documents, query):
-            doc = documents[res["index"]]
-            doc_copy = Document(doc.page_content, metadata=deepcopy(doc.metadata))
-            doc_copy.metadata["relevance_score"] = res["relevance_score"]
-            compressed.append(doc_copy)
+            if res["relevance_score"] >= self.score_threshold:
+                doc = documents[res["index"]]
+                doc_copy = Document(doc.page_content, metadata=deepcopy(doc.metadata))
+                doc_copy.metadata["relevance_score"] = res["relevance_score"]
+                compressed.append(doc_copy)
         return compressed
