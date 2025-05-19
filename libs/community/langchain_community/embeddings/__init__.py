@@ -197,6 +197,9 @@ if TYPE_CHECKING:
     from langchain_community.embeddings.sagemaker_endpoint import (
         SagemakerEndpointEmbeddings,
     )
+    from langchain_community.embeddings.replicate import (
+        ReplicateEmbeddings,
+    )
     from langchain_community.embeddings.sambanova import (
         SambaStudioEmbeddings,
     )
@@ -312,6 +315,7 @@ __all__ = [
     "QianfanEmbeddingsEndpoint",
     "QuantizedBgeEmbeddings",
     "QuantizedBiEncoderEmbeddings",
+    "ReplicateEmbeddings",
     "SagemakerEndpointEmbeddings",
     "SambaStudioEmbeddings",
     "SelfHostedEmbeddings",
@@ -396,6 +400,7 @@ _module_lookup = {
     "QuantizedBiEncoderEmbeddings": "langchain_community.embeddings.optimum_intel",
     "OracleEmbeddings": "langchain_community.embeddings.oracleai",
     "OVHCloudEmbeddings": "langchain_community.embeddings.ovhcloud",
+    "ReplicateEmbeddings": "langchain_community.embeddings.replicate",
     "SagemakerEndpointEmbeddings": "langchain_community.embeddings.sagemaker_endpoint",
     "SambaStudioEmbeddings": "langchain_community.embeddings.sambanova",
     "SelfHostedEmbeddings": "langchain_community.embeddings.self_hosted",
