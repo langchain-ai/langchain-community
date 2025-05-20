@@ -5,7 +5,7 @@ build-backend = "pdm.backend"
 [project]
 authors = []
 license = { text = "MIT" }
-requires-python = ">=3.9"
+requires-python =">=3.9, <4.0"
 dependencies = [
     "langchain-core<1.0.0,>=0.3.59",
     "langchain<1.0.0,>=0.3.25",
@@ -30,6 +30,26 @@ readme = "README.md"
 "Source Code" = "https://github.com/langchain-ai/langchain-community/tree/main/libs/community"
 "Release Notes" = "https://github.com/langchain-ai/langchain/releases?q=tag%3A%22langchain-community%3D%3D0%22&expanded=true"
 repository = "https://github.com/langchain-ai/langchain-community"
+
+[tool.poetry.group.dev.dependencies]
+pytest = ">=7.4.4,<8.0.0"
+pytest-cov = ">=4.1.0,<5.0.0"
+pytest-dotenv = ">=0.5.2,<1.0.0"
+duckdb-engine = ">=0.13.6,<1.0.0"
+pytest-watcher = ">=0.2.6,<1.0.0"
+freezegun = ">=1.2.2,<2.0.0"
+responses = ">=0.22.0,<1.0.0"
+pytest-asyncio = ">=0.20.3,<1.0.0"
+lark = ">=1.1.5,<2.0.0"
+pandas = ">=2.0.0,<3.0.0"
+pytest-mock = ">=3.10.0,<4.0.0"
+pytest-socket = ">=0.6.0,<1.0.0"
+syrupy = ">=4.0.2,<5.0.0"
+requests-mock = ">=1.11.0,<2.0.0"
+pytest-xdist = ">=3.6.1,<4.0.0"
+blockbuster = ">=1.5.18,<1.6"
+langchain-tests = "*"
+toml = ">=0.10.2"
 
 [dependency-groups]
 test = [
