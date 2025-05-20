@@ -408,7 +408,7 @@ class HuggingFaceBgeEmbeddings(BaseModel, Embeddings):
 @deprecated(
     since="0.2.2",
     removal="1.0",
-    alternative_import="langchain_huggingface.HuggingFaceEmbeddings",
+    alternative_import="langchain_huggingface.HuggingFaceEndpointEmbeddings",
 )
 class HuggingFaceInferenceAPIEmbeddings(BaseModel, Embeddings):
     """Embed texts using the HuggingFace API.
