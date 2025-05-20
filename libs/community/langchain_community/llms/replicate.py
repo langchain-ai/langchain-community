@@ -6,11 +6,11 @@ from typing import TYPE_CHECKING, Any, Dict, Iterator, List, Optional
 from langchain_core.callbacks import CallbackManagerForLLMRun
 from langchain_core.language_models.llms import LLM
 from langchain_core.outputs import GenerationChunk
-from langchain_core.utils import get_from_dict_or_env, pre_init
 from langchain_core.utils.pydantic import get_fields
-from pydantic import ConfigDict, Field, model_validator
+from pydantic import ConfigDict, Field, PrivateAttr, model_validator
 
 if TYPE_CHECKING:
+    from replicate.client import Client
     from replicate.prediction import Prediction
 
 logger = logging.getLogger(__name__)
@@ -56,6 +56,8 @@ class Replicate(LLM):
     stop: List[str] = Field(default_factory=list)
     """Stop sequences to early-terminate generation."""
 
+    _replicate_client: Optional[Client] = PrivateAttr(default=None)
+
     model_config = ConfigDict(
         populate_by_name=True,
         extra="forbid",
@@ -96,15 +98,6 @@ class Replicate(LLM):
                 )
                 extra[field_name] = values.pop(field_name)
         values["model_kwargs"] = extra
-        return values
-
-    @pre_init
-    def validate_environment(cls, values: Dict) -> Dict:
-        """Validate that api key and python package exists in environment."""
-        replicate_api_token = get_from_dict_or_env(
-            values, "replicate_api_token", "REPLICATE_API_TOKEN"
-        )
-        values["replicate_api_token"] = replicate_api_token
         return values
 
     @property
@@ -196,14 +189,21 @@ class Replicate(LLM):
                 "Please install it with `pip install replicate`."
             )
 
+        # get the replicate client
+        if self._replicate_client is None:
+            self._replicate_client = (
+                replicate_python.Client(api_token=self.replicate_api_token)
+                if self.replicate_api_token
+                else replicate_python.default_client
+            )
         # get the model and version
         if self.version_obj is None:
             if ":" in self.model:
                 model_str, version_str = self.model.split(":")
-                model = replicate_python.models.get(model_str)
+                model = self._replicate_client.models.get(model_str)
                 self.version_obj = model.versions.get(version_str)
             else:
-                model = replicate_python.models.get(self.model)
+                model = self._replicate_client.models.get(self.model)
                 self.version_obj = model.latest_version
 
         if self.prompt_key is None:
@@ -225,8 +225,8 @@ class Replicate(LLM):
 
         # if it's an official model
         if ":" not in self.model:
-            return replicate_python.models.predictions.create(self.model, input=input_)
+            return self._replicate_client.models.predictions.create(self.model, input=input_)
         else:
-            return replicate_python.predictions.create(
+            return self._replicate_client.predictions.create(
                 version=self.version_obj, input=input_
             )
