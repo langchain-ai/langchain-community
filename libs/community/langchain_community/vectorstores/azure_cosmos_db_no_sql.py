@@ -352,6 +352,7 @@ class AzureCosmosDBNoSqlVectorSearch(VectorStore):
         texts: List[str],
         embedding: Embeddings,
         metadatas: Optional[List[dict]] = None,
+        ids: Optional[List[str]] = None,
         **kwargs: Any,
     ) -> AzureCosmosDBNoSqlVectorSearch:
         cosmos_client = CosmosClient(connection_string, key, user_agent=USER_AGENT)
@@ -648,15 +649,15 @@ class AzureCosmosDBNoSqlVectorSearch(VectorStore):
                 raise ValueError(
                     "search text cannot be None for FULL_TEXT_RANK queries."
                 )
-            query += f""" ORDER BY RANK FullTextScore(c.{self._text_key}, 
+            query += f""" ORDER BY RANK FullTextScore(c.{self._text_key},
             [{", ".join(f"'{term}'" for term in search_text.split())}])"""
         elif query_type == CosmosDBQueryType.VECTOR:
             query += " ORDER BY VectorDistance(c[@embeddingKey], @embeddings)"
         elif query_type == CosmosDBQueryType.HYBRID:
             if search_text is None:
                 raise ValueError("search text cannot be None for HYBRID queries.")
-            query += f""" ORDER BY RANK RRF(FullTextScore(c.{self._text_key}, 
-            [{", ".join(f"'{term}'" for term in search_text.split())}]), 
+            query += f""" ORDER BY RANK RRF(FullTextScore(c.{self._text_key},
+            [{", ".join(f"'{term}'" for term in search_text.split())}]),
             VectorDistance(c.{self._embedding_key}, {embeddings}))"""
         else:
             query += ""
