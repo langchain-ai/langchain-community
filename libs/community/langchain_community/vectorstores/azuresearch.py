@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import asyncio
 import base64
+import copy
 import itertools
 import json
 import logging
@@ -375,7 +376,9 @@ class AzureSearch(VectorStore):
             default_fields=default_fields,
             user_agent=user_agent,
             cors_options=cors_options,
-            additional_search_client_options=additional_search_client_options,
+            additional_search_client_options=copy.deepcopy(
+                additional_search_client_options
+            ),
             azure_credential=azure_credential,
         )
 
