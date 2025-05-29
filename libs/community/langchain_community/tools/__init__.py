@@ -115,6 +115,11 @@ if TYPE_CHECKING:
     from langchain_community.tools.eleven_labs.text2speech import (
         ElevenLabsText2SpeechTool,
     )
+    from langchain_community.tools.gemini.tools.text2speech import (
+        GeminiText2SpeechTool,
+        GeminiTTSModel,
+        GeminiVoice,
+    )
     from langchain_community.tools.file_management import (
         CopyFileTool,
         DeleteFileTool,
@@ -402,6 +407,9 @@ __all__ = [
     "EdenAiTextToSpeechTool",
     "EdenaiTool",
     "ElevenLabsText2SpeechTool",
+    "GeminiText2SpeechTool",
+    "GeminiTTSModel",
+    "GeminiVoice",
     "ExtractHyperlinksTool",
     "ExtractTextTool",
     "FileSearchTool",
@@ -556,6 +564,9 @@ _module_lookup = {
     "EdenAiTextToSpeechTool": "langchain_community.tools.edenai",
     "EdenaiTool": "langchain_community.tools.edenai",
     "ElevenLabsText2SpeechTool": "langchain_community.tools.eleven_labs.text2speech",
+    "GeminiText2SpeechTool": "langchain_community.tools.gemini.tools.text2speech",
+    "GeminiTTSModel": "langchain_community.tools.gemini.tools.text2speech",
+    "GeminiVoice": "langchain_community.tools.gemini.tools.text2speech",
     "ExtractHyperlinksTool": "langchain_community.tools.playwright",
     "ExtractTextTool": "langchain_community.tools.playwright",
     "FileSearchTool": "langchain_community.tools.file_management",
