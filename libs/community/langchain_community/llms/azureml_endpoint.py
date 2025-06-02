@@ -1,16 +1,23 @@
 import json
 import urllib.request
-from urllib.parse import urlparse
 import warnings
 from abc import abstractmethod
 from enum import Enum
 from typing import Any, Dict, List, Mapping, Optional
+from urllib.parse import urlparse
 
 from langchain_core.callbacks.manager import CallbackManagerForLLMRun
 from langchain_core.language_models.llms import BaseLLM
 from langchain_core.outputs import Generation, LLMResult
 from langchain_core.utils import convert_to_secret_str, get_from_dict_or_env
-from pydantic import BaseModel, ConfigDict, SecretStr, field_validator, model_validator, validator
+from pydantic import (
+    BaseModel,
+    ConfigDict,
+    SecretStr,
+    field_validator,
+    model_validator,
+    validator,
+)
 
 DEFAULT_TIMEOUT = 50
 
@@ -432,7 +439,7 @@ class AzureMLBaseEndpoint(BaseModel):
             )
         return field_value
 
-    @field_validator('endpoint_url', mode='after')
+    @field_validator("endpoint_url", mode="after")
     @classmethod
     def validate_endpoint_url(cls, value: str) -> str:
         """Validate that endpoint url is complete."""
@@ -455,12 +462,9 @@ class AzureMLBaseEndpoint(BaseModel):
         """Validate that endpoint api type is compatible with the URL format."""
         endpoint_url = urlparse(values.get("endpoint_url"))
         if (
-            (
-                field_value == AzureMLEndpointApiType.dedicated
-                or field_value == AzureMLEndpointApiType.realtime
-            )
-            and not endpoint_url.path == "/score"
-        ):
+            field_value == AzureMLEndpointApiType.dedicated
+            or field_value == AzureMLEndpointApiType.realtime
+        ) and not endpoint_url.path == "/score":
             raise ValueError(
                 "Endpoints of type `dedicated` should follow the format "
                 "`https://<your-endpoint>.<your_region>.inference.ml.azure.com/score`."
@@ -468,8 +472,9 @@ class AzureMLBaseEndpoint(BaseModel):
                 "`/models/chat/completions`,"
                 "use `endpoint_api_type='serverless'` instead."
             )
-        if field_value == AzureMLEndpointApiType.serverless and not (
-            endpoint_url.path in ["/completions", "/models/chat/completions"]
+        if (
+            field_value == AzureMLEndpointApiType.serverless
+            and endpoint_url.path not in ["/completions", "/models/chat/completions"]
         ):
             raise ValueError(
                 "Endpoints of type `serverless` should follow the format "
