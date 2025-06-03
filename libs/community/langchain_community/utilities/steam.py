@@ -1,5 +1,6 @@
 """Util that calls Steam-WebAPI."""
 
+import os
 from typing import Any, List
 
 from langchain_community.tools.steam.prompt import (
@@ -48,14 +49,11 @@ class SteamWebAPIWrapper(BaseModel):
         except ImportError:
             raise ImportError("python-steam-api library is not installed. ")
 
-        try:
-            from decouple import config
-        except ImportError:
-            raise ImportError("decouple library is not installed. ")
-
         # initialize the steam attribute for python-steam-api usage
-        KEY = config("STEAM_KEY")
-        steam = Steam(KEY)
+        steam_key = os.getenv("STEAM_KEY")
+        if not steam_key:
+            raise ValueError("STEAM_KEY environment variable is not set")
+        steam = Steam(steam_key)
         values["steam"] = steam
         return values
 
@@ -172,10 +170,9 @@ class SteamWebAPIWrapper(BaseModel):
         if mode == "get_games_details":
             return self.details_of_games(game)
         elif mode == "get_recommended_games":
-            try:
-                from decouple import config
-            except ImportError:
-                raise ImportError("decouple library is not installed. ")
-            return self.recommended_games(config("STEAM_ID"))
+            steam_id = os.getenv("STEAM_ID")
+            if not steam_id:
+                raise ValueError("STEAM_ID environment variable is not set")
+            return self.recommended_games(steam_id)
         else:
             raise ValueError(f"Invalid mode {mode} for Steam API.")
