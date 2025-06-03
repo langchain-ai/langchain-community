@@ -43,12 +43,6 @@ def toy_dir() -> Generator[str, None, None]:
         yield f"file://{temp_dir}"
 
 
-# @pytest.fixture
-# @pytest.mark.requires("boto3")
-# def toy_dir() -> str:
-#     return "s3://ppr-langchain-test"
-
-
 _TEST_CASES = [
     {
         "glob": "**/[!.]*",

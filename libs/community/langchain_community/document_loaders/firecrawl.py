@@ -226,7 +226,7 @@ class FireCrawlLoader(BaseLoader):
         *,
         api_key: Optional[str] = None,
         api_url: Optional[str] = None,
-        mode: Literal["crawl", "scrape", "map", "extract"] = "crawl",
+        mode: Literal["crawl", "scrape", "map", "extract", "search"] = "crawl",
         params: Optional[dict] = None,
     ):
         """Initialize with API key and url.
@@ -242,6 +242,7 @@ class FireCrawlLoader(BaseLoader):
                  "crawl" (all accessible sub pages),
                  "map" (returns list of links that are semantically related).
                  "extract" (extracts structured data from a page).
+                 "search" (search for data across the web).
             params: The parameters to pass to the Firecrawl API.
                 Examples include crawlerOptions.
                 For more details, visit: https://github.com/mendableai/firecrawl-py
@@ -253,10 +254,10 @@ class FireCrawlLoader(BaseLoader):
             raise ImportError(
                 "`firecrawl` package not found, please run `pip install firecrawl-py`"
             )
-        if mode not in ("crawl", "scrape", "search", "map", "extract"):
+        if mode not in ("crawl", "scrape", "search", "map", "extract", "search"):
             raise ValueError(
                 f"""Invalid mode '{mode}'.
-                Allowed: 'crawl', 'scrape', 'search', 'map', 'extract'."""
+                Allowed: 'crawl', 'scrape', 'search', 'map', 'extract', 'search'."""
             )
 
         if not url:
@@ -293,13 +294,14 @@ class FireCrawlLoader(BaseLoader):
                 str(self.firecrawl.extract([self.url], params=self.params))
             ]
         elif self.mode == "search":
-            raise ValueError(
-                "Search mode is not supported in this version, please downgrade."
+            firecrawl_docs = self.firecrawl.search(
+                query=self.params.get("query"),
+                params=self.params,
             )
         else:
             raise ValueError(
                 f"""Invalid mode '{self.mode}'.
-                Allowed: 'crawl', 'scrape', 'map', 'extract'."""
+                Allowed: 'crawl', 'scrape', 'map', 'extract', 'search'."""
             )
         for doc in firecrawl_docs:
             if self.mode == "map" or self.mode == "extract":
