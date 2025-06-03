@@ -129,10 +129,7 @@ def test_invalid_request_format() -> None:
 
 @pytest.mark.parametrize(
     "endpoint_url",
-    [
-        "https://endpoint.inference.com",
-        "https://endpoint.inference.com/"
-    ]
+    ["https://endpoint.inference.com", "https://endpoint.inference.com/"],
 )
 def test_incorrect_url(endpoint_url: str) -> None:
     """Testing AzureML Endpoint for an incorrect URL"""
