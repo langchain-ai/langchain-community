@@ -1,9 +1,9 @@
 import logging
-from typing import Any, Dict, List, Optional
+from typing import Any, Dict, List, Optional, Iterator
 
 from langchain_core.callbacks import CallbackManagerForLLMRun
 from langchain_core.language_models.llms import LLM
-from langchain_core.outputs import Generation, LLMResult
+from langchain_core.outputs import Generation, LLMResult, GenerationChunk
 from langchain_core.utils import pre_init
 from pydantic import ConfigDict, Field
 
@@ -12,7 +12,7 @@ from langchain_community.llms.utils import enforce_stop_tokens
 logger = logging.getLogger(__name__)
 
 
-EXAMPLE_URL = "https://clarifai.com/openai/chat-completion/models/GPT-4"
+EXAMPLE_URL = "https://clarifai.com/mistralai/completion/models/Devstral-Small-2505_gguf-4bit"
 
 
 class Clarifai(LLM):
@@ -47,8 +47,14 @@ class Clarifai(LLM):
     token: Optional[str] = Field(default=None, exclude=True)  #: :meta private:
     """Clarifai session token to use."""
     model: Any = Field(default=None, exclude=True)  #: :meta private:
+    """Clarifai API base url"""
     api_base: str = "https://api.clarifai.com"
 
+    """Clarifai deployment params"""
+    deployment_id: Optional[str] = None
+    nodepool_id: Optional[str] = None
+    compute_cluster_id: Optional[str] = None
+    
     model_config = ConfigDict(
         extra="forbid",
     )
@@ -58,7 +64,7 @@ class Clarifai(LLM):
         """Validate that we have all required info to access Clarifai
         platform and python package exists in environment."""
         try:
-            from clarifai.client.model import Model
+            from clarifai.client import Model
         except ImportError:
             raise ImportError(
                 "Could not import clarifai python package. "
@@ -72,8 +78,11 @@ class Clarifai(LLM):
         api_base = values.get("api_base")
         pat = values.get("pat")
         token = values.get("token")
+        deployment_id = values.get("deployment_id")
+        nodepool_id = values.get("nodepool_id")
+        compute_cluster_id = values.get("compute_cluster_id")
 
-        values["model"] = Model(
+        model = Model(
             url=model_url,
             app_id=app_id,
             user_id=user_id,
@@ -82,8 +91,20 @@ class Clarifai(LLM):
             token=token,
             model_id=model_id,
             base_url=api_base,
+            deployment_id=deployment_id,
+            nodepool_id=nodepool_id,
+            compute_cluster_id=compute_cluster_id
         )
-
+        
+        values["model"] = model
+        if not model_id:
+            values["model_id"] = model.id
+        if not user_id:
+            values["user_id"] = model.user_app_id.user_id
+        if not model_id:
+            values["app_id"] = model.user_app_id.app_id
+            
+        
         return values
 
     @property
@@ -113,7 +134,6 @@ class Clarifai(LLM):
         prompt: str,
         stop: Optional[List[str]] = None,
         run_manager: Optional[CallbackManagerForLLMRun] = None,
-        inference_params: Optional[Dict[str, Any]] = None,
         **kwargs: Any,
     ) -> str:
         """Call out to Clarfai's PostModelOutputs endpoint.
@@ -130,64 +150,38 @@ class Clarifai(LLM):
 
                 response = clarifai_llm.invoke("Tell me a joke.")
         """
-
         try:
-            (inference_params := {}) if inference_params is None else inference_params
-            predict_response = self.model.predict_by_bytes(
-                bytes(prompt, "utf-8"),
-                input_type="text",
-                inference_params=inference_params,
+            text = self.model.predict(
+                prompt=prompt
+                **kwargs
             )
-            text = predict_response.outputs[0].data.text.raw
-            if stop is not None:
-                text = enforce_stop_tokens(text, stop)
+            print(text)
+            #if stop is not None:
+            #    text = enforce_stop_tokens(text, stop)
 
+            return text
+        
         except Exception as e:
             logger.error(f"Predict failed, exception: {e}")
 
-        return text
 
     def _generate(
         self,
         prompts: List[str],
         stop: Optional[List[str]] = None,
         run_manager: Optional[CallbackManagerForLLMRun] = None,
-        inference_params: Optional[Dict[str, Any]] = None,
         **kwargs: Any,
     ) -> LLMResult:
         """Run the LLM on the given prompt and input."""
 
-        # TODO: add caching here.
-        try:
-            from clarifai.client.input import Inputs
-        except ImportError:
-            raise ImportError(
-                "Could not import clarifai python package. "
-                "Please install it with `pip install clarifai`."
-            )
-
         generations = []
-        batch_size = 32
-        input_obj = Inputs.from_auth_helper(self.model.auth_helper)
         try:
-            for i in range(0, len(prompts), batch_size):
-                batch = prompts[i : i + batch_size]
-                input_batch = [
-                    input_obj.get_text_input(input_id=str(id), raw_text=inp)
-                    for id, inp in enumerate(batch)
-                ]
-                (
-                    inference_params := {}
-                ) if inference_params is None else inference_params
-                predict_response = self.model.predict(
-                    inputs=input_batch, inference_params=inference_params
+            for prompt in prompts:
+                text = self.model.predict(
+                    prompt=prompt, **kwargs
                 )
-
-            for output in predict_response.outputs:
                 if stop is not None:
-                    text = enforce_stop_tokens(output.data.text.raw, stop)
-                else:
-                    text = output.data.text.raw
+                    text = enforce_stop_tokens(text, stop)
 
                 generations.append([Generation(text=text)])
 
@@ -195,3 +189,16 @@ class Clarifai(LLM):
             logger.error(f"Predict failed, exception: {e}")
 
         return LLMResult(generations=generations)
+
+    def _stream(
+        self,
+        prompt: str,
+        stop: Optional[List[str]] = None,
+        run_manager: Optional[CallbackManagerForLLMRun] = None,
+        **kwargs: Any,
+    ) -> Iterator[GenerationChunk]:
+        for text in self.model.generate(prompt, **kwargs):
+            chunk = GenerationChunk(text=text)
+            if run_manager:
+                run_manager.on_llm_new_token(text, chunk=chunk)
+            yield chunk
