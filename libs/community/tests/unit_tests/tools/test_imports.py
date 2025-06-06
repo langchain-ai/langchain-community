@@ -30,6 +30,7 @@ EXPECTED_ALL = [
     "BingSearchResults",
     "BingSearchRun",
     "BraveSearch",
+    "CambAIText2SpeechTool",
     "CashFlowStatements",
     "ClickTool",
     "CogniswitchKnowledgeSourceFile",

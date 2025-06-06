@@ -77,6 +77,9 @@ if TYPE_CHECKING:
     from langchain_community.tools.brave_search.tool import (
         BraveSearch,
     )
+    from langchain_community.tools.cambai.text2speech import (
+        CambAIText2SpeechTool,
+    )
     from langchain_community.tools.cassandra_database.tool import (
         GetSchemaCassandraDatabaseTool,  # noqa: F401
         GetTableDataCassandraDatabaseTool,  # noqa: F401
@@ -379,6 +382,7 @@ __all__ = [
     "BingSearchResults",
     "BingSearchRun",
     "BraveSearch",
+    "CambAIText2SpeechTool",
     "CashFlowStatements",
     "ClickTool",
     "CogniswitchKnowledgeRequest",
@@ -532,6 +536,7 @@ _module_lookup = {
     "BingSearchResults": "langchain_community.tools.bing_search.tool",
     "BingSearchRun": "langchain_community.tools.bing_search.tool",
     "BraveSearch": "langchain_community.tools.brave_search.tool",
+    "CambAIText2SpeechTool": "langchain_community.tools.cambai.text2speech",
     "CashFlowStatements": "langchain_community.tools.financial_datasets.cash_flow_statements",  # noqa: E501
     "ClickTool": "langchain_community.tools.playwright",
     "CogniswitchKnowledgeRequest": "langchain_community.tools.cogniswitch.tool",
