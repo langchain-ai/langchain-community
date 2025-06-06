@@ -4,8 +4,6 @@ from __future__ import annotations
 
 import json
 import logging
-import os
-import sys
 import warnings
 from typing import (
     TYPE_CHECKING,
@@ -29,7 +27,6 @@ from langchain_core.callbacks import (
 from langchain_core.language_models import LanguageModelInput
 from langchain_core.language_models.chat_models import (
     BaseChatModel,
-    agenerate_from_stream,
     generate_from_stream,
 )
 from langchain_core.language_models.llms import create_base_retry_decorator
@@ -49,7 +46,7 @@ from langchain_core.utils import (
     get_pydantic_field_names,
     pre_init,
 )
-from pydantic import BaseModel, ConfigDict, Field, model_validator
+from pydantic import BaseModel, Field, model_validator
 
 from langchain_community.adapters.openai import (
     convert_dict_to_message,
@@ -154,31 +151,32 @@ def _update_token_usage(
 class ChatClarifai(BaseChatModel):
     """Clarifai Chat models."""
 
-    """Model url to use."""
     model_url: Optional[str] = None
-    """Model id to use."""
+    """Model url to use."""
     model_id: Optional[str] = None
-    """Model version id to use."""
+    """Model id to use."""
     model_version_id: Optional[str] = None
-    """Clarifai application id to use."""
+    """Model version id to use."""
     app_id: Optional[str] = None
-    """Clarifai user id to use."""
+    """Clarifai application id to use."""
     user_id: Optional[str] = None
-    """Clarifai personal access token to use."""
+    """Clarifai user id to use."""
     pat: Optional[str] = Field(default=None, exclude=True)  #: :meta private:
-    """Clarifai session token to use."""
+    """Clarifai personal access token to use."""
     token: Optional[str] = Field(default=None, exclude=True)  #: :meta private:
-    """Clarifai API base url"""
+    """Clarifai session token to use."""
     api_base: str = "https://api.clarifai.com"
+    """Clarifai API base url"""
 
-    """Clarifai deployment params"""
     deployment_id: Optional[str] = None
     nodepool_id: Optional[str] = None
     compute_cluster_id: Optional[str] = None
+    """Clarifai deployment params"""
     
     max_retries: int = Field(default=1)
-    """Whether to stream the results or not."""
+    
     streaming: bool = False
+    """Whether to stream the results or not."""
 
     model_kwargs: dict = Field(
         default_factory=lambda: {
@@ -187,6 +185,9 @@ class ChatClarifai(BaseChatModel):
             "top_p": 0.95,
         }.copy()
     )
+    
+    model_name: str = None
+    
     model: Any = Field(default=None, exclude=True)  #: :meta private:
     
     
@@ -278,6 +279,7 @@ class ChatClarifai(BaseChatModel):
         
         if not model_id:
             values["model_id"] = model.id
+            values["model_name"] = model.id
         if not user_id:
             values["user_id"] = model.user_app_id.user_id
         if not model_id:
@@ -288,6 +290,22 @@ class ChatClarifai(BaseChatModel):
         
         return values
 
+    
+    @property
+    def _identifying_params(self) -> Dict[str, Any]:
+        """Return a dictionary of identifying parameters.
+
+        This information is used by the LangChain callback system, which
+        is used for tracing purposes make it possible to monitor LLMs.
+        """
+        return {
+            # The model name allows users to specify custom token counting
+            # rules in LLM monitoring applications (e.g., in LangSmith users
+            # can provide per token pricing for their model and monitor
+            # costs for the given LLM.)
+            "model_name": self.model_name,
+            **self.model_kwargs,
+        }
 
     def _create_message_dicts(
         self, messages: List[BaseMessage]
@@ -373,6 +391,21 @@ class ChatClarifai(BaseChatModel):
         stream: Optional[bool] = None,
         **kwargs: Any,
     ) -> ChatResult:
+        """
+        This can be a call to an API, a call to a local model, or any other
+        implementation that generates a response to the input prompt.
+
+        Args:
+            messages: the prompt composed of a list of messages.
+            stop: a list of strings on which the model should stop generating.
+                  If generation stops due to a stop token, the stop token itself
+                  SHOULD BE INCLUDED as part of the output. This is not enforced
+                  across models right now, but it's a good practice to follow since
+                  it makes it much easier to parse the output of the model
+                  downstream and understand why generation stopped.
+            run_manager: A run manager with callbacks for the LLM.
+        """
+        
         should_stream = stream if stream is not None else self.streaming
         if should_stream:
             stream_iter = self._stream(
@@ -415,6 +448,24 @@ class ChatClarifai(BaseChatModel):
         run_manager: Optional[CallbackManagerForLLMRun] = None,
         **kwargs: Any,
     ) -> Iterator[ChatGenerationChunk]:
+        """Stream the output of the model.
+
+        This method should be implemented if the model can generate output
+        in a streaming fashion. If the model does not support streaming,
+        do not implement it. In that case streaming requests will be automatically
+        handled by the _generate method.
+
+        Args:
+            messages: the prompt composed of a list of messages.
+            stop: a list of strings on which the model should stop generating.
+                  If generation stops due to a stop token, the stop token itself
+                  SHOULD BE INCLUDED as part of the output. This is not enforced
+                  across models right now, but it's a good practice to follow since
+                  it makes it much easier to parse the output of the model
+                  downstream and understand why generation stopped.
+            run_manager: A run manager with callbacks for the LLM.
+        """
+        
         message_dicts = self._create_message_dicts(messages)
         params = {**kwargs, "stream": True}
         
