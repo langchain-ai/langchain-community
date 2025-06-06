@@ -1,7 +1,6 @@
 """Test ChatClarifai wrapper."""
 
 import sys
-from typing import Type, cast
 
 import pytest
 from langchain_core.callbacks import (
@@ -9,7 +8,6 @@ from langchain_core.callbacks import (
 )
 from langchain_core.messages import BaseMessage, HumanMessage, SystemMessage
 from langchain_core.outputs import ChatGeneration, ChatResult, LLMResult
-from langchain_tests.integration_tests import ChatModelIntegrationTests
 
 from langchain_community.chat_models.clarifai import ChatClarifai
 from tests.unit_tests.callbacks.fake_callback_handler import FakeCallbackHandler

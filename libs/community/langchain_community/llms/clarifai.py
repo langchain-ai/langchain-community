@@ -4,8 +4,7 @@ from typing import Any, Dict, Iterator, List, Optional
 from langchain_core.callbacks import CallbackManagerForLLMRun
 from langchain_core.language_models.llms import LLM
 from langchain_core.outputs import Generation, GenerationChunk, LLMResult
-from langchain_core.utils import pre_init
-from pydantic import ConfigDict, Field
+from pydantic import ConfigDict, Field, model_validator
 
 from langchain_community.llms.utils import enforce_stop_tokens
 
@@ -59,7 +58,7 @@ class Clarifai(LLM):
         extra="forbid",
     )
 
-    @pre_init
+    @model_validator(mode="before")
     def validate_environment(cls, values: Dict) -> Dict:
         """Validate that we have all required info to access Clarifai
         platform and python package exists in environment."""
@@ -151,10 +150,6 @@ class Clarifai(LLM):
         """
         try:
             text = self.model.predict(prompt=prompt**kwargs)
-            print(text)
-            # if stop is not None:
-            #    text = enforce_stop_tokens(text, stop)
-
             return text
 
         except Exception as e:

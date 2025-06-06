@@ -5,8 +5,6 @@ from typing import Tuple, Type
 import pytest
 from langchain_core.language_models import BaseChatModel
 from langchain_tests.unit_tests import ChatModelUnitTests
-from pydantic import SecretStr
-from pytest import CaptureFixture
 
 from langchain_community.chat_models.clarifai import DEFAULT_MODEL_URL, ChatClarifai
 
@@ -23,9 +21,4 @@ class TestClarifaiStandard(ChatModelUnitTests):
 
     @property
     def init_from_env_params(self) -> Tuple[dict, dict, dict]:
-        # return (
-        #     {"CLARIFAI_PAT": "clarifai-pat",  "model_url": DEFAULT_MODEL_URL},
-        #     {},
-        #     {"pat": "clarifai-pat",  "model_url": DEFAULT_MODEL_URL},
-        # )
         return ({}, {}, {})

@@ -6,7 +6,6 @@ import json
 import logging
 import warnings
 from typing import (
-    TYPE_CHECKING,
     Any,
     Callable,
     Dict,
@@ -19,12 +18,10 @@ from typing import (
     Union,
 )
 
-from langchain_core._api.deprecation import deprecated
 from langchain_core.callbacks import (
     AsyncCallbackManagerForLLMRun,
     CallbackManagerForLLMRun,
 )
-from langchain_core.language_models import LanguageModelInput
 from langchain_core.language_models.chat_models import (
     BaseChatModel,
     generate_from_stream,
@@ -44,7 +41,6 @@ from langchain_core.outputs import ChatGeneration, ChatGenerationChunk, ChatResu
 from langchain_core.utils import (
     get_from_dict_or_env,
     get_pydantic_field_names,
-    pre_init,
 )
 from pydantic import BaseModel, Field, model_validator
 
@@ -221,7 +217,7 @@ class ChatClarifai(BaseChatModel):
         values["model_kwargs"] = extra
         return values
 
-    @pre_init
+    @model_validator(mode="before")
     def validate_environment(cls, values: Dict) -> Dict:
         """Validate that we have all required info to access Clarifai
         platform and python package exists in environment."""
