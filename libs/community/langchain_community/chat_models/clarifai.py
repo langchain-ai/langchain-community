@@ -57,7 +57,7 @@ from langchain_community.adapters.openai import (
 
 logger = logging.getLogger(__name__)
 
-
+DEFAULT_MODEL_URL = "https://clarifai.com/meta/Llama-3/models/Llama-3_2-3B-Instruct"
 
 def _create_retry_decorator(
     llm: ChatClarifai,
@@ -197,11 +197,6 @@ class ChatClarifai(BaseChatModel):
 
 
     @classmethod
-    def is_lc_serializable(cls) -> bool:
-        return True
-
-
-    @classmethod
     def get_lc_namespace(cls) -> List[str]:
         """Get the namespace of the langchain object."""
         return ["langchain", "chat_models", "clarifai"]
@@ -246,6 +241,11 @@ class ChatClarifai(BaseChatModel):
                 "Could not import clarifai python package. "
                 "Please install it with `pip install clarifai`."
             )
+        
+        values["pat"] = get_from_dict_or_env(
+            values, "pat", "CLARIFAI_PAT"
+        )
+        
         user_id = values.get("user_id")
         app_id = values.get("app_id")
         model_id = values.get("model_id")
@@ -258,7 +258,7 @@ class ChatClarifai(BaseChatModel):
         deployment_id = values.get("deployment_id")
         nodepool_id = values.get("nodepool_id")
         compute_cluster_id = values.get("compute_cluster_id")
-
+        
         model = values.get("model")
         if not model or not isinstance(model, Model):
             model = Model(

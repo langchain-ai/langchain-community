@@ -4,20 +4,25 @@ import sys
 from typing import cast
 
 import pytest
+from tests.unit_tests.callbacks.fake_callback_handler import FakeCallbackHandler
+
 from langchain_core.messages import BaseMessage, HumanMessage, SystemMessage
 from langchain_core.outputs import ChatGeneration, ChatResult, LLMResult
 from langchain_core.callbacks import (
     CallbackManager,
 )
-from tests.unit_tests.callbacks.fake_callback_handler import FakeCallbackHandler
 
 from langchain_community.chat_models.clarifai import ChatClarifai
+from typing import Type
+
+from langchain_tests.integration_tests import ChatModelIntegrationTests
+
 
 
 if sys.version_info < (3, 11):
     pytest.skip("clarifai requires Python >= 3.11", allow_module_level=True)
 
-MODEL_URL="https://clarifai.com/qwen/qwenLM/models/Qwen3-30B-A3B-GGUF"
+MODEL_URL="https://clarifai.com/meta/Llama-3/models/Llama-3_2-3B-Instruct"
 MODEL_NAME = MODEL_URL.split("/")[-1]
 
 @pytest.fixture
@@ -94,7 +99,6 @@ def test_clarifai_invoke(chat: ChatClarifai) -> None:
     """Tests chat completion with invoke"""
     result = chat.invoke("How is the weather in New York today?", max_tokens=100)
     assert isinstance(result.content, str)
-    print("content=",result)
 
 
 @pytest.mark.scheduled

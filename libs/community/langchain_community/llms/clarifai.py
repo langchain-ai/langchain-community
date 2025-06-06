@@ -12,7 +12,7 @@ from langchain_community.llms.utils import enforce_stop_tokens
 logger = logging.getLogger(__name__)
 
 
-EXAMPLE_URL = "https://clarifai.com/mistralai/completion/models/Devstral-Small-2505_gguf-4bit"
+DEFAULT_MODEL_URL = "https://clarifai.com/meta/Llama-3/models/Llama-3_2-3B-Instruct"
 
 
 class Clarifai(LLM):
@@ -29,7 +29,7 @@ class Clarifai(LLM):
             from langchain_community.llms import Clarifai
             clarifai_llm = Clarifai(user_id=USER_ID, app_id=APP_ID, model_id=MODEL_ID)
                              (or)
-            clarifai_llm = Clarifai(model_url=EXAMPLE_URL)
+            clarifai_llm = Clarifai(model_url=DEFAULT_MODEL_URL)
     """
 
     model_url: Optional[str] = None

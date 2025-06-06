@@ -44,3 +44,4 @@ def test_clarifai_streaming() -> None:
         assert isinstance(chunk, str)
         stream_results_string += chunk
     assert len(stream_results_string.strip()) > 1
+    
