@@ -39,11 +39,11 @@ if TYPE_CHECKING:
     from langchain_community.chat_models.bedrock import (
         BedrockChat,
     )
-    from langchain_community.chat_models.cohere import (
-        ChatCohere,
-    )
     from langchain_community.chat_models.clarifai import (
         ChatClarifai,
+    )
+    from langchain_community.chat_models.cohere import (
+        ChatCohere,
     )
     from langchain_community.chat_models.coze import (
         ChatCoze,

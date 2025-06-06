@@ -53,11 +53,10 @@ from langchain_community.adapters.openai import (
     convert_message_to_dict,
 )
 
-
-
 logger = logging.getLogger(__name__)
 
 DEFAULT_MODEL_URL = "https://clarifai.com/meta/Llama-3/models/Llama-3_2-3B-Instruct"
+
 
 def _create_retry_decorator(
     llm: ChatClarifai,
@@ -65,10 +64,7 @@ def _create_retry_decorator(
         Union[AsyncCallbackManagerForLLMRun, CallbackManagerForLLMRun]
     ] = None,
 ) -> Callable[[Any], Any]:
-
-    errors = [
-        Exception
-    ]
+    errors = [Exception]
     return create_base_retry_decorator(
         error_types=errors, max_retries=llm.max_retries, run_manager=run_manager
     )
@@ -147,7 +143,6 @@ def _update_token_usage(
         return new_usage
 
 
-
 class ChatClarifai(BaseChatModel):
     """Clarifai Chat models."""
 
@@ -172,9 +167,9 @@ class ChatClarifai(BaseChatModel):
     nodepool_id: Optional[str] = None
     compute_cluster_id: Optional[str] = None
     """Clarifai deployment params"""
-    
+
     max_retries: int = Field(default=1)
-    
+
     streaming: bool = False
     """Whether to stream the results or not."""
 
@@ -185,22 +180,19 @@ class ChatClarifai(BaseChatModel):
             "top_p": 0.95,
         }.copy()
     )
-    
+
     model_name: str = None
-    
+
     model: Any = Field(default=None, exclude=True)  #: :meta private:
-    
-    
+
     @property
     def lc_secrets(self) -> Dict[str, str]:
         return {"pat": "CLARIFAI_PAT"}
-
 
     @classmethod
     def get_lc_namespace(cls) -> List[str]:
         """Get the namespace of the langchain object."""
         return ["langchain", "chat_models", "clarifai"]
-
 
     @model_validator(mode="before")
     @classmethod
@@ -228,7 +220,6 @@ class ChatClarifai(BaseChatModel):
 
         values["model_kwargs"] = extra
         return values
-    
 
     @pre_init
     def validate_environment(cls, values: Dict) -> Dict:
@@ -241,11 +232,9 @@ class ChatClarifai(BaseChatModel):
                 "Could not import clarifai python package. "
                 "Please install it with `pip install clarifai`."
             )
-        
-        values["pat"] = get_from_dict_or_env(
-            values, "pat", "CLARIFAI_PAT"
-        )
-        
+
+        values["pat"] = get_from_dict_or_env(values, "pat", "CLARIFAI_PAT")
+
         user_id = values.get("user_id")
         app_id = values.get("app_id")
         model_id = values.get("model_id")
@@ -254,11 +243,11 @@ class ChatClarifai(BaseChatModel):
         api_base = values.get("api_base")
         pat = values.get("pat")
         token = values.get("token")
-        
+
         deployment_id = values.get("deployment_id")
         nodepool_id = values.get("nodepool_id")
         compute_cluster_id = values.get("compute_cluster_id")
-        
+
         model = values.get("model")
         if not model or not isinstance(model, Model):
             model = Model(
@@ -272,11 +261,11 @@ class ChatClarifai(BaseChatModel):
                 base_url=api_base,
                 deployment_id=deployment_id,
                 nodepool_id=nodepool_id,
-                compute_cluster_id=compute_cluster_id
+                compute_cluster_id=compute_cluster_id,
             )
-            
+
             values["model"] = model
-        
+
         if not model_id:
             values["model_id"] = model.id
             values["model_name"] = model.id
@@ -286,11 +275,9 @@ class ChatClarifai(BaseChatModel):
             values["app_id"] = model.user_app_id.app_id
         if not model_version_id:
             values["model_version_id"] = model.model_version.id
-            
-        
+
         return values
 
-    
     @property
     def _identifying_params(self) -> Dict[str, Any]:
         """Return a dictionary of identifying parameters.
@@ -310,14 +297,13 @@ class ChatClarifai(BaseChatModel):
     def _create_message_dicts(
         self, messages: List[BaseMessage]
     ) -> Tuple[List[Dict[str, Any]], Dict[str, Any]]:
-        """ Preprocess LC to OpenAI Chat """
+        """Preprocess LC to OpenAI Chat"""
         message_dicts = [convert_message_to_dict(m) for m in messages]
         return message_dicts
 
-
     def _create_chat_result(self, response: Union[dict, BaseModel]) -> ChatResult:
-        """ Postprocess OpenAI Chat to LC chat """
-        
+        """Postprocess OpenAI Chat to LC chat"""
+
         generations = []
         if isinstance(response, BaseModel):
             response = response.model_dump()
@@ -337,7 +323,6 @@ class ChatClarifai(BaseChatModel):
             "model_name": self.model_id,
         }
         return ChatResult(generations=generations, llm_output=llm_output)
-
 
     def _combine_llm_outputs(self, llm_outputs: List[Optional[dict]]) -> dict:
         overall_token_usage: dict = {}
@@ -359,7 +344,6 @@ class ChatClarifai(BaseChatModel):
 
         return combined
 
-
     # -------------- Generate ----------------- #
     def completion_with_retry(
         self, run_manager: Optional[CallbackManagerForLLMRun] = None, **kwargs: Any
@@ -370,19 +354,18 @@ class ChatClarifai(BaseChatModel):
 
         @retry_decorator
         def _completion_with_retry(**kwargs: Any) -> Any:
-            
             params = {**self.model_kwargs}
-            params.update(kwargs) 
+            params.update(kwargs)
             params.pop("stream", None)
-            
+
             json_params = json.dumps(params)
             chat_response = self.model.openai_transport(msg=json_params)
             chat_response = json.loads(chat_response)
-            
+
             return chat_response
 
         return _completion_with_retry(**kwargs)
-    
+
     def _generate(
         self,
         messages: List[BaseMessage],
@@ -405,23 +388,22 @@ class ChatClarifai(BaseChatModel):
                   downstream and understand why generation stopped.
             run_manager: A run manager with callbacks for the LLM.
         """
-        
+
         should_stream = stream if stream is not None else self.streaming
         if should_stream:
             stream_iter = self._stream(
                 messages, stop=stop, run_manager=run_manager, **kwargs
             )
             return generate_from_stream(stream_iter)
-        
+
         message_dicts = self._create_message_dicts(messages)
         response = self.completion_with_retry(
             messages=message_dicts, run_manager=run_manager, **kwargs
         )
         return self._create_chat_result(response)
-    
-    
+
     # -------------- Stream ----------------- #
-    
+
     def stream_completion_with_retry(
         self, run_manager: Optional[CallbackManagerForLLMRun] = None, **kwargs: Any
     ) -> Any:
@@ -435,13 +417,14 @@ class ChatClarifai(BaseChatModel):
             params.update(kwargs)
             params["stream"] = True
             json_params = json.dumps(params)
-            chat_response_iteration = self.model.openai_stream_transport(msg=json_params)
+            chat_response_iteration = self.model.openai_stream_transport(
+                msg=json_params
+            )
 
             return chat_response_iteration
 
         return _completion_with_retry(**kwargs)
-    
-    
+
     def _stream(
         self,
         messages: List[BaseMessage],
@@ -465,10 +448,10 @@ class ChatClarifai(BaseChatModel):
                   downstream and understand why generation stopped.
             run_manager: A run manager with callbacks for the LLM.
         """
-        
+
         message_dicts = self._create_message_dicts(messages)
         params = {**kwargs, "stream": True}
-        
+
         default_chunk_class = AIMessageChunk
         for chunk in self.stream_completion_with_retry(
             messages=message_dicts, run_manager=run_manager, **params
@@ -496,12 +479,9 @@ class ChatClarifai(BaseChatModel):
                 run_manager.on_llm_new_token(cg_chunk.text, chunk=cg_chunk)
             yield cg_chunk
 
-
     # --------------- Model Info ------------ #
 
     @property
     def _llm_type(self) -> str:
         """Return type of chat model."""
         return "clarifai-chat"
-
-    

@@ -1,33 +1,31 @@
 """Test ChatClarifai wrapper."""
 
 import sys
-from typing import cast
+from typing import Type, cast
 
 import pytest
-from tests.unit_tests.callbacks.fake_callback_handler import FakeCallbackHandler
-
-from langchain_core.messages import BaseMessage, HumanMessage, SystemMessage
-from langchain_core.outputs import ChatGeneration, ChatResult, LLMResult
 from langchain_core.callbacks import (
     CallbackManager,
 )
-
-from langchain_community.chat_models.clarifai import ChatClarifai
-from typing import Type
-
+from langchain_core.messages import BaseMessage, HumanMessage, SystemMessage
+from langchain_core.outputs import ChatGeneration, ChatResult, LLMResult
 from langchain_tests.integration_tests import ChatModelIntegrationTests
 
-
+from langchain_community.chat_models.clarifai import ChatClarifai
+from tests.unit_tests.callbacks.fake_callback_handler import FakeCallbackHandler
 
 if sys.version_info < (3, 11):
     pytest.skip("clarifai requires Python >= 3.11", allow_module_level=True)
 
-MODEL_URL="https://clarifai.com/meta/Llama-3/models/Llama-3_2-3B-Instruct"
+MODEL_URL = "https://clarifai.com/meta/Llama-3/models/Llama-3_2-3B-Instruct"
 MODEL_NAME = MODEL_URL.split("/")[-1]
+
 
 @pytest.fixture
 def chat() -> ChatClarifai:
-    return ChatClarifai(model_url=MODEL_URL, model_kwargs={"temperature": 0, "max_tokens": 20})
+    return ChatClarifai(
+        model_url=MODEL_URL, model_kwargs={"temperature": 0, "max_tokens": 20}
+    )
 
 
 @pytest.mark.scheduled
@@ -116,7 +114,6 @@ def test_clarifai_batch(chat: ChatClarifai) -> None:
         assert isinstance(token.content, str)
 
 
-
 @pytest.mark.scheduled
 def test_clarifai_streaming(chat: ChatClarifai) -> None:
     """Test streaming tokens from Clarifai."""
@@ -129,8 +126,12 @@ def test_clarifai_streaming_callback() -> None:
     """Test that streaming correctly invokes on_llm_new_token callback."""
     callback_handler = FakeCallbackHandler()
     callback_manager = CallbackManager([callback_handler])
-    chat = ChatClarifai(model_url=MODEL_URL, model_kwargs={"max_tokens": 20}, 
-                        callback_manager=callback_manager, streaming=True)
+    chat = ChatClarifai(
+        model_url=MODEL_URL,
+        model_kwargs={"max_tokens": 20},
+        callback_manager=callback_manager,
+        streaming=True,
+    )
 
     message = HumanMessage(content="Write me a sentence with 10 words.")
     chat.invoke([message])

@@ -1,9 +1,9 @@
 import logging
-from typing import Any, Dict, List, Optional, Iterator
+from typing import Any, Dict, Iterator, List, Optional
 
 from langchain_core.callbacks import CallbackManagerForLLMRun
 from langchain_core.language_models.llms import LLM
-from langchain_core.outputs import Generation, LLMResult, GenerationChunk
+from langchain_core.outputs import Generation, GenerationChunk, LLMResult
 from langchain_core.utils import pre_init
 from pydantic import ConfigDict, Field
 
@@ -54,7 +54,7 @@ class Clarifai(LLM):
     deployment_id: Optional[str] = None
     nodepool_id: Optional[str] = None
     compute_cluster_id: Optional[str] = None
-    
+
     model_config = ConfigDict(
         extra="forbid",
     )
@@ -93,9 +93,9 @@ class Clarifai(LLM):
             base_url=api_base,
             deployment_id=deployment_id,
             nodepool_id=nodepool_id,
-            compute_cluster_id=compute_cluster_id
+            compute_cluster_id=compute_cluster_id,
         )
-        
+
         values["model"] = model
         if not model_id:
             values["model_id"] = model.id
@@ -103,8 +103,7 @@ class Clarifai(LLM):
             values["user_id"] = model.user_app_id.user_id
         if not model_id:
             values["app_id"] = model.user_app_id.app_id
-            
-        
+
         return values
 
     @property
@@ -151,19 +150,15 @@ class Clarifai(LLM):
                 response = clarifai_llm.invoke("Tell me a joke.")
         """
         try:
-            text = self.model.predict(
-                prompt=prompt
-                **kwargs
-            )
+            text = self.model.predict(prompt=prompt**kwargs)
             print(text)
-            #if stop is not None:
+            # if stop is not None:
             #    text = enforce_stop_tokens(text, stop)
 
             return text
-        
+
         except Exception as e:
             logger.error(f"Predict failed, exception: {e}")
-
 
     def _generate(
         self,
@@ -177,9 +172,7 @@ class Clarifai(LLM):
         generations = []
         try:
             for prompt in prompts:
-                text = self.model.predict(
-                    prompt=prompt, **kwargs
-                )
+                text = self.model.predict(prompt=prompt, **kwargs)
                 if stop is not None:
                     text = enforce_stop_tokens(text, stop)
 

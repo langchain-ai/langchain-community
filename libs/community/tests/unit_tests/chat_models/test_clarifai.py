@@ -3,13 +3,13 @@
 from typing import Tuple, Type
 
 import pytest
-from pytest import CaptureFixture
-from pydantic import SecretStr
-
 from langchain_core.language_models import BaseChatModel
 from langchain_tests.unit_tests import ChatModelUnitTests
+from pydantic import SecretStr
+from pytest import CaptureFixture
 
-from langchain_community.chat_models.clarifai import ChatClarifai, DEFAULT_MODEL_URL
+from langchain_community.chat_models.clarifai import DEFAULT_MODEL_URL, ChatClarifai
+
 
 @pytest.mark.requires("clarifai")
 class TestClarifaiStandard(ChatModelUnitTests):
@@ -28,4 +28,4 @@ class TestClarifaiStandard(ChatModelUnitTests):
         #     {},
         #     {"pat": "clarifai-pat",  "model_url": DEFAULT_MODEL_URL},
         # )
-        return ({},{},{})
+        return ({}, {}, {})
