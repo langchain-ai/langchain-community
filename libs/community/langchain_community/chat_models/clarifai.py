@@ -7,26 +7,22 @@ import logging
 import warnings
 from typing import (
     Any,
-    Callable,
     Dict,
     Iterator,
     List,
     Mapping,
     Optional,
-    Tuple,
     Type,
     Union,
 )
 
 from langchain_core.callbacks import (
-    AsyncCallbackManagerForLLMRun,
     CallbackManagerForLLMRun,
 )
 from langchain_core.language_models.chat_models import (
     BaseChatModel,
     generate_from_stream,
 )
-from langchain_core.language_models.llms import create_base_retry_decorator
 from langchain_core.messages import (
     AIMessageChunk,
     BaseMessage,
@@ -52,34 +48,6 @@ from langchain_community.adapters.openai import (
 logger = logging.getLogger(__name__)
 
 DEFAULT_MODEL_URL = "https://clarifai.com/meta/Llama-3/models/Llama-3_2-3B-Instruct"
-
-
-def _create_retry_decorator(
-    llm: ChatClarifai,
-    run_manager: Optional[
-        Union[AsyncCallbackManagerForLLMRun, CallbackManagerForLLMRun]
-    ] = None,
-) -> Callable[[Any], Any]:
-    errors = [Exception]
-    return create_base_retry_decorator(
-        error_types=errors, max_retries=llm.max_retries, run_manager=run_manager
-    )
-
-
-async def acompletion_with_retry(
-    llm: ChatClarifai,
-    run_manager: Optional[AsyncCallbackManagerForLLMRun] = None,
-    **kwargs: Any,
-) -> Any:
-    """Use tenacity to retry the async completion call."""
-
-    retry_decorator = _create_retry_decorator(llm, run_manager=run_manager)
-
-    @retry_decorator
-    async def _completion_with_retry(**kwargs: Any) -> Any:
-        return await llm.client.acreate(**kwargs)
-
-    return await _completion_with_retry(**kwargs)
 
 
 def _convert_delta_to_message_chunk(
@@ -177,7 +145,7 @@ class ChatClarifai(BaseChatModel):
         }.copy()
     )
 
-    model_name: str = None
+    model_name: Optional[str] = None
 
     model: Any = Field(default=None, exclude=True)  #: :meta private:
 
@@ -199,7 +167,7 @@ class ChatClarifai(BaseChatModel):
         for field_name in list(values):
             if field_name in extra:
                 raise ValueError(f"Found {field_name} supplied twice.")
-            if field_name not in all_required_field_names:
+            if field_name and field_name not in all_required_field_names:
                 logger.warning(
                     f"""WARNING! {field_name} is not default parameter.
                     {field_name} was transferred to model_kwargs.
@@ -290,9 +258,7 @@ class ChatClarifai(BaseChatModel):
             **self.model_kwargs,
         }
 
-    def _create_message_dicts(
-        self, messages: List[BaseMessage]
-    ) -> Tuple[List[Dict[str, Any]], Dict[str, Any]]:
+    def _create_message_dicts(self, messages: List[BaseMessage]) -> List:
         """Preprocess LC to OpenAI Chat"""
         message_dicts = [convert_message_to_dict(m) for m in messages]
         return message_dicts
@@ -320,7 +286,9 @@ class ChatClarifai(BaseChatModel):
         }
         return ChatResult(generations=generations, llm_output=llm_output)
 
-    def _combine_llm_outputs(self, llm_outputs: List[Optional[dict]]) -> dict:
+    def _combine_llm_outputs(
+        self, llm_outputs: List[Union[Dict[Any, Any], None]]
+    ) -> dict:
         overall_token_usage: dict = {}
         for output in llm_outputs:
             if output is None:
@@ -341,26 +309,16 @@ class ChatClarifai(BaseChatModel):
         return combined
 
     # -------------- Generate ----------------- #
-    def completion_with_retry(
-        self, run_manager: Optional[CallbackManagerForLLMRun] = None, **kwargs: Any
-    ) -> Any:
-        """Use tenacity to retry the completion call."""
+    def _completion(self, **kwargs: Any) -> Any:
+        params = {**self.model_kwargs}
+        params.update(kwargs)
+        params.pop("stream", None)
 
-        retry_decorator = _create_retry_decorator(self, run_manager=run_manager)
+        json_params = json.dumps(params)
+        chat_response = self.model.openai_transport(msg=json_params)
+        chat_response = json.loads(chat_response)
 
-        @retry_decorator
-        def _completion_with_retry(**kwargs: Any) -> Any:
-            params = {**self.model_kwargs}
-            params.update(kwargs)
-            params.pop("stream", None)
-
-            json_params = json.dumps(params)
-            chat_response = self.model.openai_transport(msg=json_params)
-            chat_response = json.loads(chat_response)
-
-            return chat_response
-
-        return _completion_with_retry(**kwargs)
+        return chat_response
 
     def _generate(
         self,
@@ -393,37 +351,24 @@ class ChatClarifai(BaseChatModel):
             return generate_from_stream(stream_iter)
 
         message_dicts = self._create_message_dicts(messages)
-        response = self.completion_with_retry(
-            messages=message_dicts, run_manager=run_manager, **kwargs
-        )
+        response = self._completion(messages=message_dicts, **kwargs)
         return self._create_chat_result(response)
 
     # -------------- Stream ----------------- #
 
-    def stream_completion_with_retry(
-        self, run_manager: Optional[CallbackManagerForLLMRun] = None, **kwargs: Any
-    ) -> Any:
-        """Use tenacity to retry the completion call."""
+    def _stream_completion(self, **kwargs: Any) -> Any:
+        params = {**self.model_kwargs}
+        params.update(kwargs)
+        params["stream"] = True
+        json_params = json.dumps(params)
+        chat_response_iteration = self.model.openai_stream_transport(msg=json_params)
 
-        retry_decorator = _create_retry_decorator(self, run_manager=run_manager)
-
-        @retry_decorator
-        def _completion_with_retry(**kwargs: Any) -> Any:
-            params = {**self.model_kwargs}
-            params.update(kwargs)
-            params["stream"] = True
-            json_params = json.dumps(params)
-            chat_response_iteration = self.model.openai_stream_transport(
-                msg=json_params
-            )
-
-            return chat_response_iteration
-
-        return _completion_with_retry(**kwargs)
+        return chat_response_iteration
 
     def _stream(
         self,
         messages: List[BaseMessage],
+        stop: Optional[List[str]] = None,
         run_manager: Optional[CallbackManagerForLLMRun] = None,
         **kwargs: Any,
     ) -> Iterator[ChatGenerationChunk]:
@@ -449,9 +394,7 @@ class ChatClarifai(BaseChatModel):
         params = {**kwargs, "stream": True}
 
         default_chunk_class = AIMessageChunk
-        for chunk in self.stream_completion_with_retry(
-            messages=message_dicts, run_manager=run_manager, **params
-        ):
+        for chunk in self._stream_completion(messages=message_dicts, **params):
             chunk = json.loads(chunk)
             if not isinstance(chunk, dict):
                 chunk = chunk.dict()

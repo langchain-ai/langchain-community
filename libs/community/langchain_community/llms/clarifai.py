@@ -148,12 +148,14 @@ class Clarifai(LLM):
 
                 response = clarifai_llm.invoke("Tell me a joke.")
         """
+        text = ""
         try:
-            text = self.model.predict(prompt=prompt**kwargs)
-            return text
+            text = self.model.predict(prompt=prompt, **kwargs)
 
         except Exception as e:
             logger.error(f"Predict failed, exception: {e}")
+
+        return text
 
     def _generate(
         self,
