@@ -66,8 +66,8 @@ class HuggingFaceTextToSpeechModelInference(BaseTool):
             )
 
         # Sanitize file extension to prevent path traversal attacks
-        file_extension = os.path.basename(file_extension).lstrip('.')
-        if not file_extension or '/' in file_extension or '\\' in file_extension:
+        file_extension = os.path.basename(file_extension).lstrip(".")
+        if not file_extension or "/" in file_extension or "\\" in file_extension:
             raise ValueError("Invalid file extension")
 
         if file_naming_func == "uuid":
