@@ -182,8 +182,6 @@ class TileDB(VectorStore):
         vec = np.asarray(v)
         if vec.dtype in _HALF_DTYPES and self._index_dtype == np.float32:
             vec = vec.astype(np.float32)
-        if self.metric == "cosine":
-            vec = _normalize(vec.reshape(1, -1))
         return vec.reshape(1, -1).astype(self._index_dtype, copy=False)
 
     def similarity_search_with_score_by_vector(
@@ -557,8 +555,6 @@ class TileDB(VectorStore):
         if embeddings_np.dtype in _HALF_DTYPES and target_dtype == np.float32:
             embeddings_np = embeddings_np.astype(np.float32)
         vectors = embeddings_np.astype(target_dtype)
-        if self.metric == "cosine":
-            vectors = _normalize(vectors)
         if ids is None:
             ids = [str(random.randint(0, MAX_UINT64 - 1)) for _ in texts]
         external_ids = np.asarray(ids, dtype=np.uint64)
