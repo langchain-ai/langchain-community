@@ -1,13 +1,17 @@
 import json
-from typing import Any, Dict, List, Optional
+from typing import TYPE_CHECKING, Any, Dict, List, Optional
 from unittest.mock import patch
 
 import pytest
+from pytest_socket import SocketBlockedError
 
 from langchain_community.vectorstores.azuresearch import AzureSearch
 from tests.integration_tests.vectorstores.fake_embeddings import FakeEmbeddings
 
 DEFAULT_VECTOR_DIMENSION = 4
+
+if TYPE_CHECKING:
+    from azure.search.documents.indexes.models import SearchIndex
 
 
 class FakeEmbeddingsWithDimension(FakeEmbeddings):
@@ -36,7 +40,7 @@ DEFAULT_ACCESS_TOKEN = "myaccesstoken1"
 DEFAULT_EMBEDDING_MODEL = FakeEmbeddingsWithDimension()
 
 
-def mock_default_index(*args, **kwargs):  # type: ignore[no-untyped-def]
+def mock_default_index(*args: Any, **kwargs: Any) -> "SearchIndex":
     from azure.search.documents.indexes.models import (
         ExhaustiveKnnAlgorithmConfiguration,
         ExhaustiveKnnParameters,
@@ -155,12 +159,12 @@ def test_init_new_index() -> None:
     from azure.search.documents.indexes import SearchIndexClient
     from azure.search.documents.indexes.models import SearchIndex
 
-    def no_index(self, name: str):  # type: ignore[no-untyped-def]
+    def no_index(self: SearchIndexClient, name: str) -> SearchIndex:
         raise ResourceNotFoundError
 
     created_index: Optional[SearchIndex] = None
 
-    def mock_create_index(self, index):  # type: ignore[no-untyped-def]
+    def mock_create_index(self: SearchIndexClient, index: SearchIndex) -> None:
         nonlocal created_index
         created_index = index
 
@@ -193,6 +197,40 @@ def test_additional_search_options() -> None:
 
 
 @pytest.mark.requires("azure.search.documents")
+def test_additional_search_options_retry_policy() -> None:
+    """
+    Reproduces bug captured in:
+    https://github.com/langchain-ai/langchain-community/issues/76
+    """
+    from azure.core.exceptions import HttpResponseError
+    from azure.core.pipeline.policies import RetryPolicy
+    from azure.search.documents.indexes import SearchIndexClient
+
+    def mock_create_index() -> None:
+        pytest.fail("Should not create index in this test")
+
+    with patch.multiple(
+        SearchIndexClient, get_index=mock_default_index, create_index=mock_create_index
+    ):
+        vector_store = create_vector_store(
+            additional_search_client_options={
+                "retry_policy": RetryPolicy(
+                    total_retries=3,
+                    backoff_factor=0.5,
+                    timeout=5,
+                ),
+            }
+        )
+        assert vector_store.client is not None
+
+        # Bug previously raised an:
+        #  AttributeError: 'coroutine' object has no attribute 'http_response'.
+        # Expect a network connection to be made (and blocked).
+        with pytest.raises((HttpResponseError, SocketBlockedError)):
+            list(vector_store.client.search())
+
+
+@pytest.mark.requires("azure.search.documents")
 def test_ids_used_correctly() -> None:
     """Check whether vector store uses the document ids when provided with them."""
     from azure.search.documents import SearchClient
@@ -203,7 +241,9 @@ def test_ids_used_correctly() -> None:
         def __init__(self) -> None:
             self.succeeded: bool = True
 
-    def mock_upload_documents(self, documents: List[object]) -> List[Response]:  # type: ignore[no-untyped-def]
+    def mock_upload_documents(
+        self: SearchClient, documents: List[object]
+    ) -> List[Response]:
         # assume all documents uploaded successfuly
         response = [Response() for _ in documents]
         return response

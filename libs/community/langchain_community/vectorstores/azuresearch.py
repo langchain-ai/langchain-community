@@ -2,11 +2,13 @@ from __future__ import annotations
 
 import asyncio
 import base64
+import copy
 import itertools
 import json
 import logging
 import time
 import uuid
+from types import TracebackType
 from typing import (
     TYPE_CHECKING,
     Any,
@@ -22,6 +24,7 @@ from typing import (
     Type,
     Union,
     cast,
+    overload,
 )
 
 import numpy as np
@@ -80,6 +83,54 @@ FIELDS_METADATA = get_from_env(
 MAX_UPLOAD_BATCH_SIZE = 1000
 
 
+@overload
+def _get_search_client(
+    endpoint: str,
+    index_name: str,
+    key: Optional[str] = None,
+    azure_ad_access_token: Optional[str] = None,
+    semantic_configuration_name: Optional[str] = None,
+    fields: Optional[List[SearchField]] = None,
+    vector_search: Optional[VectorSearch] = None,
+    semantic_configurations: Optional[
+        Union[SemanticConfiguration, List[SemanticConfiguration]]
+    ] = None,
+    scoring_profiles: Optional[List[ScoringProfile]] = None,
+    default_scoring_profile: Optional[str] = None,
+    default_fields: Optional[List[SearchField]] = None,
+    user_agent: Optional[str] = "langchain-comm-python-azure-search",
+    cors_options: Optional[CorsOptions] = None,
+    async_: Literal[False] = False,
+    additional_search_client_options: Optional[Dict[str, Any]] = None,
+    azure_credential: Optional[TokenCredential] = None,
+    azure_async_credential: Optional[AsyncTokenCredential] = None,
+) -> Union[SearchClient]: ...
+
+
+@overload
+def _get_search_client(
+    endpoint: str,
+    index_name: str,
+    key: Optional[str] = None,
+    azure_ad_access_token: Optional[str] = None,
+    semantic_configuration_name: Optional[str] = None,
+    fields: Optional[List[SearchField]] = None,
+    vector_search: Optional[VectorSearch] = None,
+    semantic_configurations: Optional[
+        Union[SemanticConfiguration, List[SemanticConfiguration]]
+    ] = None,
+    scoring_profiles: Optional[List[ScoringProfile]] = None,
+    default_scoring_profile: Optional[str] = None,
+    default_fields: Optional[List[SearchField]] = None,
+    user_agent: Optional[str] = "langchain-comm-python-azure-search",
+    cors_options: Optional[CorsOptions] = None,
+    async_: Literal[True] = True,
+    additional_search_client_options: Optional[Dict[str, Any]] = None,
+    azure_credential: Optional[TokenCredential] = None,
+    azure_async_credential: Optional[AsyncTokenCredential] = None,
+) -> Union[AsyncSearchClient]: ...
+
+
 def _get_search_client(
     endpoint: str,
     index_name: str,
@@ -102,6 +153,7 @@ def _get_search_client(
     azure_async_credential: Optional[AsyncTokenCredential] = None,
 ) -> Union[SearchClient, AsyncSearchClient]:
     from azure.core.credentials import AccessToken, AzureKeyCredential, TokenCredential
+    from azure.core.credentials_async import AsyncTokenCredential
     from azure.core.exceptions import ResourceNotFoundError
     from azure.identity import DefaultAzureCredential, InteractiveBrowserCredential
     from azure.identity.aio import DefaultAzureCredential as AsyncDefaultAzureCredential
@@ -139,22 +191,54 @@ def _get_search_client(
         ) -> AccessToken:
             return self._token
 
+    class AsyncTokenCredentialWrapper(AsyncTokenCredential):
+        def __init__(self, credential: TokenCredential):
+            self._credential = credential
+
+        async def get_token(
+            self,
+            *scopes: str,
+            claims: Optional[str] = None,
+            tenant_id: Optional[str] = None,
+            enable_cae: bool = False,
+            **kwargs: Any,
+        ) -> AccessToken:
+            return self._credential.get_token(
+                *scopes,
+                claims=claims,
+                tenant_id=tenant_id,
+                enable_cae=enable_cae,
+                **kwargs,
+            )
+
+        async def close(self) -> None:
+            pass
+
+        async def __aexit__(
+            self,
+            exc_type: Optional[Type[BaseException]] = None,
+            exc_value: Optional[BaseException] = None,
+            traceback: Optional[TracebackType] = None,
+        ) -> None:
+            pass
+
     additional_search_client_options = additional_search_client_options or {}
     default_fields = default_fields or []
-    credential: Union[AzureKeyCredential, TokenCredential, InteractiveBrowserCredential]
+    credential: Union[AzureKeyCredential, TokenCredential]
+    async_credential: Union[AzureKeyCredential, AsyncTokenCredential]
 
     # Determine the appropriate credential to use
     if key is not None:
         if key.upper() == "INTERACTIVE":
-            credential = InteractiveBrowserCredential()
+            credential = cast("TokenCredential", InteractiveBrowserCredential())
             credential.get_token("https://search.azure.com/.default")
-            async_credential = credential
+            async_credential = AsyncTokenCredentialWrapper(credential)
         else:
             credential = AzureKeyCredential(key)
             async_credential = credential
     elif azure_ad_access_token is not None:
         credential = AzureBearerTokenCredential(azure_ad_access_token)
-        async_credential = credential
+        async_credential = AsyncTokenCredentialWrapper(credential)
     else:
         credential = azure_credential or DefaultAzureCredential()
         async_credential = azure_async_credential or AsyncDefaultAzureCredential()
@@ -375,7 +459,9 @@ class AzureSearch(VectorStore):
             default_fields=default_fields,
             user_agent=user_agent,
             cors_options=cors_options,
-            additional_search_client_options=additional_search_client_options,
+            additional_search_client_options=copy.deepcopy(
+                additional_search_client_options
+            ),
             azure_credential=azure_credential,
         )
 
@@ -1127,7 +1213,7 @@ class AzureSearch(VectorStore):
             search_text=text_query,
             vector_queries=[
                 VectorizedQuery(
-                    vector=np.array(embedding, dtype=np.float32).tolist(),
+                    vector=embedding,
                     k_nearest_neighbors=k,
                     fields=FIELDS_CONTENT_VECTOR,
                 )
@@ -1163,7 +1249,7 @@ class AzureSearch(VectorStore):
             search_text=text_query,
             vector_queries=[
                 VectorizedQuery(
-                    vector=np.array(embedding, dtype=np.float32).tolist(),
+                    vector=embedding,
                     k_nearest_neighbors=k,
                     fields=FIELDS_CONTENT_VECTOR,
                 )
@@ -1308,7 +1394,7 @@ class AzureSearch(VectorStore):
             search_text=query,
             vector_queries=[
                 VectorizedQuery(
-                    vector=np.array(self.embed_query(query), dtype=np.float32).tolist(),
+                    vector=self.embed_query(query),
                     k_nearest_neighbors=k,
                     fields=FIELDS_CONTENT_VECTOR,
                 )
@@ -1396,7 +1482,7 @@ class AzureSearch(VectorStore):
             search_text=query,
             vector_queries=[
                 VectorizedQuery(
-                    vector=np.array(vector, dtype=np.float32).tolist(),
+                    vector=vector,
                     k_nearest_neighbors=k,
                     fields=FIELDS_CONTENT_VECTOR,
                 )
@@ -1760,7 +1846,7 @@ async def _aresults_to_documents(
 
 
 async def _areorder_results_with_maximal_marginal_relevance(
-    results: SearchItemPaged[Dict],
+    results: AsyncSearchItemPaged[Dict],
     query_embedding: np.ndarray,
     lambda_mult: float = 0.5,
     k: int = 4,

@@ -29,7 +29,7 @@ class GigaChatEmbeddings(BaseModel, Embeddings):
             from langchain_community.embeddings.gigachat import GigaChatEmbeddings
 
             embeddings = GigaChatEmbeddings(
-                credentials=..., scope=..., verify_ssl_certs=False
+                credentials=..., scope=..., verify_ssl_certs=...
             )
     """
 
