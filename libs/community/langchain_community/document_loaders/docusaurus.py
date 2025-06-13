@@ -33,10 +33,12 @@ class DocusaurusLoader(SitemapLoader):
             url = f"{url}/sitemap.xml"
 
         self.custom_html_tags = custom_html_tags or ["main article"]
+        parsing_function = kwargs.get("parsing_function",self._parsing_function)
+        kwargs.pop("parsing_function", None)
 
         super().__init__(
             url,
-            parsing_function=kwargs.get("parsing_function") or self._parsing_function,
+            parsing_function=parsing_function,
             **kwargs,
         )
 
