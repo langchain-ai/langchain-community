@@ -1,3 +1,4 @@
+import random
 import tempfile
 from enum import Enum
 from typing import Any, Dict, Optional, Union
@@ -12,7 +13,7 @@ def _import_cambai() -> Any:
         from cambai import CambAI
     except ImportError as e:
         raise ImportError(
-            "Cannot import cambai, please install `pip install cambai`."
+            "Cannot import cambai, please install `pip install cambai-sdk`."
         ) from e
     return CambAI
 
@@ -31,7 +32,7 @@ class CambAIText2SpeechTool(BaseTool):
         "It supports 140 languages, including English, German, Polish, "
         "Spanish, Italian, French, Portuguese, and Hindi. "
     )
-    voice_id: int = 20303
+    voice_id: Optional[int] = None
     @model_validator(mode="before")
     @classmethod
     def validate_environment(cls, values: Dict) -> Any:
@@ -47,14 +48,18 @@ class CambAIText2SpeechTool(BaseTool):
             cambai = _import_cambai()
             client = cambai()
             file_path = "cambai_speech.wav"
-            print(f"Generating speech and saving to {file_path}...")
+            if(self.voice_id is None):
+                voices = client.list_voices()
+                voice_list = []
+                for voice in voices:
+                    voice_list.append(voice.id)
+                self.voice_id = random.choice(voice_list)
             client.text_to_speech (
                 text=query,
                 voice_id=self.voice_id,
                 output_type=OutputType.RAW_BYTES,
                 save_to_file=file_path
             )
-            print(f"Success! Audio saved to {file_path}")
             return file_path
         except Exception as e:
             raise RuntimeError(f"Error while running CambAIText2SpeechTool: {e}")
