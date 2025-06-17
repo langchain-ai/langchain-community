@@ -640,6 +640,14 @@ class AzureSearch(VectorStore):
                     if k in [x.name for x in self.fields]
                 }
                 doc.update(additional_fields)
+
+                filtered_metadata = {
+                    k: v
+                    for k, v in metadata.items()
+                    if k not in additional_fields}
+                doc[FIELDS_METADATA] = json.dumps(filtered_metadata)
+            else:
+                doc[FIELDS_METADATA] = json.dumps(metadata)
             data.append(doc)
             ids.append(key)
             # Upload data in batches
@@ -697,6 +705,14 @@ class AzureSearch(VectorStore):
                     if k in [x.name for x in self.fields]
                 }
                 doc.update(additional_fields)
+
+                filtered_metadata = {
+                    k: v
+                    for k, v in metadata.items()
+                    if k not in additional_fields}
+                doc[FIELDS_METADATA] = json.dumps(filtered_metadata)
+            else:
+                doc[FIELDS_METADATA] = json.dumps(metadata)
             data.append(doc)
             ids.append(key)
             # Upload data in batches
