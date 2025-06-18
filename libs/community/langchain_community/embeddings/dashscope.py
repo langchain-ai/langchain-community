@@ -27,7 +27,7 @@ BATCH_SIZE = {
     "text-embedding-v1": 25,
     "text-embedding-v2": 25,
     "text-embedding-v3": 10,
-    "text-embedding-v4": 10,
+    "text-embedding-v4": 10
 }
 
 
