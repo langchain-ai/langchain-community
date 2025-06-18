@@ -52,6 +52,11 @@ def embed_with_retry(embeddings: DashScopeEmbeddings, **kwargs: Any) -> Any:
 
     @retry_decorator
     def _embed_with_retry(**kwargs: Any) -> Any:
+        # If dimension is not passed in kwargs, use the one from the instance.
+        # The Dashscope SDK's parameter is `dimension`.
+        if "dimension" not in kwargs and embeddings.dimensions is not None:
+            kwargs["dimension"] = embeddings.dimensions
+
         result = []
         i = 0
         input_data = kwargs["input"]
@@ -59,7 +64,7 @@ def embed_with_retry(embeddings: DashScopeEmbeddings, **kwargs: Any) -> Any:
         batch_size = BATCH_SIZE.get(kwargs["model"], 25)
         while i < input_len:
             kwargs["input"] = (
-                input_data[i : i + batch_size]
+                input_data[i: i + batch_size]
                 if isinstance(input_data, list)
                 else input_data
             )
@@ -104,19 +109,37 @@ class DashScopeEmbeddings(BaseModel, Embeddings):
 
             from langchain_community.embeddings.dashscope import DashScopeEmbeddings
             embeddings = DashScopeEmbeddings(
-                model="text-embedding-v1",
+                model="text-embedding-v4",
             )
             text = "This is a test query."
+            query_result = embeddings.embed_query(text)
+
+    Example with custom dimensions:
+        .. code-block:: python
+
+            embeddings = DashScopeEmbeddings(
+                model="text-embedding-v4",
+                dimensions=256,
+            )
+            text = "This is a test query with custom dimensions."
             query_result = embeddings.embed_query(text)
 
     """
 
     client: Any = None
     """The DashScope client."""
-    model: str = "text-embedding-v1"
+    model: str = "text-embedding-v4"
     dashscope_api_key: Optional[str] = None
     max_retries: int = 5
     """Maximum number of retries to make when generating."""
+    dimensions: Optional[int] = None
+    """The dimension of the embedding vector.
+
+    Only supported for ``text-embedding-v3`` and ``text-embedding-v4`` models.
+    - ``text-embedding-v4`` supports [2048, 1536, 1024, 768, 512, 256, 128, 64].
+    - ``text-embedding-v3`` supports [1024, 768, 512, 256, 128, 64].
+    If not specified, the API default of 1024 is used.
+    """
 
     model_config = ConfigDict(
         extra="forbid",
@@ -125,49 +148,59 @@ class DashScopeEmbeddings(BaseModel, Embeddings):
     @model_validator(mode="before")
     @classmethod
     def validate_environment(cls, values: Dict) -> Any:
-        import dashscope
-
         """Validate that api key and python package exists in environment."""
         values["dashscope_api_key"] = get_from_dict_or_env(
             values, "dashscope_api_key", "DASHSCOPE_API_KEY"
         )
-        dashscope.api_key = values["dashscope_api_key"]
         try:
             import dashscope
 
+            dashscope.api_key = values["dashscope_api_key"]
             values["client"] = dashscope.TextEmbedding
         except ImportError:
             raise ImportError(
                 "Could not import dashscope python package. "
                 "Please install it with `pip install dashscope`."
             )
+
+        # Validate that dimensions parameter is only used with supported models
+        if values.get("dimensions") is not None:
+            model = values.get("model", "text-embedding-v4")
+            if model not in ["text-embedding-v3", "text-embedding-v4"]:
+                raise ValueError(
+                    f"Custom `dimensions` are only supported for 'text-embedding-v3' and "
+                    f"'text-embedding-v4'. You are using '{model}'."
+                )
+
         return values
 
-    def embed_documents(self, texts: List[str]) -> List[List[float]]:
+    def embed_documents(self, texts: List[str], **kwargs) -> List[List[float]]:
         """Call out to DashScope's embedding endpoint for embedding search docs.
 
         Args:
             texts: The list of texts to embed.
+            **kwargs: Additional keyword arguments to pass to the API.
 
         Returns:
             List of embeddings, one for each text.
         """
         embeddings = embed_with_retry(
-            self, input=texts, text_type="document", model=self.model
+            self, input=texts, text_type="document", model=self.model, **kwargs
         )
         embedding_list = [item["embedding"] for item in embeddings]
         return embedding_list
 
-    def embed_query(self, text: str) -> List[float]:
+    def embed_query(self, text: str, **kwargs) -> List[float]:
         """Call out to DashScope's embedding endpoint for embedding query text.
 
         Args:
             text: The text to embed.
+            **kwargs: Additional keyword arguments to pass to the API.
 
         Returns:
             Embedding for the text.
         """
         embedding = embed_with_retry(
-            self, input=text, text_type="query", model=self.model
+            self, input=text, text_type="query", model=self.model, **kwargs
         )[0]["embedding"]
         return embedding
