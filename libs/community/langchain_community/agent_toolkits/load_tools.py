@@ -22,6 +22,7 @@ from mypy_extensions import Arg, KwArg
 
 from langchain_community.tools.arxiv.tool import ArxivQueryRun
 from langchain_community.tools.bing_search.tool import BingSearchRun
+from langchain_community.tools.cambai.text2speech import CambAIText2SpeechTool
 from langchain_community.tools.dataforseo_api_search import DataForSeoAPISearchResults
 from langchain_community.tools.dataforseo_api_search import DataForSeoAPISearchRun
 from langchain_community.tools.ddg_search.tool import DuckDuckGoSearchRun
@@ -453,10 +454,11 @@ def _get_dataforseo_api_search(**kwargs: Any) -> BaseTool:
 def _get_dataforseo_api_search_json(**kwargs: Any) -> BaseTool:
     return DataForSeoAPISearchResults(api_wrapper=DataForSeoAPIWrapper(**kwargs))
 
+def _get_cambai_text2speech(**kwargs: Any) -> BaseTool:
+    return CambAIText2SpeechTool(**kwargs)
 
 def _get_eleven_labs_text2speech(**kwargs: Any) -> BaseTool:
     return ElevenLabsText2SpeechTool(**kwargs)
-
 
 def _get_memorize(llm: BaseLanguageModel, **kwargs: Any) -> BaseTool:
     return Memorize(llm=llm)  # type: ignore[arg-type]
@@ -557,6 +559,7 @@ _EXTRA_OPTIONAL_TOOLS: Dict[str, Tuple[Callable[[KwArg(Any)], BaseTool], List[st
         _get_dataforseo_api_search_json,
         ["api_login", "api_password", "aiosession"],
     ),
+    "cambai_text2speech": (_get_cambai_text2speech, ["camb_api_key"]),
     "eleven_labs_text2speech": (_get_eleven_labs_text2speech, ["elevenlabs_api_key"]),
     "google_cloud_texttospeech": (_get_google_cloud_texttospeech, []),
     "read_file": (_get_file_management_tool, []),
