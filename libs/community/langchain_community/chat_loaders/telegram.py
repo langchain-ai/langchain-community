@@ -102,6 +102,8 @@ class TelegramChatLoader(BaseChatLoader):
             text = message.get("text", "")
             timestamp = message.get("date", "")
             from_name = message.get("from", "")
+            if from_name is None:
+                from_name = "Deleted Account"
 
             results.append(
                 HumanMessage(
