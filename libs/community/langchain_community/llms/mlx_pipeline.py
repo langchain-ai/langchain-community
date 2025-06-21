@@ -254,3 +254,14 @@ class MLXPipeline(LLM):
             # break if stop sequence found
             if token == eos_token_id or (stop is not None and text in stop):
                 break
+    
+    def bind_tools(
+        self,
+        tools: Sequence[Union[dict[str, Any], type, Callable, BaseTool]],
+        *,
+        tool_choice: Optional[Union[dict, str, Literal["auto", "any"], bool]] = None,
+        **kwargs: Any,
+    ) -> Runnable[LanguageModelInput, BaseMessage]:
+        formatted_tools = [convert_to_openai_tool(tool) for tool in tools]
+        return super().bind(tools=formatted_tools, **kwargs)
+
