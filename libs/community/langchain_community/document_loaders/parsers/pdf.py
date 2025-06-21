@@ -436,37 +436,145 @@ class PyPDFParser(BaseBlobParser):
 
         xObject = page["/Resources"]["/XObject"].get_object()
         images = []
-        for obj in xObject:
+        for obj_name in xObject: # Renamed obj to obj_name
             np_image: Any = None
-            if xObject[obj]["/Subtype"] == "/Image":
-                img_filter = (
-                    xObject[obj]["/Filter"][1:]
-                    if type(xObject[obj]["/Filter"]) is pypdf.generic._base.NameObject
-                    else xObject[obj]["/Filter"][0][1:]
-                )
-                if img_filter in _PDF_FILTER_WITHOUT_LOSS:
-                    height, width = xObject[obj]["/Height"], xObject[obj]["/Width"]
+            image_data_processed = False # Flag to indicate if np_image is set
+            try:
+                if xObject[obj_name]["/Subtype"] == "/Image":
+                    raw_data = xObject[obj_name].get_data()
+                    img_filter_obj = xObject[obj_name]["/Filter"]
 
-                    np_image = np.frombuffer(
-                        xObject[obj].get_data(), dtype=np.uint8
-                    ).reshape(height, width, -1)
-                elif img_filter in _PDF_FILTER_WITH_LOSS:
-                    np_image = np.array(Image.open(io.BytesIO(xObject[obj].get_data())))
-
-                else:
-                    logger.warning("Unknown PDF Filter!")
-                if np_image is not None:
-                    image_bytes = io.BytesIO()
-
-                    if image_bytes.getbuffer().nbytes == 0:
+                    # Handle cases where Filter might be a list or a single NameObject
+                    if isinstance(img_filter_obj, pypdf.generic.ArrayObject):
+                        # Taking the first filter if multiple are present, common for e.g. FlateDecode
+                        if not img_filter_obj: # Empty filter array
+                             logger.warning(f"PyPDFParser: Skipping image ({obj_name}) due to empty /Filter array.")
+                             continue
+                        img_filter = img_filter_obj[0].name[1:] if img_filter_obj[0].name else ""
+                    elif isinstance(img_filter_obj, pypdf.generic.NameObject):
+                        img_filter = img_filter_obj.name[1:] if img_filter_obj.name else ""
+                    else:
+                        logger.warning(f"PyPDFParser: Skipping image ({obj_name}) due to unknown /Filter type: {type(img_filter_obj)}.")
                         continue
 
-                    Image.fromarray(np_image).save(image_bytes, format="PNG")
-                    blob = Blob.from_data(image_bytes.getvalue(), mime_type="image/png")
-                    image_text = next(self.images_parser.lazy_parse(blob)).page_content
-                    images.append(
-                        _format_inner_image(blob, image_text, self.images_inner_format)
-                    )
+                    if not img_filter:
+                        logger.warning(f"PyPDFParser: Skipping image ({obj_name}) due to missing or empty /Filter name.")
+                        continue
+
+                    if img_filter in _PDF_FILTER_WITHOUT_LOSS:
+                        height = int(xObject[obj_name]["/Height"])
+                        width = int(xObject[obj_name]["/Width"])
+                        actual_size = len(raw_data)
+
+                        if actual_size == 0 or height == 0 or width == 0:
+                            logger.warning(
+                                f"PyPDFParser: Skipping image ({obj_name}, filter: {img_filter}) "
+                                f"due to zero size, height, or width. HxW: {height}x{width}, Size: {actual_size}"
+                            )
+                            continue
+
+                        if actual_size % (height * width) != 0:
+                            logger.warning(
+                                f"PyPDFParser: Skipping image ({obj_name}, filter: {img_filter}). "
+                                f"Actual data size ({actual_size}) is not divisible by H*W "
+                                f"({height*width})."
+                            )
+                            continue
+
+                        inferred_channels = actual_size // (height * width)
+                        if inferred_channels not in (1, 3, 4):
+                            logger.warning(
+                                f"PyPDFParser: Skipping image ({obj_name}, filter: {img_filter}). "
+                                f"Inferred channels ({inferred_channels}) is not 1, 3, or 4. "
+                                f"Dimensions: {width}x{height}, Actual Size: {actual_size}."
+                            )
+                            continue
+
+                        np_image = np.frombuffer(raw_data, dtype=np.uint8).reshape(
+                            height, width, inferred_channels
+                        )
+                        image_data_processed = True
+                        # Store inferred_channels for PIL processing
+                        pil_channels = inferred_channels
+
+                    elif img_filter in _PDF_FILTER_WITH_LOSS: # e.g. DCTDecode (JPEG), JPXDecode (JPEG2000)
+                        try:
+                            pil_img_from_bytes = Image.open(io.BytesIO(raw_data))
+                            # Convert to RGB if it's not, common for JPEGs that might be CMYK etc.
+                            if pil_img_from_bytes.mode not in ("L", "RGB", "RGBA"):
+                                pil_img_from_bytes = pil_img_from_bytes.convert("RGB")
+                            np_image = np.array(pil_img_from_bytes)
+                            image_data_processed = True
+                            # Determine channels from PIL image mode
+                            if pil_img_from_bytes.mode == "L":
+                                pil_channels = 1
+                            elif pil_img_from_bytes.mode == "RGBA":
+                                pil_channels = 4
+                            else: # Primarily RGB
+                                pil_channels = 3
+                        except Exception as e:
+                            logger.warning(
+                                f"PyPDFParser: Could not open image ({obj_name}) "
+                                f"with filter {img_filter} using Pillow: {e}"
+                            )
+                            continue
+                    else:
+                        logger.warning(f"PyPDFParser: Unknown PDF Filter for image ({obj_name}): {img_filter}")
+                        continue # Skip if filter is unknown
+
+                    if image_data_processed and np_image is not None:
+                        # Ensure np_image is a numpy array (Image.open might return PIL image)
+                        if not isinstance(np_image, np.ndarray):
+                             np_image = np.array(np_image)
+
+                        # Check for empty arrays after conversion (e.g. if PIL image was empty)
+                        if np_image.size == 0:
+                            logger.warning(f"PyPDFParser: Skipping image ({obj_name}) as it resulted in an empty numpy array.")
+                            continue
+
+                        pil_image_to_save = Image.fromarray(np_image)
+
+                        # Adjust PIL image mode based on (inferred) channels for correct saving
+                        if pil_channels == 1:
+                            pil_image_to_save = pil_image_to_save.convert("L")
+                        elif pil_channels == 4:
+                             # Check if alpha channel is all opaque, then convert to RGB
+                            if np_image.ndim == 3 and np_image.shape[2] == 4:
+                                if (np_image[:, :, 3] == 255).all():
+                                    pil_image_to_save = pil_image_to_save.convert("RGB")
+                        # For 3 channels, it's often already RGB. convert("RGB") handles other modes.
+                        elif pil_image_to_save.mode != "RGB": # Ensure RGB for 3 channels if not already
+                            pil_image_to_save = pil_image_to_save.convert("RGB")
+
+
+                        image_bytes_io = io.BytesIO()
+                        save_format = "PNG" # PNG is a good lossless choice for varied channel data
+                        pil_image_to_save.save(image_bytes_io, format=save_format)
+
+                        if image_bytes_io.getbuffer().nbytes == 0:
+                            logger.warning(
+                                f"PyPDFParser: Skipping image ({obj_name}) as it resulted in "
+                                f"zero bytes after PIL saving."
+                            )
+                            continue
+
+                        blob = Blob.from_data(
+                            image_bytes_io.getvalue(), mime_type=f"image/{save_format.lower()}"
+                        )
+                        image_text = next(self.images_parser.lazy_parse(blob)).page_content
+                        images.append(
+                            _format_inner_image(blob, image_text, self.images_inner_format)
+                        )
+            except ValueError as e: # Catch reshape errors specifically
+                logger.warning(
+                    f"PyPDFParser: Failed to reshape image ({obj_name}). Error: {e}"
+                )
+                continue # Skip to next image object
+            except Exception as e: # Catch other errors during processing an image object
+                logger.warning(
+                    f"PyPDFParser: Error processing XObject ({obj_name}). Error: {e}"
+                )
+                continue # Skip to next image object
         return _FORMAT_IMAGE_STR.format(
             image_text=_JOIN_IMAGES.join(filter(None, images))
         )
@@ -1104,26 +1212,137 @@ class PyMuPDFParser(BaseBlobParser):
 
         img_list = page.get_images()
         images = []
-        for img in img_list:
+        for img_info in img_list:  # Renamed img to img_info to avoid conflict with PIL.Image
             if self.images_parser:
-                xref = img[0]
-                pix = pymupdf.Pixmap(doc, xref)
-                image = np.frombuffer(pix.samples, dtype=np.uint8).reshape(
-                    pix.height, pix.width, -1
-                )
-                image_bytes = io.BytesIO()
-                if image_bytes.getbuffer().nbytes == 0:
-                    continue
+                xref = img_info[0]
+                try:
+                    pix = pymupdf.Pixmap(doc, xref)
+                    height = pix.height
+                    width = pix.width
+                    channels = pix.n
+                    samples = pix.samples
+                    actual_size = len(samples)
+                    expected_size = height * width * channels
 
-                numpy.save(image_bytes, image)
-                blob = Blob.from_data(
-                    image_bytes.getvalue(), mime_type="application/x-npy"
-                )
-                image_text = next(self.images_parser.lazy_parse(blob)).page_content
+                    if actual_size == 0 or height == 0 or width == 0:
+                        logger.warning(
+                            f"PyMuPDFParser: Skipping image (xref: {xref}) due to zero "
+                            f"size, height, or width. HxW: {height}x{width}, Size: {actual_size}"
+                        )
+                        continue
 
-                images.append(
-                    _format_inner_image(blob, image_text, self.images_inner_format)
-                )
+                    image_array = None
+                    if channels not in (1, 3, 4):  # Grayscale, RGB, RGBA
+                        # Attempt to handle if pix.n is 0 but samples are valid for common channels
+                        if channels == 0 and actual_size % (height * width) == 0:
+                            inferred_ch = actual_size // (height * width)
+                            if inferred_ch in (1,3,4):
+                                logger.warning(
+                                    f"PyMuPDFParser: Image (xref: {xref}) has pix.n=0. "
+                                    f"Attempting reshape with inferred channels: {inferred_ch}."
+                                )
+                                channels = inferred_ch # Update channels for subsequent use
+                                expected_size = height * width * channels # Update expected_size
+                            else:
+                                logger.warning(
+                                    f"PyMuPDFParser: Skipping image (xref: {xref}) with pix.n=0 and "
+                                    f"inferred_channels ({inferred_ch}) not in (1,3,4)."
+                                )
+                                continue
+                        else:
+                            logger.warning(
+                                f"PyMuPDFParser: Skipping image (xref: {xref}) with "
+                                f"unusual number of channels: {channels}. Expected 1, 3, or 4. "
+                                f"Dimensions: {width}x{height}."
+                            )
+                            continue
+
+                    if actual_size == expected_size:
+                        image_array = np.frombuffer(samples, dtype=np.uint8).reshape(
+                            height, width, channels
+                        )
+                    elif actual_size % (height * width) == 0:
+                        inferred_channels_fallback = actual_size // (height * width)
+                        if inferred_channels_fallback in (1, 3, 4):
+                            logger.warning(
+                                f"PyMuPDFParser: Image (xref: {xref}) data size ({actual_size}) "
+                                f"does not match expected size ({expected_size}) based on "
+                                f"pix.n ({pix.n}). Attempting reshape with inferred "
+                                f"channels: {inferred_channels_fallback}."
+                            )
+                            image_array = np.frombuffer(samples, dtype=np.uint8).reshape(
+                                height, width, inferred_channels_fallback
+                            )
+                            channels = inferred_channels_fallback # Update channels for PIL
+                        else:
+                            logger.warning(
+                                f"PyMuPDFParser: Skipping image (xref: {xref}). Actual data size "
+                                f"({actual_size}) is a multiple of H*W ({height*width}), "
+                                f"but fallback inferred channels ({inferred_channels_fallback}) "
+                                f"is not 1, 3, or 4."
+                            )
+                            continue
+                    else:
+                        logger.warning(
+                            f"PyMuPDFParser: Skipping image (xref: {xref}) due to data size "
+                            f"mismatch. Dimensions: {width}x{height}, "
+                            f"Channels (from pix.n): {pix.n}, Actual Size: {actual_size}, "
+                            f"Expected Size: {expected_size}. Actual size is not a "
+                            f"multiple of H*W."
+                        )
+                        continue
+
+                    if image_array is None:
+                        logger.warning(
+                           f"PyMuPDFParser: Image array for (xref: {xref}) was not created. Skipping."
+                        )
+                        continue
+
+                    # Convert numpy array to PIL Image and save to bytes
+                    pil_image = Image.fromarray(image_array)
+
+                    # Adjust PIL image mode based on channels for correct saving
+                    if channels == 1:
+                        pil_image = pil_image.convert("L")
+                    elif channels == 4:
+                        # Check if alpha channel is all opaque, then convert to RGB
+                        if image_array.shape[2] == 4:
+                             if (image_array[:, :, 3] == 255).all():
+                                pil_image = pil_image.convert("RGB")
+                                channels = 3 # Update channels as it's now effectively RGB
+                    # For 3 channels, it's already RGB or handled by convert("RGB") if needed
+
+                    image_bytes_io = io.BytesIO()
+                    save_format = "PNG" # PNG supports L, RGB, RGBA
+                    pil_image.save(image_bytes_io, format=save_format)
+
+                    if image_bytes_io.getbuffer().nbytes == 0:
+                        logger.warning(
+                            f"PyMuPDFParser: Skipping image (xref: {xref}) as it resulted "
+                            f"in zero bytes after PIL saving."
+                        )
+                        continue
+
+                    blob = Blob.from_data(
+                        image_bytes_io.getvalue(), mime_type=f"image/{save_format.lower()}"
+                    )
+                    image_text = next(self.images_parser.lazy_parse(blob)).page_content
+                    images.append(
+                        _format_inner_image(blob, image_text, self.images_inner_format)
+                    )
+                except ValueError as e: # Catch reshape errors specifically
+                    logger.warning(
+                        f"PyMuPDFParser: Failed to reshape image (xref: {xref}). "
+                        f"Original pix.n: {pix.n if 'pix' in locals() else 'N/A'}, "
+                        f"HxW: {height if 'height' in locals() else 'N/A'}x"
+                        f"{width if 'width' in locals() else 'N/A'}. Error: {e}"
+                    )
+                    continue # Skip to next image
+                except Exception as e: # Catch other errors during processing
+                    logger.warning(
+                        f"PyMuPDFParser: Error processing image (xref: {xref}). Error: {e}"
+                    )
+                    continue # Skip to next image
         return _FORMAT_IMAGE_STR.format(
             image_text=_JOIN_IMAGES.join(filter(None, images))
         )
