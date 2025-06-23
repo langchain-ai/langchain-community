@@ -31,6 +31,7 @@ from langchain_community.tools.golden_query.tool import GoldenQueryRun
 from langchain_community.tools.google_cloud.texttospeech import (
     GoogleCloudTextToSpeechTool,
 )
+from langchain_community.tools.google_vertex_camb import GoogleVertexCambTool
 from langchain_community.tools.google_finance.tool import GoogleFinanceQueryRun
 from langchain_community.tools.google_jobs.tool import GoogleJobsQueryRun
 from langchain_community.tools.google_lens.tool import GoogleLensQueryRun
@@ -474,6 +475,10 @@ def _get_reddit_search(**kwargs: Any) -> BaseTool:
     return RedditSearchRun(api_wrapper=RedditSearchAPIWrapper(**kwargs))
 
 
+def _get_google_vertex_camb(**kwargs: Any) -> BaseTool:
+    return GoogleVertexCambTool(**kwargs)
+
+
 _EXTRA_LLM_TOOLS: Dict[
     str,
     Tuple[Callable[[Arg(BaseLanguageModel, "llm"), KwArg(Any)], BaseTool], List[str]],
@@ -563,6 +568,10 @@ _EXTRA_OPTIONAL_TOOLS: Dict[str, Tuple[Callable[[KwArg(Any)], BaseTool], List[st
     "reddit_search": (
         _get_reddit_search,
         ["reddit_client_id", "reddit_client_secret", "reddit_user_agent"],
+    ),
+    "google_vertex_camb": (
+        _get_google_vertex_camb,
+        ["project_id", "endpoint_id", "location", "reference_audio_path", "reference_text", "language"],
     ),
 }
 

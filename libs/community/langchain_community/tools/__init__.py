@@ -157,6 +157,9 @@ if TYPE_CHECKING:
         GoogleSerperResults,
         GoogleSerperRun,
     )
+    from langchain_community.tools.google_vertex_camb.tool import (
+        GoogleVertexCambTool,
+    )
     from langchain_community.tools.graphql.tool import (
         BaseGraphQLTool,
     )
@@ -418,6 +421,7 @@ __all__ = [
     "GoogleSearchRun",
     "GoogleSerperResults",
     "GoogleSerperRun",
+    "GoogleVertexCambTool",
     "HumanInputRun",
     "IFTTTWebhook",
     "IncomeStatements",
@@ -572,6 +576,7 @@ _module_lookup = {
     "GoogleSearchRun": "langchain_community.tools.google_search.tool",
     "GoogleSerperResults": "langchain_community.tools.google_serper.tool",
     "GoogleSerperRun": "langchain_community.tools.google_serper.tool",
+    "GoogleVertexCambTool": "langchain_community.tools.google_vertex_camb.tool",
     "HumanInputRun": "langchain_community.tools.human.tool",
     "IFTTTWebhook": "langchain_community.tools.ifttt",
     "IncomeStatements": "langchain_community.tools.financial_datasets.income_statements",  # noqa: E501
