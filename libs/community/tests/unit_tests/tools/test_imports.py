@@ -69,6 +69,7 @@ EXPECTED_ALL = [
     "GoogleSearchRun",
     "GoogleSerperResults",
     "GoogleSerperRun",
+    "GoogleVertexCambTool",
     "HumanInputRun",
     "IFTTTWebhook",
     "IncomeStatements",
