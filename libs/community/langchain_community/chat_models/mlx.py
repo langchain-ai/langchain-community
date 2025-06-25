@@ -1,5 +1,7 @@
 """MLX Chat Wrapper."""
 
+import json  
+
 from typing import (
     Any,
     Callable,
@@ -42,28 +44,12 @@ DEFAULT_SYSTEM_PROMPT = """You are a helpful, respectful, and honest assistant."
 
 
 class ChatMLX(BaseChatModel):
-    """MLX chat models.
-
-    Works with `MLXPipeline` LLM.
-
-    To use, you should have the ``mlx-lm`` python package installed.
-
-    Example:
-        .. code-block:: python
-
-            from langchain_community.chat_models import chatMLX
-            from langchain_community.llms import MLXPipeline
-
-            llm = MLXPipeline.from_model_id(
-                model_id="mlx-community/quantized-gemma-2b-it",
-            )
-            chat = chatMLX(llm=llm)
-
-    """
+    """MLX chat models."""
 
     llm: MLXPipeline
     system_message: SystemMessage = SystemMessage(content=DEFAULT_SYSTEM_PROMPT)
     tokenizer: Any = None
+    _tools: Optional[List[dict]] = None  # <-- added to store bound tools
 
     def __init__(self, **kwargs: Any):
         super().__init__(**kwargs)
@@ -108,7 +94,17 @@ class ChatMLX(BaseChatModel):
         if not isinstance(messages[-1], HumanMessage):
             raise ValueError("Last message must be a HumanMessage!")
 
-        messages_dicts = [self._to_chatml_format(m) for m in messages]
+        messages_dicts = []
+
+        if self._tools:
+            tools_json = json.dumps({"tools": self._tools}, indent=2)
+            messages_dicts.append({
+                "role": "system",
+                "content": f"You have access to the following tools:\n{tools_json}"
+            })
+
+        messages_dicts += [self._to_chatml_format(m) for m in messages]
+
         return self.tokenizer.apply_chat_template(
             messages_dicts,
             tokenize=tokenize,
@@ -135,13 +131,23 @@ class ChatMLX(BaseChatModel):
         chat_generations = []
 
         for g in llm_result.generations[0]:
+            tool_calls = []
+            try:
+                parsed = json.loads(g.text)
+                if isinstance(parsed, dict) and "name" in parsed:
+                    tool_calls = [parsed]
+            except Exception:
+                pass
+
             chat_generation = ChatGeneration(
-                message=AIMessage(content=g.text), generation_info=g.generation_info
+                message=AIMessage(content=g.text, tool_calls=tool_calls),
+                generation_info=g.generation_info
             )
             chat_generations.append(chat_generation)
 
         return ChatResult(
-            generations=chat_generations, llm_output=llm_result.llm_output
+            generations=chat_generations,
+            llm_output=llm_result.llm_output
         )
 
     @property
@@ -202,21 +208,18 @@ class ChatMLX(BaseChatModel):
             ),
             range(max_new_tokens),
         ):
-            # identify text to yield
             text: Optional[str] = None
             if not isinstance(token, int):
                 text = self.tokenizer.decode(token.item())
             else:
                 text = self.tokenizer.decode(token)
 
-            # yield text, if any
             if text:
                 chunk = ChatGenerationChunk(message=AIMessageChunk(content=text))
                 if run_manager:
                     run_manager.on_llm_new_token(text, chunk=chunk)
                 yield chunk
 
-            # break if stop sequence found
             if token == eos_token_id or (stop is not None and text in stop):
                 break
 
@@ -227,24 +230,9 @@ class ChatMLX(BaseChatModel):
         tool_choice: Optional[Union[dict, str, Literal["auto", "none"], bool]] = None,
         **kwargs: Any,
     ) -> Runnable[LanguageModelInput, BaseMessage]:
-        """Bind tool-like objects to this chat model.
-
-        Assumes model is compatible with OpenAI tool-calling API.
-
-        Args:
-            tools: A list of tool definitions to bind to this chat model.
-                Supports any tool definition handled by
-                :meth:`langchain_core.utils.function_calling.convert_to_openai_tool`.
-            tool_choice: Which tool to require the model to call.
-                Must be the name of the single provided function or
-                "auto" to automatically determine which function to call
-                (if any), or a dict of the form:
-                {"type": "function", "function": {"name": <<tool_name>>}}.
-            **kwargs: Any additional parameters to pass to the
-                :class:`~langchain.runnable.Runnable` constructor.
-        """
-
         formatted_tools = [convert_to_openai_tool(tool) for tool in tools]
+        self._tools = formatted_tools  # <-- added to store for injection
+
         if tool_choice is not None and tool_choice:
             if len(formatted_tools) != 1:
                 raise ValueError(
