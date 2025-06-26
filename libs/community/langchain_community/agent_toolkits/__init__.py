@@ -90,6 +90,9 @@ if TYPE_CHECKING:
     from langchain_community.agent_toolkits.sql.toolkit import (
         SQLDatabaseToolkit,
     )
+    from langchain_community.agent_toolkits.stability.toolkit import (
+        StabilityToolkit,
+    )
     from langchain_community.agent_toolkits.steam.toolkit import (
         SteamToolkit,
     )
@@ -119,6 +122,7 @@ __all__ = [
     "SQLDatabaseToolkit",
     "SlackToolkit",
     "SparkSQLToolkit",
+    "StabilityToolkit",
     "SteamToolkit",
     "ZapierToolkit",
     "create_json_agent",
@@ -152,6 +156,7 @@ _module_lookup = {
     "SQLDatabaseToolkit": "langchain_community.agent_toolkits.sql.toolkit",
     "SlackToolkit": "langchain_community.agent_toolkits.slack.toolkit",
     "SparkSQLToolkit": "langchain_community.agent_toolkits.spark_sql.toolkit",
+    "StabilityToolkit": "langchain_community.agent_toolkits.stability.toolkit",
     "SteamToolkit": "langchain_community.agent_toolkits.steam.toolkit",
     "ZapierToolkit": "langchain_community.agent_toolkits.zapier.toolkit",
     "create_json_agent": "langchain_community.agent_toolkits.json.base",

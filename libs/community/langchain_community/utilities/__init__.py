@@ -152,6 +152,9 @@ if TYPE_CHECKING:
     from langchain_community.utilities.stackexchange import (
         StackExchangeAPIWrapper,
     )
+    from langchain_community.utilities.stability import (
+        StabilityAPIWrapper,
+    )
     from langchain_community.utilities.steam import (
         SteamWebAPIWrapper,
     )
@@ -227,6 +230,7 @@ __all__ = [
     "SearxSearchWrapper",
     "SerpAPIWrapper",
     "SparkSQL",
+    "StabilityAPIWrapper",
     "StackExchangeAPIWrapper",
     "SteamWebAPIWrapper",
     "TensorflowDatasets",
@@ -291,6 +295,7 @@ _module_lookup = {
     "SearxSearchWrapper": "langchain_community.utilities.searx_search",
     "SerpAPIWrapper": "langchain_community.utilities.serpapi",
     "SparkSQL": "langchain_community.utilities.spark_sql",
+    "StabilityAPIWrapper": "langchain_community.utilities.stability",
     "StackExchangeAPIWrapper": "langchain_community.utilities.stackexchange",
     "SteamWebAPIWrapper": "langchain_community.utilities.steam",
     "TensorflowDatasets": "langchain_community.utilities.tensorflow_datasets",

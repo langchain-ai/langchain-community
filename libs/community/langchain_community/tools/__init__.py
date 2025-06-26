@@ -304,6 +304,12 @@ if TYPE_CHECKING:
         QuerySQLDataBaseTool,
         QuerySQLDatabaseTool,
     )
+    from langchain_community.tools.stability import (
+        StabilityDeployTool,
+        StabilityReadTool,
+        StabilityWriteContractTool,
+        StabilityWriteTool,
+    )
     from langchain_community.tools.stackexchange.tool import (
         StackExchangeTool,
     )
@@ -476,6 +482,10 @@ __all__ = [
     "SlackScheduleMessage",
     "SlackSendMessage",
     "SleepTool",
+    "StabilityDeployTool",
+    "StabilityReadTool",
+    "StabilityWriteContractTool",
+    "StabilityWriteTool",
     "StackExchangeTool",
     "StdInInquireTool",
     "SteamWebAPIQueryRun",
@@ -631,6 +641,10 @@ _module_lookup = {
     "SlackScheduleMessage": "langchain_community.tools.slack.schedule_message",
     "SlackSendMessage": "langchain_community.tools.slack.send_message",
     "SleepTool": "langchain_community.tools.sleep.tool",
+    "StabilityDeployTool": "langchain_community.tools.stability.deploy",
+    "StabilityReadTool": "langchain_community.tools.stability.read",
+    "StabilityWriteContractTool": "langchain_community.tools.stability.write_contract",
+    "StabilityWriteTool": "langchain_community.tools.stability.write",
     "StackExchangeTool": "langchain_community.tools.stackexchange.tool",
     "StdInInquireTool": "langchain_community.tools.interaction.tool",
     "SteamWebAPIQueryRun": "langchain_community.tools.steam.tool",
