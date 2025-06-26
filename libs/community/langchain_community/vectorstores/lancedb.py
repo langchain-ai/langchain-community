@@ -681,7 +681,7 @@ class LanceDB(VectorStore):
         if filter:
             tbl.delete(filter)
         elif ids:
-            quoted_ids = [f"'{id_val}'" for id_val in ids]
+            quoted_ids = ["'" + id_val.replace("'", "''") + "'" for id_val in ids]
             ids_clause = ",".join(quoted_ids)
             delete_filter = f"{self._id_key} IN ({ids_clause})"
             tbl.delete(delete_filter)
