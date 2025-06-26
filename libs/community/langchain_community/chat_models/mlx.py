@@ -213,3 +213,5 @@ class ChatMLX(BaseChatModel):
                 f"Tool choice specified but {len(formatted)} tools were bound; only one allowed."
             )
         return super().bind(tools=formatted, **kwargs)
+#     def unbind_tools(self) -> "ChatMLX":
+#         """Unbind any tools."""
