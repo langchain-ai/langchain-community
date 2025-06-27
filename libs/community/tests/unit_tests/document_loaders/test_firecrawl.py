@@ -94,7 +94,7 @@ class TestFireCrawlLoader:
         assert "extracted main contents" in docs[0].page_content
         assert "success" in docs[0].page_content
 
-    def test_new_scrape_response_format(
+    def test_handles_scrape_response_object_and_dict_formats(
         self, mock_firecrawl: Tuple[MagicMock, MagicMock]
     ) -> None:
         """Test new ScrapeResponse object format handling."""
@@ -134,3 +134,43 @@ class TestFireCrawlLoader:
         assert len(docs) == 2
         assert all("New object content" in doc.page_content for doc in docs)
         assert all(doc.metadata["source"] == "object_format" for doc in docs)
+
+    def test_search_mode_requires_query(
+        self, mock_firecrawl: Tuple[MagicMock, MagicMock]
+    ) -> None:
+        """Test that search mode requires a query parameter."""
+        _, mock_client = mock_firecrawl
+
+        # Test missing query parameter
+        loader = FireCrawlLoader(
+            url="https://dummy.com",  # URL not used in search mode but still required
+            api_key="fake-key",
+            mode="search",
+            params={},
+        )
+
+        with pytest.raises(
+            ValueError, match="Query parameter is required for search mode"
+        ):
+            list(loader.lazy_load())
+
+        # Test with query parameter
+        mock_search_response = MagicMock()
+        mock_search_response.markdown = "Search result content"
+        mock_search_response.metadata = {"url": "https://found.com"}
+
+        mock_client.search.return_value = [mock_search_response]
+
+        loader_with_query = FireCrawlLoader(
+            url="https://dummy.com",  # URL not used in search mode but still required
+            api_key="fake-key",
+            mode="search",
+            params={"query": "test search", "limit": 10},
+        )
+        docs = list(loader_with_query.lazy_load())
+
+        assert len(docs) == 1
+        assert "Search result content" in docs[0].page_content
+
+        # Verify search was called correctly without duplicate query
+        mock_client.search.assert_called_once_with(query="test search", limit=10)

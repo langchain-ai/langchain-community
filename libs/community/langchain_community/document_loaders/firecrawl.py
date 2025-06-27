@@ -196,9 +196,13 @@ class FireCrawlLoader(BaseLoader):
                 raise ValueError("URL is required for extract mode")
             firecrawl_docs = [str(self.firecrawl.extract([self.url], **self.params))]
         elif self.mode == "search":
+            search_params = self.params.copy()
+            query = search_params.pop("query", None)
+            if not query:
+                raise ValueError("Query parameter is required for search mode")
             firecrawl_docs = self.firecrawl.search(
-                query=self.params.get("query"),
-                **self.params,
+                query=query,
+                **search_params,
             )
         else:
             raise ValueError(
