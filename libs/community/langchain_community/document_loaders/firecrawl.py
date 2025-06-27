@@ -190,7 +190,9 @@ class FireCrawlLoader(BaseLoader):
         elif self.mode == "map":
             if not self.url:
                 raise ValueError("URL is required for map mode")
-            firecrawl_docs = self.firecrawl.map_url(self.url, **self.params)
+            map_response = self.firecrawl.map_url(self.url, **self.params)
+            # Map returns a MapResponse object with links attribute
+            firecrawl_docs = getattr(map_response, "links", [])
         elif self.mode == "extract":
             if not self.url:
                 raise ValueError("URL is required for extract mode")
