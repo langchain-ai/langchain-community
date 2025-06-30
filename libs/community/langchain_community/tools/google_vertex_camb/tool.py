@@ -2,13 +2,28 @@ import base64
 import json
 import os
 import random
-from typing import Any, Dict, Optional
+import tempfile
+import soundfile as sf
+import pygame
+from typing import Any, Dict, Literal, Optional
 
 from langchain_core.callbacks import CallbackManagerForToolRun
 from langchain_core.tools import BaseTool
 from langchain_core.utils import get_from_dict_or_env
 from pydantic import model_validator
-
+            
+Mars7Language = Literal[
+    "de-de",
+    "en-gb",
+    "en-us",
+    "es-us",
+    "es-es",
+    "fr-ca",
+    "fr-fr",
+    "ja-jp",
+    "ko-kr",
+    "zh-cn",
+]
 def _import_vertex_ai() -> Any:
     try:
         from google.cloud import aiplatform
@@ -35,9 +50,9 @@ class GoogleVertexCambTool(BaseTool):
     project_id: str = ""
     location: str = ""
     endpoint_id: str = ""
-    reference_audio_path: Optional[str] = None
+    reference_audio_path: str
     reference_text: Optional[str] = None
-    language: str = "en-us"
+    language: Mars7Language = "en-us"
 
     @model_validator(mode="before")
     @classmethod
@@ -53,7 +68,7 @@ class GoogleVertexCambTool(BaseTool):
             values, "endpoint_id", "ENDPOINT_ID"
         )
         values["reference_audio_path"] = get_from_dict_or_env(
-            values, "reference_audio_path", "REFERENCE_AUDIO_PATH", default=None
+            values, "reference_audio_path", "REFERENCE_AUDIO_PATH"
         )
         values["reference_text"] = get_from_dict_or_env(
             values, "reference_text", "REFERENCE_TEXT", default=None
@@ -133,38 +148,26 @@ class GoogleVertexCambTool(BaseTool):
             speech_file: Path to the audio file to play (FLAC format).
         """
         try:
-            import tempfile
             
             # Check if file exists
             if not os.path.exists(speech_file):
-                raise FileNotFoundError(f"Audio file not found: {speech_file}")
-            
-            import soundfile as sf
+                raise FileNotFoundError(f"Audio file not found: {speech_file}")     
             
             # Read FLAC file
             data, samplerate = sf.read(speech_file)
             
-            with tempfile.NamedTemporaryFile(suffix=".wav", delete=False) as tmp_file:
+            with tempfile.NamedTemporaryFile(suffix=".wav", delete=True) as tmp_file:
                 temp_wav_path = tmp_file.name
                 sf.write(temp_wav_path, data, samplerate, format='WAV')
             
-            # Play the converted WAV file
-            import pygame
-            pygame.mixer.init()
-            pygame.mixer.music.load(temp_wav_path)
-            pygame.mixer.music.play()
-            
-            # Wait for the audio to finish playing
-            while pygame.mixer.music.get_busy():
-                pygame.time.Clock().tick(10)
-            
-            # Clean up temporary file
-            os.unlink(temp_wav_path)
+                pygame.mixer.init()
+                pygame.mixer.music.load(temp_wav_path)
+                pygame.mixer.music.play()
                 
-        except ImportError:
-            raise ImportError(
-                "Cannot import required audio libraries. Please install: pip install pygame soundfile"
-            )
+                # Wait for the audio to finish playing
+                while pygame.mixer.music.get_busy():
+                    pygame.time.Clock().tick(10)
+                
         except Exception as e:
             raise RuntimeError(f"Error playing audio file: {e}")
             
@@ -182,7 +185,7 @@ class GoogleVertexCambTool(BaseTool):
         if reference_text:
             self.reference_text = reference_text
             
-    def set_language(self, language: str) -> None:
+    def set_language(self, language: Mars7Language) -> None:
         """Set the target language for synthesis.
         
         Args:
