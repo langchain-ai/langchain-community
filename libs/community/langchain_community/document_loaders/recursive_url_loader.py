@@ -270,6 +270,7 @@ class RecursiveUrlLoader(BaseLoader):
         autoset_encoding: bool = True,
         encoding: Optional[str] = None,
         proxies: Optional[dict] = None,
+        ssl: bool = True,
     ) -> None:
         """Initialize with URL to crawl and any subdirectories to exclude.
 
@@ -325,12 +326,25 @@ class RecursiveUrlLoader(BaseLoader):
                         "http": "http://10.10.1.10:3128",
                         "https": "https://10.10.1.10:1080",
                     }
+            ssl: Whether to verify SSL certificates during requests.
+                By default, SSL certificate verification is enabled (`ssl=True`),
+                ensuring secure HTTPS connections. Setting this to `False` disables SSL
+                certificate verification, which can be useful when crawling internal
+                services, development environments, or sites with misconfigured or
+                self-signed certificates.
+
+                **Use with caution:** Disabling SSL verification exposes your crawler to
+                man-in-the-middle (MitM) attacks, data tampering, and potential
+                interception of sensitive information. This significantly compromises
+                the security and integrity of the communication. It should never be
+                used in production or when handling sensitive data.
         """  # noqa: E501
 
         self.url = url
         self.max_depth = max_depth if max_depth is not None else 2
         self.use_async = use_async if use_async is not None else False
         self.extractor = extractor if extractor is not None else lambda x: x
+        self.ssl = ssl
         metadata_extractor = (
             metadata_extractor
             if metadata_extractor is not None
@@ -447,7 +461,7 @@ class RecursiveUrlLoader(BaseLoader):
             session
             if session is not None
             else aiohttp.ClientSession(
-                connector=aiohttp.TCPConnector(ssl=False),
+                connector=aiohttp.TCPConnector(ssl=self.ssl),
                 timeout=aiohttp.ClientTimeout(total=self.timeout),
                 headers=self.headers,
             )
