@@ -1,6 +1,7 @@
-"""Load documents from Evernote.
+"""Document loader for EverNote ENEX export files.
 
-https://gist.github.com/foxmask/7b29c43a161e001ff04afdb2f181e31c
+This module provides functionality to securely load and parse EverNote notebook
+export files (.enex format) into LangChain Document objects.
 """
 
 import hashlib
@@ -18,23 +19,42 @@ logger = logging.getLogger(__name__)
 
 
 class EverNoteLoader(BaseLoader):
-    """Load from `EverNote`.
+    """Document loader for EverNote ENEX export files.
 
-    Loads an EverNote notebook export file e.g. my_notebook.enex into Documents.
-    Instructions on producing this file can be found at
+    Loads EverNote notebook export files (.enex format) into LangChain Documents.
+    Extracts plain text content from HTML and preserves note metadata including
+    titles, timestamps, and attachments. Uses secure XML parsing to prevent
+    vulnerabilities.
+
+    The loader supports two modes:
+    - Single document: Concatenates all notes into one Document (default)
+    - Multiple documents: Creates separate Documents for each note
+
+    Instructions for creating ENEX files:
     https://help.evernote.com/hc/en-us/articles/209005557-Export-notes-and-notebooks-as-ENEX-or-HTML
 
-    Currently only the plain text in the note is extracted and stored as the contents
-    of the Document, any non content metadata (e.g. 'author', 'created', 'updated' etc.
-    but not 'content-raw' or 'resource') tags on the note will be extracted and stored
-    as metadata on the Document.
+    Example:
+        Basic usage:
+        ```python
+        from langchain_community.document_loaders import EverNoteLoader
+        
+        # Load all notes as a single document
+        loader = EverNoteLoader("my_notebook.enex")
+        documents = loader.load()
+        
+        # Load each note as a separate document
+        loader = EverNoteLoader("my_notebook.enex", load_single_document=False)
+        documents = loader.load()
+        
+        # Lazy loading for large files
+        for doc in loader.lazy_load():
+            print(f"Title: {doc.metadata.get('title', 'Untitled')}")
+            print(f"Content: {doc.page_content[:100]}...")
+        ```
 
-    Args:
-        file_path (str): The path to the notebook export with a .enex extension
-        load_single_document (bool): Whether or not to concatenate the content of all
-            notes into a single long Document.
-        If this is set to True (default) then the only metadata on the document will be
-            the 'source' which contains the file name of the export.
+    Note:
+        Requires the `lxml` and `html2text` packages to be installed.
+        Install with: `pip install lxml html2text`
     """
 
     def __init__(self, file_path: Union[str, Path], load_single_document: bool = True):
