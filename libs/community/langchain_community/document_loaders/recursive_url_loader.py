@@ -270,6 +270,7 @@ class RecursiveUrlLoader(BaseLoader):
         autoset_encoding: bool = True,
         encoding: Optional[str] = None,
         proxies: Optional[dict] = None,
+        ssl: bool = True,
     ) -> None:
         """Initialize with URL to crawl and any subdirectories to exclude.
 
@@ -277,16 +278,18 @@ class RecursiveUrlLoader(BaseLoader):
             url: The URL to crawl.
             max_depth: The max depth of the recursive loading.
             use_async: Whether to use asynchronous loading.
-                If True, lazy_load function will not be lazy, but it will still work in the
-                expected way, just not lazy.
+                If ``True``, ``lazy_load()`` will not be lazy, but it will still work in
+                the expected way, just not lazy.
             extractor: A function to extract document contents from raw HTML.
                 When extract function returns an empty string, the document is
                 ignored. Default returns the raw HTML.
             metadata_extractor: A function to extract metadata from args: raw HTML, the
                 source url, and the requests.Response/aiohttp.ClientResponse object
                 (args in that order).
+
                 Default extractor will attempt to use BeautifulSoup4 to extract the
                 title, description and language of the page.
+
                 ..code-block:: python
 
                     import requests
@@ -299,38 +302,54 @@ class RecursiveUrlLoader(BaseLoader):
                         return {"source": url, "content_type": content_type}
 
             exclude_dirs: A list of subdirectories to exclude.
-            timeout: The timeout for the requests, in the unit of seconds. If None then
-                connection will not timeout.
-            prevent_outside: If True, prevent loading from urls which are not children
+            timeout: The timeout for the requests, in the unit of seconds. If ``None``
+                then connection will not timeout.
+            prevent_outside: If ``True``, prevent loading from urls which are not children
                 of the root url.
             link_regex: Regex for extracting sub-links from the raw html of a web page.
             headers: Default request headers to use for all requests.
-            check_response_status: If True, check HTTP response status and skip
-                URLs with error responses (400-599).
-            continue_on_failure: If True, continue if getting or parsing a link raises
+            check_response_status: If ``True``, check HTTP response status and skip
+                URLs with error responses (``400-599``).
+            continue_on_failure: If ``True``, continue if getting or parsing a link raises
                 an exception. Otherwise, raise the exception.
             base_url: The base url to check for outside links against.
             autoset_encoding: Whether to automatically set the encoding of the response.
-                If True, the encoding of the response will be set to the apparent
-                encoding, unless the `encoding` argument has already been explicitly set.
+                If ``True``, the encoding of the response will be set to the apparent
+                encoding, unless the ``encoding`` argument has already been explicitly set.
             encoding: The encoding of the response. If manually set, the encoding will be
-                set to given value, regardless of the `autoset_encoding` argument.
+                set to given value, regardless of the ``autoset_encoding`` argument.
             proxies: A dictionary mapping protocol names to the proxy URLs to be used for requests.
                 This allows the crawler to route its requests through specified proxy servers.
-                If None, no proxies will be used and requests will go directly to the target URL.
+                If ``None``, no proxies will be used and requests will go directly to the target URL.
+
                 Example usage:
+
                 ..code-block:: python
 
                     proxies = {
                         "http": "http://10.10.1.10:3128",
                         "https": "https://10.10.1.10:1080",
                     }
+
+            ssl: Whether to verify SSL certificates during requests.
+                By default, SSL certificate verification is enabled (``ssl=True``),
+                ensuring secure HTTPS connections. Setting this to ``False`` disables SSL
+                certificate verification, which can be useful when crawling internal
+                services, development environments, or sites with misconfigured or
+                self-signed certificates.
+
+                **Use with caution:** Disabling SSL verification exposes your crawler to
+                man-in-the-middle (MitM) attacks, data tampering, and potential
+                interception of sensitive information. This significantly compromises
+                the security and integrity of the communication. It should never be
+                used in production or when handling sensitive data.
         """  # noqa: E501
 
         self.url = url
         self.max_depth = max_depth if max_depth is not None else 2
         self.use_async = use_async if use_async is not None else False
         self.extractor = extractor if extractor is not None else lambda x: x
+        self.ssl = ssl
         metadata_extractor = (
             metadata_extractor
             if metadata_extractor is not None
@@ -447,7 +466,7 @@ class RecursiveUrlLoader(BaseLoader):
             session
             if session is not None
             else aiohttp.ClientSession(
-                connector=aiohttp.TCPConnector(ssl=False),
+                connector=aiohttp.TCPConnector(ssl=self.ssl),
                 timeout=aiohttp.ClientTimeout(total=self.timeout),
                 headers=self.headers,
             )
