@@ -130,9 +130,6 @@ class EverNoteLoader(BaseLoader):
     @staticmethod
     def _parse_note_xml(xml_file: str) -> Iterator[Dict[str, Any]]:
         """Parse Evernote xml."""
-        # Without huge_tree set to True, parser may complain about huge text node
-        # Try to recover, because there may be "&nbsp;", which will cause
-        # "XMLSyntaxError: Entity 'nbsp' not defined"
         try:
             from lxml import etree
         except ImportError as e:
@@ -144,7 +141,12 @@ class EverNoteLoader(BaseLoader):
             raise e
 
         context = etree.iterparse(
-            xml_file, encoding="utf-8", strip_cdata=False, huge_tree=True, recover=True
+            xml_file,
+            encoding="utf-8",
+            resolve_entities=False,  # Prevents XXE attacks
+            no_network=True,  # Blocks network-based external entities
+            recover=False,  # Avoid parsing invalid/malformed XML
+            huge_tree=False,  # Protect against XML Bomb DoS attacks
         )
 
         for action, elem in context:
