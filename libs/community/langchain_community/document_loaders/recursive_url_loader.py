@@ -80,7 +80,7 @@ class RecursiveUrlLoader(BaseLoader):
         GET request to an endpoint on Bob's site. Both sites are hosted on the
         same host, so such a request would not be prevented by default.
 
-        (See `LangChain Security Policy <https://python.langchain.com/docs/security/>`__)
+        See https://python.langchain.com/docs/security/
 
     Setup:
 
