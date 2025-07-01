@@ -144,7 +144,9 @@ class JSONLoader(BaseLoader):
                             yield doc
                             index += 1
         else:
-            for doc in self._parse(self.file_path.read_text(encoding="utf-8-sig"), index):
+            for doc in self._parse(
+                self.file_path.read_text(encoding="utf-8-sig"), index
+            ):
                 yield doc
                 index += 1
 
