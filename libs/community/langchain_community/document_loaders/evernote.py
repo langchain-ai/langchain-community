@@ -38,11 +38,27 @@ class EverNoteLoader(BaseLoader):
     """
 
     def __init__(self, file_path: Union[str, Path], load_single_document: bool = True):
-        """Initialize with file path."""
+        """Initialize the EverNote loader.
+        
+        Args:
+            file_path: Path to the EverNote export file (.enex extension).
+            load_single_document: Whether to concatenate all notes into a single
+                Document. If True, only the 'source' metadata is preserved.
+                If False, each note becomes a separate Document with its own metadata.
+        """
         self.file_path = str(file_path)
         self.load_single_document = load_single_document
 
     def _lazy_load(self) -> Iterator[Document]:
+        """Lazily load documents from the EverNote export file.
+        
+        Parses the XML file and yields one Document per note. Each Document
+        contains the note's content as page_content and metadata including
+        title, created/updated timestamps, and other note attributes.
+        
+        Yields:
+            Document: A Document object for each note in the export file.
+        """
         for note in self._parse_note_xml(self.file_path):
             if note.get("content") is not None:
                 yield Document(
@@ -58,7 +74,14 @@ class EverNoteLoader(BaseLoader):
                 )
 
     def lazy_load(self) -> Iterator[Document]:
-        """Load documents from EverNote export file."""
+        """Load documents from EverNote export file.
+        
+        Depending on the load_single_document setting, either yields individual
+        Documents for each note or a single Document containing all notes.
+        
+        Yields:
+            Document: Either individual note Documents or a single combined Document.
+        """
         if not self.load_single_document:
             yield from self._lazy_load()
         else:
@@ -71,6 +94,20 @@ class EverNoteLoader(BaseLoader):
 
     @staticmethod
     def _parse_content(content: str) -> str:
+        """Parse HTML content from EverNote into plain text.
+        
+        Converts HTML content to plain text using html2text library.
+        Strips whitespace from the result.
+        
+        Args:
+            content: HTML content string from EverNote.
+            
+        Returns:
+            Plain text version of the content.
+            
+        Raises:
+            ImportError: If html2text library is not installed.
+        """
         try:
             import html2text
 
@@ -84,6 +121,17 @@ class EverNoteLoader(BaseLoader):
 
     @staticmethod
     def _parse_resource(resource: list) -> dict:
+        """Parse resource elements from EverNote XML.
+        
+        Extracts resource information like attachments, images, etc.
+        Base64 decodes data elements and generates MD5 hashes.
+        
+        Args:
+            resource: List of XML elements representing a resource.
+            
+        Returns:
+            Dictionary containing resource metadata and decoded data.
+        """
         rsc_dict: Dict[str, Any] = {}
         for elem in resource:
             if elem.tag == "data":
@@ -97,6 +145,18 @@ class EverNoteLoader(BaseLoader):
 
     @staticmethod
     def _parse_note(note: List, prefix: Optional[str] = None) -> dict:
+        """Parse a note element from EverNote XML.
+        
+        Extracts note content, metadata, resources, and attributes.
+        Handles nested note-attributes recursively with prefixes.
+        
+        Args:
+            note: List of XML elements representing a note.
+            prefix: Optional prefix for nested attribute names.
+            
+        Returns:
+            Dictionary containing note content and metadata.
+        """
         note_dict: Dict[str, Any] = {}
         resources = []
 
@@ -129,7 +189,20 @@ class EverNoteLoader(BaseLoader):
 
     @staticmethod
     def _parse_note_xml(xml_file: str) -> Iterator[Dict[str, Any]]:
-        """Parse Evernote xml."""
+        """Parse EverNote XML file securely.
+        
+        Uses lxml with secure parsing configuration to prevent XML vulnerabilities
+        including XXE attacks, XML bombs, and malformed XML exploitation.
+        
+        Args:
+            xml_file: Path to the EverNote export XML file.
+            
+        Yields:
+            Dictionary containing parsed note data for each note in the file.
+            
+        Raises:
+            ImportError: If lxml library is not installed.
+        """
         try:
             from lxml import etree
         except ImportError as e:
