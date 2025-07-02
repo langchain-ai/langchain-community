@@ -1,7 +1,7 @@
 """Document loader for EverNote ENEX export files.
 
 This module provides functionality to securely load and parse EverNote notebook
-export files (.enex format) into LangChain Document objects.
+export files (``.enex`` format) into LangChain Document objects.
 """
 
 import hashlib
@@ -21,7 +21,7 @@ logger = logging.getLogger(__name__)
 class EverNoteLoader(BaseLoader):
     """Document loader for EverNote ENEX export files.
 
-    Loads EverNote notebook export files (.enex format) into LangChain Documents.
+    Loads EverNote notebook export files (``.enex`` format) into LangChain Documents.
     Extracts plain text content from HTML and preserves note metadata including
     titles, timestamps, and attachments. Uses secure XML parsing to prevent
     vulnerabilities.
@@ -30,12 +30,12 @@ class EverNoteLoader(BaseLoader):
     - Single document: Concatenates all notes into one Document (default)
     - Multiple documents: Creates separate Documents for each note
 
-    Instructions for creating ENEX files:
-    https://help.evernote.com/hc/en-us/articles/209005557-Export-notes-and-notebooks-as-ENEX-or-HTML
+    `Instructions for creating ENEX files <https://help.evernote.com/hc/en-us/articles/209005557-Export-notes-and-notebooks-as-ENEX-or-HTML>`__
 
     Example:
-        Basic usage:
-        ```python
+
+    .. code-block:: python
+
         from langchain_community.document_loaders import EverNoteLoader
 
         # Load all notes as a single document
@@ -50,21 +50,21 @@ class EverNoteLoader(BaseLoader):
         for doc in loader.lazy_load():
             print(f"Title: {doc.metadata.get('title', 'Untitled')}")
             print(f"Content: {doc.page_content[:100]}...")
-        ```
 
     Note:
-        Requires the `lxml` and `html2text` packages to be installed.
-        Install with: `pip install lxml html2text`
+        Requires the ``lxml`` and ``html2text`` packages to be installed.
+        Install with: ``pip install lxml html2text``
     """
 
     def __init__(self, file_path: Union[str, Path], load_single_document: bool = True):
         """Initialize the EverNote loader.
 
         Args:
-            file_path: Path to the EverNote export file (.enex extension).
+            file_path: Path to the EverNote export file (``.enex`` extension).
             load_single_document: Whether to concatenate all notes into a single
-                Document. If True, only the 'source' metadata is preserved.
-                If False, each note becomes a separate Document with its own metadata.
+                Document. If ``True``, only the ``source`` metadata is preserved.
+                If ``False``, each note becomes a separate Document with its own
+                metadata.
         """
         self.file_path = str(file_path)
         self.load_single_document = load_single_document
@@ -96,7 +96,7 @@ class EverNoteLoader(BaseLoader):
     def lazy_load(self) -> Iterator[Document]:
         """Load documents from EverNote export file.
 
-        Depending on the load_single_document setting, either yields individual
+        Depending on the ``load_single_document`` setting, either yields individual
         Documents for each note or a single Document containing all notes.
 
         Yields:
@@ -116,7 +116,7 @@ class EverNoteLoader(BaseLoader):
     def _parse_content(content: str) -> str:
         """Parse HTML content from EverNote into plain text.
 
-        Converts HTML content to plain text using html2text library.
+        Converts HTML content to plain text using the ``html2text`` library.
         Strips whitespace from the result.
 
         Args:
@@ -126,7 +126,7 @@ class EverNoteLoader(BaseLoader):
             Plain text version of the content.
 
         Raises:
-            ImportError: If html2text library is not installed.
+            ImportError: If ``html2text`` is not installed.
         """
         try:
             import html2text
@@ -135,7 +135,7 @@ class EverNoteLoader(BaseLoader):
         except ImportError as e:
             raise ImportError(
                 "Could not import `html2text`. Although it is not a required package "
-                "to use Langchain, using the EverNote loader requires `html2text`. "
+                "to use LangChain, using the EverNote loader requires `html2text`. "
                 "Please install `html2text` via `pip install html2text` and try again."
             ) from e
 
@@ -211,7 +211,7 @@ class EverNoteLoader(BaseLoader):
     def _parse_note_xml(xml_file: str) -> Iterator[Dict[str, Any]]:
         """Parse EverNote XML file securely.
 
-        Uses lxml with secure parsing configuration to prevent XML vulnerabilities
+        Uses ``lxml`` with secure parsing configuration to prevent XML vulnerabilities
         including XXE attacks, XML bombs, and malformed XML exploitation.
 
         Args:
@@ -221,14 +221,14 @@ class EverNoteLoader(BaseLoader):
             Dictionary containing parsed note data for each note in the file.
 
         Raises:
-            ImportError: If lxml library is not installed.
+            ImportError: If ``lxml`` is not installed.
         """
         try:
             from lxml import etree
         except ImportError as e:
             logger.error(
                 "Could not import `lxml`. Although it is not a required package to use "
-                "Langchain, using the EverNote loader requires `lxml`. Please install "
+                "LangChain, using the EverNote loader requires `lxml`. Please install "
                 "`lxml` via `pip install lxml` and try again."
             )
             raise e
