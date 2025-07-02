@@ -42,7 +42,8 @@ class EverNoteLoader(BaseLoader):
         loader = EverNoteLoader("my_notebook.enex")
         documents = loader.load()
 
-        # Load each note as a separate document
+        # Load each note as a separate document:
+        # documents = [ document1, document2, ... ]
         loader = EverNoteLoader("my_notebook.enex", load_single_document=False)
         documents = loader.load()
 
@@ -72,9 +73,11 @@ class EverNoteLoader(BaseLoader):
     def _lazy_load(self) -> Iterator[Document]:
         """Lazily load documents from the EverNote export file.
 
-        Parses the XML file and yields one Document per note. Each Document
-        contains the note's content as page_content and metadata including
-        title, created/updated timestamps, and other note attributes.
+        Lazy loading allows processing large EverNote files without
+        loading everything into memory at once. This method yields Documents
+        one by one by parsning the XML. Each document represents a note in the EverNote
+        export, containing the note's content as ``page_content`` and metadata including
+        ``title``, ``created/updated`` ``timestamps``, and other note attributes.
 
         Yields:
             Document: A Document object for each note in the export file.
