@@ -47,9 +47,9 @@ class GoogleVertexCambTool(BaseTool):
         "Supports multilingual synthesis including English, Spanish, and other languages. "
         "Requires reference audio for voice cloning."
     )
-    project_id: str = ""
-    location: str = ""
-    endpoint_id: str = ""
+    project_id: str
+    location: str
+    endpoint_id: str
     reference_audio_path: str
     reference_text: Optional[str] = None
     language: Mars7Language = "en-us"
