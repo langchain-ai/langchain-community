@@ -48,10 +48,10 @@ class SlackToolkit(BaseToolkit):
 
             # Using environment variables (default)
             toolkit = SlackToolkit()
-            
+
             # Or with an existing WebClient instance
             from slack_sdk import WebClient
-            client = WebClient(token="your-token")
+            client = WebClient(token="your-user-token")
             toolkit = SlackToolkit(client=client)
 
     Tools:
