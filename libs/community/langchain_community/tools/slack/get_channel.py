@@ -53,7 +53,11 @@ class SlackGetChannel(SlackBaseTool):
         try:
             logging.getLogger(__name__)
 
-            all_channels = self._get_all_channels_by_type()
+            public_channels = self._get_all_channels_by_type()
+            private_channels = self._get_all_channels_by_type(
+                types="private_channel,mpim,im"
+            )
+            all_channels = public_channels + private_channels
 
             filtered_result = [
                 {key: channel[key] for key in ("id", "name", "created", "num_members")}
