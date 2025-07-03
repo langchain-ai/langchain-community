@@ -22,7 +22,7 @@ dependencies = [
     "numpy>=2.1.0; python_version>='3.13'",
 ]
 name = "langchain-community"
-version = "0.3.26"
+version = "0.3.27"
 description = "Community contributed LangChain integrations."
 readme = "README.md"
 
