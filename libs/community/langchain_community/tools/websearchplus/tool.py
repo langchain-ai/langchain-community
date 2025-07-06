@@ -91,7 +91,10 @@ class WebSearchPlusResults(BaseTool):
     
     Instantiation:
         .. code-block:: python
-            from langchain_community.tools import WebSearchPlusResults, WebSearchPlusAPIWrapper
+
+from langchain_community.tools import WebSearchPlusResults
+from langchain_community.utilities.websearchplus_search import WebSearchPlusAPIWrapper
+
             
             api_wrapper = WebSearchPlusAPIWrapper(websearchplus_api_key="your_api_key_here")  # type: ignore[arg-type]
             websearchplus_tool = WebSearchPlusResults(api_wrapper=api_wrapper)
