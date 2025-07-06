@@ -30,7 +30,7 @@ class WebSearchPlusResults(BaseTool):
     string — Optional
     
     Controls search depth: low, medium (default), or high. Affects number of results and pricing.
-        - low: For some lightweight search needs, such as weathre, stock prices, etc.
+        - low: For some lightweight search needs, such as weather, stock prices, etc.
         - medium: Can be applied to most search scenarios.
         - high: Being able to conduct in-depth searches on a topic.
     
