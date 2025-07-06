@@ -17,7 +17,7 @@ class WebSearchPlusResults(BaseTool):
     
     Get 4M tokens for free, no credit card required.
     Please refer to the official documentation for more details.
-    `websearch.plus <https://websearch.plus/>`
+    `websearch.plus <https://websearch.plus/>`_
     
     ### Request Body
     
