@@ -79,7 +79,7 @@ class WebSearchPlusResults(BaseTool):
                 "language": "en",
                 "mode": "smart",
                 "type": "search",
-                "return_type": "text",
+                "result_type": "text",
                 "qdr": "w"
             }
         }
