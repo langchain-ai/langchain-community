@@ -82,7 +82,7 @@ class WebSearchPlusResults(BaseTool):
                 "return_type": "text",
                 "qdr": "w"
             }
-        }'
+        }
     Setup:
         Install ``langchain-community`` and ``httpx``.
     
