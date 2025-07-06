@@ -89,7 +89,7 @@ class WebSearchPlusResults(BaseTool):
         .. code-block:: bash
             pip install -U langchain-community httpx
     
-    Instantation:
+    Instantiation:
         .. code-block:: python
             from langchain_community.tools import WebSearchPlusResults, WebSearchPlusAPIWrapper
             
