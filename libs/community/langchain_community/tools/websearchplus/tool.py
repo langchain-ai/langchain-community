@@ -52,7 +52,7 @@ class WebSearchPlusResults(BaseTool):
         - search: Search across the entire network.
         - news: Only search for reliable news sources, very suitable for searching real-time content.
     
-    *options.qdr
+    * options.qdr
     string — Optional
     
     Time filter: any (default), h, d, w, m, y.
