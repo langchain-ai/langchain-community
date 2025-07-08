@@ -1,12 +1,11 @@
 from typing import Iterable, Optional, Type
 
+from langchain_community.document_loaders.web_base import WebBaseLoader
 from langchain_core.callbacks import CallbackManagerForToolRun
 from langchain_core.documents import Document
 from langchain_core.tools import BaseTool
 from pydantic import BaseModel, Field
-from requests.exceptions import HTTPError, ReadTimeout, ConnectionError
-
-from langchain_community.document_loaders.web_base import WebBaseLoader
+from requests.exceptions import ConnectionError, HTTPError, ReadTimeout
 
 
 class YahooFinanceNewsInput(BaseModel):
