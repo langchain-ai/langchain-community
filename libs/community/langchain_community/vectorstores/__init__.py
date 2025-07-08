@@ -261,9 +261,6 @@ if TYPE_CHECKING:
     from langchain_community.vectorstores.tidb_vector import (
         TiDBVectorStore,
     )
-    from langchain_community.vectorstores.tigris import (
-        Tigris,
-    )
     from langchain_community.vectorstores.tiledb import (
         TileDB,
     )
