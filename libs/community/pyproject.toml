@@ -74,6 +74,13 @@ typing = [
     "langchain-text-splitters",
     "langchain",
 ]
+pdf = [
+    "pdfminer-six>=20250506",
+    "pdfplumber>=0.11.7",
+    "pymupdf>=1.21.0",
+    "pypdf>=5.7.0",
+    "unstructured>=0.18.3",
+]
 
 [tool.ruff]
 exclude = [
@@ -82,9 +89,9 @@ exclude = [
 ]
 
 [tool.mypy]
-ignore_missing_imports = "True"
-disallow_untyped_defs = "True"
-warn_unused_ignores = "True"
+ignore_missing_imports = true
+disallow_untyped_defs = true
+warn_unused_ignores = true
 
 [tool.codespell]
 skip = ".git,*.pdf,*.svg,*.pdf,*.yaml,*.ipynb,poetry.lock,*.min.js,*.css,package-lock.json,example_data,_dist,examples,*.trig"

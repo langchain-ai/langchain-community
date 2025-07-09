@@ -431,42 +431,46 @@ class PyPDFParser(BaseBlobParser):
         import pypdf
         from PIL import Image
 
-        if "/XObject" not in cast(dict, page["/Resources"]).keys():
+        if "/Resources" not in page or "/XObject" not in cast(dict, page["/Resources"]).keys():
             return ""
 
         xObject = page["/Resources"]["/XObject"].get_object()
         images = []
         for obj in xObject:
-            np_image: Any = None
-            if xObject[obj]["/Subtype"] == "/Image":
-                img_filter = (
-                    xObject[obj]["/Filter"][1:]
-                    if type(xObject[obj]["/Filter"]) is pypdf.generic._base.NameObject
-                    else xObject[obj]["/Filter"][0][1:]
-                )
-                if img_filter in _PDF_FILTER_WITHOUT_LOSS:
-                    height, width = xObject[obj]["/Height"], xObject[obj]["/Width"]
-
-                    np_image = np.frombuffer(
-                        xObject[obj].get_data(), dtype=np.uint8
-                    ).reshape(height, width, -1)
-                elif img_filter in _PDF_FILTER_WITH_LOSS:
-                    np_image = np.array(Image.open(io.BytesIO(xObject[obj].get_data())))
-
-                else:
-                    logger.warning("Unknown PDF Filter!")
-                if np_image is not None:
-                    image_bytes = io.BytesIO()
-
-                    if image_bytes.getbuffer().nbytes == 0:
-                        continue
-
-                    Image.fromarray(np_image).save(image_bytes, format="PNG")
-                    blob = Blob.from_data(image_bytes.getvalue(), mime_type="image/png")
-                    image_text = next(self.images_parser.lazy_parse(blob)).page_content
-                    images.append(
-                        _format_inner_image(blob, image_text, self.images_inner_format)
+            try:
+                np_image: Any = None
+                if xObject[obj]["/Subtype"] == "/Image":
+                    img_filter = (
+                        xObject[obj]["/Filter"][1:]
+                        if type(xObject[obj]["/Filter"]) is pypdf.generic._base.NameObject
+                        else xObject[obj]["/Filter"][0][1:]
                     )
+                    if img_filter in _PDF_FILTER_WITHOUT_LOSS:
+                        height, width = xObject[obj]["/Height"], xObject[obj]["/Width"]
+
+                        np_image = np.frombuffer(
+                            xObject[obj].get_data(), dtype=np.uint8
+                        ).reshape(height, width, -1)
+                    elif img_filter in _PDF_FILTER_WITH_LOSS:
+                        np_image = np.array(Image.open(io.BytesIO(xObject[obj].get_data())))
+
+                    else:
+                        logger.warning("Unknown PDF Filter!")
+                    if np_image is not None:
+                        image_bytes = io.BytesIO()
+                        Image.fromarray(np_image).save(image_bytes, format="PNG")
+                        
+                        if image_bytes.getbuffer().nbytes == 0:
+                            continue
+
+                        blob = Blob.from_data(image_bytes.getvalue(), mime_type="image/png")
+                        image_text = next(self.images_parser.lazy_parse(blob)).page_content
+                        images.append(
+                            _format_inner_image(blob, image_text, self.images_inner_format)
+                        )
+            except Exception as e:
+                logger.warning(f"Failed to extract image from PDF: {e}")
+                continue
         return _FORMAT_IMAGE_STR.format(
             image_text=_JOIN_IMAGES.join(filter(None, images))
         )
