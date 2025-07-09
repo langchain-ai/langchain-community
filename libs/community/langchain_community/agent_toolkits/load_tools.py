@@ -571,7 +571,14 @@ _EXTRA_OPTIONAL_TOOLS: Dict[str, Tuple[Callable[[KwArg(Any)], BaseTool], List[st
     ),
     "google_vertex_camb": (
         _get_google_vertex_camb,
-        ["project_id", "endpoint_id", "location", "reference_audio_path", "reference_text", "language"],
+        [
+            "project_id",
+            "endpoint_id",
+            "location",
+            "reference_audio_path",
+            "reference_text",
+            "language",
+        ],
     ),
 }
 
