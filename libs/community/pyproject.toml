@@ -61,7 +61,7 @@ lint = [
     "cffi<1.17.1; python_version < \"3.10\"",
     "cffi; python_version >= \"3.10\"",
 ]
-dev = ["jupyter<2.0.0,>=1.0.0", "setuptools<68.0.0,>=67.6.1", "langchain-core"]
+dev = ["jupyter<2.0.0,>=1.0.0", "setuptools<68.0.0,>=67.6.1", "langchain-core", "ollama<1.0.0,>=0.4.8"]
 typing = [
     "mypy<2.0,>=1.15",
     "types-pyyaml<7.0.0.0,>=6.0.12.2",

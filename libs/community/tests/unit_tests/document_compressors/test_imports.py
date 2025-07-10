@@ -9,6 +9,7 @@ EXPECTED_ALL = [
     "DashScopeRerank",
     "VolcengineRerank",
     "InfinityRerank",
+    "OllamaRerank",
 ]
 
 

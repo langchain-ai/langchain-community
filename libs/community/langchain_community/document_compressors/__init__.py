@@ -26,6 +26,9 @@ if TYPE_CHECKING:
     from langchain_community.document_compressors.volcengine_rerank import (
         VolcengineRerank,
     )
+    from langchain_community.document_compressors.ollama_rerank import (
+        OllamaRerank,
+    )
 
 _module_lookup = {
     "LLMLinguaCompressor": "langchain_community.document_compressors.llmlingua_filter",
@@ -36,6 +39,7 @@ _module_lookup = {
     "DashScopeRerank": "langchain_community.document_compressors.dashscope_rerank",
     "VolcengineRerank": "langchain_community.document_compressors.volcengine_rerank",
     "InfinityRerank": "langchain_community.document_compressors.infinity_rerank",
+    "OllamaRerank": "langchain_community.document_compressors.ollama_rerank",
 }
 
 
@@ -55,4 +59,5 @@ __all__ = [
     "DashScopeRerank",
     "VolcengineRerank",
     "InfinityRerank",
+    "OllamaRerank",
 ]
