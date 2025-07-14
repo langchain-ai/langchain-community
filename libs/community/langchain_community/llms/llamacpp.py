@@ -104,11 +104,23 @@ class LlamaCpp(LLM):
     use_mmap: Optional[bool] = True
     """Whether to keep the model loaded in RAM"""
 
-    rope_freq_scale: float = 1.0
-    """Scale factor for rope sampling."""
+    # NOTE on RoPE defaults
+    # ---------------------
+    # llama.cpp interprets
+    #   rope_freq_base = 0.0
+    #   rope_freq_scale = 0.0
+    # as “use the values stored in the GGUF’s metadata (freq_base_train / freq_scale_train)”.
+    # Modern GGUF models (DeepSeek‑Coder, Mistral‑Instruct, Yi‑34B, etc.)
+    # carry fine‑tuned RoPE settings for extended context lengths.  
+    # Hard‑coding non‑zero defaults breaks those models, resulting in blank or
+    # gibberish output.  Leave these at 0.0 unless you explicitly need to
+    # override a model’s training values for experimental purposes.
 
-    rope_freq_base: float = 10000.0
-    """Base frequency for rope sampling."""
+    rope_freq_scale: float = 0.0  # defer to model metadata
+    """Scale factor for RoPE frequency. 0.0 → use model’s own value."""
+
+    rope_freq_base: float = 0.0   # defer to model metadata
+    """Base frequency for RoPE. 0.0 → use model’s own value."""
 
     model_kwargs: Dict[str, Any] = Field(default_factory=dict)
     """Any additional parameters to pass to llama_cpp.Llama."""
