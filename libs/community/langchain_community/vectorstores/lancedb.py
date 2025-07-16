@@ -482,22 +482,17 @@ class LanceDB(VectorStore):
             raise ValueError("search needs an emmbedding function to be specified.")
 
         if query_type == "fts" or query_type == "hybrid":
-            if self.api_key is None and self._fts_index is None:
-                tbl = self.get_table(name)
-                self._fts_index = tbl.create_fts_index(self._text_key, replace=True)
+            tbl = self.get_table(name)
+            self._fts_index = tbl.create_fts_index(self._text_key, replace=True)
 
-                if query_type == "hybrid":
-                    embedding = self._embedding.embed_query(query)
-                    _query = (embedding, query)
-                else:
-                    _query = query  # type: ignore[assignment]
-
-                res = self._query(_query, k, filter=filter, name=name, **kwargs)
-                return self.results_to_docs(res, score=score)
+            if query_type == "hybrid":
+                embedding = self._embedding.embed_query(query)
+                _query = (embedding, query)
             else:
-                raise NotImplementedError(
-                    "Full text/ Hybrid search is not supported in LanceDB Cloud yet."
-                )
+                _query = query  # type: ignore[assignment]
+
+            res = self._query(_query, k, filter=filter, name=name, **kwargs)
+            return self.results_to_docs(res, score=score)
         else:
             embedding = self._embedding.embed_query(query)
             res = self._query(embedding, k, filter=filter, **kwargs)
