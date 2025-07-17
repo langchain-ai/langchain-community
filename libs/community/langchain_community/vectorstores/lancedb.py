@@ -483,7 +483,9 @@ class LanceDB(VectorStore):
 
         if query_type == "fts" or query_type == "hybrid":
             tbl = self.get_table(name)
-            self._fts_index = tbl.create_fts_index(self._text_key, replace=True)
+
+            if self._fts_index is None:
+                self._fts_index = tbl.create_fts_index(self._text_key, replace=True)
 
             if query_type == "hybrid":
                 embedding = self._embedding.embed_query(query)
