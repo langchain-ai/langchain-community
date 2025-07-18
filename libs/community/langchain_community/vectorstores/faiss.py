@@ -407,7 +407,7 @@ class FAISS(VectorStore):
                     filter the resulting set of retrieved docs
 
         Returns:
-            List of documents most similar to the query text and L2 distance
+            List of documents most similar to the query text and distance
             in float for each. Lower score represents more similarity.
         """
         faiss = dependable_faiss_import()
@@ -415,6 +415,10 @@ class FAISS(VectorStore):
         if self._normalize_L2:
             faiss.normalize_L2(vector)
         scores, indices = self.index.search(vector, k if filter is None else fetch_k)
+
+        if self.distance_strategy == DistanceStrategy.EUCLIDEAN_DISTANCE:
+            scores = np.sqrt(scores)
+
         docs = []
 
         if filter is not None:
@@ -994,7 +998,7 @@ class FAISS(VectorStore):
         **kwargs: Any,
     ) -> FAISS:
         faiss = dependable_faiss_import()
-        if distance_strategy == DistanceStrategy.MAX_INNER_PRODUCT:
+        if distance_strategy == DistanceStrategy.MAX_INNER_PRODUCT or distance_strategy == DistanceStrategy.COSINE:
             index = faiss.IndexFlatIP(len(embeddings[0]))
         else:
             # Default to L2, currently other metric types not initialized.
