@@ -111,6 +111,9 @@ class WebSearchPlusAPIWrapper(BaseModel):
                 if data.get("status") == "completed":
                     return data.get("results", [])
                 return [{"error": f"Search failed: {data.get('status')}"}]
+        except (ConnectionError, TimeoutError) as e:
+            logger.error(f"Network error during search: {e}")
+            raise
         except Exception as e:
-            logger.error(f"Search error: {e}")
-            return [{"error": f"Search failed: {str(e)}"}]
+            logger.error(f"Unexpected search error: {e}")
+            raise
