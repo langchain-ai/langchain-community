@@ -120,7 +120,7 @@ from langchain_community.utilities.websearchplus_search import WebSearchPlusAPIW
             ]")
     """ # noqa: E501
 
-    name: str = "websearchplus_results"
+    name: str = "web_search_plus"
     description: str = (
         "A wrapper around the WebSearchPlus API. "
         "Useful for searching the web and retrieving results, intelligently filter out invalid information. "
