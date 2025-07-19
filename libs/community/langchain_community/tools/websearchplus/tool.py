@@ -151,7 +151,7 @@ from langchain_community.utilities.websearchplus_search import WebSearchPlusAPIW
                 # input=input
             )
             return results
-        except (requests.RequestException, ConnectionError) as e:
+        except (httpx.RequestError, ConnectionError) as e:
             warnings.warn(f"Network error during WebSearchPlus search: {e}")
             return f"Error: Could not complete search due to network issues: {e}"
         except Exception as e:
