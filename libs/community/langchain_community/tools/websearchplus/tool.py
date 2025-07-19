@@ -130,7 +130,20 @@ from langchain_community.utilities.websearchplus_search import WebSearchPlusAPIW
     """Output format of the search results."""
     
     def _run(self, **kwargs) -> Union[str, List[dict]]:
-        """Use the tool to perform a web search."""
+        """Use the tool to perform a web search.
+        
+        Args:
+            **kwargs: Keyword arguments that match WebSearchPlusInput fields:
+                query (str): The search query string
+                search_context_size (str, optional): Controls search depth ('low', 'medium', 'high')
+                options (dict, optional): Additional search configuration options
+        
+        Returns:
+            Union[str, List[dict]]: Search results as either formatted text or a list of result objects
+        
+        Raises:
+            Exception: If the web search fails, returns the error message as a string
+        """
         try:
             input_model = WebSearchPlusInput(**kwargs)    
             results = self.api_wrapper._run(
