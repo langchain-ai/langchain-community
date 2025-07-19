@@ -82,7 +82,15 @@ class WebSearchPlusAPIWrapper(BaseModel):
         return values
     
     def _run(self, input: dict[str, Any],  **kwargs: Any) -> Any:
-        """Run the search query and return results."""
+        """Run the search query and return results.
+        
+        Args:
+            input: A dictionary containing the search query and options.
+            **kwargs: Additional keyword arguments.
+            
+        Returns:
+            List of search results or error information.
+        """
         # Here you would implement the actual API call to WebSearchPlus
         
         try:
