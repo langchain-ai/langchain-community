@@ -1,5 +1,6 @@
 import fnmatch
 import os
+import re
 from typing import Optional, Type
 
 from langchain_core.callbacks import CallbackManagerForToolRun
@@ -22,7 +23,9 @@ class FileSearchInput(BaseModel):
     )
     pattern: str = Field(
         ...,
-        description="Unix shell regex, where * matches everything.",
+        description=(
+            "Unix shell-style pattern, where * matches everything, or filename regex."
+        ),
     )
 
 
@@ -33,6 +36,44 @@ class FileSearchTool(BaseFileToolMixin, BaseTool):
     args_schema: Type[BaseModel] = FileSearchInput
     description: str = (
         "Recursively search for files in a subdirectory that match the regex pattern"
+    )
+
+    def _run(
+        self,
+        pattern: str,
+        dir_path: str = ".",
+        run_manager: Optional[CallbackManagerForToolRun] = None,
+    ) -> str:
+        try:
+            dir_path_ = self.get_relative_path(dir_path)
+        except FileValidationError:
+            return INVALID_PATH_TEMPLATE.format(arg_name="dir_path", value=dir_path)
+        matches = []
+        regex = re.compile(pattern)
+        try:
+            for root, _, filenames in os.walk(dir_path_):
+                for filename in filenames:
+                    if regex.search(filename):
+                        absolute_path = os.path.join(root, filename)
+                        relative_path = os.path.relpath(absolute_path, dir_path_)
+                        matches.append(relative_path)
+            if matches:
+                return "\n".join(matches)
+            else:
+                return f"No files found for pattern {pattern} in directory {dir_path}"
+        except Exception as e:
+            return "Error: " + str(e)
+
+    # TODO: Add aiofiles method
+
+
+class ShellFileSearchTool(BaseFileToolMixin, BaseTool):
+    """Tool that searches for files in a subdirectory that match a shell pattern."""
+
+    name: str = "file_search"
+    args_schema: Type[BaseModel] = FileSearchInput
+    description: str = (
+        "Recursively search for files in a subdirectory that match the shell pattern"
     )
 
     def _run(
@@ -58,5 +99,3 @@ class FileSearchTool(BaseFileToolMixin, BaseTool):
                 return f"No files found for pattern {pattern} in directory {dir_path}"
         except Exception as e:
             return "Error: " + str(e)
-
-    # TODO: Add aiofiles method
