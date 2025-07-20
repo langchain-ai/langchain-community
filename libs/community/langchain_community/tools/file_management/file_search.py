@@ -48,9 +48,10 @@ class RegexFileSearchTool(BaseFileToolMixin, BaseTool):
             dir_path_ = self.get_relative_path(dir_path)
         except FileValidationError:
             return INVALID_PATH_TEMPLATE.format(arg_name="dir_path", value=dir_path)
+
         matches = []
-        regex = re.compile(pattern)
         try:
+            regex = re.compile(pattern)
             for root, _, filenames in os.walk(dir_path_):
                 for filename in filenames:
                     if regex.search(filename):
@@ -61,6 +62,8 @@ class RegexFileSearchTool(BaseFileToolMixin, BaseTool):
                 return "\n".join(matches)
             else:
                 return f"No files found for pattern {pattern} in directory {dir_path}"
+        except re.error as regex_error:
+            return f"Invalid regex pattern: {regex_error}"
         except Exception as e:
             return "Error: " + str(e)
 
