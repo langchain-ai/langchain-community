@@ -32,7 +32,7 @@ class FileSearchInput(BaseModel):
 class RegexFileSearchTool(BaseFileToolMixin, BaseTool):
     """Tool that searches for files in a subdirectory that match a regex pattern."""
 
-    name: str = "file_search"
+    name: str = "regex_file_search"
     args_schema: Type[BaseModel] = FileSearchInput
     description: str = (
         "Recursively search for files in a subdirectory that match the regex pattern"
