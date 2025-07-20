@@ -29,7 +29,7 @@ class FileSearchInput(BaseModel):
     )
 
 
-class FileSearchTool(BaseFileToolMixin, BaseTool):
+class RegexFileSearchTool(BaseFileToolMixin, BaseTool):
     """Tool that searches for files in a subdirectory that match a regex pattern."""
 
     name: str = "file_search"
@@ -67,7 +67,7 @@ class FileSearchTool(BaseFileToolMixin, BaseTool):
     # TODO: Add aiofiles method
 
 
-class ShellFileSearchTool(BaseFileToolMixin, BaseTool):
+class FileSearchTool(BaseFileToolMixin, BaseTool):
     """Tool that searches for files in a subdirectory that match a shell pattern."""
 
     name: str = "file_search"
