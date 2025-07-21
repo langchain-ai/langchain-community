@@ -6,6 +6,8 @@ from langchain_core.language_models import BaseLanguageModel
 from langchain_core.tools import BaseTool
 from langchain_core.tools.base import BaseToolkit
 from pydantic import ConfigDict, Field
+from amadeus import Client
+
 
 from langchain_community.tools.amadeus.closest_airport import AmadeusClosestAirport
 from langchain_community.tools.amadeus.flight_search import AmadeusFlightSearch
@@ -23,7 +25,7 @@ class AmadeusToolkit(BaseToolkit):
         llm: Optional. The language model to use. Default is None.
     """
 
-    client: Client = Field(default_factory=authenticate)
+    client: "Client" = Field(default_factory=authenticate)
     llm: Optional[BaseLanguageModel] = Field(default=None)
 
     model_config = ConfigDict(
@@ -36,3 +38,5 @@ class AmadeusToolkit(BaseToolkit):
             AmadeusClosestAirport(llm=self.llm),
             AmadeusFlightSearch(),
         ]
+
+AmadeusToolkit.model_rebuild()
