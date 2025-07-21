@@ -44,7 +44,7 @@ class QuerySQLDatabaseTool(BaseSQLDatabaseTool, BaseTool):
 
     name: str = "sql_db_query"
     description: str = """
-    Execute a SQL query against the database and get back the result..
+    Execute a SQL query against the database and get back the result.
     If the query is not correct, an error message will be returned.
     If an error is returned, rewrite the query, check the query, and try again.
     """
