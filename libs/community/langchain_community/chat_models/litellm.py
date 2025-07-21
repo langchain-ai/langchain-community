@@ -1,4 +1,9 @@
-"""Wrapper around LiteLLM's model I/O library."""
+"""
+Deprecated LiteLLM wrapper.
+
+⭐  Use `pip install langchain-litellm` and import
+   `from langchain_litellm import ChatLiteLLM` instead.
+"""
 
 from __future__ import annotations
 
@@ -20,6 +25,7 @@ from typing import (
     Union,
 )
 
+from langchain_core._api.deprecation import deprecated
 from langchain_core.callbacks import (
     AsyncCallbackManagerForLLMRun,
     CallbackManagerForLLMRun,
@@ -243,8 +249,13 @@ _OPENAI_MODELS = [
 ]
 
 
+@deprecated(
+    since="0.3.24",
+    removal="1.0",
+    alternative_import="langchain_litellm.ChatLiteLLM",
+)
 class ChatLiteLLM(BaseChatModel):
-    """Chat model that uses the LiteLLM API."""
+    """DEPRECATED – use `langchain_litellm.ChatLiteLLM` instead."""
 
     client: Any = None  #: :meta private:
     model: str = "gpt-3.5-turbo"

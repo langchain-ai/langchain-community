@@ -57,13 +57,13 @@ MODEL_COST_PER_1K_TOKENS = {
     "o1-pro-completion": 0.6,
     "o1-pro-2025-03-19-completion": 0.6,
     # OpenAI o3 input
-    "o3": 0.01,
-    "o3-2025-04-16": 0.01,
-    "o3-cached": 0.0025,
-    "o3-2025-04-16-cached": 0.0025,
+    "o3": 0.002,
+    "o3-2025-04-16": 0.002,
+    "o3-cached": 0.0005,
+    "o3-2025-04-16-cached": 0.0005,
     # OpenAI o3 output
-    "o3-completion": 0.04,
-    "o3-2025-04-16-completion": 0.04,
+    "o3-completion": 0.008,
+    "o3-2025-04-16-completion": 0.008,
     # OpenAI o4-mini input
     "o4-mini": 0.0011,
     "o4-mini-2025-04-16": 0.0011,
