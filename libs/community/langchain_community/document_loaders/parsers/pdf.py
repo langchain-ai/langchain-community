@@ -1112,10 +1112,10 @@ class PyMuPDFParser(BaseBlobParser):
                     pix.height, pix.width, -1
                 )
                 image_bytes = io.BytesIO()
+                numpy.save(image_bytes, image)
                 if image_bytes.getbuffer().nbytes == 0:
                     continue
 
-                numpy.save(image_bytes, image)
                 blob = Blob.from_data(
                     image_bytes.getvalue(), mime_type="application/x-npy"
                 )
