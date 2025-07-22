@@ -279,7 +279,8 @@ class Clickhouse(VectorStore):
 
         index_params = (
             (
-                ",".join([f"'{k}={v}'" for k, v in self.config.index_param.items()])
+                ",".join(
+                    [f"'{k}={v}'" for k, v in self.config.index_param.items()])
                 if self.config.index_param
                 else ""
             )
@@ -492,7 +493,8 @@ class Clickhouse(VectorStore):
                 self._insert(transac, keys)
             return [i for i in ids]
         except Exception as e:
-            logger.error(f"\033[91m\033[1m{type(e)}\033[0m \033[95m{str(e)}\033[0m")
+            logger.error(
+                f"\033[91m\033[1m{type(e)}\033[0m \033[95m{str(e)}\033[0m")
             return []
 
     @classmethod
@@ -523,7 +525,8 @@ class Clickhouse(VectorStore):
             ClickHouse Index
         """
         ctx = cls(embedding, config, **kwargs)
-        ctx.add_texts(texts, ids=text_ids, batch_size=batch_size, metadatas=metadatas)
+        ctx.add_texts(texts, ids=text_ids,
+                      batch_size=batch_size, metadatas=metadatas)
         return ctx
 
     def __repr__(self) -> str:
@@ -573,7 +576,8 @@ class Clickhouse(VectorStore):
         settings_strs = []
         if self.config.index_query_params:
             for k in self.config.index_query_params:
-                settings_strs.append(f"SETTING {k}={self.config.index_query_params[k]}")
+                settings_strs.append(
+                    f"SETTING {k}={self.config.index_query_params[k]}")
         q_str = f"""
             SELECT {self.config.column_map["document"]}, 
                 {self.config.column_map["metadata"]}, dist
@@ -618,30 +622,29 @@ class Clickhouse(VectorStore):
         """Perform a similarity search with ClickHouse by vectors
 
         Args:
-            query (str): query string
+            embedding (List[float]): Embedding vector
             k (int, optional): Top K neighbors to retrieve. Defaults to 4.
             where_str (Optional[str], optional): where condition string.
                                                  Defaults to None.
 
-            NOTE: Please do not let end-user to fill this and always be aware
-                  of SQL injection. When dealing with metadatas, remember to
-                  use `{self.metadata_column}.attribute` instead of `attribute`
-                  alone. The default name for it is `metadata`.
-
         Returns:
-            List[Document]: List of documents
+            List[Document]: List of documents with metadata and distance score
         """
         q_str = self._build_query_sql(embedding, k, where_str)
         try:
             return [
                 Document(
-                    page_content=r[self.config.column_map["document"]],
-                    metadata=r[self.config.column_map["metadata"]],
+                    page_content=row[self.config.column_map["document"]],
+                    metadata={
+                        **row[self.config.column_map["metadata"]],
+                        "distance": row.get("distance", None),
+                    },
                 )
-                for r in self.client.query(q_str).named_results()
+                for row in self.client.query(q_str).named_results()
             ]
         except Exception as e:
-            logger.error(f"\033[91m\033[1m{type(e)}\033[0m \033[95m{str(e)}\033[0m")
+            logger.error(
+                f"\033[91m\033[1m{type(e)}\033[0m \033[95m{str(e)}\033[0m")
             return []
 
     def similarity_search_with_relevance_scores(
@@ -678,7 +681,8 @@ class Clickhouse(VectorStore):
                 for r in self.client.query(q_str).named_results()
             ]
         except Exception as e:
-            logger.error(f"\033[91m\033[1m{type(e)}\033[0m \033[95m{str(e)}\033[0m")
+            logger.error(
+                f"\033[91m\033[1m{type(e)}\033[0m \033[95m{str(e)}\033[0m")
             return []
 
     def drop(self) -> None:
