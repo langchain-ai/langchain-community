@@ -184,3 +184,8 @@ docs/docs/templates
 
 prof
 virtualenv/
+.venv
+.venv/
+__pypackages__/
+.pdm-build/
+.uv.lock
