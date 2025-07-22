@@ -2,12 +2,11 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING, List, Optional
 
+from amadeus import Client
 from langchain_core.language_models import BaseLanguageModel
 from langchain_core.tools import BaseTool
 from langchain_core.tools.base import BaseToolkit
 from pydantic import ConfigDict, Field
-from amadeus import Client
-
 
 from langchain_community.tools.amadeus.closest_airport import AmadeusClosestAirport
 from langchain_community.tools.amadeus.flight_search import AmadeusFlightSearch
@@ -38,5 +37,6 @@ class AmadeusToolkit(BaseToolkit):
             AmadeusClosestAirport(llm=self.llm),
             AmadeusFlightSearch(),
         ]
+
 
 AmadeusToolkit.model_rebuild()
