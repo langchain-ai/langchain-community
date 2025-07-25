@@ -348,7 +348,7 @@ class Completions:
         stream: bool = False,
         **kwargs: Any,
     ) -> Union[ChatCompletions, Iterable]:
-        models = importlib.import_module("langchain.chat_models")
+        models = importlib.import_module("langchain_community.chat_models")
         model_cls = getattr(models, provider)
         model_config = model_cls(**kwargs)
         converted_messages = convert_openai_messages(messages)
@@ -393,7 +393,7 @@ class Completions:
         stream: bool = False,
         **kwargs: Any,
     ) -> Union[ChatCompletions, AsyncIterator]:
-        models = importlib.import_module("langchain.chat_models")
+        models = importlib.import_module("langchain_community.chat_models")
         model_cls = getattr(models, provider)
         model_config = model_cls(**kwargs)
         converted_messages = convert_openai_messages(messages)
