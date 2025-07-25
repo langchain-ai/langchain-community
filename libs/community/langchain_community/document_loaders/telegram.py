@@ -109,9 +109,17 @@ class TelegramChatApiLoader(BaseLoader):
 
     async def fetch_data_from_telegram(self) -> None:
         """Fetch data from Telegram API and save it as a JSON file."""
-        from telethon.sync import TelegramClient
+        try:
+            from telethon.sync import TelegramClient
+        except ImportError:
+            raise ImportError(
+                """`telethon` package not found.
+                please install with `pip install telethon`
+                """
+            )
 
         data = []
+
         async with TelegramClient(self.username, self.api_id, self.api_hash) as client:
             async for message in client.iter_messages(self.chat_entity):
                 is_reply = message.reply_to is not None
@@ -233,15 +241,15 @@ class TelegramChatApiLoader(BaseLoader):
         if self.chat_entity is not None:
             try:
                 import nest_asyncio
-
-                nest_asyncio.apply()
-                asyncio.run(self.fetch_data_from_telegram())
             except ImportError:
                 raise ImportError(
                     """`nest_asyncio` package not found.
                     please install with `pip install nest_asyncio`
                     """
                 )
+            nest_asyncio.apply()
+            asyncio.run(self.fetch_data_from_telegram())
+
 
         p = Path(self.file_path)
 
