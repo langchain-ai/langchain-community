@@ -270,7 +270,7 @@ class FireCrawlLoader(BaseLoader):
         self.params = params or {}
 
     def lazy_load(self) -> Iterator[Document]:
-        self.params['integration'] = 'langchain'
+        self.params["integration"] = "langchain"
         if self.mode == "scrape":
             firecrawl_docs = [
                 self.firecrawl.scrape_url(
