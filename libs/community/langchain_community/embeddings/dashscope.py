@@ -23,7 +23,12 @@ from tenacity import (
 
 logger = logging.getLogger(__name__)
 
-BATCH_SIZE = {"text-embedding-v1": 25, "text-embedding-v2": 25, "text-embedding-v3": 6}
+BATCH_SIZE = {
+    "text-embedding-v1": 25,
+    "text-embedding-v2": 25,
+    "text-embedding-v3": 10,
+    "text-embedding-v4": 10,
+}
 
 
 def _create_retry_decorator(embeddings: DashScopeEmbeddings) -> Callable[[Any], Any]:
