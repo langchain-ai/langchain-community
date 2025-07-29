@@ -196,7 +196,17 @@ class HuggingFaceInstructEmbeddings(BaseModel, Embeddings):
                 self.model_name, cache_folder=self.cache_folder, **self.model_kwargs
             )
         except ImportError as e:
-            raise ImportError("Dependencies for InstructorEmbedding not found.") from e
+            raise ImportError(
+                "Could not import the InstructorEmbedding package.\n"
+                "To use HuggingFaceInstructEmbeddings, you must install\n"
+                "the InstructorEmbedding package.\n\n"
+                "Recommended (official) install method for LangChain development:\n"
+                "    uv pip install InstructorEmbedding\n"
+                "    https://python.langchain.com/docs/contributing/how_to/code/setup/\n\n"
+                "If you use pip, you can also try:\n"
+                "    pip install InstructorEmbedding\n\n"
+                "InstructorEmbedding docs: https://github.com/HKUNLP/instructor-embedding"
+            ) from e
 
         if "show_progress_bar" in self.encode_kwargs:
             warn_deprecated(
