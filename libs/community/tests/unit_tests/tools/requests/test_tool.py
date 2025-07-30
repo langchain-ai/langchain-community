@@ -216,3 +216,17 @@ def test_requests_delete_tool_json(
     assert asyncio.run(tool.arun("https://example.com")) == {
         "response": "adelete_response"
     }
+
+
+def test_requests_tool_missing_wrapper_raises_error() -> None:
+    """Test that initializing a requests tool without a wrapper raises a ValueError.
+
+    Ensures that our custom Pydantic validator produces a clear error message when
+    requests_wrapper is missing.
+    """
+    from langchain_community.tools.requests.tool import RequestsGetTool
+
+    with pytest.raises(ValueError) as exc_info:
+        RequestsGetTool(allow_dangerous_requests=True)
+
+    assert "`requests_wrapper` is a required argument" in str(exc_info.value)

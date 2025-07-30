@@ -4,12 +4,12 @@
 import json
 from typing import Any, Dict, Optional, Union
 
-from pydantic import BaseModel
+from pydantic import BaseModel, model_validator
+
 from langchain_core.callbacks import (
     AsyncCallbackManagerForToolRun,
     CallbackManagerForToolRun,
 )
-
 from langchain_community.utilities.requests import GenericRequestsWrapper
 from langchain_core.tools import BaseTool
 
@@ -28,8 +28,26 @@ class BaseRequestsTool(BaseModel):
     """Base class for requests tools."""
 
     requests_wrapper: GenericRequestsWrapper
-
     allow_dangerous_requests: bool = False
+
+    @model_validator(mode="before")
+    @classmethod
+    def _validate_requests_wrapper(cls, values: dict[str, Any]) -> dict[str, Any]:
+        """Validate that requests_wrapper is present.
+
+        Args:
+            values: Dictionary of field values to validate.
+
+        Returns:
+            The validated values dictionary.
+        """
+        if "requests_wrapper" not in values:
+            raise ValueError(
+                "`requests_wrapper` is a required argument for this tool. "
+                "Please pass in an instance of a RequestsWrapper, e.g. "
+                "`TextRequestsWrapper()`."
+            )
+        return values
 
     def __init__(self, **kwargs: Any):
         """Initialize the tool."""
@@ -48,13 +66,40 @@ class BaseRequestsTool(BaseModel):
 
 
 class RequestsGetTool(BaseRequestsTool, BaseTool):
-    """Tool for making a GET request to an API endpoint."""
+    """Tool for making a GET request to an API endpoint.
+
+    .. warning::
+        This tool can be used to make arbitrary GET requests.
+        By default, it is unsafe and requires ``allow_dangerous_requests=True``
+        to be passed to the constructor. Use with caution.
+
+    This tool requires that a ``requests_wrapper`` be provided.
+
+    Example:
+        .. code-block:: python
+
+            from langchain_community.tools import RequestsGetTool
+            from langchain_community.utilities import TextRequestsWrapper
+
+            requests_wrapper = TextRequestsWrapper()
+            tool = RequestsGetTool(
+                requests_wrapper=requests_wrapper,
+                allow_dangerous_requests=True
+            )
+            tool.run("https://www.google.com")
+
+    Args:
+        requests_wrapper: Required wrapper for making HTTP requests.
+        allow_dangerous_requests: If True, allows potentially dangerous requests.
+            Defaults to False.
+    """
 
     name: str = "requests_get"
-    description: str = """A portal to the internet. Use this when you need to get specific
-    content from a website. Input should be a  url (i.e. https://www.google.com).
-    The output will be the text response of the GET request.
-    """
+    description: str = (
+        "A portal to the internet. Use this when you need to get specific content "
+        "from a website. Input should be a url (i.e. https://www.google.com). "
+        "The output will be the text response of the GET request."
+    )
 
     def _run(
         self, url: str, run_manager: Optional[CallbackManagerForToolRun] = None
@@ -75,13 +120,14 @@ class RequestsPostTool(BaseRequestsTool, BaseTool):
     """Tool for making a POST request to an API endpoint."""
 
     name: str = "requests_post"
-    description: str = """Use this when you want to POST to a website.
-    Input should be a json string with two keys: "url" and "data".
-    The value of "url" should be a string, and the value of "data" should be a dictionary of 
-    key-value pairs you want to POST to the url.
-    Be careful to always use double quotes for strings in the json string
-    The output will be the text response of the POST request.
-    """
+    description: str = (
+        "Use this when you want to POST to a website. "
+        'Input should be a json string with two keys: "url" and "data". '
+        'The value of "url" should be a string, and the value of "data" should be a '
+        "dictionary of key-value pairs you want to POST to the url. "
+        "Be careful to always use double quotes for strings in the json string. "
+        "The output will be the text response of the POST request."
+    )
 
     def _run(
         self, text: str, run_manager: Optional[CallbackManagerForToolRun] = None
@@ -112,13 +158,14 @@ class RequestsPatchTool(BaseRequestsTool, BaseTool):
     """Tool for making a PATCH request to an API endpoint."""
 
     name: str = "requests_patch"
-    description: str = """Use this when you want to PATCH to a website.
-    Input should be a json string with two keys: "url" and "data".
-    The value of "url" should be a string, and the value of "data" should be a dictionary of 
-    key-value pairs you want to PATCH to the url.
-    Be careful to always use double quotes for strings in the json string
-    The output will be the text response of the PATCH request.
-    """
+    description: str = (
+        "Use this when you want to PATCH to a website. "
+        'Input should be a json string with two keys: "url" and "data". '
+        'The value of "url" should be a string, and the value of "data" should be a '
+        "dictionary of key-value pairs you want to PATCH to the url. "
+        "Be careful to always use double quotes for strings in the json string. "
+        "The output will be the text response of the PATCH request."
+    )
 
     def _run(
         self, text: str, run_manager: Optional[CallbackManagerForToolRun] = None
@@ -149,13 +196,14 @@ class RequestsPutTool(BaseRequestsTool, BaseTool):
     """Tool for making a PUT request to an API endpoint."""
 
     name: str = "requests_put"
-    description: str = """Use this when you want to PUT to a website.
-    Input should be a json string with two keys: "url" and "data".
-    The value of "url" should be a string, and the value of "data" should be a dictionary of 
-    key-value pairs you want to PUT to the url.
-    Be careful to always use double quotes for strings in the json string.
-    The output will be the text response of the PUT request.
-    """
+    description: str = (
+        "Use this when you want to PUT to a website. "
+        'Input should be a json string with two keys: "url" and "data". '
+        'The value of "url" should be a string, and the value of "data" should be a '
+        "dictionary of key-value pairs you want to PUT to the url. "
+        "Be careful to always use double quotes for strings in the json string. "
+        "The output will be the text response of the PUT request."
+    )
 
     def _run(
         self, text: str, run_manager: Optional[CallbackManagerForToolRun] = None
@@ -186,11 +234,12 @@ class RequestsDeleteTool(BaseRequestsTool, BaseTool):
     """Tool for making a DELETE request to an API endpoint."""
 
     name: str = "requests_delete"
-    description: str = """A portal to the internet.
-    Use this when you need to make a DELETE request to a URL.
-    Input should be a specific url, and the output will be the text
-    response of the DELETE request.
-    """
+    description: str = (
+        "A portal to the internet. "
+        "Use this when you need to make a DELETE request to a URL. "
+        "Input should be a specific url, and the output will be the text "
+        "response of the DELETE request."
+    )
 
     def _run(
         self,
