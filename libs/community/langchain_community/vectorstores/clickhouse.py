@@ -279,7 +279,8 @@ class Clickhouse(VectorStore):
 
         index_params = (
             (
-                ",".join([f"'{k}={v}'" for k, v in self.config.index_param.items()])
+                ",".join(
+                    [f"'{k}={v}'" for k, v in self.config.index_param.items()])
                 if self.config.index_param
                 else ""
             )
@@ -416,7 +417,7 @@ class Clickhouse(VectorStore):
             n = ",".join([f"'{self.escape_str(str(_n))}'" for _n in n])
             _data.append(f"({n})")
         i_str = f"""
-                INSERT INTO TABLE 
+                INSERT INTO TABLE
                     {self.config.database}.{self.config.table}({ks})
                 VALUES
                 {",".join(_data)}
@@ -492,7 +493,8 @@ class Clickhouse(VectorStore):
                 self._insert(transac, keys)
             return [i for i in ids]
         except Exception as e:
-            logger.error(f"\033[91m\033[1m{type(e)}\033[0m \033[95m{str(e)}\033[0m")
+            logger.error(
+                f"\033[91m\033[1m{type(e)}\033[0m \033[95m{str(e)}\033[0m")
             return []
 
     @classmethod
@@ -523,7 +525,8 @@ class Clickhouse(VectorStore):
             ClickHouse Index
         """
         ctx = cls(embedding, config, **kwargs)
-        ctx.add_texts(texts, ids=text_ids, batch_size=batch_size, metadatas=metadatas)
+        ctx.add_texts(texts, ids=text_ids,
+                      batch_size=batch_size, metadatas=metadatas)
         return ctx
 
     def __repr__(self) -> str:
@@ -573,13 +576,14 @@ class Clickhouse(VectorStore):
         settings_strs = []
         if self.config.index_query_params:
             for k in self.config.index_query_params:
-                settings_strs.append(f"SETTING {k}={self.config.index_query_params[k]}")
+                settings_strs.append(
+                    f"SETTING {k}={self.config.index_query_params[k]}")
         q_str = f"""
-            SELECT {self.config.column_map["document"]}, 
+            SELECT {self.config.column_map["document"]},
                 {self.config.column_map["metadata"]}, dist
             FROM {self.config.database}.{self.config.table}
             {where_str}
-            ORDER BY L2Distance({self.config.column_map["embedding"]}, [{q_emb_str}]) 
+            ORDER BY L2Distance({self.config.column_map["embedding"]}, [{q_emb_str}])
                 AS dist {self.dist_order}
             LIMIT {topk} {" ".join(settings_strs)}
             """
@@ -641,28 +645,32 @@ class Clickhouse(VectorStore):
                 for r in self.client.query(q_str).named_results()
             ]
         except Exception as e:
-            logger.error(f"\033[91m\033[1m{type(e)}\033[0m \033[95m{str(e)}\033[0m")
+            logger.error(
+                f"\033[91m\033[1m{type(e)}\033[0m \033[95m{str(e)}\033[0m")
             return []
 
     def similarity_search_with_relevance_scores(
         self, query: str, k: int = 4, where_str: Optional[str] = None, **kwargs: Any
     ) -> List[Tuple[Document, float]]:
-        """Perform a similarity search with ClickHouse
+        """Perform a similarity search and return documents with relevance scores.
+
+        Relevance scores reflect vector distance and are not normalized across stores.
+
+        For example:
+            - DistanceStrategy.L2: Lower score = more relevant.
+            - DistanceStrategy.MAX_INNER_PRODUCT: Higher score = more relevant.
 
         Args:
-            query (str): query string
-            k (int, optional): Top K neighbors to retrieve. Defaults to 4.
-            where_str (Optional[str], optional): where condition string.
-                                                 Defaults to None.
-
-            NOTE: Please do not let end-user to fill this and always be aware
-                  of SQL injection. When dealing with metadatas, remember to
-                  use `{self.metadata_column}.attribute` instead of `attribute`
-                  alone. The default name for it is `metadata`.
+            query (str): The input query string.
+            k (int, optional): Number of top documents to return. Defaults to 4.
+            where_str (Optional[str], optional): Additional WHERE conditions for the query.
+                Defaults to None. Be aware of SQL injection risks when using this parameter.
+            **kwargs: Additional keyword arguments.
 
         Returns:
-            List[Document]: List of (Document, similarity)
+            List[Tuple[Document, float]]: List of documents with associated relevance scores.
         """
+
         q_str = self._build_query_sql(
             self.embedding_function.embed_query(query), k, where_str
         )
@@ -678,7 +686,8 @@ class Clickhouse(VectorStore):
                 for r in self.client.query(q_str).named_results()
             ]
         except Exception as e:
-            logger.error(f"\033[91m\033[1m{type(e)}\033[0m \033[95m{str(e)}\033[0m")
+            logger.error(
+                f"\033[91m\033[1m{type(e)}\033[0m \033[95m{str(e)}\033[0m")
             return []
 
     def drop(self) -> None:
