@@ -163,6 +163,7 @@ class YoutubeLoader(BaseLoader):
         transcript_format: TranscriptFormat = TranscriptFormat.TEXT,
         continue_on_failure: bool = False,
         chunk_size_seconds: int = 120,
+        proxy_config: Optional[Any] = None,
     ):
         """Initialize with YouTube video ID."""
         self.video_id = video_id
@@ -177,6 +178,7 @@ class YoutubeLoader(BaseLoader):
         self.transcript_format = transcript_format
         self.continue_on_failure = continue_on_failure
         self.chunk_size_seconds = chunk_size_seconds
+        self.proxy_config = proxy_config 
 
     @staticmethod
     def extract_video_id(youtube_url: str) -> str:
@@ -259,7 +261,11 @@ class YoutubeLoader(BaseLoader):
             self._metadata.update(video_info)
 
         try:
-            transcript_list = YouTubeTranscriptApi.list_transcripts(self.video_id)
+            if hasattr(self, "proxy_config") and self.proxy_config:
+                yta = YouTubeTranscriptApi(proxy_config=self.proxy_config)
+                transcript_list = yta.list_transcripts(self.video_id)
+            else:
+                transcript_list = YouTubeTranscriptApi.list_transcripts(self.video_id)
         except TranscriptsDisabled:
             return []
 
@@ -412,7 +418,11 @@ class GoogleApiYoutubeLoader(BaseLoader):
     def _get_transcripe_for_video_id(self, video_id: str) -> str:
         from youtube_transcript_api import NoTranscriptFound, YouTubeTranscriptApi
 
-        transcript_list = YouTubeTranscriptApi.list_transcripts(video_id)
+        if hasattr(self, "proxy_config") and self.proxy_config:
+            yta = YouTubeTranscriptApi(proxy_config=self.proxy_config)
+            transcript_list = yta.list_transcripts(video_id)
+        else:
+            transcript_list = YouTubeTranscriptApi.list_transcripts(video_id)
         try:
             transcript = transcript_list.find_transcript([self.captions_language])
         except NoTranscriptFound:
