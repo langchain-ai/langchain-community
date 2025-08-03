@@ -89,7 +89,33 @@ class UnstructuredPDFLoader(UnstructuredFileLoader):
         super().__init__(file_path=file_path, mode=mode, **unstructured_kwargs)
 
     def _get_elements(self) -> list:
-        from unstructured.partition.pdf import partition_pdf
+        try:
+            from unstructured.partition.pdf import partition_pdf
+        except ImportError as e:
+            # Provide more helpful error messages for common dependency issues
+            error_msg = str(e)
+            if "pdfminer.layout" in error_msg:
+                raise ImportError(
+                    "Failed to import unstructured due to pdfminer dependency issues. "
+                    "Please ensure you have the correct versions installed:\n"
+                    "1. Install/upgrade pdfminer.six: pip install --upgrade 'pdfminer.six>=20221105'\n"
+                    "2. Install/upgrade unstructured with PDF support: pip install --upgrade 'unstructured[pdf]>=0.15'\n"
+                    "Note: Make sure you install 'pdfminer.six' (not 'pdfminer')."
+                ) from e
+            elif "pdfminer.utils" in error_msg and "open_filename" in error_msg:
+                raise ImportError(
+                    "Failed to import unstructured due to pdfminer.utils.open_filename issue. "
+                    "This typically means you have an incompatible version of pdfminer installed.\n"
+                    "Please try:\n"
+                    "1. Uninstall any conflicting packages: pip uninstall pdfminer pdfminer.six\n"
+                    "2. Install the correct version: pip install 'pdfminer.six>=20221105'\n"
+                    "3. Reinstall unstructured: pip install --upgrade 'unstructured[pdf]>=0.15'"
+                ) from e
+            else:
+                raise ImportError(
+                    f"Failed to import unstructured.partition.pdf: {error_msg}\n"
+                    "Please install unstructured with PDF support: pip install 'unstructured[pdf]>=0.15'"
+                ) from e
 
         return partition_pdf(filename=self.file_path, **self.unstructured_kwargs)
 
@@ -697,7 +723,19 @@ class PDFMinerPDFasHTMLLoader(BasePDFLoader):
         """Load file."""
         from pdfminer.high_level import extract_text_to_fp
         from pdfminer.layout import LAParams
-        from pdfminer.utils import open_filename
+        
+        # Try to import open_filename from multiple locations for compatibility
+        try:
+            from pdfminer.utils import open_filename
+        except ImportError:
+            try:
+                from pdfminer.high_level import open_filename
+            except ImportError:
+                raise ImportError(
+                    "Could not import 'open_filename' from pdfminer. "
+                    "Please make sure you have installed the correct version of pdfminer.six. "
+                    "Try: pip install --upgrade pdfminer.six"
+                )
 
         output_string = StringIO()
         with open_filename(self.file_path, "rb") as fp:
