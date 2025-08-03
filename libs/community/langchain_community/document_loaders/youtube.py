@@ -12,6 +12,7 @@ from xml.etree.ElementTree import ParseError  # OK: trusted-source
 from langchain_core.documents import Document
 from pydantic import model_validator
 from pydantic.dataclasses import dataclass
+from youtube_transcript_api.proxies import ProxyConfig
 
 from langchain_community.document_loaders.base import BaseLoader
 
@@ -163,7 +164,7 @@ class YoutubeLoader(BaseLoader):
         transcript_format: TranscriptFormat = TranscriptFormat.TEXT,
         continue_on_failure: bool = False,
         chunk_size_seconds: int = 120,
-        proxy_config: Optional[Any] = None,
+        proxy_config: Optional[ProxyConfig] = None,
     ):
         """Initialize with YouTube video ID."""
         self.video_id = video_id
