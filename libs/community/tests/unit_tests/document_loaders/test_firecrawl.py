@@ -173,4 +173,6 @@ class TestFireCrawlLoader:
         assert "Search result content" in docs[0].page_content
 
         # Verify search was called correctly without duplicate query
-        mock_client.search.assert_called_once_with(query="test search", limit=10)
+        mock_client.search.assert_called_once_with(
+            query="test search", limit=10, integration="langchain"
+        )
