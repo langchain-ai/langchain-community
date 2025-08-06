@@ -17,7 +17,7 @@ from langchain_community.llms.utils import enforce_stop_tokens
 warnings.warn(
     """This module is deprecated and will be removed in the future. 
               Please use the official Oracle langchain_oci integration. 
-              Install with `pip install -U langchain_oci`
+              Install with `pip install -U langchain-oci`
               and use with
               `from langchain_oci.llms import OCIGenAI`
               See https://github.com/oracle/langchain-oracle for more details.

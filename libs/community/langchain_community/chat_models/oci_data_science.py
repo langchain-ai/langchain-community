@@ -50,7 +50,7 @@ from langchain_community.llms.oci_data_science_model_deployment_endpoint import 
 warnings.warn(
     """This module is deprecated and will be removed in the future. 
               Please use the official Oracle langchain_oci integration. 
-              Install with `pip install -U langchain_oci`
+              Install with `pip install -U langchain-oci`
               and use with
               `from langchain_oci.chat_models import ChatOCIModelDeployment, ChatOCIModelDeploymentVLLM, ChatOCIModelDeploymentTGI`
               See https://github.com/oracle/langchain-oracle for more details.
