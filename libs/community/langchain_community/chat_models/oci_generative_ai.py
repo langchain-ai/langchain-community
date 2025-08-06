@@ -248,16 +248,23 @@ class CohereProvider(Provider):
     def messages_to_oci_params(
         self, messages: Sequence[ChatMessage], **kwargs: Any
     ) -> Dict[str, Any]:
-        is_force_single_step = kwargs.get("is_force_single_step") or False
+        """
+        Convert LangChain messages to OCI parameters for Cohere.
 
+        This includes conversion of chat history and tool call results.
+        """
+        is_force_single_step = kwargs.get("is_force_single_step", False)
         oci_chat_history = []
 
+        # Process all messages except the last one for chat history
         for msg in messages[:-1]:
-            if self.get_role(msg) == "USER" or self.get_role(msg) == "SYSTEM":
+            role = self.get_role(msg)
+            if role in ("USER", "SYSTEM"):
                 oci_chat_history.append(
-                    self.oci_chat_message[self.get_role(msg)](message=msg.content)
+                    self.oci_chat_message[role](message=msg.content)
                 )
             elif isinstance(msg, AIMessage):
+                # Skip tool calls if forcing single step
                 if msg.tool_calls and is_force_single_step:
                     continue
                 tool_calls = (
@@ -270,43 +277,58 @@ class CohereProvider(Provider):
                 )
                 msg_content = msg.content if msg.content else " "
                 oci_chat_history.append(
-                    self.oci_chat_message[self.get_role(msg)](
+                    self.oci_chat_message[role](
                         message=msg_content, tool_calls=tool_calls
                     )
                 )
+            elif isinstance(msg, ToolMessage):
+                oci_chat_history.append(
+                    self.oci_chat_message[self.get_role(msg)](
+                        tool_results=[
+                            self.oci_tool_result(
+                                call=self.oci_tool_call(
+                                    name=msg.name, parameters={}
+                                ),
+                                outputs=[{"output": msg.content}],
+                            )
+                        ],
+                    )
+                )
 
-        # Get the messages for the current chat turn
-        current_chat_turn_messages = []
-        for message in messages[::-1]:
-            current_chat_turn_messages.append(message)
+        # Process current turn messages in reverse order until a HumanMessage
+        current_turn = []
+        for i, message in enumerate(messages[::-1]):
+            current_turn.append(message)
             if isinstance(message, HumanMessage):
+                if len(messages) > i and isinstance(messages[len(messages) - i - 2], ToolMessage):
+                    # add dummy message REPEATING the tool_result to avoid the error about ToolMessage needing to be followed by an AI message
+                    oci_chat_history.append(self.oci_chat_message['CHATBOT'](message=messages[len(messages) - i - 2].content))
                 break
-        current_chat_turn_messages = current_chat_turn_messages[::-1]
+        current_turn = list(reversed(current_turn))
 
-        oci_tool_results: Union[List[Any], None] = []
-        for message in current_chat_turn_messages:
+        # Process tool results from the current turn
+        oci_tool_results: List[Any] = []
+        for message in current_turn:
             if isinstance(message, ToolMessage):
-                tool_message = message
+                tool_msg = message
                 previous_ai_msgs = [
-                    message
-                    for message in current_chat_turn_messages
-                    if isinstance(message, AIMessage) and message.tool_calls
+                    m for m in current_turn if isinstance(m, AIMessage) and m.tool_calls
                 ]
                 if previous_ai_msgs:
                     previous_ai_msg = previous_ai_msgs[-1]
                     for lc_tool_call in previous_ai_msg.tool_calls:
-                        if lc_tool_call["id"] == tool_message.tool_call_id:
+                        if lc_tool_call["id"] == tool_msg.tool_call_id:
                             tool_result = self.oci_tool_result()
                             tool_result.call = self.oci_tool_call(
                                 name=lc_tool_call["name"],
                                 parameters=lc_tool_call["args"],
                             )
-                            tool_result.outputs = [{"output": tool_message.content}]
+                            tool_result.outputs = [{"output": tool_msg.content}]
                             oci_tool_results.append(tool_result)
-
         if not oci_tool_results:
             oci_tool_results = None
 
+        # Use last message's content if no tool results are present
         message_str = "" if oci_tool_results else messages[-1].content
 
         oci_params = {
@@ -315,7 +337,7 @@ class CohereProvider(Provider):
             "tool_results": oci_tool_results,
             "api_format": self.chat_api_format,
         }
-
+        # Remove keys with None values
         return {k: v for k, v in oci_params.items() if v is not None}
 
     def convert_to_oci_tool(
