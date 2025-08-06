@@ -1,3 +1,4 @@
+import warnings
 from enum import Enum
 from typing import TYPE_CHECKING, Any, Dict, Iterator, List, Mapping, Optional
 
@@ -7,6 +8,18 @@ from pydantic import BaseModel, ConfigDict
 
 if TYPE_CHECKING:
     import oci
+
+warnings.warn(
+    """This module is deprecated and will be removed in the future. 
+              Please use the official Oracle langchain_oci integration. 
+              Install with `pip install -U langchain-oci`
+              and use with
+              `from langchain_oci.embeddings import OCIGenAIEmbeddings`
+              See https://github.com/oracle/langchain-oracle for more details.
+              """,
+    DeprecationWarning,
+    stacklevel=2,
+)
 
 CUSTOM_ENDPOINT_PREFIX = "ocid1.generativeaiendpoint"
 
