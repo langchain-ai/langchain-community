@@ -5,6 +5,7 @@
 import importlib
 import json
 import logging
+import warnings
 from operator import itemgetter
 from typing import (
     Any,
@@ -44,6 +45,18 @@ from pydantic import BaseModel, Field, model_validator
 from langchain_community.llms.oci_data_science_model_deployment_endpoint import (
     DEFAULT_MODEL_NAME,
     BaseOCIModelDeployment,
+)
+
+warnings.warn(
+    """This module is deprecated and will be removed in the future. 
+              Please use the official Oracle langchain_oci integration. 
+              Install with `pip install -U langchain_oci`
+              and use with
+              `from langchain_oci.chat_models import ChatOCIModelDeployment, ChatOCIModelDeploymentVLLM, ChatOCIModelDeploymentTGI`
+              See https://github.com/oracle/langchain-oracle for more details.
+              """,
+    DeprecationWarning,
+    stacklevel=2,
 )
 
 logger = logging.getLogger(__name__)

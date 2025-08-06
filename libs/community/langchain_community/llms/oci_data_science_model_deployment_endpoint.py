@@ -5,6 +5,7 @@
 import json
 import logging
 import traceback
+import warnings
 from typing import (
     Any,
     AsyncIterator,
@@ -30,6 +31,18 @@ from langchain_core.utils import get_from_dict_or_env
 from pydantic import Field, model_validator
 
 from langchain_community.utilities.requests import Requests
+
+warnings.warn(
+    """This module is deprecated and will be removed in the future. 
+              Please use the official Oracle langchain_oci integration. 
+              Install with `pip install -U langchain_oci`
+              and use with
+              `from langchain_oci.llms import OCIModelDeploymentLLM, OCIModelDeploymentVLLM, OCIModelDeploymentTGI`
+              See https://github.com/oracle/langchain-oracle for more details.
+              """,
+    DeprecationWarning,
+    stacklevel=2,
+)
 
 logger = logging.getLogger(__name__)
 DEFAULT_INFERENCE_ENDPOINT = "/v1/completions"

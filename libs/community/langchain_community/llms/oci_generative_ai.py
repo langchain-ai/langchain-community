@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import json
+import warnings
 from abc import ABC, abstractmethod
 from enum import Enum
 from typing import Any, Dict, Iterator, List, Mapping, Optional
@@ -12,6 +13,18 @@ from langchain_core.utils import pre_init
 from pydantic import BaseModel, ConfigDict, Field
 
 from langchain_community.llms.utils import enforce_stop_tokens
+
+warnings.warn(
+    """This module is deprecated and will be removed in the future. 
+              Please use the official Oracle langchain_oci integration. 
+              Install with `pip install -U langchain_oci`
+              and use with
+              `from langchain_oci.llms import OCIGenAI`
+              See https://github.com/oracle/langchain-oracle for more details.
+              """,
+    DeprecationWarning,
+    stacklevel=2,
+)
 
 CUSTOM_ENDPOINT_PREFIX = "ocid1.generativeaiendpoint"
 
