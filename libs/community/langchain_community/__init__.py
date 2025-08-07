@@ -1,8 +1,10 @@
-# In the agent_toolkits section
-"agent_toolkits.splunk",
+"""Main entrypoint into package."""
 
-# In the tools section  
-"tools.splunk",
+from importlib import metadata
 
-# In the utilities section  
-"utilities.splunk",
+try:
+    __version__ = metadata.version(__package__)
+except metadata.PackageNotFoundError:
+    # Case where package metadata is not available.
+    __version__ = ""
+del metadata  # optional, avoids polluting the results of dir(__package__)
