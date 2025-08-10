@@ -196,14 +196,14 @@ class O365BaseLoader(BaseLoader, BaseModel):
                             file.modified > self.modified_since
                         ):
                             source = file.web_url
+                            # Handle non-standard Doc.aspx links
                             if re.search(
                                 r"Doc.aspx\?sourcedoc=.*file=([^&]+)", file.web_url
                             ):
-                                source = (
-                                    file._parent.web_url
-                                    + "/"
-                                    + urllib.parse.quote(file.name)
-                                )
+                                file_parent = file._parent or file.get_parent()
+                                if file_parent and getattr(file_parent, "web_url", None):
+                                    source = file_parent.web_url + "/" + urllib.parse.quote(file.name)
+                            
                             file.download(to_path=temp_dir, chunk_size=self.chunk_size)
                             metadata_dict[file.name] = {
                                 "source": source,
@@ -260,14 +260,14 @@ class O365BaseLoader(BaseLoader, BaseModel):
                 if file.is_file:
                     if file.mime_type in list(file_mime_types.values()):
                         source = file.web_url
+                        # Handle non-standard Doc.aspx links
                         if re.search(
                             r"Doc.aspx\?sourcedoc=.*file=([^&]+)", file.web_url
                         ):
-                            source = (
-                                file._parent.web_url
-                                + "/"
-                                + urllib.parse.quote(file.name)
-                            )
+                            file_parent = file._parent or file.get_parent()
+                            if file_parent and getattr(file_parent, "web_url", None):
+                                source = file_parent.web_url + "/" + urllib.parse.quote(file.name)
+                        
                         file.download(to_path=temp_dir, chunk_size=self.chunk_size)
                         metadata_dict[file.name] = {
                             "source": source,
