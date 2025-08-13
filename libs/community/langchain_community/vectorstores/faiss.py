@@ -996,6 +996,8 @@ class FAISS(VectorStore):
         faiss = dependable_faiss_import()
         if distance_strategy == DistanceStrategy.MAX_INNER_PRODUCT:
             index = faiss.IndexFlatIP(len(embeddings[0]))
+        elif distance_strategy == DistanceStrategy.COSINE:
+            index = faiss.IndexFlatIP(len(embeddings[0]))  # with normalization
         else:
             # Default to L2, currently other metric types not initialized.
             index = faiss.IndexFlatL2(len(embeddings[0]))
@@ -1250,6 +1252,12 @@ class FAISS(VectorStore):
             serialized
         )
         return cls(embeddings, index, docstore, index_to_docstore_id, **kwargs)
+    
+    @staticmethod
+    def _cosine_relevance_score_fn(distance: float) -> float:
+        # FAISS already returns cosine similarity directly when using IndexFlatIP + normalized vectors
+        return float(distance)
+
 
     def _select_relevance_score_fn(self) -> Callable[[float], float]:
         """
