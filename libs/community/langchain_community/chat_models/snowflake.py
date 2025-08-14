@@ -231,10 +231,12 @@ class ChatSnowflakeCortex(BaseChatModel):
                     "client_session_keep_alive": "True",
                 }
     
+
             try:
                 values["session"] = Session.builder.configs(connection_params).create()
             except Exception as e:
                 raise ChatSnowflakeCortexError(f"Failed to create session: {e}")
+
 
         return values
 
