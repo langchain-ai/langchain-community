@@ -196,7 +196,7 @@ class ChatSnowflakeCortex(BaseChatModel):
                 return values
 
             # else, executed from client, so build a session from connection parameters
-            except(SnowparkSessionException):
+            except SnowparkSessionException:
                 
                 values["snowflake_username"] = get_from_dict_or_env(
                     values, "snowflake_username", "SNOWFLAKE_USERNAME"
