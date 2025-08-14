@@ -1255,9 +1255,14 @@ class FAISS(VectorStore):
     
     @staticmethod
     def _cosine_relevance_score_fn(distance: float) -> float:
+        """
+        Returns cosine similarity score as-is from FAISS IndexFlatIP.
+        
+        Args:
+            distance: The cosine similarity value returned by FAISS.
+        """
         # FAISS already returns cosine similarity directly when using IndexFlatIP + normalized vectors
         return float(distance)
-
 
     def _select_relevance_score_fn(self) -> Callable[[float], float]:
         """
