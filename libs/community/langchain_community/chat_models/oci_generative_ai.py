@@ -252,6 +252,10 @@ class CohereProvider(Provider):
         Convert LangChain messages to OCI parameters for Cohere.
 
         This includes conversion of chat history and tool call results.
+
+        Args:
+            messages: Sequence of chat messages to convert.
+            **kwargs: Additional keyword arguments including is_force_single_step.
         """
         is_force_single_step = kwargs.get("is_force_single_step", False)
         oci_chat_history = []
