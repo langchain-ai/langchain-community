@@ -304,7 +304,7 @@ class CohereProvider(Provider):
         for i, message in enumerate(messages[::-1]):
             current_turn.append(message)
             if isinstance(message, HumanMessage):
-                if len(messages) > i and isinstance(messages[len(messages) - i - 2], ToolMessage):
+                if len(messages) > i + 1 and isinstance(messages[len(messages) - i - 2], ToolMessage):
                     # add dummy message REPEATING the tool_result to avoid the error about ToolMessage needing to be followed by an AI message
                     oci_chat_history.append(self.oci_chat_message['CHATBOT'](message=messages[len(messages) - i - 2].content))
                 break
