@@ -47,6 +47,10 @@ from langchain_core.utils import from_env, get_pydantic_field_names
 from langchain_core.utils.pydantic import (
     is_basemodel_subclass,
 )
+from langchain_community.output_parsers.rail_parser import (
+    ReasoningJsonOutputParser,
+    ReasoningStructuredOutputParser,
+)
 from pydantic import BaseModel, ConfigDict, Field, TypeAdapter, model_validator
 from typing_extensions import Self
 
@@ -502,9 +506,9 @@ class ChatPerplexity(BaseChatModel):
                 }
             )
             output_parser = (
-                PydanticOutputParser(pydantic_object=schema)  # type: ignore[arg-type]
+                ReasoningStructuredOutputParser(schema)  # pydantic schemas
                 if is_pydantic_schema
-                else JsonOutputParser()
+                else ReasoningJsonOutputParser()         # plain JSON
             )
         else:
             raise ValueError(
