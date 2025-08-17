@@ -1,6 +1,5 @@
 import re
-from langchain_core.output_parsers import JsonOutputParser, StructuredOutputParser
-
+from langchain_core.output_parsers import JsonOutputParser, PydanticOutputParser
 
 
 def strip_think_tags(text: str) -> str:
@@ -15,31 +14,47 @@ def strip_think_tags(text: str) -> str:
     return re.sub(r"<think>.*?</think>\s*", "", text, flags=re.DOTALL).strip()
 
 
-
 class ReasoningJsonOutputParser(JsonOutputParser):
     """A JSON output parser that strips reasoning tags before parsing.
-    
+
     This parser removes any content enclosed in <think> tags from the input text
     before delegating to the parent JsonOutputParser for JSON parsing.
-    
+
     Args:
         text: The text to parse, which may contain <think> reasoning tags.
     """
-    async def parse(self, text: str):
+
+    def parse(self, text: str):
+        """Parse text by first removing <think> tags.
+
+        Args:
+            text: Text to parse that may contain <think> tags
+
+        Returns:
+            Parsed output after removing reasoning blocks
+        """
         cleaned = strip_think_tags(text)
-        return await super().parse(cleaned)
+        return super().parse(cleaned)
 
 
-class ReasoningStructuredOutputParser(StructuredOutputParser):
+class ReasoningStructuredOutputParser(PydanticOutputParser):
     """A structured output parser that strips reasoning tags before parsing.
-    
+
     This parser removes any content enclosed in <think> tags from the input text
-    before delegating to the parent StructuredOutputParser for structured parsing.
-    
+    before delegating to the parent PydanticOutputParser for structured parsing.
+
     Args:
         text: The text to parse, which may contain <think> reasoning tags.
     """
-    async def parse(self, text: str):
-        cleaned = strip_think_tags(text)
-        return await super().parse(cleaned)
 
+    def parse(self, text: str):
+        """Parse text by first removing <think> tags.
+
+        Args:
+            text: Text to parse that may contain <think> tags
+
+        Returns:
+            Parsed output after removing reasoning blocks
+        """
+        cleaned = strip_think_tags(text)
+        return super().parse(cleaned)
