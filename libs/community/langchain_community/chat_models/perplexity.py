@@ -47,7 +47,7 @@ from langchain_core.utils import from_env, get_pydantic_field_names
 from langchain_core.utils.pydantic import (
     is_basemodel_subclass,
 )
-from langchain_community.output_parsers.rail_parser import (
+from langchain_community.output_parsers.reasoning_parser import (
     ReasoningJsonOutputParser,
     ReasoningStructuredOutputParser,
 )
