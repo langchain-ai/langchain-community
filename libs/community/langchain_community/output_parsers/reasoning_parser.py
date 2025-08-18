@@ -1,4 +1,8 @@
 import re
+from typing import Any
+from langchain_core.utils.pydantic import (
+    TBaseModel,
+)
 from langchain_core.output_parsers import JsonOutputParser, PydanticOutputParser
 
 
@@ -24,7 +28,7 @@ class ReasoningJsonOutputParser(JsonOutputParser):
         text: The text to parse, which may contain <think> reasoning tags.
     """
 
-    def parse(self, text: str):
+    def parse(self, text: str) -> Any:
         """Parse text by first removing <think> tags.
 
         Args:
@@ -47,7 +51,7 @@ class ReasoningStructuredOutputParser(PydanticOutputParser):
         text: The text to parse, which may contain <think> reasoning tags.
     """
 
-    def parse(self, text: str):
+    def parse(self, text: str) -> TBaseModel:
         """Parse text by first removing <think> tags.
 
         Args:
