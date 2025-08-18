@@ -24,8 +24,6 @@ class ReasoningJsonOutputParser(JsonOutputParser):
     This parser removes any content enclosed in <think> tags from the input text
     before delegating to the parent JsonOutputParser for JSON parsing.
 
-    Args:
-        text: The text to parse, which may contain <think> reasoning tags.
     """
 
     def parse(self, text: str) -> Any:
