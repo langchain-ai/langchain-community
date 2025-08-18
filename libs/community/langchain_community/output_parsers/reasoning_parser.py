@@ -39,15 +39,14 @@ class ReasoningJsonOutputParser(JsonOutputParser):
         return super().parse(cleaned)
 
 
+
 class ReasoningStructuredOutputParser(PydanticOutputParser):
     """A structured output parser that strips reasoning tags before parsing.
 
     This parser removes any content enclosed in <think> tags from the input text
     before delegating to the parent PydanticOutputParser for structured parsing.
-
-    Args:
-        text: The text to parse, which may contain <think> reasoning tags.
     """
+
 
     def parse(self, text: str) -> TBaseModel:
         """Parse text by first removing <think> tags.
