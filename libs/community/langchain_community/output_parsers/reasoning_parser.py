@@ -11,9 +11,6 @@ def strip_think_tags(text: str) -> str:
 
     Args:
         text: The input text that may contain think tags.
-
-    Returns:
-        The text with think tags removed and whitespace stripped.
     """
     return re.sub(r"<think>.*?</think>\s*", "", text, flags=re.DOTALL).strip()
 
