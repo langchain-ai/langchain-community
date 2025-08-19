@@ -506,7 +506,7 @@ class ChatPerplexity(BaseChatModel):
                 }
             )
             output_parser = (
-                ReasoningStructuredOutputParser(schema)  # pydantic schemas
+                ReasoningStructuredOutputParser(pydantic_object=schema)  # pydantic schemas
                 if is_pydantic_schema
                 else ReasoningJsonOutputParser()         # plain JSON
             )
