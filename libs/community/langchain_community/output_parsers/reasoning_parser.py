@@ -12,7 +12,34 @@ def strip_think_tags(text: str) -> str:
     Args:
         text: The input text that may contain think tags.
     """
-    return re.sub(r"<think>.*?</think>\s*", "", text, flags=re.DOTALL).strip()
+    def remove_think_tags(text: str) -> str:
+        """Remove content between <think> and </think> tags more safely."""
+        result = []
+        i = 0
+        while i < len(text):
+            # Look for opening tag
+            open_tag_pos = text.find("<think>", i)
+            if open_tag_pos == -1:
+                # No more opening tags, add the rest and break
+                result.append(text[i:])
+                break
+            
+            # Add text before the opening tag
+            result.append(text[i:open_tag_pos])
+            
+            # Look for closing tag
+            close_tag_pos = text.find("</think>", open_tag_pos + 7)
+            if close_tag_pos == -1:
+                # No closing tag found, treat opening tag as literal text
+                result.append("<think>")
+                i = open_tag_pos + 7
+            else:
+                # Skip the content between tags and move past closing tag
+                i = close_tag_pos + 9
+        
+        return "".join(result).strip()
+    
+    return remove_think_tags(text)
 
 
 class ReasoningJsonOutputParser(JsonOutputParser):
