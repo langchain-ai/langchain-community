@@ -75,9 +75,12 @@ class ClickhouseSettings(BaseSettings):
 
     secure: bool = False
 
-    index_type: Optional[str] = "annoy"
-    # Annoy supports L2Distance and cosineDistance.
-    index_param: Optional[Union[List, Dict]] = ["'L2Distance'", 100]
+    # Annoy/Usearch index support deprecated: https://github.com/ClickHouse/ClickHouse/pull/79802
+    # Use vector similarity index instead
+    index_type: Optional[str] = "vector_similarity"
+
+    # vector_similarity supports L2Distance and cosineDistance.
+    index_param: Optional[Union[List, Dict]] = ["'hnsw'", "'L2Distance'", None]
     index_query_params: Dict[str, str] = {}
 
     column_map: Dict[str, str] = {
@@ -277,19 +280,7 @@ class Clickhouse(VectorStore):
         # initialize the schema
         dim = len(embedding.embed_query("test"))
 
-        index_params = (
-            (
-                ",".join([f"'{k}={v}'" for k, v in self.config.index_param.items()])
-                if self.config.index_param
-                else ""
-            )
-            if isinstance(self.config.index_param, Dict)
-            else (
-                ",".join([str(p) for p in self.config.index_param])
-                if isinstance(self.config.index_param, List)
-                else self.config.index_param
-            )
-        )
+        index_params = self._build_index_params(dim)
 
         self.schema = self._schema(dim, index_params)
 
@@ -365,6 +356,42 @@ class Clickhouse(VectorStore):
             }) = {dim}
                 ) ENGINE = MergeTree ORDER BY uuid
                 """
+
+    def _build_index_params(self, dim) -> str:
+        """Build a string representation of index params for ClickHouse vector index.
+
+        This method constructs the index parameters string based on the configured
+        index_param value and index type. For vector_similarity indices (the default),
+        the last parameter is automatically set to the embedding dimension.
+
+        Args:
+            dim (int): The dimension of the embeddings/vectors.
+
+        Returns:
+            str: Formatted index parameters string suitable for ClickHouse index
+                creation.
+
+        Notes:
+            - Default index type is 'vector_similarity' which requires the last
+              parameter to be equal to the embedding dimension
+            - Supports Dict, List, or string formats for index_param configuration
+            - For vector_similarity with List format, automatically overwrites the 3rd
+              parameter (index 2) with the actual embedding dimension
+        """
+        if isinstance(self.config.index_param, dict):
+            return (
+                ",".join([f"'{k}={v}'" for k, v in self.config.index_param.items()])
+                if self.config.index_param
+                else ""
+            )
+        elif isinstance(self.config.index_param, list):
+            param_list = self.config.index_param.copy()
+            # For vector_similarity, set the last parameter to the actual dimension
+            if self.config.index_type == "vector_similarity" and len(param_list) >= 3:
+                param_list[2] = dim
+            return ",".join(str(p) for p in param_list)
+        else:
+            return str(self.config.index_param or "")
 
     @property
     def embeddings(self) -> Embeddings:
