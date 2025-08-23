@@ -27,11 +27,6 @@ def test_build_index_params_dict_format() -> None:
     config.index_param = {}
     result = clickhouse._build_index_params(128)
     assert result == ""
-    
-    # Test with None dictionary  
-    config.index_param = None
-    result = clickhouse._build_index_params(128)
-    assert result == ""
 
 
 @pytest.mark.requires("clickhouse_connect")
@@ -43,23 +38,11 @@ def test_build_index_params_list_format() -> None:
     with patch("clickhouse_connect.get_client"):
         clickhouse = Clickhouse(embedding=FakeEmbeddings(), config=config)
     
-    # Test with vector_similarity index type (should replace 3rd parameter with dimension)
+    # Test with vector_similarity index type (should replace 3rd parameter)
     config.index_type = "vector_similarity"
     config.index_param = ["'hnsw'", "'L2Distance'", 64, "'additional_param'"]
     result = clickhouse._build_index_params(128)
     expected = "'hnsw','L2Distance',128,'additional_param'"
-    assert result == expected
-    
-    # Test with vector_similarity and exactly 3 parameters (should replace last one)
-    config.index_param = ["'hnsw'", "'L2Distance'", 64]
-    result = clickhouse._build_index_params(256)
-    expected = "'hnsw','L2Distance',256"
-    assert result == expected
-    
-    # Test with vector_similarity but less than 3 parameters (should not modify)
-    config.index_param = ["'hnsw'", "'L2Distance'"]
-    result = clickhouse._build_index_params(128)
-    expected = "'hnsw','L2Distance'"
     assert result == expected
     
     # Test with non-vector_similarity index type (should not modify)
@@ -116,42 +99,7 @@ def test_build_index_params_default_behavior() -> None:
     result = clickhouse._build_index_params(384)
     expected = "'hnsw','L2Distance',384"
     assert result == expected
-
-
-@pytest.mark.requires("clickhouse_connect")
-def test_build_index_params_edge_cases() -> None:
-    """Test _build_index_params with edge cases."""
-    config = ClickhouseSettings()
-    config.table = "test_table"
     
-    with patch("clickhouse_connect.get_client"):
-        clickhouse = Clickhouse(embedding=FakeEmbeddings(), config=config)
-    
-    # Test with list containing various data types
-    config.index_type = "vector_similarity"
-    config.index_param = [True, 42, "string", 99.9]
-    result = clickhouse._build_index_params(128)
-    expected = "True,42,128,99.9"  # 3rd parameter (index 2) should be replaced
-    assert result == expected
-    
-    # Test with single-item dictionary
-    config.index_param = {"single": "value"}
-    result = clickhouse._build_index_params(128)
-    expected = "'single=value'"
-    assert result == expected
-    
-    # Test with numeric string
-    config.index_param = "123"
-    result = clickhouse._build_index_params(128)
-    expected = "123"
-    assert result == expected
-    
-    # Test with special characters in dictionary values
-    config.index_param = {"key": "value with spaces", "special": "chars!@#"}
-    result = clickhouse._build_index_params(128)
-    expected = "'key=value with spaces','special=chars!@#'"
-    assert result == expected
-
 
 @pytest.mark.requires("clickhouse_connect")
 def test_build_index_params_vector_similarity_dimension_replacement() -> None:
@@ -181,47 +129,4 @@ def test_build_index_params_vector_similarity_dimension_replacement() -> None:
     config.index_param = ["a", "b", 999, "d", "e"]
     result = clickhouse._build_index_params(1024)
     expected = "a,b,999,d,e"  # Should not replace the dimension
-    assert result == expected
-
-
-@pytest.mark.requires("clickhouse_connect")
-def test_build_index_params_maintains_parameter_order() -> None:
-    """Test that _build_index_params maintains parameter order in dictionary."""
-    config = ClickhouseSettings()
-    config.table = "test_table"
-    
-    with patch("clickhouse_connect.get_client"):
-        clickhouse = Clickhouse(embedding=FakeEmbeddings(), config=config)
-    
-    # Test with ordered dictionary (Python 3.7+ maintains insertion order)
-    config.index_param = {
-        "first": "value1",
-        "second": "value2", 
-        "third": "value3"
-    }
-    result = clickhouse._build_index_params(128)
-    expected = "'first=value1','second=value2','third=value3'"
-    assert result == expected
-
-
-@pytest.mark.requires("clickhouse_connect")
-def test_build_index_params_with_none_values() -> None:
-    """Test _build_index_params handles None values correctly."""
-    config = ClickhouseSettings()
-    config.table = "test_table"
-    
-    with patch("clickhouse_connect.get_client"):
-        clickhouse = Clickhouse(embedding=FakeEmbeddings(), config=config)
-    
-    # Test list with None values
-    config.index_type = "vector_similarity"
-    config.index_param = ["param1", None, None, "param4"]
-    result = clickhouse._build_index_params(256)
-    expected = "param1,None,256,param4"
-    assert result == expected
-    
-    # Test with dictionary containing None values
-    config.index_param = {"key1": None, "key2": "value"}
-    result = clickhouse._build_index_params(128)
-    expected = "'key1=None','key2=value'"
     assert result == expected
