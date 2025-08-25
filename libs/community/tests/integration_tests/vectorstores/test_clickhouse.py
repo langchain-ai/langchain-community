@@ -13,7 +13,7 @@ def test_clickhouse() -> None:
     config.table = "test_clickhouse"
     docsearch = Clickhouse.from_texts(texts, FakeEmbeddings(), config=config)
     output = docsearch.similarity_search("foo", k=1)
-    assert output == [Document(page_content="foo", metadata={"_dummy": 0})]
+    assert output == [Document(page_content="foo", metadata={})]
     docsearch.drop()
 
 
@@ -26,7 +26,7 @@ async def test_clickhouse_async() -> None:
         texts=texts, embedding=FakeEmbeddings(), config=config
     )
     output = await docsearch.asimilarity_search("foo", k=1)
-    assert output == [Document(page_content="foo", metadata={"_dummy": 0})]
+    assert output == [Document(page_content="foo", metadata={})]
     docsearch.drop()
 
 
@@ -95,7 +95,7 @@ def test_clickhouse_with_persistence() -> None:
     )
 
     output = docsearch.similarity_search("foo", k=1)
-    assert output == [Document(page_content="foo", metadata={"_dummy": 0})]
+    assert output == [Document(page_content="foo", metadata={})]
 
     # Get a new VectorStore with same config
     # it will reuse the table spontaneously

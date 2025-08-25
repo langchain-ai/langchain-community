@@ -36,20 +36,24 @@ class ClickhouseSettings(BaseSettings):
     Attribute:
         host (str) : An URL to connect to MyScale backend.
                              Defaults to 'localhost'.
-        port (int) : URL port to connect with HTTP. Defaults to 8443.
+        port (int) : URL port to connect with HTTP. Defaults to 8123.
         username (str) : Username to login. Defaults to None.
         password (str) : Password to login. Defaults to None.
         secure (bool) : Connect to server over secure connection. Defaults to False.
-        index_type (str): index type string.
-        index_param (list): index build parameter.
+        index_type (str): index type string. Default is "HNSW", supported values are
+                          "HNSW" or "NONE".
+        index_params (Dict): index build parameter.
+            Defaults to None. For HNSW, following parameters are supported :-
+                "quantization" : One of 'f64','f32', 'f16', 'bf16', 'i8', 'b1'. Default is 'bf16'.
+                "hnsw_max_connections_per_layer": Default is 32.
+                "hnsw_candidate_list_size_for_construction" : Default is 128.
         index_query_params(dict): index query parameters.
         database (str) : Database name to find the table. Defaults to 'default'.
         table (str) : Table name to operate on.
                       Defaults to 'vector_table'.
         metric (str) : Metric to compute distance,
-                       supported are ('angular', 'euclidean', 'manhattan', 'hamming',
-                       'dot'). Defaults to 'angular'.
-                       https://github.com/spotify/annoy/blob/main/src/annoymodule.cc#L149-L169
+                       supported are ('L2Distance', 'cosineDistance')
+                       Defaults to 'cosineDistance'.
 
         column_map (Dict) : Column type map to project column name onto langchain
                             semantics. Must have keys: `text`, `id`, `vector`,
@@ -75,9 +79,9 @@ class ClickhouseSettings(BaseSettings):
 
     secure: bool = False
 
-    index_type: Optional[str] = "annoy"
-    # Annoy supports L2Distance and cosineDistance.
-    index_param: Optional[Union[List, Dict]] = ["'L2Distance'", 100]
+    index_type: Optional[str] = "HNSW"
+    # ClickHouse supports L2Distance and cosineDistance.
+    index_params: Optional[Dict] = {"quantization": "bf16", "hnsw_max_connections_per_layer": "64", "hnsw_candidate_list_size_for_construction": "256"}
     index_query_params: Dict[str, str] = {}
 
     column_map: Dict[str, str] = {
@@ -90,7 +94,7 @@ class ClickhouseSettings(BaseSettings):
 
     database: str = "default"
     table: str = "langchain"
-    metric: str = "angular"
+    metric: str = "cosineDistance"
 
     def __getitem__(self, item: str) -> Any:
         return getattr(self, item)
@@ -148,78 +152,43 @@ class Clickhouse(VectorStore):
 
             vector_store.delete(ids=["3"])
 
-    # TODO: Fill out example output.
     Search:
         .. code-block:: python
 
-            results = vector_store.similarity_search(query="thud",k=1)
+            results = vector_store.similarity_search(query="What did I eat for breakfast?",k=1)
             for doc in results:
                 print(f"* {doc.page_content} [{doc.metadata}]")
 
         .. code-block:: python
 
-            # TODO: Example output
-
-    # TODO: Fill out with relevant variables and example output.
     Search with filter:
         .. code-block:: python
 
-            # TODO: Edit filter if needed
-            results = vector_store.similarity_search(query="thud",k=1,filter="metadata.baz='bar'")
+            results = vector_store.similarity_search(query="What did I eat for breakfast?",k=1,filter="<filter>")
             for doc in results:
                 print(f"* {doc.page_content} [{doc.metadata}]")
 
         .. code-block:: python
 
-            # TODO: Example output
-
-    # TODO: Fill out with example output.
     Search with score:
         .. code-block:: python
 
-            results = vector_store.similarity_search_with_score(query="qux",k=1)
+            results = vector_store.similarity_search_with_relevance_scores(query="Will it be hot tomorrow?",k=1)
             for doc, score in results:
                 print(f"* [SIM={score:3f}] {doc.page_content} [{doc.metadata}]")
 
         .. code-block:: python
 
-            # TODO: Example output
-
-    # TODO: Fill out with example output.
-    Async:
-        .. code-block:: python
-
-            # add documents
-            # await vector_store.aadd_documents(documents=documents, ids=ids)
-
-            # delete documents
-            # await vector_store.adelete(ids=["3"])
-
-            # search
-            # results = vector_store.asimilarity_search(query="thud",k=1)
-
-            # search with score
-            results = await vector_store.asimilarity_search_with_score(query="qux",k=1)
-            for doc,score in results:
-                print(f"* [SIM={score:3f}] {doc.page_content} [{doc.metadata}]")
-
-        .. code-block:: python
-
-            # TODO: Example output
-
-    # TODO: Fill out with example output.
     Use as Retriever:
         .. code-block:: python
 
             retriever = vector_store.as_retriever(
-                search_type="mmr",
-                search_kwargs={"k": 1, "fetch_k": 2, "lambda_mult": 0.5},
+                search_type="similarity_score_threshold",
+                search_kwargs={"k": 1, "score_threshold": 0.5},
             )
-            retriever.invoke("thud")
+            retriever.invoke("Stealing from the bank is a crime", filter={"source": "news"})
 
         .. code-block:: python
-
-            # TODO: Example output
 
     """  # noqa: E501
 
@@ -267,37 +236,18 @@ class Clickhouse(VectorStore):
         for k in ["id", "embedding", "document", "metadata", "uuid"]:
             assert k in self.config.column_map
         assert self.config.metric in [
-            "angular",
-            "euclidean",
-            "manhattan",
-            "hamming",
-            "dot",
+            "L2Distance",
+            "cosineDistance",
         ]
-
         # initialize the schema
         dim = len(embedding.embed_query("test"))
-
-        index_params = (
-            (
-                ",".join([f"'{k}={v}'" for k, v in self.config.index_param.items()])
-                if self.config.index_param
-                else ""
-            )
-            if isinstance(self.config.index_param, Dict)
-            else (
-                ",".join([str(p) for p in self.config.index_param])
-                if isinstance(self.config.index_param, List)
-                else self.config.index_param
-            )
-        )
-
-        self.schema = self._schema(dim, index_params)
+        self.schema = self._schema(dim, self.config.index_params)
 
         self.dim = dim
         self.BS = "\\"
         self.must_escape = ("\\", "'")
         self.embedding_function = embedding
-        self.dist_order = "ASC"  # Only support ConsingDistance and L2Distance
+        self.dist_order = "ASC"
 
         # Create a connection to clickhouse
         self.client = get_client(
@@ -308,24 +258,9 @@ class Clickhouse(VectorStore):
             secure=self.config.secure,
             **kwargs,
         )
-        # Enable JSON type
-        try:
-            self.client.command("SET allow_experimental_json_type=1")
-        except Exception as _:
-            logger.debug(
-                f"Clickhouse version={self.client.server_version} - "
-                "There is no allow_experimental_json_type parameter."
-            )
-
-        self.client.command("SET allow_experimental_object_type=1")
-        if self.config.index_type:
-            # Enable index
-            self.client.command(
-                f"SET allow_experimental_{self.config.index_type}_index=1"
-            )
         self.client.command(self.schema)
 
-    def _schema(self, dim: int, index_params: Optional[str] = "") -> str:
+    def _schema(self, dim: int, index_params: Optional[dict] = None) -> str:
         """Create table schema
         :param dim: dimension of embeddings
         :param index_params: parameters used for index
@@ -338,7 +273,24 @@ class Clickhouse(VectorStore):
         when the embedding field is queried.
         """
 
-        if self.config.index_type:
+        if self.config.index_type.lower() == "hnsw":
+            quantization = "bf16"
+            M = 32
+            ef_c = 128
+            if (
+                index_params and "quantization" in index_params
+            ):
+                quantization = index_params["quantization"]
+            if (
+                index_params and "hnsw_max_connections_per_layer" in index_params
+            ):
+                M = int(index_params["hnsw_max_connections_per_layer"])
+            if (
+                index_params
+                and "hnsw_candidate_list_size_for_construction" in index_params
+            ):
+                ef_c = int(index_params[
+                    "hnsw_candidate_list_size_for_construction"])
             return f"""\
         CREATE TABLE IF NOT EXISTS {self.config.database}.{self.config.table}(
             {self.config.column_map["id"]} Nullable(String),
@@ -349,7 +301,7 @@ class Clickhouse(VectorStore):
             CONSTRAINT cons_vec_len CHECK length(
                 {self.config.column_map["embedding"]}) = {dim},
             INDEX vec_idx {self.config.column_map["embedding"]} TYPE \
-        {self.config.index_type}({index_params}) GRANULARITY 1000
+            vector_similarity('{self.config.index_type.lower()}','{self.config.metric}', {dim}, '{quantization}', {M}, {ef_c})
         ) ENGINE = MergeTree ORDER BY uuid SETTINGS index_granularity = 8192\
         """
         else:
@@ -573,7 +525,7 @@ class Clickhouse(VectorStore):
         settings_strs = []
         if self.config.index_query_params:
             for k in self.config.index_query_params:
-                settings_strs.append(f"SETTING {k}={self.config.index_query_params[k]}")
+                settings_strs.append(f"SETTINGS {k}={self.config.index_query_params[k]}")
         q_str = f"""
             SELECT {self.config.column_map["document"]}, 
                 {self.config.column_map["metadata"]}, dist
