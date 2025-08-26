@@ -5,6 +5,8 @@ import math
 import tempfile
 from typing import Union
 
+import faiss
+import numpy as np
 import pytest
 from langchain_core.documents import Document
 
@@ -12,7 +14,10 @@ from langchain_community.docstore.base import Docstore
 from langchain_community.docstore.in_memory import InMemoryDocstore
 from langchain_community.vectorstores.faiss import FAISS
 from langchain_community.vectorstores.utils import DistanceStrategy
-from tests.integration_tests.vectorstores.fake_embeddings import FakeEmbeddings
+from tests.integration_tests.vectorstores.fake_embeddings import (
+    ConsistentFakeEmbeddings,
+    FakeEmbeddings,
+)
 
 _PAGE_CONTENT = """This is a page about LangChain.
 
@@ -1648,6 +1653,64 @@ def test_faiss_similarity_search_with_relevance_scores_with_threshold() -> None:
     output, score = outputs[0]
     assert output == Document(id=output.id, page_content="foo")
     assert score == 1.0
+
+
+@pytest.mark.requires("faiss")
+def test_faiss_cosine_distance_with_index_flat_ip() -> None:
+    """Verify that with IndexFlatIP + COSINE + normalize_L2, the returned
+    relevance score equals (cosine+1)/2."""
+    embeddings = ConsistentFakeEmbeddings()
+    e1 = np.asarray(embeddings.embed_query("foo"), dtype=np.float32)
+    e1 = e1 / np.linalg.norm(e1)
+    e2 = np.asarray(embeddings.embed_query("bar"), dtype=np.float32)
+    e2 = e2 / np.linalg.norm(e2)
+    dot_product = float(np.dot(e1, e2))
+    required_relevance_score = (dot_product + 1.0) / 2.0
+
+    dim = e1.shape[0]
+    index = faiss.IndexFlatIP(dim)
+    store = FAISS(
+        embedding_function=embeddings,
+        index=index,
+        distance_strategy=DistanceStrategy.COSINE,
+        normalize_L2=True,
+        docstore=InMemoryDocstore(),
+        index_to_docstore_id={},
+    )
+    store.add_texts(["foo"])
+    outputs = store.similarity_search_with_relevance_scores("bar")
+    output, score = outputs[0]
+    assert output == Document(id=output.id, page_content="foo")
+    assert score == pytest.approx(required_relevance_score, rel=1e-6)
+
+
+@pytest.mark.requires("faiss")
+def test_faiss_cosine_distance_with_index_flat_l2() -> None:
+    """Verify IndexFlatL2 + COSINE + normalize_L2 maps to
+    relevance = 1 - (squared_L2)/4."""
+    embeddings = ConsistentFakeEmbeddings()
+    e1 = np.asarray(embeddings.embed_query("foo"), dtype=np.float32)
+    e1 = e1 / np.linalg.norm(e1)
+    e2 = np.asarray(embeddings.embed_query("bar"), dtype=np.float32)
+    e2 = e2 / np.linalg.norm(e2)
+    l2_dist = np.sum((e1 - e2) ** 2)
+    required_relevance_score = 1 - l2_dist / 4
+
+    dim = e1.shape[0]
+    index = faiss.IndexFlatL2(dim)
+    store = FAISS(
+        embedding_function=embeddings,
+        index=index,
+        distance_strategy=DistanceStrategy.COSINE,
+        normalize_L2=True,
+        docstore=InMemoryDocstore(),
+        index_to_docstore_id={},
+    )
+    store.add_texts(["foo"])
+    outputs = store.similarity_search_with_relevance_scores("bar")
+    output, score = outputs[0]
+    assert output == Document(id=output.id, page_content="foo")
+    assert score == pytest.approx(required_relevance_score, rel=1e-6)
 
 
 @pytest.mark.requires("faiss")

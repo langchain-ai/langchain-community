@@ -227,7 +227,8 @@ class FAISS(VectorStore):
         self.override_relevance_score_fn = relevance_score_fn
         self._normalize_L2 = normalize_L2
         if (
-            self.distance_strategy != DistanceStrategy.EUCLIDEAN_DISTANCE
+            self.distance_strategy
+            not in (DistanceStrategy.EUCLIDEAN_DISTANCE, DistanceStrategy.COSINE)
             and self._normalize_L2
         ):
             warnings.warn(
@@ -1271,12 +1272,30 @@ class FAISS(VectorStore):
             # Default behavior is to use euclidean distance relevancy
             return self._euclidean_relevance_score_fn
         elif self.distance_strategy == DistanceStrategy.COSINE:
-            return self._cosine_relevance_score_fn
+            return self._select_cosine_relevance_fn()
         else:
             raise ValueError(
                 "Unknown distance strategy, must be cosine, max_inner_product,"
                 " or euclidean"
             )
+
+    def _select_cosine_relevance_fn(self) -> Callable[[float], float]:
+        """Pick the correct relevance mapping for COSINE based on FAISS index metric."""
+        faiss = dependable_faiss_import()
+        metric = getattr(self.index, "metric_type", None)
+
+        if metric == getattr(faiss, "METRIC_INNER_PRODUCT", None):
+            # FAISS returns cosine similarity (if vectors are unit-normalized).
+            # Map similarity s ∈ [-1,1] → [0,1]
+            return lambda s: (float(s) + 1.0) / 2.0
+
+        if metric == getattr(faiss, "METRIC_L2", None):
+            # FAISS returns squared L2 distance d ∈ [0,4] (for unit vectors).
+            # Map distance → [0,1]
+            return lambda d: 1.0 - float(d) / 4.0
+
+        # Default fallback
+        return self._cosine_relevance_score_fn
 
     def _similarity_search_with_relevance_scores(
         self,
