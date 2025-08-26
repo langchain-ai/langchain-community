@@ -600,7 +600,9 @@ class Clickhouse(VectorStore):
         settings_strs = []
         if self.config.index_query_params:
             for k in self.config.index_query_params:
-                settings_strs.append(f"SETTING {k}={self.config.index_query_params[k]}")
+                settings_strs.append(
+                    f"SETTINGS {k}={self.config.index_query_params[k]}"
+                )
         q_str = f"""
             SELECT {self.config.column_map["document"]}, 
                 {self.config.column_map["metadata"]}, dist
