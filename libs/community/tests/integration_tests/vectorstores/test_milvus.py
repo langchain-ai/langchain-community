@@ -52,7 +52,7 @@ def test_milvus_with_id() -> None:
     assert output == [Document(page_content="foo")]
 
     output = docsearch.delete(ids=ids)
-    assert output.delete_count == len(fake_texts)  # type: ignore[attr-defined]
+    assert output.delete_count == len(fake_texts)
 
     try:
         ids = ["dup_id" for _ in fake_texts]

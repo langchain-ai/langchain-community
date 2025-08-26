@@ -473,7 +473,7 @@ class ChatBaichuan(BaseChatModel):
         res = self._chat(messages, stream=True, **kwargs)
         if res.status_code != 200:
             raise ValueError(f"Error from Baichuan api response: {res}")
-        default_chunk_class = AIMessageChunk
+        default_chunk_class: Type[BaseMessageChunk] = AIMessageChunk
         for chunk in res.iter_lines():
             chunk = chunk.decode("utf-8").strip("\r\n")
             parts = chunk.split("data: ", 1)
@@ -490,7 +490,7 @@ class ChatBaichuan(BaseChatModel):
                 default_chunk_class = chunk.__class__
                 cg_chunk = ChatGenerationChunk(message=chunk)
                 if run_manager:
-                    run_manager.on_llm_new_token(chunk.content, chunk=cg_chunk)
+                    run_manager.on_llm_new_token(str(chunk.content), chunk=cg_chunk)
                 yield cg_chunk
 
     async def _agenerate(
