@@ -834,6 +834,7 @@ class ElasticsearchStore(VectorStore):
 
         def default_doc_builder(hit: Dict) -> Document:
             return Document(
+                id=hit["_id"],
                 page_content=hit["_source"].get(self.query_field, ""),
                 metadata=hit["_source"]["metadata"],
             )
