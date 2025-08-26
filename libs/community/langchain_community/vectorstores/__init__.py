@@ -291,6 +291,10 @@ if TYPE_CHECKING:
     from langchain_community.vectorstores.vectara import (
         Vectara,
     )
+    
+    from langchain_community.vectorstores.vectorx import(
+        VectorXVectorStore,
+    )
     from langchain_community.vectorstores.vespa import (
         VespaStore,
     )
