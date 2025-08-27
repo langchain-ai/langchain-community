@@ -7,8 +7,8 @@ authors = []
 license = { text = "MIT" }
 requires-python = ">=3.9"
 dependencies = [
-    "langchain-core<1.0.0,>=0.3.74",
-    "langchain<1.0.0,>=0.3.27",
+    "langchain-core<2.0.0,>=0.3.74",
+    "langchain<2.0.0,>=0.3.27",
     "SQLAlchemy<3,>=1.4",
     "requests<3,>=2.32.5",
     "PyYAML>=5.3",
