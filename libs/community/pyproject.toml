@@ -7,22 +7,22 @@ authors = []
 license = { text = "MIT" }
 requires-python = ">=3.9"
 dependencies = [
-    "langchain-core<1.0.0,>=0.3.66",
-    "langchain<1.0.0,>=0.3.26",
+    "langchain-core<1.0.0,>=0.3.74",
+    "langchain<1.0.0,>=0.3.27",
     "SQLAlchemy<3,>=1.4",
-    "requests<3,>=2",
+    "requests<3,>=2.32.5",
     "PyYAML>=5.3",
     "aiohttp<4.0.0,>=3.8.3",
     "tenacity!=8.4.0,<10,>=8.1.0",
-    "dataclasses-json<0.7,>=0.5.7",
-    "pydantic-settings<3.0.0,>=2.4.0",
+    "dataclasses-json<0.7,>=0.6.7",
+    "pydantic-settings<3.0.0,>=2.10.1",
     "langsmith>=0.1.125",
     "httpx-sse<1.0.0,>=0.4.0",
     "numpy>=1.26.2; python_version<'3.13'",
     "numpy>=2.1.0; python_version>='3.13'",
 ]
 name = "langchain-community"
-version = "0.3.27"
+version = "0.3.28"
 description = "Community contributed LangChain integrations."
 readme = "README.md"
 
@@ -33,11 +33,11 @@ repository = "https://github.com/langchain-ai/langchain-community"
 
 [dependency-groups]
 test = [
-    "pytest<8.0.0,>=7.4.4",
-    "pytest-cov<5.0.0,>=4.1.0",
+    "pytest<9.0.0,>=8.4.1",
+    "pytest-cov<7.0.0,>=6.2.1",
     "pytest-dotenv<1.0.0,>=0.5.2",
     "duckdb-engine<1.0.0,>=0.13.6",
-    "pytest-watcher<1.0.0,>=0.2.6",
+    "pytest-watcher<1.0.0,>=0.4.3",
     "freezegun<2.0.0,>=1.2.2",
     "responses<1.0.0,>=0.22.0",
     "pytest-asyncio<1.0.0,>=0.20.3",
@@ -54,16 +54,15 @@ test = [
     "langchain-tests",
     "toml>=0.10.2",
 ]
-codespell = ["codespell<3.0.0,>=2.2.0"]
 test_integration = ["pytest-vcr<2.0.0,>=1.0.2", "vcrpy<7,>=6"]
 lint = [
-    "ruff<0.10,>=0.9",
+    "ruff<1,>=0.12.10",
     "cffi<1.17.1; python_version < \"3.10\"",
     "cffi; python_version >= \"3.10\"",
 ]
 dev = ["jupyter<2.0.0,>=1.0.0", "setuptools<68.0.0,>=67.6.1", "langchain-core"]
 typing = [
-    "mypy<2.0,>=1.15",
+    "mypy<2.0,>=1.17.1",
     "types-pyyaml<7.0.0.0,>=6.0.12.2",
     "types-requests<3.0.0.0,>=2.28.11.5",
     "types-toml<1.0.0.0,>=0.10.8.1",
