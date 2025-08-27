@@ -7,7 +7,7 @@ authors = []
 license = { text = "MIT" }
 requires-python = ">=3.9"
 dependencies = [
-    "langchain-core<2.0.0,>=0.3.74",
+    "langchain-core<2.0.0,>=0.3.75",
     "langchain<2.0.0,>=0.3.27",
     "SQLAlchemy<3,>=1.4",
     "requests<3,>=2.32.5",
@@ -22,7 +22,7 @@ dependencies = [
     "numpy>=2.1.0; python_version>='3.13'",
 ]
 name = "langchain-community"
-version = "0.3.28"
+version = "0.3.29"
 description = "Community contributed LangChain integrations."
 readme = "README.md"
 
