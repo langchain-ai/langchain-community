@@ -374,7 +374,10 @@ def _default_painless_scripting_query(
 
 
 def _default_hybrid_search_query(
-    query_text: str, query_vector: List[float], k: int = 4
+    query_text: str,
+    query_vector: List[float],
+    k: int = 4,
+    include_embeddings: bool = False,
 ) -> Dict:
     """Returns payload for performing hybrid search for given options.
 
@@ -382,12 +385,12 @@ def _default_hybrid_search_query(
         query_text: The query text to search for.
         query_vector: The embedding vector (query) to search for.
         k: Number of Documents to return. Defaults to 4.
+        include_embeddings: Whether to include vector_field in response. Defaults to False.
 
     Returns:
         dict: The payload for hybrid search.
     """
     payload = {
-        "_source": {"exclude": ["vector_field"]},
         "query": {
             "hybrid": {
                 "queries": [
@@ -405,6 +408,10 @@ def _default_hybrid_search_query(
         "size": k,
     }
 
+    # Only exclude vector_field if embeddings are not needed
+    if not include_embeddings:
+        payload["_source"] = {"exclude": ["vector_field"]}
+
     return payload
 
 
@@ -413,6 +420,7 @@ def _hybrid_search_query_with_post_filter(
     query_vector: List[float],
     k: int,
     post_filter: Dict,
+    include_embeddings: bool = False,
 ) -> Dict:
     """Returns payload for performing hybrid search with post filter.
 
@@ -421,11 +429,14 @@ def _hybrid_search_query_with_post_filter(
         query_vector: The embedding vector to search for.
         k: Number of Documents to return.
         post_filter: The post filter to apply.
+        include_embeddings: Include vector_field in response. Defaults to False.
 
     Returns:
         dict: The payload for hybrid search with post filter.
     """
-    search_query = _default_hybrid_search_query(query_text, query_vector, k)
+    search_query = _default_hybrid_search_query(
+        query_text, query_vector, k, include_embeddings
+    )
 
     search_query["post_filter"] = post_filter
 
@@ -1217,6 +1228,7 @@ class OpenSearchVectorSearch(VectorStore):
             search_pipeline = kwargs.get("search_pipeline")
             post_filter = kwargs.get("post_filter", {})
             query_text = kwargs.get("query_text")
+            include_embeddings = kwargs.get("include_embeddings", False)
             path = f"/{index_name}/_search?search_pipeline={search_pipeline}"
 
             if query_text is None:
@@ -1232,11 +1244,13 @@ class OpenSearchVectorSearch(VectorStore):
             if post_filter != {}:
                 # hybrid search with post filter
                 payload = _hybrid_search_query_with_post_filter(
-                    query_text, embeded_query, k, post_filter
+                    query_text, embeded_query, k, post_filter, include_embeddings
                 )
             else:
                 # hybrid search without post filter
-                payload = _default_hybrid_search_query(query_text, embeded_query, k)
+                payload = _default_hybrid_search_query(
+                    query_text, embeded_query, k, include_embeddings
+                )
 
             response = self.client.transport.perform_request(
                 method="GET", url=path, body=payload
@@ -1285,6 +1299,11 @@ class OpenSearchVectorSearch(VectorStore):
         embedding = self.embedding_function.embed_query(query)
 
         # Do ANN/KNN search to get top fetch_k results where fetch_k >= k
+        # For hybrid search, we need embeddings for MMR calculation
+        search_type = kwargs.get("search_type", "approximate_search")
+        if search_type == HYBRID_SEARCH:
+            kwargs["include_embeddings"] = True
+
         results = self._raw_similarity_search_with_score_by_vector(
             embedding, fetch_k, **kwargs
         )
