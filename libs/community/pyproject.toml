@@ -5,10 +5,10 @@ build-backend = "pdm.backend"
 [project]
 authors = []
 license = { text = "MIT" }
-requires-python = ">=3.9"
+requires-python = ">=3.10"
 dependencies = [
-    "langchain-core<1.0.0,>=0.3.74",
-    "langchain<1.0.0,>=0.3.27",
+    "langchain-core<2.0.0,>=0.3.74",
+    "langchain<2.0.0,>=0.3.27",
     "SQLAlchemy<3,>=1.4",
     "requests<3,>=2.32.5",
     "PyYAML>=5.3",
@@ -49,16 +49,14 @@ test = [
     "requests-mock<2.0.0,>=1.11.0",
     "pytest-xdist<4.0.0,>=3.6.1",
     "blockbuster<1.6,>=1.5.18",
-    "cffi<1.17.1; python_version < \"3.10\"",
-    "cffi; python_version >= \"3.10\"",
+    "cffi",
     "langchain-tests",
     "toml>=0.10.2",
 ]
 test_integration = ["pytest-vcr<2.0.0,>=1.0.2", "vcrpy<7,>=6"]
 lint = [
     "ruff<1,>=0.12.10",
-    "cffi<1.17.1; python_version < \"3.10\"",
-    "cffi; python_version >= \"3.10\"",
+    "cffi",
 ]
 dev = ["jupyter<2.0.0,>=1.0.0", "setuptools<68.0.0,>=67.6.1", "langchain-core"]
 typing = [
