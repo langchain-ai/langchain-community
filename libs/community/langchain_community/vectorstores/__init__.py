@@ -291,8 +291,7 @@ if TYPE_CHECKING:
     from langchain_community.vectorstores.vectara import (
         Vectara,
     )
-    
-    from langchain_community.vectorstores.vectorx import(
+    from langchain_community.vectorstores.vectorx import (
         VectorXVectorStore,
     )
     from langchain_community.vectorstores.vespa import (
@@ -412,6 +411,7 @@ __all__ = [
     "Vald",
     "Vearch",
     "Vectara",
+    "VectorXVectorStore"
     "VectorStore",
     "VespaStore",
     "VLite",
@@ -517,6 +517,7 @@ _module_lookup = {
     "VDMS": "langchain_community.vectorstores.vdms",
     "Vearch": "langchain_community.vectorstores.vearch",
     "Vectara": "langchain_community.vectorstores.vectara",
+    "VectorXVectorStore": "langchain_community.vectorstores.vectorx",
     "VectorStore": "langchain_core.vectorstores",
     "VespaStore": "langchain_community.vectorstores.vespa",
     "VLite": "langchain_community.vectorstores.vlite",
