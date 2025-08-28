@@ -59,12 +59,6 @@ format format_diff:
 	[ "$(PYTHON_FILES)" = "" ] || uv run --group typing --group lint ruff format $(PYTHON_FILES)
 	[ "$(PYTHON_FILES)" = "" ] || uv run --group typing --group lint ruff check --select I --fix $(PYTHON_FILES)
 
-spell_check:
-	uv run --group typing --group lint codespell --toml pyproject.toml
-
-spell_fix:
-	uv run --group typing --group lint codespell --toml pyproject.toml -w
-
 ######################
 # HELP
 ######################

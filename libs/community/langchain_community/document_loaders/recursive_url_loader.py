@@ -14,6 +14,7 @@ from typing import (
     Union,
     cast,
 )
+from urllib.parse import urlparse
 
 import aiohttp
 import requests
@@ -372,8 +373,22 @@ class RecursiveUrlLoader(BaseLoader):
         self.headers = headers
         self.check_response_status = check_response_status
         self.continue_on_failure = continue_on_failure
-        self.base_url = base_url if base_url is not None else url
+        self.base_url = base_url if base_url is not None else self._parse_base_url(url)
         self.proxies = proxies
+
+    def _parse_base_url(self, url: str) -> str:
+        """Parse the base URL from the given URL.
+
+        Args:
+            url: The URL to parse.
+
+        Returns:
+            The base URL with scheme and netloc only, ending with a slash.
+        """
+        if not url.startswith(("http://", "https://")):
+            url = "https://" + url
+        parsed_url = urlparse(url)
+        return f"{parsed_url.scheme}://{parsed_url.netloc}/"
 
     def _get_child_links_recursive(
         self, url: str, visited: Set[str], *, depth: int = 0
