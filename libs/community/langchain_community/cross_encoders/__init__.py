@@ -23,6 +23,9 @@ if TYPE_CHECKING:
     from langchain_community.cross_encoders.huggingface import (
         HuggingFaceCrossEncoder,
     )
+    from langchain_community.cross_encoders.mixedbreadai import (
+        MixedbreadAICrossEncoder,
+    )
     from langchain_community.cross_encoders.sagemaker_endpoint import (
         SagemakerEndpointCrossEncoder,
     )
@@ -32,6 +35,7 @@ __all__ = [
     "FakeCrossEncoder",
     "HuggingFaceCrossEncoder",
     "SagemakerEndpointCrossEncoder",
+    "MixedbreadAICrossEncoder",
 ]
 
 _module_lookup = {
@@ -39,6 +43,7 @@ _module_lookup = {
     "FakeCrossEncoder": "langchain_community.cross_encoders.fake",
     "HuggingFaceCrossEncoder": "langchain_community.cross_encoders.huggingface",
     "SagemakerEndpointCrossEncoder": "langchain_community.cross_encoders.sagemaker_endpoint",  # noqa: E501
+    "MixedbreadAICrossEncoder": "langchain_community.cross_encoders.mixedbreadai",
 }
 
 
