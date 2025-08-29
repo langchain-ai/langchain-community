@@ -8,7 +8,7 @@ DEFAULT_MODEL_NAME = "mixedbread-ai/mxbai-rerank-base-v2"
 
 
 class MixedbreadAICrossEncoder(BaseModel, BaseCrossEncoder):
-    """Mixbread cross encoder models.
+"""Mixedbread cross encoder models.
 
     Example:
         .. code-block:: python
