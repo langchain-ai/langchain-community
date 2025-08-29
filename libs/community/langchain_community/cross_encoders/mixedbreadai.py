@@ -42,7 +42,7 @@ class MixedbreadAICrossEncoder(BaseModel, BaseCrossEncoder):
                 "Please install it with `pip install mxbai-rerank`."
             ) from exc
 
-        self.client = MxbaiRerankV2(self.model_name,**self.model_kwargs)
+        self.client = MxbaiRerankV2(self.model_name, **self.model_kwargs)
 
     model_config = ConfigDict(extra="forbid", protected_namespaces=())
 
