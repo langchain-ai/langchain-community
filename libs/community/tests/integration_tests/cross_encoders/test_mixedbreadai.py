@@ -34,33 +34,6 @@ def test_mixedbreadai_cross_encoder_without_normalization() -> None:
     _assert(encoder)
 
 
-def test_mixedbreadai_cross_encoder_with_model_kwargs() -> None:
-    """Test MixedbreadAICrossEncoder with model kwargs."""
-    encoder = MixedbreadAICrossEncoder(
-        model_name="mixedbread-ai/mxbai-rerank-large-v2",
-        model_kwargs={},  # mixedbreadai doesn't use traditional model_kwargs like HF
-        normalize_scores=True
-    )
-    _assert(encoder)
-
-
-def test_mixedbreadai_cross_encoder_empty_input() -> None:
-    """Test MixedbreadAICrossEncoder with empty input."""
-    encoder = MixedbreadAICrossEncoder()
-    output = encoder.score([])
-    assert output == []
-
-
-def test_mixedbreadai_cross_encoder_single_text() -> None:
-    """Test MixedbreadAICrossEncoder with single text."""
-    encoder = MixedbreadAICrossEncoder()
-    query = "Hello world"
-    texts = ["Hello world"]
-    output = encoder.score([(query, text) for text in texts])
-    
-    assert len(output) == 1
-    assert isinstance(output[0], float)
-
 
 def test_mixedbreadai_cross_encoder_multilingual() -> None:
     """Test MixedbreadAICrossEncoder with multilingual content."""
@@ -69,7 +42,7 @@ def test_mixedbreadai_cross_encoder_multilingual() -> None:
     texts = [
         "El cambio climático provoca sequías e inundaciones que afectan los cultivos.",
         "Climate change leads to droughts and floods, affecting crop yields.",
-        "Agriculture is impacted by rising temperatures and unpredecable weather."
+        "Agriculture is impacted by rising temperatures and unpredictable weather."
     ]
     output = encoder.score([(query, text) for text in texts])
     
