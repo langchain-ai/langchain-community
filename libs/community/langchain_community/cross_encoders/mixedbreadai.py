@@ -10,22 +10,23 @@ DEFAULT_MODEL_NAME = "mixedbread-ai/mxbai-rerank-base-v2"
 
 
 class MixedbreadAICrossEncoder(BaseModel, BaseCrossEncoder):
-"""Mixedbread cross encoder models.
-    Args:
-        model_name: The name or identifier of the Mixedbread AI model to use.
-        model_kwargs: Additional keyword arguments to pass to the model.
-        normalize_scores: Whether to normalize the scores returned by the model.
-            Defaults to True.
-    Example:
-        .. code-block:: python
-            from langchain_community.cross_encoders import MixedbreadAICrossEncoder
-            model_name = "mixedbread-ai/mxbai-rerank-base-v2"
-            model_kwargs = {'top_k': 10}
-            mb = MixedbreadAICrossEncoder(
-                model_name=model_name,
-                model_kwargs=model_kwargs
-            )
-    """
+    """Mixedbread cross encoder models.
+        Args:
+            model_name: The name or identifier of the Mixedbread AI model to use.
+            model_kwargs: Additional keyword arguments to pass to the model.
+            normalize_scores: Whether to normalize the scores returned by the model.
+                Defaults to True.
+        
+        Example:
+            .. code-block:: python
+                from langchain_community.cross_encoders import MixedbreadAICrossEncoder
+                model_name = "mixedbread-ai/mxbai-rerank-base-v2"
+                model_kwargs = {'top_k': 10}
+                mb = MixedbreadAICrossEncoder(
+                    model_name=model_name,
+                    model_kwargs=model_kwargs
+                )
+        """
 
     client: Any = None  #: :meta private:
     model_name: str = DEFAULT_MODEL_NAME
@@ -36,7 +37,7 @@ class MixedbreadAICrossEncoder(BaseModel, BaseCrossEncoder):
     """Whether to normalize scores to [0, 1] range."""
 
     def __init__(self, **kwargs: Any):
-        """Initialize the mixbread reranker."""
+        """Initialize the Mixedbread reranker."""
         super().__init__(**kwargs)
         try:
             from mxbai_rerank import MxbaiRerankV2
@@ -64,7 +65,7 @@ class MixedbreadAICrossEncoder(BaseModel, BaseCrossEncoder):
         return [(score - min_score) / (max_score - min_score) for score in scores]
 
     def score(self, text_pairs: List[Tuple[str, str]]) -> List[float]:
-        """Compute similarity scores using a Mixbread transformer model.
+        """Compute similarity scores using a Mixedbread transformer model.
 
         Args:
             text_pairs: The list of text pairs to score the similarity.

@@ -5,6 +5,7 @@ EXPECTED_ALL = [
     "FakeCrossEncoder",
     "HuggingFaceCrossEncoder",
     "SagemakerEndpointCrossEncoder",
+    "MixedbreadAICrossEncoder",
 ]
 
 
