@@ -24,8 +24,8 @@ VST = TypeVar("VST", bound=VectorStore)
 def _import_vectorx() -> Any:
     """Try to import vectorx module.
 
-        If it's not already installed, instruct user how
-        to install.
+    If it's not already installed, instruct user how
+    to install.
 
     Returns:
         Any: The imported vecx module.
