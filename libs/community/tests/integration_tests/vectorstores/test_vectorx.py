@@ -1,9 +1,10 @@
 import os
 import time
+
 import pytest
+
 from langchain_community.embeddings import HuggingFaceEmbeddings
 from langchain_community.vectorstores.vectorx import VectorXVectorStore
-
 
 # ---- Skip tests if no API key ----
 VECTORX_API_KEY = os.getenv("VECTORX_API_KEY")
@@ -13,7 +14,7 @@ pytestmark = pytest.mark.skipif(
 
 
 @pytest.fixture(scope="module")
-def vectorx_store ():
+def vectorx_store():
     """Fixture to create and clean up a VectorXVectorStore."""
     from vecx.vectorx import VectorX
 
@@ -54,15 +55,62 @@ def vectorx_store ():
     ]
 
     test_metadatas = [
-        {"category": "programming", "language": "python", "difficulty": "beginner", "doc_id": "doc1"},
-        {"category": "programming", "language": "javascript", "difficulty": "intermediate", "doc_id": "doc2"},
-        {"category": "programming", "language": "rust", "difficulty": "advanced", "doc_id": "doc3"},
-        {"category": "ai", "field": "machine_learning", "difficulty": "intermediate", "doc_id": "doc4"},
-        {"category": "ai", "field": "deep_learning", "difficulty": "advanced", "doc_id": "doc5"},
-        {"category": "database", "type": "vector", "feature": "similarity_search", "doc_id": "doc6"},
-        {"category": "database", "type": "time_series", "feature": "temporal_storage", "doc_id": "doc7"},
-        {"category": ["programming", "ai", "database"], "languages": ["python"], "technologies": ["ml", "vector_db"], "difficulty": "advanced", "doc_id": "doc8"},
-        {"category": ["programming", "database", "security"], "field": "cryptography", "difficulty": "advanced", "feature": "encryption", "doc_id": "doc9"},
+        {
+            "category": "programming",
+            "language": "python",
+            "difficulty": "beginner",
+            "doc_id": "doc1",
+        },
+        {
+            "category": "programming",
+            "language": "javascript",
+            "difficulty": "intermediate",
+            "doc_id": "doc2",
+        },
+        {
+            "category": "programming",
+            "language": "rust",
+            "difficulty": "advanced",
+            "doc_id": "doc3",
+        },
+        {
+            "category": "ai",
+            "field": "machine_learning",
+            "difficulty": "intermediate",
+            "doc_id": "doc4",
+        },
+        {
+            "category": "ai",
+            "field": "deep_learning",
+            "difficulty": "advanced",
+            "doc_id": "doc5",
+        },
+        {
+            "category": "database",
+            "type": "vector",
+            "feature": "similarity_search",
+            "doc_id": "doc6",
+        },
+        {
+            "category": "database",
+            "type": "time_series",
+            "feature": "temporal_storage",
+            "doc_id": "doc7",
+        },
+        {
+            "category": ["programming", "ai", "database"],
+            "languages": ["python"],
+            "technologies": ["ml", "vector_db"],
+            "difficulty": "advanced",
+            "doc_id": "doc8",
+        },
+        {
+            "category": ["programming", "database", "security"],
+            "field": "cryptography",
+            "difficulty": "advanced",
+            "feature": "encryption",
+            "doc_id": "doc9",
+        },
     ]
 
     store.add_texts(texts=test_texts, metadatas=test_metadatas)
@@ -96,7 +144,8 @@ def test_similarity_search_with_score(vectorx_store):
 
 def test_single_filter(vectorx_store):
     results = vectorx_store.similarity_search(
-        "Programming languages", k=3,
+        "Programming languages",
+        k=3,
         filter={"category": {"$eq": "programming"}},
     )
     assert len(results) > 0
@@ -106,7 +155,8 @@ def test_single_filter(vectorx_store):
 
 def test_invalid_filter(vectorx_store):
     results = vectorx_store.similarity_search(
-        "Random query", k=2,
+        "Random query",
+        k=2,
         filter={"non_existent": {"$eq": "something"}},
     )
     assert len(results) == 0

@@ -411,7 +411,7 @@ __all__ = [
     "Vald",
     "Vearch",
     "Vectara",
-    "VectorXVectorStore"
+    "VectorXVectorStore",
     "VectorStore",
     "VespaStore",
     "VLite",

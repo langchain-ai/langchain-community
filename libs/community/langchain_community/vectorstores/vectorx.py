@@ -1,12 +1,9 @@
 from __future__ import annotations
 
 import logging
-import os
 import uuid
 from typing import (
-    TYPE_CHECKING,
     Any,
-    Callable,
     Iterable,
     List,
     Optional,
@@ -14,13 +11,10 @@ from typing import (
     TypeVar,
 )
 
-import numpy as np
-from langchain_core._api.deprecation import deprecated
 from langchain_core.documents import Document
 from langchain_core.embeddings import Embeddings
-from langchain_core.utils.iter import batch_iterate
 from langchain_core.vectorstores import VectorStore
-
+from vecx.exceptions import NotFoundException
 
 logger = logging.getLogger(__name__)
 
@@ -28,10 +22,10 @@ VST = TypeVar("VST", bound=VectorStore)
 
 
 def _import_vectorx() -> Any:
-    """Try to import vectorx module. If it's not already installed, instruct user how to install.
+    """Try to import vectorx module.
 
-    Args:
-        None
+        If it's not already installed, instruct user how
+        to install.
 
     Returns:
         Any: The imported vecx module.
@@ -41,7 +35,6 @@ def _import_vectorx() -> Any:
     """
     try:
         import vecx
-        from vecx.vectorx import VectorX
     except ImportError as e:
         raise ImportError(
             "Could not import vectorx python package. "
@@ -84,16 +77,22 @@ class VectorXVectorStore(VectorStore):
         # If index is not provided, initialize it
         if vectorx_index is None:
             if api_token is None:
-                raise ValueError("API token must be provided if vectorx_index is not provided")
+                raise ValueError(
+                    "API token must be provided if vectorx_index is not provided"
+                )
             if index_name is None:
-                raise ValueError("Index name must be provided if vectorx_index is not provided")
+                raise ValueError(
+                    "Index name must be provided if vectorx_index is not provided"
+                )
             if encryption_key is None:
-                raise ValueError("Encryption key must be provided if vectorx_index is not provided")
-            
+                raise ValueError(
+                    "Encryption key must be provided if vectorx_index is not provided"
+                )
+
             vectorx_index = self._initialize_vectorx_index(
                 api_token, encryption_key, index_name, dimension, space_type
             )
-        
+
         self._vectorx_index = vectorx_index
 
     @classmethod
@@ -106,7 +105,7 @@ class VectorXVectorStore(VectorStore):
         space_type: str = "cosine",
     ) -> Any:
         """Initialize VectorX index using the current API."""
-        vecx = _import_vectorx()
+        _import_vectorx()
         from vecx.vectorx import VectorX
 
         # Initialize VectorX client
@@ -117,12 +116,12 @@ class VectorXVectorStore(VectorStore):
             index = vx.get_index(name=index_name, key=encryption_key)
             logger.info(f"Retrieved existing index: {index_name}")
             return index
-        except Exception as e:
+        except NotFoundException as e:
             if dimension is None:
                 raise ValueError(
                     "Must provide dimension when creating a new index"
                 ) from e
-            
+
             # Create a new index if it doesn't exist
             logger.info(f"Creating new index: {index_name}")
             vx.create_index(
@@ -165,7 +164,7 @@ class VectorXVectorStore(VectorStore):
         texts = list(texts)
         ids = ids or [str(uuid.uuid4()) for _ in texts]
         metadatas = metadatas or [{} for _ in texts]
-        
+
         for metadata, text in zip(metadatas, texts):
             metadata[self._text_key] = text
 
@@ -174,14 +173,18 @@ class VectorXVectorStore(VectorStore):
             chunk_texts = texts[i : i + batch_size]
             chunk_ids = ids[i : i + batch_size]
             chunk_metadatas = metadatas[i : i + batch_size]
-            
+
             # Generate embeddings
             embeddings = []
-            for j in range(0, len(chunk_texts), embedding_chunk_size):
-                sub_texts = chunk_texts[j : j + embedding_chunk_size]
+            for embedding_batch_start in range(
+                0, len(chunk_texts), embedding_chunk_size
+            ):
+                sub_texts = chunk_texts[
+                    embedding_batch_start : embedding_batch_start + embedding_chunk_size
+                ]
                 sub_embeddings = self._embedding.embed_documents(sub_texts)
                 embeddings.extend(sub_embeddings)
-            
+
             # Prepare entries for upsert
             entries = []
             for id, embedding, metadata in zip(chunk_ids, embeddings, chunk_metadatas):
@@ -191,16 +194,15 @@ class VectorXVectorStore(VectorStore):
                 for key, value in metadata.items():
                     if key not in [self._text_key]:
                         filter_data[key] = value
-                
-                
+
                 entry = {
                     "id": id,
                     "vector": embedding,
                     "meta": metadata,
-                    "filter": filter_data
+                    "filter": filter_data,
                 }
                 entries.append(entry)
-                
+
             # Insert to VectorX - encryption handled by client
             self._vectorx_index.upsert(entries)
 
@@ -224,7 +226,9 @@ class VectorXVectorStore(VectorStore):
             List of tuples of (document, similarity score).
         """
         embedding = self._embedding.embed_query(query)
-        return self.similarity_search_by_vector_with_score(embedding, k=k, filter=filter)
+        return self.similarity_search_by_vector_with_score(
+            embedding, k=k, filter=filter
+        )
 
     def similarity_search_by_vector_with_score(
         self,
@@ -247,12 +251,9 @@ class VectorXVectorStore(VectorStore):
 
         # Execute query - encryption handled by client
         results = self._vectorx_index.query(
-            vector=embedding, 
-            top_k=k, 
-            filter=filter,
-            include_vectors=False
+            vector=embedding, top_k=k, filter=filter, include_vectors=False
         )
-        
+
         # Process results
         for res in results:
             metadata = res["meta"]
@@ -326,8 +327,10 @@ class VectorXVectorStore(VectorStore):
         """
         # If dimension not provided, infer from embedding
         if dimension is None and vectorx_index is None:
-            raise ValueError("Dimension must be explicitly provided when creating a new index.")
-            
+            raise ValueError(
+                "Dimension must be explicitly provided when creating a new index."
+            )
+
         vectorx = cls(
             vectorx_index=vectorx_index,
             embedding=embedding,
@@ -336,7 +339,7 @@ class VectorXVectorStore(VectorStore):
             encryption_key=encryption_key,
             index_name=index_name,
             space_type=space_type,
-            dimension=dimension
+            dimension=dimension,
         )
 
         vectorx.add_texts(
@@ -392,7 +395,7 @@ class VectorXVectorStore(VectorStore):
         text_key: str = "text",
     ) -> "VectorXVectorStore":
         """Create VectorXVectorStore from parameters.
-        
+
         Args:
             embedding: Embedding function
             api_token: VectorX API token
@@ -401,14 +404,16 @@ class VectorXVectorStore(VectorStore):
             dimension: Dimension of vectors
             space_type: Distance metric (cosine, l2, ip)
             text_key: Key in metadata to store the text
-            
+
         Returns:
             VectorXVectorStore instance
         """
         # If dimension not provided, infer from embedding
         if dimension is None:
-            raise ValueError("Dimension must be explicitly provided when creating a new index.")
-            
+            raise ValueError(
+                "Dimension must be explicitly provided when creating a new index."
+            )
+
         vectorx_index = cls._initialize_vectorx_index(
             api_token, encryption_key, index_name, dimension, space_type
         )
