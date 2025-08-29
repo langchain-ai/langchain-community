@@ -2,6 +2,8 @@ from typing import Any, Dict, List, Tuple
 
 from pydantic import BaseModel, ConfigDict, Field
 
+from collections import defaultdict
+
 from langchain_community.cross_encoders.base import BaseCrossEncoder
 
 DEFAULT_MODEL_NAME = "mixedbread-ai/mxbai-rerank-base-v2"
@@ -9,12 +11,14 @@ DEFAULT_MODEL_NAME = "mixedbread-ai/mxbai-rerank-base-v2"
 
 class MixedbreadAICrossEncoder(BaseModel, BaseCrossEncoder):
 """Mixedbread cross encoder models.
-
+    Args:
+        model_name: The name or identifier of the Mixedbread AI model to use.
+        model_kwargs: Additional keyword arguments to pass to the model.
+        normalize_scores: Whether to normalize the scores returned by the model.
+            Defaults to True.
     Example:
         .. code-block:: python
-
             from langchain_community.cross_encoders import MixedbreadAICrossEncoder
-
             model_name = "mixedbread-ai/mxbai-rerank-base-v2"
             model_kwargs = {'top_k': 10}
             mb = MixedbreadAICrossEncoder(
@@ -47,7 +51,7 @@ class MixedbreadAICrossEncoder(BaseModel, BaseCrossEncoder):
     model_config = ConfigDict(extra="forbid", protected_namespaces=())
 
     def _normalize_scores(self, scores: List[float]) -> List[float]:
-        """Normalize scores to [0, 1] range."""
+        """Normalise scores to [0, 1] range."""
         if not scores:
             return scores
         
@@ -73,21 +77,28 @@ class MixedbreadAICrossEncoder(BaseModel, BaseCrossEncoder):
         if not text_pairs:
             return []
 
-        # Extract query and documents (assuming single query)
-        query = text_pairs[0][0]
-        documents = [pair[1] for pair in text_pairs]
+        query_groups = defaultdict(list)
+        for i, (query, doc) in enumerate(text_pairs):
+            query_groups[query].append((i, doc))
+            
         
-        # Single API call for all documents
-        results = self.client.rank(
-            query,
-            documents,
-            return_documents=False,
-            top_k=len(documents)
-        )
-        
-        # Create score mapping and preserve original order
-        score_map = {res.index: res.score for res in results}
-        scores = [score_map.get(i, 0.0) for i in range(len(documents))]
+        # Process each query group
+        scores = [0.0] * len(text_pairs)
+        for query, doc_entries in query_groups.items():
+            indices = [i for i, _ in doc_entries]
+            documents = [doc for _, doc in doc_entries]
+            
+            results = self.client.rank(
+                query,
+                documents,
+                return_documents=False,
+                top_k=len(documents)
+            )
+            
+            # Map scores back to original positions
+            for res_idx, result in enumerate(results):
+                orig_idx = indices[result.index]
+                scores[orig_idx] = result.score
 
         # Normalize scores if requested
         if self.normalize_scores:
