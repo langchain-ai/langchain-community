@@ -28,8 +28,16 @@ VST = TypeVar("VST", bound=VectorStore)
 
 
 def _import_vectorx() -> Any:
-    """
-    Try to import vectorx module. If it's not already installed, instruct user how to install.
+    """Try to import vectorx module. If it's not already installed, instruct user how to install.
+
+    Args:
+        None
+
+    Returns:
+        Any: The imported vecx module.
+
+    Raises:
+        ImportError: If the vectorx python package is not installed.
     """
     try:
         import vecx
@@ -181,7 +189,7 @@ class VectorXVectorStore(VectorStore):
                 filter_data = {}
 
                 for key, value in metadata.items():
-                    if key not in ["text"]:
+                    if key not in [self._text_key]:
                         filter_data[key] = value
                 
                 

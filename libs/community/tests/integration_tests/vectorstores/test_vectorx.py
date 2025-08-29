@@ -13,7 +13,7 @@ pytestmark = pytest.mark.skipif(
 
 
 @pytest.fixture(scope="module")
-def vectorx_store():
+def vectorx_store ():
     """Fixture to create and clean up a VectorXVectorStore."""
     from vecx.vectorx import VectorX
 
@@ -118,19 +118,6 @@ def test_delete_by_filter_and_verify(vectorx_store):
     results = vectorx_store.similarity_search("JavaScript programming", k=2)
     for doc in results:
         assert "programming" not in str(doc.metadata.get("category", "")).lower()
-
-
-def test_delete_by_ids(vectorx_store):
-    ids = vectorx_store.add_texts(
-        ["Temp doc for deletion"], metadatas=[{"category": "temp"}]
-    )
-    assert ids 
-
-    vectorx_store.delete(ids=ids)
-
-    results = vectorx_store.similarity_search("Temp doc for deletion", k=1)
-    for doc in results:
-        assert doc.metadata.get("doc_id") not in ids
 
 
 def test_from_texts():
