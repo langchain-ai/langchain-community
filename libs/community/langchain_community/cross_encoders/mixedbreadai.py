@@ -67,7 +67,8 @@ class MixedbreadAICrossEncoder(BaseModel, BaseCrossEncoder):
                        Each tuple should be (query, document).
 
         Returns:
-            List of scores, one for each pair.
+            List of similarity/relevance scores between query-document pairs,
+            one float score for each input pair.
         """
         if not text_pairs:
             return []
