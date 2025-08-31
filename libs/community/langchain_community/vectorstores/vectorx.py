@@ -104,7 +104,21 @@ class VectorXVectorStore(VectorStore):
         dimension: Optional[int] = None,
         space_type: str = "cosine",
     ) -> Any:
-        """Initialize VectorX index using the current API."""
+        """Initialize VectorX index using the current API.
+
+        Args:
+            api_token (str): VectorX API token for authentication.
+            encryption_key (str): Encryption key for securing the index.
+            index_name (str): Name of the index to create or retrieve.
+            dimension (Optional[int]): Vector dimension, required when creating a new index.
+            space_type (str): Distance metric type (cosine, l2, ip).
+
+        Returns:
+            Any: A VectorX index instance.
+
+        Raises:
+            ValueError: If dimension is not provided while creating a new index.
+        """
         _import_vectorx()
         from vecx.vectorx import VectorX
 
