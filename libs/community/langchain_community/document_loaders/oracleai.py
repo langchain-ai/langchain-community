@@ -189,7 +189,7 @@ class OracleDocReader:
         "This class is deprecated and will be removed in a future release. "
         "Instead, please use `OracleDocLoader` from the "
         "`langchain-oracledb` package. "
-        "package. For more information, refer to <https://github.com/oracle/langchain-oracle/tree/main/libs/oracledb>."
+        "For more information, refer to <https://github.com/oracle/langchain-oracle/tree/main/libs/oracledb>."
     ),
     alternative="from langchain_oracledb.document_loaders import OracleDocLoader;",
     pending=False,
