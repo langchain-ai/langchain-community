@@ -532,6 +532,9 @@ if TYPE_CHECKING:
     from langchain_community.document_loaders.yuque import (
         YuqueLoader,
     )
+    from langchain_community.document_loaders.ocr_pdf import (
+        OCRPDFLoader,
+    )
 
 
 _module_lookup = {
@@ -732,6 +735,7 @@ _module_lookup = {
     "YoutubeAudioLoader": "langchain_community.document_loaders.blob_loaders",
     "YoutubeLoader": "langchain_community.document_loaders.youtube",
     "YuqueLoader": "langchain_community.document_loaders.yuque",
+    "OCRPDFLoader": "langchain_community.document_loaders.ocr_pdf",
 }
 
 
@@ -940,4 +944,5 @@ __all__ = [
     "YoutubeAudioLoader",
     "YoutubeLoader",
     "YuqueLoader",
+    "OCRPDFLoader",
 ]
