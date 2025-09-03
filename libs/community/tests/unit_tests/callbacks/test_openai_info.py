@@ -145,6 +145,10 @@ def test_on_llm_end_finetuned_model(
         ("gpt-4-32k", 0.18),
         ("gpt-4-32k-0314", 0.18),
         ("gpt-4-32k-0613", 0.18),
+        ("gpt-5", 0.01125),
+        ("gpt-5-mini", 0.00225),
+        ("gpt-5-nano", 0.00045),
+        ("gpt-5-chat-latest", 0.01125),
     ],
 )
 def test_on_llm_end_azure_openai(
