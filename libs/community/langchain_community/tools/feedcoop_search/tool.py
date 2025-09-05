@@ -97,7 +97,9 @@ class FeedCoopSearchResults(BaseTool):
     OneYear: Within 1 year
     YYYY-MM-DD..YYYY-MM-DD: Content published within the period from date A (inclusive) to date B (inclusive), for example "2024-12-30..2025-12-30"
     """  # noqa: E501
-    api_wrapper: FeedCoopSearchAPIWrapper = Field(default_factory=FeedCoopSearchAPIWrapper)  # type: ignore[arg-type]  # noqa: E501
+    api_wrapper: FeedCoopSearchAPIWrapper = Field(
+        default_factory=FeedCoopSearchAPIWrapper  # type: ignore[arg-type]
+    )
     response_format: Literal["content_and_artifact"] = "content_and_artifact"
 
     def __init__(self, **kwargs: Any):

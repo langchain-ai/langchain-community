@@ -151,6 +151,7 @@ EXPECTED_ALL = [
     "tool",
     "MerriamWebsterQueryRun",
     "MojeekSearch",
+    "FeedCoopSearchResults",
 ]
 
 

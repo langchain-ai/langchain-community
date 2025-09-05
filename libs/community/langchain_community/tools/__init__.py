@@ -115,6 +115,7 @@ if TYPE_CHECKING:
     from langchain_community.tools.eleven_labs.text2speech import (
         ElevenLabsText2SpeechTool,
     )
+    from langchain_community.tools.feedcoop_search.tool import FeedCoopSearchResults
     from langchain_community.tools.file_management import (
         CopyFileTool,
         DeleteFileTool,
@@ -344,9 +345,6 @@ if TYPE_CHECKING:
         Detector,
         ZenGuardInput,
         ZenGuardTool,
-    )
-    from langchain_community.tools.feedcoop_search.tool import (
-        FeedCoopSearchResults
     )
 
 __all__ = [
