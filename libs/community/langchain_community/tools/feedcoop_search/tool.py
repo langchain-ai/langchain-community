@@ -23,12 +23,22 @@ class FeedCoopSearchResults(BaseTool):
 
     Instantiate:
 
+        .. code-block:: bash
+
+            pip install -U langchain-community
+            export FEEDCOOP_API_KEY="your-api-key"
+
         .. code-block:: python
 
             from langchain_community.tools import FeedCoopSearchResults
 
             tool = FeedCoopSearchResults(
-                max_results=5,
+                count=10,
+                need_content=False,
+                need_url=False,
+                include_domains=[],
+                need_summary=False,
+                time_range=None,
             )
     """
 
@@ -66,7 +76,7 @@ class FeedCoopSearchResults(BaseTool):
     OneYear: Within 1 year
     YYYY-MM-DD..YYYY-MM-DD: Content published within the period from date A (inclusive) to date B (inclusive), for example "2024-12-30..2025-12-30"
     """  # noqa: E501
-    api_wrapper: FeedCoopSearchAPIWrapper
+    api_wrapper: FeedCoopSearchAPIWrapper = Field(default_factory=FeedCoopSearchAPIWrapper)  # type: ignore[arg-type]  # noqa: E501
     response_format: Literal["content_and_artifact"] = "content_and_artifact"
 
     def __init__(self, **kwargs: Any):

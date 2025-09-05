@@ -345,6 +345,9 @@ if TYPE_CHECKING:
         ZenGuardInput,
         ZenGuardTool,
     )
+    from langchain_community.tools.feedcoop_search.tool import (
+        FeedCoopSearchResults
+    )
 
 __all__ = [
     "BaseTool",
@@ -497,6 +500,7 @@ __all__ = [
     "ZenGuardTool",
     "authenticate",
     "format_tool_to_openai_function",
+    "FeedCoopSearchResults",
 ]
 
 # Used for internal purposes
@@ -654,6 +658,7 @@ _module_lookup = {
     "authenticate": "langchain_community.tools.office365.utils",
     "format_tool_to_openai_function": "langchain_community.tools.convert_to_openai",
     "tool": "langchain_core.tools",
+    "FeedcoopSearchResults": "langchain_community.tools.feedcoop_search.tool",
 }
 
 
