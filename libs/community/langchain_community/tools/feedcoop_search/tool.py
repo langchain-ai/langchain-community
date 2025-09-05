@@ -40,6 +40,27 @@ class FeedCoopSearchResults(BaseTool):
                 need_summary=False,
                 time_range=None,
             )
+    Invoke directly with args:
+
+        .. code-block:: python
+
+            tool.invoke({'query': 'who won the last french open'})
+
+        .. code-block:: json
+
+            {
+                "title": "title",
+                "site_name": "火山引擎"
+                "url": "https://www.volcengine.com/...",
+                "snippet": "snippet",
+                "content": "content",
+                "summary": "summary",
+                "publish_time": "1970-01-01T08:00:00+08:00",
+                "logo_url": "https://www.volcengine.com/...",
+                "rank_score": 1,
+                "auth_info_des": "正常权威",
+                "auth_info_level": 2
+            }
     """
 
     name: str = "feedcoop_search_results_json"

@@ -658,7 +658,7 @@ _module_lookup = {
     "authenticate": "langchain_community.tools.office365.utils",
     "format_tool_to_openai_function": "langchain_community.tools.convert_to_openai",
     "tool": "langchain_core.tools",
-    "FeedcoopSearchResults": "langchain_community.tools.feedcoop_search.tool",
+    "FeedCoopSearchResults": "langchain_community.tools.feedcoop_search.tool",
 }
 
 
