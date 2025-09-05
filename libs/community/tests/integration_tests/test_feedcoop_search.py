@@ -1,11 +1,14 @@
 """Integration tests for FeedCoopSearchAPIWrapper utility."""
+
 import os
+
 import pytest
-from langchain_community.utilities.feedcoop_search import FeedCoopSearchAPIWrapper
 from pydantic import SecretStr
 
+from langchain_community.utilities.feedcoop_search import FeedCoopSearchAPIWrapper
 
-def test_feedcoop_search_real():
+
+def test_feedcoop_search_real() -> None:
     api_key = os.environ.get("FEEDCOOP_API_KEY")
     if not api_key:
         pytest.skip("FEEDCOOP_API_KEY not set in environment")
@@ -43,7 +46,10 @@ def test_feedcoop_search_real():
 
     # 搜索带 include_domains
     results_domain = wrapper.results(
-        "langchain", count=1, include_domains=["aliyun.com"])
+        "langchain", count=1, include_domains=["aliyun.com"]
+    )
     if results_domain:
-        assert "aliyun.com" in results_domain[0]["url"] or results_domain[0]["site_name"].lower(
-        ) == "aliyun"
+        assert (
+            "aliyun.com" in results_domain[0]["url"]
+            or results_domain[0]["site_name"].lower() == "aliyun"
+        )

@@ -5,7 +5,7 @@ https://www.volcengine.com/docs/85508/1650263
 """
 
 import json
-from typing import Any, Dict, List, Optional, Literal
+from typing import Any, Dict, List, Literal, Optional
 
 import aiohttp
 import requests
@@ -44,11 +44,14 @@ class FeedCoopSearchAPIWrapper(BaseModel):
         need_url: bool = False,
         include_domains: List[str] = [],
         need_summary: bool = False,
-        time_range: Optional[Literal["OneDay", "OneWeek",
-                                     "OneMonth", "OneYear"] | str] = None
+        time_range: Optional[
+            Literal["OneDay", "OneWeek", "OneMonth", "OneYear"] | str
+        ] = None,
     ) -> Dict:
-        headers = {"Content-Type": "application/json",
-                   "Authorization": f"Bearer {self.feedcoop_api_key.get_secret_value()}"}
+        headers = {
+            "Content-Type": "application/json",
+            "Authorization": f"Bearer {self.feedcoop_api_key.get_secret_value()}",
+        }
         params = {
             "Query": query,
             "SearchType": search_type,
@@ -56,7 +59,7 @@ class FeedCoopSearchAPIWrapper(BaseModel):
             "Filter": {
                 "NeedContent": need_content,
                 "NeedUrl": need_url,
-                "Sites": "|".join(include_domains)
+                "Sites": "|".join(include_domains),
             },
             "NeedSummary": need_summary,
             "TimeRange": time_range,
@@ -71,8 +74,11 @@ class FeedCoopSearchAPIWrapper(BaseModel):
         # request failed
         if "Error" in response_json["ResponseMetadata"]:
             error_info = response_json["ResponseMetadata"]["Error"]
+            error_code = error_info["CodeN"]
+            error_msg = error_info["Message"]
             raise Exception(
-                f"FeedCoop API failed, CodeN: {error_info["CodeN"]}, Message: {error_info["Message"]}")
+                f"FeedCoop API failed, CodeN: {error_code}, Message: {error_msg}"
+            )
         return response_json
 
     def results(
@@ -84,8 +90,9 @@ class FeedCoopSearchAPIWrapper(BaseModel):
         need_url: bool = False,
         include_domains: List[str] = [],
         need_summary: bool = False,
-        time_range: Optional[Literal["OneDay", "OneWeek",
-                                     "OneMonth", "OneYear"] | str] = None
+        time_range: Optional[
+            Literal["OneDay", "OneWeek", "OneMonth", "OneYear"] | str
+        ] = None,
     ) -> List[Dict]:
         """Run query through FeedCoop Search API and return metadata.
 
@@ -98,10 +105,7 @@ class FeedCoopSearchAPIWrapper(BaseModel):
             include_domains (List[str], optional): A list of domains to specifically include in the search results. Defaults to [].
             need_summary (bool, optional): Whether to include a summary of the content. Defaults to False.
             time_range (Optional[Literal[&quot;OneDay&quot;, &quot;OneWeek&quot;, &quot;OneMonth&quot;, &quot;OneYear&quot;]  |  str], optional): Specify the publication time for the search. Defaults to None.
-
-        Returns:
-            List[Dict]: _description_
-        """
+        """  # noqa: E501
         raw_results = self.raw_results(
             query,
             search_type=search_type,
@@ -110,27 +114,32 @@ class FeedCoopSearchAPIWrapper(BaseModel):
             need_url=need_url,
             include_domains=include_domains,
             need_summary=need_summary,
-            time_range=time_range
+            time_range=time_range,
         )
         return self.clean_results(raw_results["Result"]["WebResults"])
 
     async def raw_results_async(
-        self, query: str,
+        self,
+        query: str,
         search_type: str = "web",
         count: int = 10,
         need_content: bool = False,
         need_url: bool = False,
         include_domains: List[str] = [],
         need_summary: bool = False,
-        time_range: Optional[Literal["OneDay", "OneWeek",
-                                     "OneMonth", "OneYear"] | str] = None
+        time_range: Optional[
+            Literal["OneDay", "OneWeek", "OneMonth", "OneYear"] | str
+        ] = None,
     ) -> Dict:
         """Get raw results from FeedCoop Search API asynchronously."""
 
         # Function to perform the API call
         async def fetch() -> str:
-            headers = {"Content-Type": "application/json",
-                       "Authorization": f"Bearer {self.feedcoop_api_key.get_secret_value()}"}
+            authorization = f"Bearer {self.feedcoop_api_key.get_secret_value()}"
+            headers = {
+                "Content-Type": "application/json",
+                "Authorization": authorization,
+            }
             params = {
                 "Query": query,
                 "SearchType": search_type,
@@ -138,37 +147,48 @@ class FeedCoopSearchAPIWrapper(BaseModel):
                 "Filter": {
                     "NeedContent": need_content,
                     "NeedUrl": need_url,
-                    "Sites": "|".join(include_domains)
+                    "Sites": "|".join(include_domains),
                 },
                 "NeedSummary": need_summary,
                 "TimeRange": time_range,
             }
             async with aiohttp.ClientSession() as session:
-                async with session.post(f"{FEEDCOOP_API_URL}/search_api/web_search", headers=headers, json=params) as res:
+                async with session.post(
+                    f"{FEEDCOOP_API_URL}/search_api/web_search",
+                    headers=headers,
+                    json=params,
+                ) as res:
                     if res.status == 200:
                         data = await res.text()
                         return data
                     else:
                         raise Exception(
-                            f"FeedCoop API request failed with status code {res.status}")
+                            f"FeedCoop API request failed with status code {res.status}"
+                        )  # noqa: E501
+
         result_json_str = await fetch()
         result_json = json.loads(result_json_str)
         if "Error" in result_json["ResponseMetadata"]:
             error_info = result_json["ResponseMetadata"]["Error"]
+            error_code = error_info["CodeN"]
+            error_msg = error_info["Message"]
             raise Exception(
-                f"FeedCoop API failed, CodeN: {error_info["CodeN"]}, Message: {error_info["Message"]}")
+                f"FeedCoop API failed, CodeN: {error_code}, Message: {error_msg}"
+            )
         return result_json
 
     async def results_async(
-        self, query: str,
+        self,
+        query: str,
         search_type: Literal["web", "web_summary"] = "web",
         count: int = 10,
         need_content: bool = False,
         need_url: bool = False,
         include_domains: List[str] = [],
         need_summary: bool = False,
-        time_range: Optional[Literal["OneDay", "OneWeek",
-                                     "OneMonth", "OneYear"] | str] = None
+        time_range: Optional[
+            Literal["OneDay", "OneWeek", "OneMonth", "OneYear"] | str
+        ] = None,
     ) -> List[Dict]:
         results_json = await self.raw_results_async(
             query,
@@ -178,7 +198,7 @@ class FeedCoopSearchAPIWrapper(BaseModel):
             need_url=need_url,
             include_domains=include_domains,
             need_summary=need_summary,
-            time_range=time_range
+            time_range=time_range,
         )
         return self.clean_results(results_json["Result"]["WebResults"])
 

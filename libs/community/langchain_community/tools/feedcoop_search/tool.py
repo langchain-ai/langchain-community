@@ -1,6 +1,6 @@
 """Tool for the FeedCoop search API."""
 
-from typing import Any, Dict, List, Literal, Optional, Tuple, Type, Union
+from typing import Any, Dict, List, Literal, Optional, Type, Union
 
 from langchain_core.callbacks import (
     AsyncCallbackManagerForToolRun,
@@ -43,7 +43,10 @@ class FeedCoopSearchResults(BaseTool):
     count: int = 10
     """Max search results to return, default is 10"""
     search_type: Literal["web"] = Field(default="web")
-    """feedcoop api supports `web` and `web_summary`, `web` is only supported for this tool."""
+    """
+    feedcoop api supports `web` and `web_summary`.
+    `web` is only supported for this tool.
+    """
     need_content: bool = False
     """Whether to only return results with body text, default to false"""
     need_url: bool = False
@@ -52,8 +55,9 @@ class FeedCoopSearchResults(BaseTool):
     """A list of domains to specifically include in the search results."""
     need_summary: bool = False
     """Whether to include a summary of the content, default to false"""
-    time_range: Optional[Literal["OneDay", "OneWeek",
-                                 "OneMonth", "OneYear"] | str] = None
+    time_range: Optional[Literal["OneDay", "OneWeek", "OneMonth", "OneYear"] | str] = (
+        None
+    )
     """Specify the publication time for the search.
     The following enumeration values are unrestricted if left blank
     OneDay: Within 1 day
@@ -61,9 +65,8 @@ class FeedCoopSearchResults(BaseTool):
     OneMonth: Within 1 month
     OneYear: Within 1 year
     YYYY-MM-DD..YYYY-MM-DD: Content published within the period from date A (inclusive) to date B (inclusive), for example "2024-12-30..2025-12-30"
-    """
-    api_wrapper: FeedCoopSearchAPIWrapper = Field(
-        default_factory=FeedCoopSearchAPIWrapper)  # type: ignore[arg-type]
+    """  # noqa: E501
+    api_wrapper: FeedCoopSearchAPIWrapper
     response_format: Literal["content_and_artifact"] = "content_and_artifact"
 
     def __init__(self, **kwargs: Any):
@@ -75,9 +78,10 @@ class FeedCoopSearchResults(BaseTool):
         super().__init__(**kwargs)
 
     def _run(
-        self, query: str,
+        self,
+        query: str,
         run_manager: Optional[CallbackManagerForToolRun] = None,
-    ) -> Union[List[Dict], str]:
+    ) -> tuple[Union[str, list[Dict]], Dict]:
         """Use the tool."""
         try:
             raw_results = self.api_wrapper.raw_results(
@@ -88,17 +92,20 @@ class FeedCoopSearchResults(BaseTool):
                 need_url=self.need_url,
                 include_domains=self.include_domains,
                 need_summary=self.need_summary,
-                time_range=self.time_range
+                time_range=self.time_range,
             )
         except Exception as e:
             return repr(e), {}
-        return self.api_wrapper.clean_results(raw_results["Result"]["WebResults"]), raw_results
+        cleaned_results = self.api_wrapper.clean_results(
+            raw_results["Result"]["WebResults"]
+        )
+        return cleaned_results, raw_results
 
     async def _arun(
         self,
         query: str,
         run_manager: Optional[AsyncCallbackManagerForToolRun] = None,
-    ) -> Union[List[Dict], str]:
+    ) -> tuple[Union[str, list[Dict]], Dict]:
         """Use the tool asynchronously."""
         try:
             raw_results = await self.api_wrapper.raw_results_async(
@@ -109,8 +116,11 @@ class FeedCoopSearchResults(BaseTool):
                 need_url=self.need_url,
                 include_domains=self.include_domains,
                 need_summary=self.need_summary,
-                time_range=self.time_range
+                time_range=self.time_range,
             )
         except Exception as e:
             return repr(e), {}
-        return self.api_wrapper.clean_results(raw_results["Result"]["WebResults"]), raw_results
+        cleaned_results = self.api_wrapper.clean_results(
+            raw_results["Result"]["WebResults"]
+        )
+        return cleaned_results, raw_results
