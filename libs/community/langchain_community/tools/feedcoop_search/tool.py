@@ -61,6 +61,14 @@ class FeedCoopSearchResults(BaseTool):
                 "auth_info_des": "正常权威",
                 "auth_info_level": 2
             }
+            
+    Args:
+        count: Number of search results to return. Defaults to 10.
+        need_content: Whether to include the full content in the results. Defaults to False.
+        need_url: Whether to include the URL in the results. Defaults to False.
+        include_domains: List of domains to restrict the search to. Defaults to empty list.
+        need_summary: Whether to include a summary in the results. Defaults to False.
+        time_range: Time range for the search results. Defaults to None.
     """
 
     name: str = "feedcoop_search_results_json"
