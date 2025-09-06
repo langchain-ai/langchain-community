@@ -1,7 +1,10 @@
 """Tool for the FeedCoop search API."""
 
+import json
+import logging
 from typing import Any, Dict, List, Literal, Optional, Type, Union
 
+import requests
 from langchain_core.callbacks import (
     AsyncCallbackManagerForToolRun,
     CallbackManagerForToolRun,
@@ -10,6 +13,8 @@ from langchain_core.tools import BaseTool
 from pydantic import BaseModel, Field
 
 from langchain_community.utilities.feedcoop_search import FeedCoopSearchAPIWrapper
+
+logger = logging.getLogger(__name__)
 
 
 class FeedCoopInput(BaseModel):
@@ -61,7 +66,7 @@ class FeedCoopSearchResults(BaseTool):
                 "auth_info_des": "正常权威",
                 "auth_info_level": 2
             }
-            
+
     Args:
         count: Number of search results to return. Defaults to 10.
         need_content: Whether to include the full content in the results. Defaults to False.
@@ -69,7 +74,7 @@ class FeedCoopSearchResults(BaseTool):
         include_domains: List of domains to restrict the search to. Defaults to empty list.
         need_summary: Whether to include a summary in the results. Defaults to False.
         time_range: Time range for the search results. Defaults to None.
-    """
+    """  # noqa: E501
 
     name: str = "feedcoop_search_results_json"
     description: str = (
@@ -116,7 +121,7 @@ class FeedCoopSearchResults(BaseTool):
         Args:
             **kwargs: Keyword arguments including optional feedcoop_api_key for API authentication.
                 Other arguments are passed to parent BaseTool.
-        """
+        """  # noqa: E501
         if "feedcoop_api_key" in kwargs:
             kwargs["api_wrapper"] = FeedCoopSearchAPIWrapper(
                 feedcoop_api_key=kwargs["feedcoop_api_key"]
@@ -146,7 +151,7 @@ class FeedCoopSearchResults(BaseTool):
         except json.JSONDecodeError as e:
             logger.error(f"Failed to parse FeedCoop response: {e}")
             return f"Error parsing FeedCoop response: {e}", {}
-        except Exception as e:
+        except Exception:
             logger.exception("Unexpected error during FeedCoop search")
             raise
         cleaned_results = self.api_wrapper.clean_results(
