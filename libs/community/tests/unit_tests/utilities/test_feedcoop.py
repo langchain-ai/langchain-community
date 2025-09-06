@@ -109,9 +109,10 @@ class TestFeedCoopSearchAPIWrapperUnit(unittest.IsolatedAsyncioTestCase):
         mock_response.status = 400
         from unittest.mock import AsyncMock
 
+        mock_session_instance = AsyncMock()
         mock_post = AsyncMock()
-        mock_post.__aenter__.return_value = mock_response
-        mock_session.return_value.__aenter__.return_value.post.return_value = mock_post
+        mock_session.return_value.__aenter__.return_value = mock_session_instance
+        mock_session_instance.post.return_value.__aenter__.return_value = mock_response
 
         with self.assertRaises(Exception):
             coro = self.wrapper.raw_results_async("test")
