@@ -127,8 +127,15 @@ class FeedCoopSearchResults(BaseTool):
                 need_summary=self.need_summary,
                 time_range=self.time_range,
             )
+        except requests.RequestException as e:
+            logger.error(f"Network error during FeedCoop search: {e}")
+            return f"Error connecting to FeedCoop service: {e}", {}
+        except json.JSONDecodeError as e:
+            logger.error(f"Failed to parse FeedCoop response: {e}")
+            return f"Error parsing FeedCoop response: {e}", {}
         except Exception as e:
-            return repr(e), {}
+            logger.exception("Unexpected error during FeedCoop search")
+            raise
         cleaned_results = self.api_wrapper.clean_results(
             raw_results["Result"]["WebResults"]
         )
