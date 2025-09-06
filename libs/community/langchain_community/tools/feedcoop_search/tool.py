@@ -111,7 +111,12 @@ class FeedCoopSearchResults(BaseTool):
     response_format: Literal["content_and_artifact"] = "content_and_artifact"
 
     def __init__(self, **kwargs: Any):
-        """Create api_wrapper with feedcoop_api_key if provided."""
+        """Initialize FeedCoopSearchResults tool.
+
+        Args:
+            **kwargs: Keyword arguments including optional feedcoop_api_key for API authentication.
+                Other arguments are passed to parent BaseTool.
+        """
         if "feedcoop_api_key" in kwargs:
             kwargs["api_wrapper"] = FeedCoopSearchAPIWrapper(
                 feedcoop_api_key=kwargs["feedcoop_api_key"]
