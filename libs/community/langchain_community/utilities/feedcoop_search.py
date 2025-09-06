@@ -202,6 +202,7 @@ class FeedCoopSearchAPIWrapper(BaseModel):
         )
         return self.clean_results(results_json["Result"]["WebResults"])
 
+
     def clean_results(self, results: List[Dict]) -> List[Dict]:
         """Clean results from FeedCoop Search API."""
         clean_results = []
@@ -221,3 +222,4 @@ class FeedCoopSearchAPIWrapper(BaseModel):
             }
             clean_results.append(clean_result)
         return clean_results
+
