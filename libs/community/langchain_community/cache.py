@@ -485,7 +485,7 @@ class RedisCache(_RedisCacheBase):
         # Read from a Redis HASH
         try:
             results = self.redis.hgetall(self._key(prompt, llm_string))
-            return self._get_generations(results)  # type: ignore[arg-type]
+            return self._get_generations(results)
         except Exception as e:
             logger.error(f"Redis lookup failed: {e}")
             return None
@@ -558,7 +558,7 @@ class AsyncRedisCache(_RedisCacheBase):
         """Look up based on prompt and llm_string. Async version."""
         try:
             results = await self.redis.hgetall(self._key(prompt, llm_string))
-            return self._get_generations(results)  # type: ignore[arg-type]
+            return self._get_generations(results)
         except Exception as e:
             logger.error(f"Redis async lookup failed: {e}")
             return None

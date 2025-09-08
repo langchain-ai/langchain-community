@@ -17,6 +17,7 @@ from typing import (
     Tuple,
     Type,
     Union,
+    cast,
 )
 
 from langchain_core.callbacks import (
@@ -31,6 +32,7 @@ from langchain_core.messages import (
     AIMessage,
     AIMessageChunk,
     BaseMessage,
+    BaseMessageChunk,
     ChatMessage,
     HumanMessage,
     SystemMessage,
@@ -276,13 +278,13 @@ class ChatWriter(BaseChatModel):
             delta = chunk.choices[0].delta
             if not delta or not delta.content:
                 continue
-            chunk = self._convert_writer_to_langchain(
+            message_chunk = self._convert_writer_to_langchain(
                 {
                     "role": "assistant",
                     "content": delta.content,
                 }
             )
-            chunk = ChatGenerationChunk(message=chunk)
+            chunk = ChatGenerationChunk(message=cast(BaseMessageChunk, message_chunk))
 
             if run_manager:
                 run_manager.on_llm_new_token(chunk.text)
@@ -305,13 +307,13 @@ class ChatWriter(BaseChatModel):
             delta = chunk.choices[0].delta
             if not delta or not delta.content:
                 continue
-            chunk = self._convert_writer_to_langchain(
+            message_chunk = self._convert_writer_to_langchain(
                 {
                     "role": "assistant",
                     "content": delta.content,
                 }
             )
-            chunk = ChatGenerationChunk(message=chunk)
+            chunk = ChatGenerationChunk(message=cast(BaseMessageChunk, message_chunk))
 
             if run_manager:
                 await run_manager.on_llm_new_token(chunk.text)

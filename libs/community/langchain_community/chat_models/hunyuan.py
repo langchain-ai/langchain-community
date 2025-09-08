@@ -228,7 +228,7 @@ class ChatHunyuan(BaseChatModel):
     ) -> Iterator[ChatGenerationChunk]:
         res = self._chat(messages, **kwargs)
 
-        default_chunk_class = AIMessageChunk
+        default_chunk_class: Type[BaseMessageChunk] = AIMessageChunk
         for chunk in res:
             chunk = chunk.get("data", "")
             if len(chunk) == 0:
@@ -245,7 +245,7 @@ class ChatHunyuan(BaseChatModel):
                 default_chunk_class = chunk.__class__
                 cg_chunk = ChatGenerationChunk(message=chunk)
                 if run_manager:
-                    run_manager.on_llm_new_token(chunk.content, chunk=cg_chunk)
+                    run_manager.on_llm_new_token(str(chunk.content), chunk=cg_chunk)
                 yield cg_chunk
 
     def _chat(self, messages: List[BaseMessage], **kwargs: Any) -> Any:
