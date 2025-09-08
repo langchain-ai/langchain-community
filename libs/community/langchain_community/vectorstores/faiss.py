@@ -1280,7 +1280,14 @@ class FAISS(VectorStore):
             )
 
     def _select_cosine_relevance_fn(self) -> Callable[[float], float]:
-        """Pick the correct relevance mapping for COSINE based on FAISS index metric."""
+        """Pick the correct relevance mapping for COSINE based on FAISS index metric.
+        
+        Args:
+            None
+
+        Returns:
+            A function that takes a relevance score and returns a cosine similarity score.
+        """
         faiss = dependable_faiss_import()
         metric = getattr(self.index, "metric_type", None)
 
