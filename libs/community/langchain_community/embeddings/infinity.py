@@ -76,7 +76,7 @@ class InfinityEmbeddings(BaseModel, Embeddings):
 
         values["client"] = TinyAsyncOpenAIInfinityEmbeddingClient(
             host=values["infinity_api_url"],
-            key=values["infinity_api_key"]
+            api_key=values["infinity_api_key"]
         )
         return values
 
@@ -247,11 +247,11 @@ class TinyAsyncOpenAIInfinityEmbeddingClient:  #: :meta private:
             Dict[str, Collection[str]]: _description_
         """
 
-        if self.key:
+        if self.api_key:
             headers = {
                 # "accept": "application/json",
                 "content-type": "application/json",
-                "Authorization": f"Bearer {self.key}"
+                "Authorization": f"Bearer {self.api_key}"
             }
         else:
             headers = {
