@@ -71,7 +71,7 @@ class InfinityEmbeddings(BaseModel, Embeddings):
             values, "infinity_api_url", "INFINITY_API_URL"
         )
         values["infinity_api_key"] = get_from_dict_or_env(
-            values, "infinity_api_key", "infinity_api_key"
+            values, "infinity_api_key", "INFINITY_API_KEY"
         )
 
         values["client"] = TinyAsyncOpenAIInfinityEmbeddingClient(
@@ -161,11 +161,11 @@ class TinyAsyncOpenAIInfinityEmbeddingClient:  #: :meta private:
     def __init__(
             self,
             host: str = "http://localhost:7797/v1",
-            key: str = None,
+            api_key: str = None,
             aiosession: Optional[aiohttp.ClientSession] = None,
     ) -> None:
         self.host = host
-        self.key = key
+        self.api_key = api_key
         self.aiosession = aiosession
 
         if self.host is None or len(self.host) < 3:
