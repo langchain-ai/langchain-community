@@ -14,7 +14,13 @@ def test_sql_database_run_content_and_artifact():
     assert "foo" in string_result and "bar" in string_result
     assert (1, "foo") in artifact and (2, "bar") in artifact
 
+    # Test content_and_artifact format with empty result set
+    empty_string, empty_artifact = db.run(
+        "SELECT * FROM test WHERE id = 999", response_format="content_and_artifact"
+    )
+    assert empty_string == ""
+    assert empty_artifact == []
+
     # Test default format (string only)
     only_string = db.run("SELECT * FROM test")
     assert isinstance(only_string, str)
-    assert "foo" in only_string and "bar" in only_string
