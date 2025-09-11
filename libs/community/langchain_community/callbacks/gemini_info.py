@@ -52,6 +52,7 @@ def standardize_model_name(
 
 
 
+
 def get_gemini_token_cost_for_model(
     model_name: str,
     num_tokens: int,
@@ -59,7 +60,22 @@ def get_gemini_token_cost_for_model(
     *,
     token_type: TokenType = TokenType.PROMPT,
 ) -> float:
-    """Get the cost in USD for a given model and number of tokens."""
+    """Get the cost in USD for a given model and number of tokens.
+    
+    Args:
+        model_name: The name of the Gemini model to calculate cost for.
+        num_tokens: The number of tokens to calculate cost for.
+        is_completion: Whether the tokens are completion tokens.
+            If True, token_type will be set to TokenType.COMPLETION.
+        token_type: The type of token (prompt or completion).
+            Defaults to TokenType.PROMPT.
+    
+    Returns:
+        The cost in USD for the specified number of tokens.
+        
+    Raises:
+        ValueError: If the model name is not recognized as a valid Gemini model.
+    """
     if is_completion:
         token_type = TokenType.COMPLETION
     model_name = standardize_model_name(model_name, token_type=token_type)
@@ -69,6 +85,7 @@ def get_gemini_token_cost_for_model(
             + ", ".join(MODEL_COST_PER_1K_TOKENS.keys())
         )
     return MODEL_COST_PER_1K_TOKENS[model_name] * (num_tokens / 1000)
+
 
 
 class GeminiCallbackHandler(BaseCallbackHandler):
