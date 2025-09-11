@@ -101,9 +101,6 @@ class GeminiCallbackHandler(BaseCallbackHandler):
         self.reasoning_tokens = 0
         self.successful_requests = 0
         self.total_cost = 0.0
-    def __init__(self) -> None:
-        super().__init__()
-        self._lock = threading.Lock()
 
     def __repr__(self) -> str:
         return f"""Tokens Used: {self.total_tokens}
