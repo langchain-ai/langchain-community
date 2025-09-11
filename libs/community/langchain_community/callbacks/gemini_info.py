@@ -65,7 +65,7 @@ def get_gemini_token_cost_for_model(
     model_name = standardize_model_name(model_name, token_type=token_type)
     if model_name not in MODEL_COST_PER_1K_TOKENS:
         raise ValueError(
-            f"Unknown model: {model_name}. Please provide a valid Gemini model name.Known models are: "
+            f"Unknown model: {model_name}. Please provide a valid Gemini model name. Known models are: "
             + ", ".join(MODEL_COST_PER_1K_TOKENS.keys())
         )
     return MODEL_COST_PER_1K_TOKENS[model_name] * (num_tokens / 1000)
