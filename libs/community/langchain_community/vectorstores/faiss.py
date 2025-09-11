@@ -1286,7 +1286,8 @@ class FAISS(VectorStore):
             None
 
         Returns:
-            A function that takes a relevance score and returns a cosine similarity score.
+            A function that takes a relevance score and returns a cosine similarity 
+            score.
         """
         faiss = dependable_faiss_import()
         metric = getattr(self.index, "metric_type", None)
