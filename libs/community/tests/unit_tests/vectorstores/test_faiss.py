@@ -1668,6 +1668,7 @@ def test_faiss_cosine_distance_with_index_flat_ip() -> None:
 
     dim = e1.shape[0]
     import faiss
+
     index = faiss.IndexFlatIP(dim)
     store = FAISS(
         embedding_function=embeddings,
@@ -1698,6 +1699,7 @@ def test_faiss_cosine_distance_with_index_flat_l2() -> None:
 
     dim = e1.shape[0]
     import faiss
+
     index = faiss.IndexFlatL2(dim)
     store = FAISS(
         embedding_function=embeddings,
