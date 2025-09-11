@@ -5,7 +5,6 @@ import math
 import tempfile
 from typing import Union
 
-import faiss
 import numpy as np
 import pytest
 from langchain_core.documents import Document
@@ -1668,6 +1667,7 @@ def test_faiss_cosine_distance_with_index_flat_ip() -> None:
     required_relevance_score = (dot_product + 1.0) / 2.0
 
     dim = e1.shape[0]
+    import faiss
     index = faiss.IndexFlatIP(dim)
     store = FAISS(
         embedding_function=embeddings,
@@ -1697,6 +1697,7 @@ def test_faiss_cosine_distance_with_index_flat_l2() -> None:
     required_relevance_score = 1 - l2_dist / 4
 
     dim = e1.shape[0]
+    import faiss
     index = faiss.IndexFlatL2(dim)
     store = FAISS(
         embedding_function=embeddings,
