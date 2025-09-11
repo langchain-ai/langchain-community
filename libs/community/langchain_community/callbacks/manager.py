@@ -13,6 +13,7 @@ from langchain_core.tracers.context import register_configure_hook
 from langchain_community.callbacks.bedrock_anthropic_callback import (
     BedrockAnthropicTokenUsageCallbackHandler,
 )
+from langchain_community.callbacks.gemini_info import GeminiCallbackHandler
 from langchain_community.callbacks.openai_info import OpenAICallbackHandler
 from langchain_community.callbacks.tracers.comet import CometTracer
 from langchain_community.callbacks.tracers.wandb import WandbTracer
@@ -25,6 +26,9 @@ openai_callback_var: ContextVar[Optional[OpenAICallbackHandler]] = ContextVar(
 bedrock_anthropic_callback_var: (ContextVar)[
     Optional[BedrockAnthropicTokenUsageCallbackHandler]
 ] = ContextVar("bedrock_anthropic_callback", default=None)
+gemini_callback_var: ContextVar[Optional[GeminiCallbackHandler]] = ContextVar(
+    "gemini_callback", default=None
+)
 wandb_tracing_callback_var: ContextVar[Optional[WandbTracer]] = ContextVar(
     "tracing_wandb_callback", default=None
 )
@@ -34,6 +38,7 @@ comet_tracing_callback_var: ContextVar[Optional[CometTracer]] = ContextVar(
 
 register_configure_hook(openai_callback_var, True)
 register_configure_hook(bedrock_anthropic_callback_var, True)
+register_configure_hook(gemini_callback_var, True)
 register_configure_hook(
     wandb_tracing_callback_var, True, WandbTracer, "LANGCHAIN_WANDB_TRACING"
 )
@@ -79,6 +84,24 @@ def get_bedrock_anthropic_callback() -> Generator[
     bedrock_anthropic_callback_var.set(cb)
     yield cb
     bedrock_anthropic_callback_var.set(None)
+
+
+@contextmanager
+def get_gemini_callback() -> Generator[GeminiCallbackHandler, None, None]:
+    """Get the Gemini callback handler in a context manager.
+    which conveniently exposes token and cost information.
+
+    Returns:
+        GeminiCallbackHandler: The Gemini callback handler.
+
+    Example:
+        >>> with get_gemini_callback() as cb:
+        ...     # Use the Gemini callback handler
+    """
+    cb = GeminiCallbackHandler()
+    gemini_callback_var.set(cb)
+    yield cb
+    gemini_callback_var.set(None)
 
 
 @contextmanager

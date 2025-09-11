@@ -57,6 +57,9 @@ if TYPE_CHECKING:
     from langchain_community.callbacks.mlflow_callback import (
         MlflowCallbackHandler,
     )
+    from langchain_community.callbacks.gemini_info import (
+        GeminiCallbackHandler,
+    )
     from langchain_community.callbacks.openai_info import (
         OpenAICallbackHandler,
     )
@@ -103,6 +106,7 @@ _module_lookup = {
     "LLMThoughtLabeler": "langchain_community.callbacks.streamlit",
     "LLMonitorCallbackHandler": "langchain_community.callbacks.llmonitor_callback",
     "LabelStudioCallbackHandler": "langchain_community.callbacks.labelstudio_callback",
+    "GeminiCallbackHandler": "langchain_community.callbacks.gemini_info",
     "MlflowCallbackHandler": "langchain_community.callbacks.mlflow_callback",
     "OpenAICallbackHandler": "langchain_community.callbacks.openai_info",
     "PromptLayerCallbackHandler": "langchain_community.callbacks.promptlayer_callback",
@@ -136,6 +140,7 @@ __all__ = [
     "ContextCallbackHandler",
     "FiddlerCallbackHandler",
     "FlyteCallbackHandler",
+    "GeminiCallbackHandler",
     "HumanApprovalCallbackHandler",
     "InfinoCallbackHandler",
     "LLMThoughtLabeler",
