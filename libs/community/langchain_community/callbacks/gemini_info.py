@@ -33,16 +33,23 @@ class TokenType(Enum):
     COMPLETION = auto()
 
 
+
 def standardize_model_name(
     model_name: str,
     token_type: TokenType = TokenType.PROMPT,
 ) -> str:
-    """Standardize the model name to a format that can be used in the Gemini API."""
+    """Standardize the model name to a format that can be used in the Gemini API.
+    
+    Args:
+        model_name: The name of the model to standardize.
+        token_type: The type of token, defaults to PROMPT.
+    """
     model_name = model_name.lower()
     if token_type == TokenType.COMPLETION:
         return model_name + "-completion"
     else:
         return model_name
+
 
 
 def get_gemini_token_cost_for_model(
