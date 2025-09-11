@@ -71,6 +71,9 @@ def _len_check_if_sized(x: Any, y: Any, x_name: str, y_name: str) -> None:
         )
     return
 
+def _clamp01(x: float) -> float:
+    return 0.0 if x < 0.0 else 1.0 if x > 1.0 else x
+
 
 class FAISS(VectorStore):
     """FAISS vector store integration.
@@ -142,17 +145,6 @@ class FAISS(VectorStore):
 
             * thud [{'bar': 'baz'}]
 
-    Search with filter:
-        .. code-block:: python
-
-            results = vector_store.similarity_search(query="thud",k=1,filter={"bar": "baz"})
-            for doc in results:
-                print(f"* {doc.page_content} [{doc.metadata}]")
-
-        .. code-block:: python
-
-            * thud [{'bar': 'baz'}]
-
     Search with score:
         .. code-block:: python
 
@@ -174,10 +166,7 @@ class FAISS(VectorStore):
             # await vector_store.adelete(ids=["3"])
 
             # search
-            # results = vector_store.asimilarity_search(query="thud",k=1)
-
-            # search with score
-            results = await vector_store.asimilarity_search_with_score(query="qux",k=1)
+            # results = await vector_store.asimilarity_search_with_score(query="qux",k=1)
             for doc,score in results:
                 print(f"* [SIM={score:3f}] {doc.page_content} [{doc.metadata}]")
 
@@ -434,19 +423,7 @@ class FAISS(VectorStore):
             else:
                 docs.append((doc, scores[0][j]))
 
-        score_threshold = kwargs.get("score_threshold")
-        if score_threshold is not None:
-            cmp = (
-                operator.ge
-                if self.distance_strategy
-                in (DistanceStrategy.MAX_INNER_PRODUCT, DistanceStrategy.JACCARD)
-                else operator.le
-            )
-            docs = [
-                (doc, similarity)
-                for doc, similarity in docs
-                if cmp(similarity, score_threshold)
-            ]
+        # ⬇️ Removed raw-score threshold filtering here.
         return docs[:k]
 
     async def asimilarity_search_with_score_by_vector(
@@ -570,8 +547,8 @@ class FAISS(VectorStore):
             embedding: Embedding to look up documents similar to.
             k: Number of Documents to return. Defaults to 4.
             filter (Optional[Dict[str, str]]): Filter by metadata.
-                Defaults to None. If a callable, it must take as input the
-                metadata dict of Document and return a bool.
+            Defaults to None. If a callable, it must take as input the
+            metadata dict of Document and return a bool.
 
             fetch_k: (Optional[int]) Number of Documents to fetch before filtering.
                       Defaults to 20.
@@ -1287,8 +1264,6 @@ class FAISS(VectorStore):
         **kwargs: Any,
     ) -> List[Tuple[Document, float]]:
         """Return docs and their similarity scores on a scale from 0 to 1."""
-        # Pop score threshold so that only relevancy scores, not raw scores, are
-        # filtered.
         relevance_score_fn = self._select_relevance_score_fn()
         if relevance_score_fn is None:
             raise ValueError(
@@ -1303,9 +1278,18 @@ class FAISS(VectorStore):
             **kwargs,
         )
         docs_and_rel_scores = [
-            (doc, relevance_score_fn(score)) for doc, score in docs_and_scores
+                (doc, _clamp01(relevance_score_fn(score))) for doc, score in docs_and_scores
         ]
-        return docs_and_rel_scores
+
+
+        # ✅ filter once on normalized relevance
+        score_threshold = kwargs.pop("score_threshold", None)
+        if score_threshold is not None:
+            docs_and_rel_scores = [
+                (d, s) for (d, s) in docs_and_rel_scores if s >= score_threshold
+            ]
+
+        return docs_and_rel_scores[:k]
 
     async def _asimilarity_search_with_relevance_scores(
         self,
@@ -1316,8 +1300,6 @@ class FAISS(VectorStore):
         **kwargs: Any,
     ) -> List[Tuple[Document, float]]:
         """Return docs and their similarity scores on a scale from 0 to 1."""
-        # Pop score threshold so that only relevancy scores, not raw scores, are
-        # filtered.
         relevance_score_fn = self._select_relevance_score_fn()
         if relevance_score_fn is None:
             raise ValueError(
@@ -1332,9 +1314,18 @@ class FAISS(VectorStore):
             **kwargs,
         )
         docs_and_rel_scores = [
-            (doc, relevance_score_fn(score)) for doc, score in docs_and_scores
+            (doc, _clamp01(relevance_score_fn(score))) for doc, score in docs_and_scores
         ]
-        return docs_and_rel_scores
+
+
+        # ✅ filter once on normalized relevance
+        score_threshold = kwargs.pop("score_threshold", None)
+        if score_threshold is not None:
+            docs_and_rel_scores = [
+                (d, s) for (d, s) in docs_and_rel_scores if s >= score_threshold
+            ]
+
+        return docs_and_rel_scores[:k]
 
     @staticmethod
     def _create_filter_func(
