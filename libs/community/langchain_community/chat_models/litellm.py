@@ -462,7 +462,7 @@ class ChatLiteLLM(BaseChatModel):
         message_dicts, params = self._create_message_dicts(messages, stop)
         params = {**params, **kwargs, "stream": True}
 
-        default_chunk_class = AIMessageChunk
+        default_chunk_class: Type[BaseMessageChunk] = AIMessageChunk
         added_model_name = False
         for chunk in self.completion_with_retry(
             messages=message_dicts, run_manager=run_manager, **params
@@ -484,7 +484,7 @@ class ChatLiteLLM(BaseChatModel):
             default_chunk_class = chunk.__class__
             cg_chunk = ChatGenerationChunk(message=chunk)
             if run_manager:
-                run_manager.on_llm_new_token(chunk.content, chunk=cg_chunk)
+                run_manager.on_llm_new_token(str(chunk.content), chunk=cg_chunk)
             yield cg_chunk
 
     async def _astream(
@@ -497,7 +497,7 @@ class ChatLiteLLM(BaseChatModel):
         message_dicts, params = self._create_message_dicts(messages, stop)
         params = {**params, **kwargs, "stream": True}
 
-        default_chunk_class = AIMessageChunk
+        default_chunk_class: Type[BaseMessageChunk] = AIMessageChunk
         added_model_name = False
         async for chunk in await acompletion_with_retry(
             self, messages=message_dicts, run_manager=run_manager, **params
@@ -519,7 +519,7 @@ class ChatLiteLLM(BaseChatModel):
             default_chunk_class = chunk.__class__
             cg_chunk = ChatGenerationChunk(message=chunk)
             if run_manager:
-                await run_manager.on_llm_new_token(chunk.content, chunk=cg_chunk)
+                await run_manager.on_llm_new_token(str(chunk.content), chunk=cg_chunk)
             yield cg_chunk
 
     async def _agenerate(

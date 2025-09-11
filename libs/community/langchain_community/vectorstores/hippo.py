@@ -145,8 +145,8 @@ class Hippo(VectorStore):
                 "`pip install hippo-api`."
             ) from e
 
-        host: str = connection_args.get("host", None)
-        port: int = connection_args.get("port", None)
+        host: Optional[str] = connection_args.get("host", None)
+        port: Optional[int] = connection_args.get("port", None)
         username: str = connection_args.get("username", "shiva")
         password: str = connection_args.get("password", "shiva")
 
