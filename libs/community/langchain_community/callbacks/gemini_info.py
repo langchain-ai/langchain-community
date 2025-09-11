@@ -74,14 +74,16 @@ def get_gemini_token_cost_for_model(
 class GeminiCallbackHandler(BaseCallbackHandler):
     """Callback Handler that tracks Gemini info."""
 
-    total_tokens: int = 0
-    prompt_tokens: int = 0
-    prompt_tokens_cached: int = 0
-    completion_tokens: int = 0
-    reasoning_tokens: int = 0
-    successful_requests: int = 0
-    total_cost: float = 0.0
-
+    def __init__(self) -> None:
+        super().__init__()
+        self._lock = threading.Lock()
+        self.total_tokens = 0
+        self.prompt_tokens = 0
+        self.prompt_tokens_cached = 0
+        self.completion_tokens = 0
+        self.reasoning_tokens = 0
+        self.successful_requests = 0
+        self.total_cost = 0.0
     def __init__(self) -> None:
         super().__init__()
         self._lock = threading.Lock()
