@@ -99,7 +99,8 @@ class ChatMLX(BaseChatModel):
         run_manager: Optional[CallbackManagerForLLMRun] = None,
         **kwargs: Any,
     ) -> ChatResult:
-        llm_input = self._to_chat_prompt(messages)
+        tools = kwargs.pop("tools", None)
+        llm_input = self._to_chat_prompt(messages, tools=tools)
         llm_result = self.llm._generate(
             prompts=[llm_input], stop=stop, run_manager=run_manager, **kwargs
         )
@@ -112,7 +113,8 @@ class ChatMLX(BaseChatModel):
         run_manager: Optional[AsyncCallbackManagerForLLMRun] = None,
         **kwargs: Any,
     ) -> ChatResult:
-        llm_input = self._to_chat_prompt(messages)
+        tools = kwargs.pop("tools", None)
+        llm_input = self._to_chat_prompt(messages, tools=tools)
         llm_result = await self.llm._agenerate(
             prompts=[llm_input], stop=stop, run_manager=run_manager, **kwargs
         )
@@ -123,8 +125,17 @@ class ChatMLX(BaseChatModel):
         messages: List[BaseMessage],
         tokenize: bool = False,
         return_tensors: Optional[str] = None,
+        tools: Sequence[dict] | None = None,
     ) -> str:
-        """Convert a list of messages into a prompt format expected by wrapped LLM."""
+        """Convert messages to the prompt format expected by the wrapped LLM.
+
+        Args:
+            messages: Chat messages to include in the prompt.
+            tokenize: Whether to return token IDs instead of text.
+            return_tensors: Framework for returned tensors when ``tokenize`` is
+                True.
+            tools: Optional tool definitions to include in the prompt.
+        """
         if not messages:
             raise ValueError("At least one HumanMessage must be provided!")
 
@@ -137,6 +148,7 @@ class ChatMLX(BaseChatModel):
             tokenize=tokenize,
             add_generation_prompt=True,
             return_tensors=return_tensors,
+            tools=tools,
         )
 
     def _to_chatml_format(self, message: BaseMessage) -> dict:
