@@ -71,8 +71,16 @@ def _len_check_if_sized(x: Any, y: Any, x_name: str, y_name: str) -> None:
         )
     return
 
+
 def _clamp01(x: float) -> float:
+    """
+    Clamps a float value to the range [0.0, 1.0].
+    
+    Args:
+        x: The float value to clamp.
+    """
     return 0.0 if x < 0.0 else 1.0 if x > 1.0 else x
+
 
 
 class FAISS(VectorStore):
