@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import base64
 import logging
+import os
 import uuid
 from typing import (
     TYPE_CHECKING,
@@ -125,6 +126,15 @@ class Chroma(VectorStore):
             )
 
         self._embedding_function = embedding_function
+        # --- BEGIN ADDED CPU GUARD LOGIC ---
+        if (
+            collection_metadata
+            and "hnsw:num_threads" in collection_metadata
+            and collection_metadata["hnsw:num_threads"] > os.cpu_count()
+        ):
+            collection_metadata["hnsw:num_threads"] = os.cpu_count()
+        # --- END ADDED LOGIC ---
+        
         self._collection = self._client.get_or_create_collection(
             name=collection_name,
             embedding_function=None,
