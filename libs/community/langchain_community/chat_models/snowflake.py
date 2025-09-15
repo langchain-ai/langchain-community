@@ -89,17 +89,27 @@ def _truncate_at_stop_tokens(
 class ChatSnowflakeCortex(BaseChatModel):
     """Snowflake Cortex based Chat model
 
-    To use the chat model, you must have the ``snowflake-snowpark-python`` Python
-    package installed and either:
+    To use this chat model, you need the ``snowflake-snowpark-python`` Python package installed.
 
-        1. environment variables set with your snowflake credentials or
-        2. directly passed in as kwargs to the ChatSnowflakeCortex constructor.
+    You must provide your Snowflake credentials as arguments to the ChatSnowflakeCortex constructor.
 
     Example:
         .. code-block:: python
 
             from langchain_community.chat_models import ChatSnowflakeCortex
-            chat = ChatSnowflakeCortex()
+
+            # Authentication using OAuth
+            chat_oauth = ChatSnowflakeCortex(
+                username="<your_username>",
+                account="<your_account>",
+                database="<your_database>",
+                schema="<your_schema>",
+                warehouse="<your_warehouse>",
+                role="<your_role>",
+                password=<password>,  # Optional if using OAuth
+                authenticator="oauth",
+                token="<your_oauth_token>",
+            )
     """
 
     # test_tools: Dict[str, Any] = Field(default_factory=dict)
@@ -130,21 +140,81 @@ class ChatSnowflakeCortex(BaseChatModel):
         cumulative probabilities. Value should be ranging between 0.0 and 1.0. 
     """
 
-    snowflake_username: Optional[str] = Field(default=None, alias="username")
-    """Automatically inferred from env var `SNOWFLAKE_USERNAME` if not provided."""
-    snowflake_password: Optional[SecretStr] = Field(default=None, alias="password")
-    """Automatically inferred from env var `SNOWFLAKE_PASSWORD` if not provided."""
-    snowflake_account: Optional[str] = Field(default=None, alias="account")
-    """Automatically inferred from env var `SNOWFLAKE_ACCOUNT` if not provided."""
-    snowflake_database: Optional[str] = Field(default=None, alias="database")
-    """Automatically inferred from env var `SNOWFLAKE_DATABASE` if not provided."""
-    snowflake_schema: Optional[str] = Field(default=None, alias="schema")
-    """Automatically inferred from env var `SNOWFLAKE_SCHEMA` if not provided."""
-    snowflake_warehouse: Optional[str] = Field(default=None, alias="warehouse")
-    """Automatically inferred from env var `SNOWFLAKE_WAREHOUSE` if not provided."""
-    snowflake_role: Optional[str] = Field(default=None, alias="role")
-    """Automatically inferred from env var `SNOWFLAKE_ROLE` if not provided."""
+    def __init__(
+        self,
+        username: str,
+        account: str,
+        database: str,
+        schema: str,
+        warehouse: str,
+        role: str,
+        password: Optional[SecretStr] = None,
+        authenticator: Optional[str] = None,
+        token: Optional[str] = None,
+        model: str = "mistral-large",
+        cortex_function: str = "complete",
+        temperature: float = 0,
+        max_tokens: Optional[int] = None,
+        top_p: Optional[float] = 0,
+    ):
+        """Initialize the chat model."""
+        super().__init__(
+            username=username,
+            account=account,
+            database=database,
+            schema=schema,
+            warehouse=warehouse,
+            role=role,
+            password=password,
+            authenticator=authenticator,
+            token=token,
+            model=model,
+            cortex_function=cortex_function,
+            temperature=temperature,
+            max_tokens=max_tokens,
+            top_p=top_p,
+        )
+        errors = ChatSnowflakeCortex.validate_authentication(
+            username=username,
+            password=password,
+            authenticator=authenticator,
+            token=token,
+        )
 
+        if errors:
+            raise ValueError("Invalid Snowflake credentials: " + "; ".join(errors))
+
+        # Build base connection params
+        connection_params = {
+            "account": account,
+            "user": username,
+            "database": database,
+            "schema": schema,
+            "warehouse": warehouse,
+            "role": role,
+            "client_session_keep_alive": "True",
+        }
+
+        if authenticator is not None and authenticator.lower() == "oauth":
+            connection_params["authenticator"] = authenticator
+            connection_params["token"] = token
+        else:
+            connection_params["password"] = convert_to_secret_str(password).get_secret_value()
+
+        try:
+            from snowflake.snowpark import Session
+        except ImportError:
+            raise ImportError(
+                """`snowflake-snowpark-python` package not found, please install:
+                `pip install snowflake-snowpark-python`
+                """
+            )
+
+        try:
+            self.session = Session.builder.configs(connection_params).create()
+        except Exception as e:
+            raise ChatSnowflakeCortexError(f"Failed to create session: {e}")
+        
     def bind_tools(
         self,
         tools: Sequence[Union[Dict[str, Any], Type, Callable, BaseTool]],
@@ -166,65 +236,34 @@ class ChatSnowflakeCortex(BaseChatModel):
 
         return self
 
-    @model_validator(mode="before")
-    @classmethod
-    def build_extra(cls, values: Dict[str, Any]) -> Any:
-        """Build extra kwargs from additional params that were passed in."""
-        all_required_field_names = get_pydantic_field_names(cls)
-        values = _build_model_kwargs(values, all_required_field_names)
-        return values
-
-    @model_validator(mode="before")
-    def validate_environment(cls, values: Dict) -> Dict:
-        try:
-            from snowflake.snowpark import Session
-        except ImportError:
-            raise ImportError(
-                """`snowflake-snowpark-python` package not found, please install:
-                `pip install snowflake-snowpark-python`
-                """
-            )
-
-        values["snowflake_username"] = get_from_dict_or_env(
-            values, "snowflake_username", "SNOWFLAKE_USERNAME"
-        )
-        values["snowflake_password"] = convert_to_secret_str(
-            get_from_dict_or_env(values, "snowflake_password", "SNOWFLAKE_PASSWORD")
-        )
-        values["snowflake_account"] = get_from_dict_or_env(
-            values, "snowflake_account", "SNOWFLAKE_ACCOUNT"
-        )
-        values["snowflake_database"] = get_from_dict_or_env(
-            values, "snowflake_database", "SNOWFLAKE_DATABASE"
-        )
-        values["snowflake_schema"] = get_from_dict_or_env(
-            values, "snowflake_schema", "SNOWFLAKE_SCHEMA"
-        )
-        values["snowflake_warehouse"] = get_from_dict_or_env(
-            values, "snowflake_warehouse", "SNOWFLAKE_WAREHOUSE"
-        )
-        values["snowflake_role"] = get_from_dict_or_env(
-            values, "snowflake_role", "SNOWFLAKE_ROLE"
-        )
-
-        connection_params = {
-            "account": values["snowflake_account"],
-            "user": values["snowflake_username"],
-            "password": values["snowflake_password"].get_secret_value(),
-            "database": values["snowflake_database"],
-            "schema": values["snowflake_schema"],
-            "warehouse": values["snowflake_warehouse"],
-            "role": values["snowflake_role"],
-            "client_session_keep_alive": "True",
-        }
-
-        try:
-            values["session"] = Session.builder.configs(connection_params).create()
-        except Exception as e:
-            raise ChatSnowflakeCortexError(f"Failed to create session: {e}")
-
-        return values
-
+    @staticmethod
+    def validate_authentication(
+        username: Optional[str] = None,
+        password: Optional[SecretStr] = None,
+        authenticator: Optional[str] = None,
+        token: Optional[str] = None,
+    ) -> list:
+        """
+        Validate authentication credentials.
+        - username is always required
+        - if password is provided, it must not be None
+        - if authenticator is provided, it must be 'oauth' (case-insensitive) and token must be provided
+        Returns a list of error messages (empty if valid)
+        """
+        errors = []
+        if not username:
+            errors.append("Username must be provided.")
+        if authenticator:
+            if authenticator.lower() != "oauth":
+                errors.append("If authenticator is provided, it must be 'oauth'.")
+            if not token:
+                errors.append("OAuth authenticator requires a token.")
+        else:
+            # If not using OAuth, password must be provided
+            if password is None or (isinstance(password, SecretStr) and not password.get_secret_value()):
+                errors.append("Password must be provided for basic authentication.")
+        return errors
+    
     def __del__(self) -> None:
         if getattr(self, "session", None) is not None:
             self.session.close()
