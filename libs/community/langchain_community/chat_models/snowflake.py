@@ -147,18 +147,19 @@ class ChatSnowflakeCortex(BaseChatModel):
     """Automatically inferred from env var `SNOWFLAKE_ROLE` if not provided."""
     snowflake_authenticator: Optional[str] = Field(default=None, alias="authenticator")
     """
-    The authentication method to use for connecting to Snowflake.
-
-    Args:
-        authenticator: The authentication mechanism. Set to 'OAUTH' (case-insensitive) to use OAuth authentication with a token. 
-        If not provided, password-based authentication is used by default.
+    The authentication method for connecting to Snowflake. 
+    Set to 'OAUTH' (case-insensitive) to use OAuth authentication with a token. 
+    If not provided, password-based authentication is used by default. 
+    This value can be passed as an argument or set via the `SNOWFLAKE_AUTHENTICATOR` environment variable. 
+    If set to 'OAUTH', you must also provide a valid OAuth token via the `token` argument or the `SNOWFLAKE_ACCESS_TOKEN` environment variable. 
+    Refer to Snowflake documentation for other supported authenticators if needed.
     """
     snowflake_token: Optional[str] = Field(default=None, alias="token")
     """
-    The OAuth access token to use for authentication when `authenticator` is set to 'OAUTH'.
-
-    Args:
-        token: The OAuth access token string. Required if using OAuth authentication (`authenticator='OAUTH'`).
+    The OAuth access token for authentication when `authenticator` is set to 'OAUTH'. 
+    Required if using OAuth authentication (`authenticator='OAUTH'`). 
+    This value can be passed as an argument or set via the `SNOWFLAKE_ACCESS_TOKEN` environment variable. 
+    If not using OAuth, this field is ignored. Ensure your token is valid and has the necessary permissions for Snowflake Cortex access.
     """
 
     def bind_tools(
