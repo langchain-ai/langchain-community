@@ -8,7 +8,7 @@ Note: This test must be run with the following environment variables set:
     SNOWFLAKE_WAREHOUSE="YOUR_SNOWFLAKE_WAREHOUSE"
     SNOWFLAKE_ROLE="YOUR_SNOWFLAKE_ROLE",
     SNOWFLAKE_AUTHENTICATOR="OAUTH",
-    SNOWFLAKE_TOKEN-"YOUR_SNOWFLAKE_TOKEN",
+    SNOWFLAKE_TOKEN="YOUR_SNOWFLAKE_TOKEN",
 """
 
 import pytest
