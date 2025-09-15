@@ -204,7 +204,7 @@ class ChatSnowflakeCortex(BaseChatModel):
         values["snowflake_username"] = get_from_dict_or_env(
             values, "snowflake_username", "SNOWFLAKE_USERNAME"
         )
-        values['snowflake_password'] = convert_to_secret_str(
+        values["snowflake_password"] = convert_to_secret_str(
             get_from_dict_or_env(values, "snowflake_password", "SNOWFLAKE_PASSWORD")
         )
         values["snowflake_account"] = get_from_dict_or_env(
