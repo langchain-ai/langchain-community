@@ -222,7 +222,7 @@ class ChatSnowflakeCortex(BaseChatModel):
         values["snowflake_role"] = get_from_dict_or_env(
             values, "snowflake_role", "SNOWFLAKE_ROLE"
         )
-        if os.getenv("SNOWFLAKE_AUTHENTICATOR") == "OAUTH" or os.getenv("snoflake_authenticator"):
+        if os.getenv("SNOWFLAKE_AUTHENTICATOR") == "OAUTH" or os.getenv("snowflake_authenticator"):
             values["snowflake_authenticator"] = get_from_dict_or_env(
                 values, "snowflake_authenticator", "SNOWFLAKE_AUTHENTICATOR"
             )
