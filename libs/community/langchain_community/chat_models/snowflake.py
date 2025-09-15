@@ -90,7 +90,7 @@ def _truncate_at_stop_tokens(
 class ChatSnowflakeCortex(BaseChatModel):
     """Snowflake Cortex based Chat model
 
-    To use this chat model, you must have the ``snowflake-snowpark-python`` Python
+    To use the chat model, you must have the ``snowflake-snowpark-python`` Python
     package installed and either:
 
         1. environment variables set with your snowflake credentials or
@@ -146,9 +146,20 @@ class ChatSnowflakeCortex(BaseChatModel):
     snowflake_role: Optional[str] = Field(default=None, alias="role")
     """Automatically inferred from env var `SNOWFLAKE_ROLE` if not provided."""
     snowflake_authenticator: Optional[str] = Field(default=None, alias="authenticator")
-    """Automatically inferred from env var `SNOWFLAKE_AUTHENTICATOR` if not provided."""
+    """
+    The authentication method to use for connecting to Snowflake.
+
+    Args:
+        authenticator: The authentication mechanism. Set to 'OAUTH' (case-insensitive) to use OAuth authentication with a token. 
+        If not provided, password-based authentication is used by default.
+    """
     snowflake_token: Optional[str] = Field(default=None, alias="token")
-    """Automatically inferred from env var `SNOWFLAKE_ACCESS_TOKEN` if not provided."""
+    """
+    The OAuth access token to use for authentication when `authenticator` is set to 'OAUTH'.
+
+    Args:
+        token: The OAuth access token string. Required if using OAuth authentication (`authenticator='OAUTH'`).
+    """
 
     def bind_tools(
         self,
