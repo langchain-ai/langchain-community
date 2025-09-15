@@ -1,4 +1,5 @@
 import json
+import os
 from typing import (
     Any,
     Callable,
@@ -89,11 +90,16 @@ def _truncate_at_stop_tokens(
 class ChatSnowflakeCortex(BaseChatModel):
     """Snowflake Cortex based Chat model
 
-    To use the chat model, you must have the ``snowflake-snowpark-python`` Python
+    To use this chat model, you must have the ``snowflake-snowpark-python`` Python
     package installed and either:
 
         1. environment variables set with your snowflake credentials or
         2. directly passed in as kwargs to the ChatSnowflakeCortex constructor.
+
+    Authentication requirements:
+        - You must provide either:
+            1. A password (via the `password` argument or the `SNOWFLAKE_PASSWORD` environment variable)
+            2. OR, for OAuth: set `SNOWFLAKE_AUTHENTICATOR="OAUTH"` and provide a token (via the `SNOWFLAKE_ACCESS_TOKEN` environment variable)
 
     Example:
         .. code-block:: python
@@ -144,6 +150,10 @@ class ChatSnowflakeCortex(BaseChatModel):
     """Automatically inferred from env var `SNOWFLAKE_WAREHOUSE` if not provided."""
     snowflake_role: Optional[str] = Field(default=None, alias="role")
     """Automatically inferred from env var `SNOWFLAKE_ROLE` if not provided."""
+    snowflake_authenticator: Optional[str] = Field(default=None, alias="authenticator")
+    """Automatically inferred from env var `SNOWFLAKE_AUTHENTICATOR` if not provided."""
+    snowflake_token: Optional[str] = Field(default=None, alias="token")
+    """Automatically inferred from env var `SNOWFLAKE_ACCESS_TOKEN` if not provided."""
 
     def bind_tools(
         self,
@@ -188,9 +198,6 @@ class ChatSnowflakeCortex(BaseChatModel):
         values["snowflake_username"] = get_from_dict_or_env(
             values, "snowflake_username", "SNOWFLAKE_USERNAME"
         )
-        values["snowflake_password"] = convert_to_secret_str(
-            get_from_dict_or_env(values, "snowflake_password", "SNOWFLAKE_PASSWORD")
-        )
         values["snowflake_account"] = get_from_dict_or_env(
             values, "snowflake_account", "SNOWFLAKE_ACCOUNT"
         )
@@ -207,16 +214,37 @@ class ChatSnowflakeCortex(BaseChatModel):
             values, "snowflake_role", "SNOWFLAKE_ROLE"
         )
 
+        if os.getenv("SNOWFLAKE_PASSWORD") is None:
+            values["snowflake_authenticator"] = get_from_dict_or_env(
+                values, "snowflake_authenticator", "SNOWFLAKE_AUTHENTICATOR"
+            )
+            values["snowflake_token"] = get_from_dict_or_env(
+                values, "snowflake_token", "SNOWFLAKE_ACCESS_TOKEN"
+            )     
+        else:
+            values['snowflake_password'] = convert_to_secret_str(
+                get_from_dict_or_env(values, "snowflake_password", "SNOWFLAKE_PASSWORD")
+            )
+
+        authenticator = values.get("snowflake_authenticator")
+        password = values.get("snowflake_password")
+        token = values.get("snowflake_token")        
+
         connection_params = {
             "account": values["snowflake_account"],
             "user": values["snowflake_username"],
-            "password": values["snowflake_password"].get_secret_value(),
             "database": values["snowflake_database"],
             "schema": values["snowflake_schema"],
             "warehouse": values["snowflake_warehouse"],
             "role": values["snowflake_role"],
             "client_session_keep_alive": "True",
         }
+
+        if authenticator and str(authenticator).lower() == "oauth":
+            connection_params["authenticator"] = authenticator
+            connection_params["token"] = token
+        else:
+            connection_params["password"] = password.get_secret_value() if isinstance(password, SecretStr) else password
 
         try:
             values["session"] = Session.builder.configs(connection_params).create()
