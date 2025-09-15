@@ -96,11 +96,6 @@ class ChatSnowflakeCortex(BaseChatModel):
         1. environment variables set with your snowflake credentials or
         2. directly passed in as kwargs to the ChatSnowflakeCortex constructor.
 
-    Authentication requirements:
-        - You must provide either:
-            1. A password (via the `password` argument or the `SNOWFLAKE_PASSWORD` environment variable)
-            2. OR, for OAuth: set `SNOWFLAKE_AUTHENTICATOR="OAUTH"` and provide a token (via the `SNOWFLAKE_ACCESS_TOKEN` environment variable)
-
     Example:
         .. code-block:: python
 
@@ -198,6 +193,9 @@ class ChatSnowflakeCortex(BaseChatModel):
         values["snowflake_username"] = get_from_dict_or_env(
             values, "snowflake_username", "SNOWFLAKE_USERNAME"
         )
+        values['snowflake_password'] = convert_to_secret_str(
+            get_from_dict_or_env(values, "snowflake_password", "SNOWFLAKE_PASSWORD")
+        )
         values["snowflake_account"] = get_from_dict_or_env(
             values, "snowflake_account", "SNOWFLAKE_ACCOUNT"
         )
@@ -213,18 +211,13 @@ class ChatSnowflakeCortex(BaseChatModel):
         values["snowflake_role"] = get_from_dict_or_env(
             values, "snowflake_role", "SNOWFLAKE_ROLE"
         )
-
-        if os.getenv("SNOWFLAKE_PASSWORD") is None:
+        if os.getenv("SNOWFLAKE_AUTHENTICATOR") == "OAUTH" or os.getenv("snoflake_authenticator"):
             values["snowflake_authenticator"] = get_from_dict_or_env(
                 values, "snowflake_authenticator", "SNOWFLAKE_AUTHENTICATOR"
             )
             values["snowflake_token"] = get_from_dict_or_env(
                 values, "snowflake_token", "SNOWFLAKE_ACCESS_TOKEN"
-            )     
-        else:
-            values['snowflake_password'] = convert_to_secret_str(
-                get_from_dict_or_env(values, "snowflake_password", "SNOWFLAKE_PASSWORD")
-            )
+            )            
 
         authenticator = values.get("snowflake_authenticator")
         password = values.get("snowflake_password")
