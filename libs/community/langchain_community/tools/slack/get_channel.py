@@ -1,10 +1,20 @@
 import json
 import logging
-from typing import Any, Optional
+from typing import Any, Optional, Type
+
+from pydantic import BaseModel, Field
 
 from langchain_core.callbacks import CallbackManagerForToolRun
 
 from langchain_community.tools.slack.base import SlackBaseTool
+
+class SlackGetChannelSchema(BaseModel):
+    """Placeholder input schema for SlackGetChannel.
+
+    This is intentionally minimal. Add fields later if the tool needs
+    structured input (for example: pagination cursors or filters).
+    """
+    pass
 
 
 class SlackGetChannel(SlackBaseTool):
@@ -14,6 +24,7 @@ class SlackGetChannel(SlackBaseTool):
     description: str = (
         "Use this tool to get channelid-name dict. There is no input to this tool"
     )
+    args_schema: Type[SlackGetChannelSchema] = SlackGetChannelSchema
 
     def _run(
         self, *args: Any, run_manager: Optional[CallbackManagerForToolRun] = None
