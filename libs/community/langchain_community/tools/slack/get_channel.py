@@ -11,8 +11,15 @@ from langchain_community.tools.slack.base import SlackBaseTool
 class SlackGetChannelSchema(BaseModel):
     """Placeholder input schema for SlackGetChannel.
 
-    This is intentionally minimal. Add fields later if the tool needs
-    structured input (for example: pagination cursors or filters).
+    This class is intentionally minimal and serves as a placeholder for the
+    tool's argument schema. It exists so the tool machinery can introspect
+    the expected argument type. Add fields here later if the tool requires
+    structured inputs such as pagination cursors or filters.
+
+    Note:
+        No arguments are currently defined for this schema. If/when fields
+        are added, document them in an ``Args`` section following Google
+        style docstrings.
     """
     pass
 
