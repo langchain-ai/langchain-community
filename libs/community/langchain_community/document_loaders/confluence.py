@@ -467,16 +467,27 @@ class ConfluenceLoader(BaseLoader):
         if next_url:
             response = self.confluence.get(next_url)
         else:
-            url = "rest/api/content/search"
+            # using "rest/api/search" api which respects includeArchivedSpaces, while "rest/api/content/search" does not
+            url = "rest/api/search"
 
             params: Dict[str, Any] = {"cql": cql}
             params.update(kwargs)
             if include_archived_spaces is not None:
                 params["includeArchivedSpaces"] = include_archived_spaces
 
+            # expand params need to be prefixed with ".content", since "rest/api/search" acts one level higher than "rest/api/content/search"
+            if "expand" in params and params["expand"]:
+                params["expand"] = ",".join(
+                    [f"content.{item.strip()}" for item in params["expand"].split(",")]
+                )
             response = self.confluence.get(url, params=params)
 
-        return response.get("results", []), response.get("_links", {}).get("next", "")
+        results = response.get("results", [])
+        pages = []
+        for item in results:
+            # return the content field of each result object
+            pages.append(item["content"])
+        return pages, response.get("_links", {}).get("next", "")
 
     def paginate_request(self, retrieval_method: Callable, **kwargs: Any) -> List:
         """Paginate the various methods to retrieve groups of pages.
