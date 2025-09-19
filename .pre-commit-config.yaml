@@ -1,0 +1,12 @@
+# Pre-commit configuration for langchain-community
+# See https://python.langchain.com/docs/contributing/how_to/code/setup/#pre-commit
+
+repos:
+  - repo: https://github.com/astral-sh/ruff-pre-commit
+    rev: v0.12.10
+    hooks:
+      - id: ruff
+        args: [--fix]
+        name: ruff-check
+      - id: ruff-format
+        name: ruff-format

@@ -1,4 +1,5 @@
 import json
+import os
 from typing import (
     Any,
     Callable,
@@ -27,6 +28,7 @@ from langchain_core.tools import BaseTool
 from langchain_core.utils import (
     convert_to_secret_str,
     get_from_dict_or_env,
+    get_from_env,
     get_pydantic_field_names,
 )
 from langchain_core.utils.function_calling import convert_to_openai_tool
@@ -130,6 +132,8 @@ class ChatSnowflakeCortex(BaseChatModel):
         cumulative probabilities. Value should be ranging between 0.0 and 1.0. 
     """
 
+    snowflake_config: Optional[Dict[str, Any]] = Field(default=None)
+    """Automatically inferred from env var `SNOWFLAKE_CONFIG` if not provided."""
     snowflake_username: Optional[str] = Field(default=None, alias="username")
     """Automatically inferred from env var `SNOWFLAKE_USERNAME` if not provided."""
     snowflake_password: Optional[SecretStr] = Field(default=None, alias="password")
@@ -185,38 +189,51 @@ class ChatSnowflakeCortex(BaseChatModel):
                 """
             )
 
-        values["snowflake_username"] = get_from_dict_or_env(
-            values, "snowflake_username", "SNOWFLAKE_USERNAME"
-        )
-        values["snowflake_password"] = convert_to_secret_str(
-            get_from_dict_or_env(values, "snowflake_password", "SNOWFLAKE_PASSWORD")
-        )
-        values["snowflake_account"] = get_from_dict_or_env(
-            values, "snowflake_account", "SNOWFLAKE_ACCOUNT"
-        )
-        values["snowflake_database"] = get_from_dict_or_env(
-            values, "snowflake_database", "SNOWFLAKE_DATABASE"
-        )
-        values["snowflake_schema"] = get_from_dict_or_env(
-            values, "snowflake_schema", "SNOWFLAKE_SCHEMA"
-        )
-        values["snowflake_warehouse"] = get_from_dict_or_env(
-            values, "snowflake_warehouse", "SNOWFLAKE_WAREHOUSE"
-        )
-        values["snowflake_role"] = get_from_dict_or_env(
-            values, "snowflake_role", "SNOWFLAKE_ROLE"
-        )
+        if os.getenv("SNOWFLAKE_CONFIG") is not None:
+            import json
 
-        connection_params = {
-            "account": values["snowflake_account"],
-            "user": values["snowflake_username"],
-            "password": values["snowflake_password"].get_secret_value(),
-            "database": values["snowflake_database"],
-            "schema": values["snowflake_schema"],
-            "warehouse": values["snowflake_warehouse"],
-            "role": values["snowflake_role"],
-            "client_session_keep_alive": "True",
-        }
+            connection_params = json.loads(
+                get_from_env("SNOWFLAKE_CONFIG", "SNOWFLAKE_CONFIG")
+            )
+            values["snowflake_config"] = connection_params
+        else:
+            values["snowflake_config"] = get_from_dict_or_env(
+                values, "snowflake_config", "SNOWFLAKE_CONFIG"
+            )
+
+        if values["snowflake_config"] is None:
+            values["snowflake_username"] = get_from_dict_or_env(
+                values, "snowflake_username", "SNOWFLAKE_USERNAME"
+            )
+            values["snowflake_password"] = convert_to_secret_str(
+                get_from_dict_or_env(values, "snowflake_password", "SNOWFLAKE_PASSWORD")
+            )
+            values["snowflake_account"] = get_from_dict_or_env(
+                values, "snowflake_account", "SNOWFLAKE_ACCOUNT"
+            )
+            values["snowflake_database"] = get_from_dict_or_env(
+                values, "snowflake_database", "SNOWFLAKE_DATABASE"
+            )
+            values["snowflake_schema"] = get_from_dict_or_env(
+                values, "snowflake_schema", "SNOWFLAKE_SCHEMA"
+            )
+            values["snowflake_warehouse"] = get_from_dict_or_env(
+                values, "snowflake_warehouse", "SNOWFLAKE_WAREHOUSE"
+            )
+            values["snowflake_role"] = get_from_dict_or_env(
+                values, "snowflake_role", "SNOWFLAKE_ROLE"
+            )
+
+            connection_params = {
+                "account": values["snowflake_account"],
+                "user": values["snowflake_username"],
+                "password": values["snowflake_password"].get_secret_value(),
+                "database": values["snowflake_database"],
+                "schema": values["snowflake_schema"],
+                "warehouse": values["snowflake_warehouse"],
+                "role": values["snowflake_role"],
+                "client_session_keep_alive": "True",
+            }
 
         try:
             values["session"] = Session.builder.configs(connection_params).create()
