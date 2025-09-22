@@ -31,8 +31,8 @@ def test_messages_to_prompt_dict_with_valid_messages() -> None:
     assert result == expected
 
 
-def test_create_chat_without_config_in_env() -> None:
-    os.environ["SNOWFLAKE_CONFIG"] = "None"
+def test_create_chat_with_invalid_config_in_env() -> None:
+    os.environ["SNOWFLAKE_CONFIG"] = "{invalid json"
     with pytest.raises(ChatSnowflakeCortexError):
         ChatSnowflakeCortex()
 

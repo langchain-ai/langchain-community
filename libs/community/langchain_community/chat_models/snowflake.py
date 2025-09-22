@@ -135,24 +135,10 @@ class ChatSnowflakeCortex(BaseChatModel):
     snowflake_config: Optional[Dict[str, Any]] = Field(default=None)
     """Snowflake connection configuration dictionary.
     
-    A dictionary containing Snowflake connection parameters that can be used
-    instead of providing individual connection fields. If not provided, will
-    attempt to load from the SNOWFLAKE_CONFIG environment variable as JSON.
-    
-    Expected structure:
-        {
-            "account": "your-account-identifier",
-            "user": "username", 
-            "password": "password",
-            "database": "database-name",
-            "schema": "schema-name", 
-            "warehouse": "warehouse-name",
-            "role": "role-name",
-            "client_session_keep_alive": "True"
-        }
-        
-    When snowflake_config is provided, individual snowflake_* fields will be
-    ignored in favor of this configuration dictionary.
+    Dictionary containing connection parameters (account, user, password, database,
+    schema, warehouse, role). If not provided, attempts to load from 
+    SNOWFLAKE_CONFIG environment variable as JSON. When provided, individual 
+    snowflake_* fields are ignored.
     """
     snowflake_username: Optional[str] = Field(default=None, alias="username")
     """Automatically inferred from env var `SNOWFLAKE_USERNAME` if not provided."""
