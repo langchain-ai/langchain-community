@@ -132,8 +132,11 @@ class ChatSnowflakeCortex(BaseChatModel):
         cumulative probabilities. Value should be ranging between 0.0 and 1.0. 
     """
 
-    snowflake_config: Optional[Dict[str, Any]] = Field(default=None)
-    """Dictionary with Snowflake connection parameters, overrides individual snowflake_* fields."""
+    snowflake_config: Optional[Dict[str, Any]] = Field(
+        default=None,
+        description="Dictionary with Snowflake connection parameters, "
+        "overrides individual snowflake_* fields.",
+    )
     snowflake_username: Optional[str] = Field(default=None, alias="username")
     """Automatically inferred from env var `SNOWFLAKE_USERNAME` if not provided."""
     snowflake_password: Optional[SecretStr] = Field(default=None, alias="password")
