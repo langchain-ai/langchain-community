@@ -133,7 +133,27 @@ class ChatSnowflakeCortex(BaseChatModel):
     """
 
     snowflake_config: Optional[Dict[str, Any]] = Field(default=None)
-    """Automatically inferred from env var `SNOWFLAKE_CONFIG` if not provided."""
+    """Snowflake connection configuration dictionary.
+    
+    A dictionary containing Snowflake connection parameters that can be used
+    instead of providing individual connection fields. If not provided, will
+    attempt to load from the SNOWFLAKE_CONFIG environment variable as JSON.
+    
+    Expected structure:
+        {
+            "account": "your-account-identifier",
+            "user": "username", 
+            "password": "password",
+            "database": "database-name",
+            "schema": "schema-name", 
+            "warehouse": "warehouse-name",
+            "role": "role-name",
+            "client_session_keep_alive": "True"
+        }
+        
+    When snowflake_config is provided, individual snowflake_* fields will be
+    ignored in favor of this configuration dictionary.
+    """
     snowflake_username: Optional[str] = Field(default=None, alias="username")
     """Automatically inferred from env var `SNOWFLAKE_USERNAME` if not provided."""
     snowflake_password: Optional[SecretStr] = Field(default=None, alias="password")
@@ -190,12 +210,27 @@ class ChatSnowflakeCortex(BaseChatModel):
             )
 
         if os.getenv("SNOWFLAKE_CONFIG") is not None:
-            import json
+            try:
+                config_string = get_from_env("SNOWFLAKE_CONFIG", "SNOWFLAKE_CONFIG")
+                if not config_string or not config_string.strip():
+                    raise ChatSnowflakeCortexError(
+                        "SNOWFLAKE_CONFIG environment variable not properly configured"
+                    )
 
-            connection_params = json.loads(
-                get_from_env("SNOWFLAKE_CONFIG", "SNOWFLAKE_CONFIG")
-            )
-            values["snowflake_config"] = connection_params
+                connection_params = json.loads(config_string)
+                values["snowflake_config"] = connection_params
+
+            except json.JSONDecodeError as e:
+                raise ChatSnowflakeCortexError(
+                    f"SNOWFLAKE_CONFIG contains invalid JSON: {str(e)}"
+                )
+            except ChatSnowflakeCortexError:
+                # Re-raise our custom errors as-is
+                raise
+            except Exception as e:
+                raise ChatSnowflakeCortexError(
+                    f"Failed to parse SNOWFLAKE_CONFIG: {str(e)}"
+                )
         else:
             values["snowflake_config"] = get_from_dict_or_env(
                 values, "snowflake_config", "SNOWFLAKE_CONFIG"
@@ -234,9 +269,12 @@ class ChatSnowflakeCortex(BaseChatModel):
                 "role": values["snowflake_role"],
                 "client_session_keep_alive": "True",
             }
+            values["snowflake_config"] = connection_params
 
         try:
-            values["session"] = Session.builder.configs(connection_params).create()
+            values["session"] = Session.builder.configs(
+                values["snowflake_config"]
+            ).create()
         except Exception as e:
             raise ChatSnowflakeCortexError(f"Failed to create session: {e}")
 

@@ -34,8 +34,6 @@ SNOWFLAKE_CONFIG='{
 '
 """
 
-import os
-
 import pytest
 from langchain_core.messages import BaseMessage, HumanMessage, SystemMessage
 from langchain_core.outputs import ChatGeneration, LLMResult
@@ -46,20 +44,6 @@ from langchain_community.chat_models import ChatSnowflakeCortex
 @pytest.fixture
 def chat() -> ChatSnowflakeCortex:
     return ChatSnowflakeCortex()
-
-
-@pytest.fixture
-def chat_with_config() -> ChatSnowflakeCortex:
-    snowflake_config = {
-        "user": os.getenv("SNOWFLAKE_USER"),
-        "authenticator": "externalbrowser",
-        "account": os.getenv("SNOWFLAKE_ACCOUNT"),
-        "role": os.getenv("SNOWFLAKE_ROLE"),
-        "warehouse": os.getenv("SNOWFLAKE_WAREHOUSE"),
-        "database": os.getenv("SNOWFLAKE_DATABASE"),
-        "schema": os.getenv("SNOWFLAKE_SCHEMA"),
-    }
-    return ChatSnowflakeCortex(snowflake_config=snowflake_config)
 
 
 def test_chat_snowflake_cortex(chat: ChatSnowflakeCortex) -> None:

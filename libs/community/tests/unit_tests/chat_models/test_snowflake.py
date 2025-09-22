@@ -1,8 +1,15 @@
 """Test ChatSnowflakeCortex."""
 
+import os
+
+import pytest
 from langchain_core.messages import AIMessage, HumanMessage, SystemMessage
 
-from langchain_community.chat_models.snowflake import _convert_message_to_dict
+from langchain_community.chat_models.snowflake import (
+    ChatSnowflakeCortex,
+    ChatSnowflakeCortexError,
+    _convert_message_to_dict,
+)
 
 
 def test_messages_to_prompt_dict_with_valid_messages() -> None:
@@ -22,3 +29,18 @@ def test_messages_to_prompt_dict_with_valid_messages() -> None:
         {"role": "assistant", "content": "AI message #2"},
     ]
     assert result == expected
+
+
+def test_create_chat_without_config_in_env() -> None:
+    os.environ["SNOWFLAKE_CONFIG"] = "None"
+    with pytest.raises(ChatSnowflakeCortexError):
+        ChatSnowflakeCortex()
+
+
+def test_create_chat_with_config_in_args() -> None:
+    os.environ.pop("SNOWFLAKE_CONFIG", None)
+    with pytest.raises(
+        ChatSnowflakeCortexError,
+        match="Failed to create session: 251005: User is empty",
+    ):
+        ChatSnowflakeCortex(snowflake_config={"account": "test"})
