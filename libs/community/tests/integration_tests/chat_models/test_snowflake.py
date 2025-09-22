@@ -21,7 +21,7 @@ that is supported by snowflake. For example:
         "schema": os.getenv("SNOWFLAKE_SCHEMA"),
     }
 
-OR crate a environment variable SNOWFLAKE_CONFIG with the following format:
+OR create a environment variable SNOWFLAKE_CONFIG with the following format:
 
 SNOWFLAKE_CONFIG='{
     "user": "YOUR_SNOWFLAKE_USER",
