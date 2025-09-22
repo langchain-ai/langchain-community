@@ -32,9 +32,14 @@ def test_messages_to_prompt_dict_with_valid_messages() -> None:
 
 
 def test_create_chat_with_invalid_config_in_env() -> None:
+
     os.environ["SNOWFLAKE_CONFIG"] = "{invalid json"
-    with pytest.raises(ChatSnowflakeCortexError):
-        ChatSnowflakeCortex()
+    try:
+        with pytest.raises(ChatSnowflakeCortexError):
+            ChatSnowflakeCortex()
+    finally:
+        os.environ.pop("SNOWFLAKE_CONFIG", None)
+
 
 
 def test_create_chat_with_config_in_args() -> None:
