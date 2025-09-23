@@ -30,8 +30,7 @@ SNOWFLAKE_CONFIG='{
     "role": "YOUR_SNOWFLAKE_ROLE",
     "warehouse": "YOUR_SNOWFLAKE_WAREHOUSE",
     "database": "YOUR_SNOWFLAKE_DATABASE",
-    "schema": "YOUR_SNOWFLAKE_SCHEMA"}'
-'
+    "schema": "YOUR_SNOWFLAKE_SCHEMA"}
 """
 
 import pytest
