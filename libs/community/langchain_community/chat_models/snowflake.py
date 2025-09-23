@@ -137,24 +137,14 @@ class ChatSnowflakeCortex(BaseChatModel):
         description="Dictionary with Snowflake connection parameters, "
         "overrides individual snowflake_* fields.",
     )
-    """Snowflake connection configuration dictionary.
-
-    Args:
-        snowflake_config: Optional dictionary containing Snowflake connection parameters.
-            When provided, overrides individual snowflake_* fields for session creation.
-            Can be loaded from SNOWFLAKE_CONFIG environment variable as JSON string.
-            
-            Required keys:
-                - account (str): Snowflake account identifier
-                - user (str): Username for authentication  
-                - password (str): Password for authentication
-                - database (str): Database name
-                - schema (str): Schema name
-                - warehouse (str): Warehouse name for compute
-                - role (str): Role to assume after connection
-                - client_session_keep_alive (str): Keep session alive ("True")
-                
-            If None, falls back to individual snowflake_* fields and environment variables.
+    """Optional dictionary containing Snowflake connection parameters.
+    When provided, overrides individual snowflake_* fields for session creation.
+    Can be loaded from SNOWFLAKE_CONFIG environment variable as JSON string.
+    
+    Required keys include: account, user, password, database, schema, warehouse,
+    role, and client_session_keep_alive.
+    
+    If None, falls back to individual snowflake_* fields and environment variables.
     """
     snowflake_username: Optional[str] = Field(default=None, alias="username")
     """Automatically inferred from env var `SNOWFLAKE_USERNAME` if not provided."""
