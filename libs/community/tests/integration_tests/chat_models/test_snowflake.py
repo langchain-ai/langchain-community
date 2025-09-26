@@ -61,7 +61,7 @@ def test_chat_snowflake_cortex_generate(chat: ChatSnowflakeCortex) -> None:
 
 def test_chat_snowflake_cortex_message_with_special_characters(
     chat: ChatSnowflakeCortex,
-) -> None:```
+) -> None:
     """Test ChatSnowflakeCortex with messages containing special characters.
 
     Args:
