@@ -431,7 +431,10 @@ class PyPDFParser(BaseBlobParser):
         import pypdf
         from PIL import Image
 
-        if "/Resources" not in page or "/XObject" not in cast(dict, page["/Resources"]).keys():
+        if (
+            "/Resources" not in page
+            or "/XObject" not in cast(dict, page["/Resources"]).keys()
+        ):
             return ""
 
         xObject = page["/Resources"]["/XObject"].get_object()
@@ -442,7 +445,8 @@ class PyPDFParser(BaseBlobParser):
                 if xObject[obj]["/Subtype"] == "/Image":
                     img_filter = (
                         xObject[obj]["/Filter"][1:]
-                        if type(xObject[obj]["/Filter"]) is pypdf.generic._base.NameObject
+                        if type(xObject[obj]["/Filter"])
+                        is pypdf.generic._base.NameObject
                         else xObject[obj]["/Filter"][0][1:]
                     )
                     if img_filter in _PDF_FILTER_WITHOUT_LOSS:
@@ -452,21 +456,29 @@ class PyPDFParser(BaseBlobParser):
                             xObject[obj].get_data(), dtype=np.uint8
                         ).reshape(height, width, -1)
                     elif img_filter in _PDF_FILTER_WITH_LOSS:
-                        np_image = np.array(Image.open(io.BytesIO(xObject[obj].get_data())))
+                        np_image = np.array(
+                            Image.open(io.BytesIO(xObject[obj].get_data()))
+                        )
 
                     else:
                         logger.warning("Unknown PDF Filter!")
                     if np_image is not None:
                         image_bytes = io.BytesIO()
                         Image.fromarray(np_image).save(image_bytes, format="PNG")
-                        
+
                         if image_bytes.getbuffer().nbytes == 0:
                             continue
 
-                        blob = Blob.from_data(image_bytes.getvalue(), mime_type="image/png")
-                        image_text = next(self.images_parser.lazy_parse(blob)).page_content
+                        blob = Blob.from_data(
+                            image_bytes.getvalue(), mime_type="image/png"
+                        )
+                        image_text = next(
+                            self.images_parser.lazy_parse(blob)
+                        ).page_content
                         images.append(
-                            _format_inner_image(blob, image_text, self.images_inner_format)
+                            _format_inner_image(
+                                blob, image_text, self.images_inner_format
+                            )
                         )
             except Exception as e:
                 logger.warning(f"Failed to extract image from PDF: {e}")
