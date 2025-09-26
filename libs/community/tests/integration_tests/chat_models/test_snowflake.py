@@ -59,7 +59,6 @@ def test_chat_snowflake_cortex_generate(chat: ChatSnowflakeCortex) -> None:
             assert generation.text == generation.message.content
 
 
-
 def test_chat_snowflake_cortex_message_with_special_characters(
     chat: ChatSnowflakeCortex,
 ) -> None:```
