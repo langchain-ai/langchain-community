@@ -84,8 +84,14 @@ def test_filter_sitemap() -> None:
     assert "LangChain Python API" in documents[0].page_content
 
 
+
 def test_exclude_sitemap() -> None:
-    """Test sitemap loader with exclude_urls parameter."""
+    """Test sitemap loader with exclude_urls parameter.
+
+    This test verifies that the exclude_urls parameter properly filters out
+    specified URLs from the sitemap loading process.
+    """
+
     # First load without exclusion to get total count
     loader_all = SitemapLoader("https://api.python.langchain.com/sitemap.xml")
     documents_all = loader_all.load()
