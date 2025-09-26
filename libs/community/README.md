@@ -28,3 +28,11 @@ All changes will be accompanied by a patch version increase.
 As an open-source project in a rapidly developing field, we are extremely open to contributions, whether it be in the form of a new feature, improved infrastructure, or better documentation.
 
 For detailed information on how to contribute, see the [Contributing Guide](https://python.langchain.com/docs/contributing/).
+
+> [!NOTE]
+> Contributing a new integration? LangChain has published a
+[guide](https://python.langchain.com/docs/contributing/how_to/integrations/) on
+implementing new `langchain-*` [integration packages](https://python.langchain.com/docs/concepts/architecture/#integration-packages)
+and is recommending this in most cases to help decouple versioning and support
+varied testing infrastructures. See [docs](https://python.langchain.com/docs/contributing/how_to/integrations/)
+for details.

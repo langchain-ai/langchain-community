@@ -310,7 +310,7 @@ class ChatLlamaCpp(BaseChatModel):
             messages=message_dicts, stream=True, **params
         )
 
-        default_chunk_class = AIMessageChunk
+        default_chunk_class: Type[BaseMessageChunk] = AIMessageChunk
         count = 0
         for chunk in result:
             count += 1

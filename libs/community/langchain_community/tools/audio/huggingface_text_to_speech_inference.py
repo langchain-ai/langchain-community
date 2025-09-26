@@ -65,6 +65,11 @@ class HuggingFaceTextToSpeechModelInference(BaseTool):
                 f"'{_HUGGINGFACE_API_KEY_ENV_NAME}' must be or set or passed"
             )
 
+        # Sanitize file extension to prevent path traversal attacks
+        file_extension = os.path.basename(file_extension).lstrip(".")
+        if not file_extension or "/" in file_extension or "\\" in file_extension:
+            raise ValueError("Invalid file extension")
+
         if file_naming_func == "uuid":
             file_namer = lambda: str(uuid.uuid4())  # noqa: E731
         elif file_naming_func == "timestamp":

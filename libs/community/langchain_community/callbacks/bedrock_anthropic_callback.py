@@ -12,8 +12,10 @@ MODEL_COST_PER_1K_INPUT_TOKENS = {
     "anthropic.claude-3-5-sonnet-20240620-v1:0": 0.003,
     "anthropic.claude-3-5-sonnet-20241022-v2:0": 0.003,
     "anthropic.claude-3-7-sonnet-20250219-v1:0": 0.003,
+    "anthropic.claude-sonnet-4-20250514-v1:0": 0.003,
     "anthropic.claude-3-haiku-20240307-v1:0": 0.00025,
     "anthropic.claude-3-opus-20240229-v1:0": 0.015,
+    "anthropic.claude-opus-4-20250514-v1:0": 0.015,
     "anthropic.claude-3-5-haiku-20241022-v1:0": 0.0008,
 }
 
@@ -25,8 +27,10 @@ MODEL_COST_PER_1K_OUTPUT_TOKENS = {
     "anthropic.claude-3-5-sonnet-20240620-v1:0": 0.015,
     "anthropic.claude-3-5-sonnet-20241022-v2:0": 0.015,
     "anthropic.claude-3-7-sonnet-20250219-v1:0": 0.015,
+    "anthropic.claude-sonnet-4-20250514-v1:0": 0.015,
     "anthropic.claude-3-haiku-20240307-v1:0": 0.00125,
     "anthropic.claude-3-opus-20240229-v1:0": 0.075,
+    "anthropic.claude-opus-4-20250514-v1:0": 0.075,
     "anthropic.claude-3-5-haiku-20241022-v1:0": 0.004,
 }
 
