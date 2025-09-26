@@ -73,4 +73,3 @@ def test_chat_snowflake_cortex_message_with_special_characters(
     response = chat([system_message, human_message])
     assert isinstance(response, BaseMessage)
     assert isinstance(response.content, str)
-
