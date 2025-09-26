@@ -23,6 +23,31 @@ from sqlalchemy.sql.expression import Executable
 from sqlalchemy.types import NullType
 
 
+# Workaround for DuckDB type hashability issue with SQLAlchemy
+# See: https://github.com/duckdb/duckdb-python/issues/78
+def _patch_duckdb_types() -> None:
+    """Patch DuckDBPyType to be hashable for SQLAlchemy compatibility."""
+    try:
+        import duckdb
+
+        # Check if DuckDBPyType exists and doesn't already have __hash__
+        if hasattr(duckdb, "typing") and hasattr(duckdb.typing, "DuckDBPyType"):
+            duckdb_type = duckdb.typing.DuckDBPyType
+            if not hasattr(duckdb_type, "__hash__") or duckdb_type.__hash__ is None:
+                # Add a hash method based on the string representation
+                def __hash__(self) -> int:  # type: ignore[no-untyped-def]
+                    return hash(str(self))
+
+                duckdb_type.__hash__ = __hash__
+    except ImportError:
+        # DuckDB not available, nothing to patch
+        pass
+
+
+# Apply the patch when this module is imported
+_patch_duckdb_types()
+
+
 def _format_index(index: sqlalchemy.engine.interfaces.ReflectedIndex) -> str:
     return (
         f"Name: {index['name']}, Unique: {index['unique']},"
