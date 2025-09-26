@@ -41,7 +41,6 @@ def test_create_chat_with_invalid_config_in_env() -> None:
         os.environ.pop("SNOWFLAKE_CONFIG", None)
 
 
-
 def test_create_chat_with_config_in_args() -> None:
     os.environ.pop("SNOWFLAKE_CONFIG", None)
     with pytest.raises(
