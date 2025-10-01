@@ -1,4 +1,4 @@
-from typing import Dict, List
+from typing import AsyncIterator, Dict, List
 from unittest.mock import AsyncMock, MagicMock, patch
 
 import pytest
@@ -68,5 +68,44 @@ async def test_load_mocked_with_filters(expected_documents: List[Document]) -> N
         )
         loader.collection = mock_collection
         documents = await loader.aload()
+
+    assert documents == expected_documents
+
+
+@pytest.mark.requires("motor")
+def test_lazy_load_mocked_with_filters(expected_documents: List[Document]) -> None:
+    filter_criteria = {"address.room": {"$eq": "2"}}
+    field_names = ["address.building", "address.room"]
+    metadata_names = ["_id"]
+    include_db_collection_in_metadata = True
+
+    async def mock_async_generator() -> AsyncIterator[Document]:
+        for doc in expected_documents:
+            yield doc
+
+    mock_find = AsyncMock()
+    mock_find.return_value = mock_async_generator()
+
+    mock_collection = MagicMock()
+    mock_collection.find = mock_find
+
+    with (
+        patch("motor.motor_asyncio.AsyncIOMotorClient", return_value=MagicMock()),
+        patch(
+            "langchain_community.document_loaders.mongodb.MongodbLoader.alazy_load",
+            return_value=mock_async_generator(),
+        ),
+    ):
+        loader = MongodbLoader(
+            "mongodb://localhost:27017",
+            "test_db",
+            "test_collection",
+            filter_criteria=filter_criteria,
+            field_names=field_names,
+            metadata_names=metadata_names,
+            include_db_collection_in_metadata=include_db_collection_in_metadata,
+        )
+        loader.collection = mock_collection
+        documents = list(loader.lazy_load())
 
     assert documents == expected_documents
