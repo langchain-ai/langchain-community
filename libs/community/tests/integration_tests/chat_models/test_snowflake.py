@@ -40,11 +40,13 @@ from langchain_core.outputs import ChatGeneration, LLMResult
 from langchain_community.chat_models import ChatSnowflakeCortex
 
 
+@pytest.mark.requires("snowflake.snowpark")
 @pytest.fixture
 def chat() -> ChatSnowflakeCortex:
     return ChatSnowflakeCortex()
 
 
+@pytest.mark.requires("snowflake.snowpark")
 def test_chat_snowflake_cortex(chat: ChatSnowflakeCortex) -> None:
     """Test ChatSnowflakeCortex."""
     message = HumanMessage(content="Hello")
@@ -53,6 +55,7 @@ def test_chat_snowflake_cortex(chat: ChatSnowflakeCortex) -> None:
     assert isinstance(response.content, str)
 
 
+@pytest.mark.requires("snowflake.snowpark")
 def test_chat_snowflake_cortex_system_message(chat: ChatSnowflakeCortex) -> None:
     """Test ChatSnowflakeCortex for system message"""
     system_message = SystemMessage(content="You are to chat with the user.")
@@ -62,6 +65,7 @@ def test_chat_snowflake_cortex_system_message(chat: ChatSnowflakeCortex) -> None
     assert isinstance(response.content, str)
 
 
+@pytest.mark.requires("snowflake.snowpark")
 def test_chat_snowflake_cortex_model() -> None:
     """Test ChatSnowflakeCortex handles model_name."""
     chat = ChatSnowflakeCortex(
@@ -70,6 +74,7 @@ def test_chat_snowflake_cortex_model() -> None:
     assert chat.model == "foo"
 
 
+@pytest.mark.requires("snowflake.snowpark")
 def test_chat_snowflake_cortex_generate(chat: ChatSnowflakeCortex) -> None:
     """Test ChatSnowflakeCortex with generate."""
     message = HumanMessage(content="Hello")
@@ -83,6 +88,7 @@ def test_chat_snowflake_cortex_generate(chat: ChatSnowflakeCortex) -> None:
             assert generation.text == generation.message.content
 
 
+@pytest.mark.requires("snowflake.snowpark")
 def test_chat_snowflake_cortex_message_with_special_characters(
     chat: ChatSnowflakeCortex,
 ) -> None:
