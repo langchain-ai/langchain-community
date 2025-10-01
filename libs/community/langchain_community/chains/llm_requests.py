@@ -86,7 +86,7 @@ class LLMRequestsChain(Chain):
         url = inputs[self.input_key]
         res = self.requests_wrapper.get(url)
         # extract the text from the html
-        soup = BeautifulSoup(res, "html.parser")
+        soup = BeautifulSoup(res, "html.parser")  # type: ignore[arg-type]
         other_keys[self.requests_key] = soup.get_text()[: self.text_length]
         result = self.llm_chain.predict(
             callbacks=_run_manager.get_child(), **other_keys
