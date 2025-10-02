@@ -622,7 +622,7 @@ class Clickhouse(VectorStore):
         """Perform a similarity search with ClickHouse by vectors
 
         Args:
-            embedding (List[float]): Embedding vector
+            query (List[float]): Embedding vector
             k (int, optional): Top K neighbors to retrieve. Defaults to 4.
             where_str (Optional[str], optional): where condition string.
                                                  Defaults to None.
