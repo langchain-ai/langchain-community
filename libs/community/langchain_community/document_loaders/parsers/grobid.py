@@ -55,9 +55,9 @@ class GrobidParser(BaseBlobParser):
             title = "No title found"
         chunks = []
         for section in sections:
-            sect = section.find("head")
+            sect = section.find("head")  # type: ignore[union-attr]
             if sect is not None:
-                for i, paragraph in enumerate(section.find_all("p")):
+                for i, paragraph in enumerate(section.find_all("p")):  # type: ignore[union-attr]
                     chunk_bboxes = []
                     paragraph_text = []
                     for i, sentence in enumerate(paragraph.find_all("s")):
@@ -82,8 +82,8 @@ class GrobidParser(BaseBlobParser):
                                 "text": sentence.text,
                                 "para": str(i),
                                 "bboxes": [sbboxes],
-                                "section_title": sect.text,
-                                "section_number": sect.get("n"),
+                                "section_title": sect.text,  # type: ignore[union-attr]
+                                "section_number": sect.get("n"),  # type: ignore[union-attr]
                                 "pages": (fpage, lpage),
                             }
                             chunks.append(sentence_dict)
@@ -96,8 +96,8 @@ class GrobidParser(BaseBlobParser):
                             "text": "".join(paragraph_text),
                             "para": str(i),
                             "bboxes": chunk_bboxes,
-                            "section_title": sect.text,
-                            "section_number": sect.get("n"),
+                            "section_title": sect.text,  # type: ignore[union-attr]
+                            "section_number": sect.get("n"),  # type: ignore[union-attr]
                             "pages": (fpage, lpage),
                         }
                         chunks.append(paragraph_dict)

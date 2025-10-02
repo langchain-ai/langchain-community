@@ -5,6 +5,8 @@ This repository contains 1 package with community-maintained LangChain integrati
 - [langchain-community](https://pypi.org/project/langchain-community/)
 
 > [!NOTE]
+> [Looking for the JS/TS version?](https://github.com/langchain-ai/langchainjs/tree/main/libs/langchain-community)
+>
 > Contributing a new integration? LangChain has published a
 [guide](https://python.langchain.com/docs/contributing/how_to/integrations/) on
 implementing new `langchain-*` [integration packages](https://python.langchain.com/docs/concepts/architecture/#integration-packages)
