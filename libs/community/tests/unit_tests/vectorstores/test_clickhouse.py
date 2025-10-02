@@ -39,7 +39,19 @@ class DummyClickhouse(Clickhouse):
         return "SELECT * FROM dummy_table"
 
 
+
 def test_similarity_search_by_vector_returns_distance():
+    """Test that similarity_search_by_vector returns documents with distance metadata.
+    
+    This test verifies that when using similarity_search_by_vector:
+    1. The returned results are a list of Document objects
+    2. The correct number of results is returned
+    3. Each Document contains the expected metadata
+    4. Each Document includes a distance value in its metadata
+    
+    Args:
+        None
+    """
     ch = DummyClickhouse()
     results = ch.similarity_search_by_vector([0.1, 0.2, 0.3], k=2)
 
@@ -50,6 +62,7 @@ def test_similarity_search_by_vector_returns_distance():
     assert "distance" in results[0].metadata
     assert isinstance(results[0].metadata["distance"], float)
     print("✅ Test passed: Metadata and distance are returned correctly.")
+
 
 
 if __name__ == "__main__":
