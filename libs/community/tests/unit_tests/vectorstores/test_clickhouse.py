@@ -40,6 +40,7 @@ class DummyClickhouse(Clickhouse):
 
 
 
+
 def test_similarity_search_by_vector_returns_distance():
     """Test that similarity_search_by_vector returns documents with distance metadata.
     
@@ -48,10 +49,8 @@ def test_similarity_search_by_vector_returns_distance():
     2. The correct number of results is returned
     3. Each Document contains the expected metadata
     4. Each Document includes a distance value in its metadata
-    
-    Args:
-        None
     """
+
     ch = DummyClickhouse()
     results = ch.similarity_search_by_vector([0.1, 0.2, 0.3], k=2)
 
