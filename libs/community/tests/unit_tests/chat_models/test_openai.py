@@ -107,7 +107,7 @@ def test_openai_predict(mock_completion: dict) -> None:
         mock_client,
     ):
         res = llm.invoke("bar")
-        assert res.text == "Bar Baz"
+        assert res.content == "Bar Baz"
     assert completed
 
 
@@ -129,5 +129,5 @@ async def test_openai_apredict(mock_completion: dict) -> None:
         mock_client,
     ):
         res = await llm.ainvoke("bar")
-        assert res.text == "Bar Baz"
+        assert res.content == "Bar Baz"
     assert completed
