@@ -1537,7 +1537,6 @@ test = [
     { name = "toml" },
 ]
 test-integration = [
-    { name = "pytest-vcr" },
     { name = "vcrpy" },
 ]
 typing = [
@@ -1604,10 +1603,7 @@ test = [
     { name = "syrupy", specifier = ">=4.0.2,<5.0.0" },
     { name = "toml", specifier = ">=0.10.2,<1.0.0" },
 ]
-test-integration = [
-    { name = "pytest-vcr", specifier = ">=1.0.2,<2.0.0" },
-    { name = "vcrpy", specifier = ">=6.0.0" },
-]
+test-integration = [{ name = "vcrpy", specifier = ">=6.0.0" }]
 typing = [
     { name = "langchain" },
     { name = "langchain-core" },
@@ -2864,19 +2860,6 @@ dependencies = [
 sdist = { url = "https://files.pythonhosted.org/packages/05/ff/90c7e1e746baf3d62ce864c479fd53410b534818b9437413903596f81580/pytest_socket-0.7.0.tar.gz", hash = "sha256:71ab048cbbcb085c15a4423b73b619a8b35d6a307f46f78ea46be51b1b7e11b3", size = 12389, upload-time = "2024-01-28T20:17:23.177Z" }
 wheels = [
     { url = "https://files.pythonhosted.org/packages/19/58/5d14cb5cb59409e491ebe816c47bf81423cd03098ea92281336320ae5681/pytest_socket-0.7.0-py3-none-any.whl", hash = "sha256:7e0f4642177d55d317bbd58fc68c6bd9048d6eadb2d46a89307fa9221336ce45", size = 6754, upload-time = "2024-01-28T20:17:22.105Z" },
-]
-
-[[package]]
-name = "pytest-vcr"
-version = "1.0.2"
-source = { registry = "https://pypi.org/simple" }
-dependencies = [
-    { name = "pytest" },
-    { name = "vcrpy" },
-]
-sdist = { url = "https://files.pythonhosted.org/packages/1a/60/104c619483c1a42775d3f8b27293f1ecfc0728014874d065e68cb9702d49/pytest-vcr-1.0.2.tar.gz", hash = "sha256:23ee51b75abbcc43d926272773aae4f39f93aceb75ed56852d0bf618f92e1896", size = 3810, upload-time = "2019-04-26T19:04:00.806Z" }
-wheels = [
-    { url = "https://files.pythonhosted.org/packages/9d/d3/ff520d11e6ee400602711d1ece8168dcfc5b6d8146fb7db4244a6ad6a9c3/pytest_vcr-1.0.2-py2.py3-none-any.whl", hash = "sha256:2f316e0539399bea0296e8b8401145c62b6f85e9066af7e57b6151481b0d6d9c", size = 4137, upload-time = "2019-04-26T19:03:57.034Z" },
 ]
 
 [[package]]

@@ -54,7 +54,7 @@ test = [
     "langchain-tests>=1.0.0a2,<2.0.0",
     "toml>=0.10.2,<1.0.0",
 ]
-test_integration = ["pytest-vcr>=1.0.2,<2.0.0", "vcrpy>=6.0.0"]
+test_integration = ["vcrpy>=6.0.0"]
 lint = [
     "ruff>=0.13.1,<1.0.0",
     "cffi<1.17.1; python_version < \"3.10\"",
