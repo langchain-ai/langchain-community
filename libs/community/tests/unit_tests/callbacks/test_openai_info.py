@@ -1,3 +1,4 @@
+import math
 from unittest.mock import MagicMock
 from uuid import uuid4
 
@@ -166,7 +167,7 @@ def test_on_llm_end_azure_openai(
         },
     )
     handler.on_llm_end(response)
-    assert handler.total_cost == expected_cost
+    assert math.isclose(handler.total_cost, expected_cost)
 
 
 @pytest.mark.parametrize(
