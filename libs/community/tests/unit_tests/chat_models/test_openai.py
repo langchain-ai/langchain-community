@@ -128,6 +128,6 @@ async def test_openai_apredict(mock_completion: dict) -> None:
         "async_client",
         mock_client,
     ):
-        res = await llm.apredict("bar")
+        res = await llm.ainvoke("bar")
         assert res == "Bar Baz"
     assert completed
