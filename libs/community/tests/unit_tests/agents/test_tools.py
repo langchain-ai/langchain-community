@@ -5,13 +5,13 @@ from typing import Any, Type
 from unittest.mock import MagicMock, Mock
 
 import pytest
-from langchain.agents.agent import Agent
-from langchain.agents.chat.base import ChatAgent
-from langchain.agents.conversational.base import ConversationalAgent
-from langchain.agents.conversational_chat.base import ConversationalChatAgent
-from langchain.agents.mrkl.base import ZeroShotAgent
-from langchain.agents.react.base import ReActDocstoreAgent, ReActTextWorldAgent
-from langchain.agents.self_ask_with_search.base import SelfAskWithSearchAgent
+from langchain_classic.agents.agent import Agent
+from langchain_classic.agents.chat.base import ChatAgent
+from langchain_classic.agents.conversational.base import ConversationalAgent
+from langchain_classic.agents.conversational_chat.base import ConversationalChatAgent
+from langchain_classic.agents.mrkl.base import ZeroShotAgent
+from langchain_classic.agents.react.base import ReActDocstoreAgent, ReActTextWorldAgent
+from langchain_classic.agents.self_ask_with_search.base import SelfAskWithSearchAgent
 from langchain_core.tools import Tool, ToolException, tool
 
 from langchain_community.agent_toolkits.load_tools import load_tools

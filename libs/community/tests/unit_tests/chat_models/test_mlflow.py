@@ -3,7 +3,7 @@ from typing import Any, Dict, List
 from unittest.mock import MagicMock
 
 import pytest
-from langchain.agents import AgentExecutor, create_tool_calling_agent
+from langchain_classic.agents import AgentExecutor, create_tool_calling_agent
 from langchain_core.messages import (
     AIMessage,
     AIMessageChunk,

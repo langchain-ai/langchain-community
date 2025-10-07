@@ -4,8 +4,8 @@ from __future__ import annotations
 
 from typing import Any, Dict, List, Optional
 
-from langchain.chains import LLMChain
-from langchain.chains.base import Chain
+from langchain_classic.chains import LLMChain
+from langchain_classic.chains.base import Chain
 from langchain_core.callbacks import CallbackManagerForChainRun
 from pydantic import ConfigDict, Field, model_validator
 

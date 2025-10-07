@@ -33,7 +33,7 @@ questions = [
 
 
 def test_tracing_sequential() -> None:
-    from langchain.agents import AgentType, initialize_agent, load_tools
+    from langchain_classic.agents import AgentType, initialize_agent, load_tools
 
     os.environ["LANGCHAIN_TRACING"] = "true"
 
@@ -47,7 +47,7 @@ def test_tracing_sequential() -> None:
 
 
 def test_tracing_session_env_var() -> None:
-    from langchain.agents import AgentType, initialize_agent, load_tools
+    from langchain_classic.agents import AgentType, initialize_agent, load_tools
 
     os.environ["LANGCHAIN_TRACING"] = "true"
     os.environ["LANGCHAIN_SESSION"] = "my_session"
@@ -63,7 +63,7 @@ def test_tracing_session_env_var() -> None:
 
 
 async def test_tracing_concurrent() -> None:
-    from langchain.agents import AgentType, initialize_agent, load_tools
+    from langchain_classic.agents import AgentType, initialize_agent, load_tools
 
     os.environ["LANGCHAIN_TRACING"] = "true"
     aiosession = ClientSession()
@@ -78,7 +78,7 @@ async def test_tracing_concurrent() -> None:
 
 
 async def test_tracing_concurrent_bw_compat_environ() -> None:
-    from langchain.agents import AgentType, initialize_agent, load_tools
+    from langchain_classic.agents import AgentType, initialize_agent, load_tools
 
     os.environ["LANGCHAIN_HANDLER"] = "langchain"
     if "LANGCHAIN_TRACING" in os.environ:
@@ -97,7 +97,7 @@ async def test_tracing_concurrent_bw_compat_environ() -> None:
 
 
 async def test_tracing_v2_environment_variable() -> None:
-    from langchain.agents import AgentType, initialize_agent, load_tools
+    from langchain_classic.agents import AgentType, initialize_agent, load_tools
 
     os.environ["LANGCHAIN_TRACING_V2"] = "true"
 
@@ -113,7 +113,7 @@ async def test_tracing_v2_environment_variable() -> None:
 
 
 def test_tracing_v2_context_manager() -> None:
-    from langchain.agents import AgentType, initialize_agent, load_tools
+    from langchain_classic.agents import AgentType, initialize_agent, load_tools
 
     llm = ChatOpenAI(temperature=0)
     tools = load_tools(["llm-math", "serpapi"], llm=llm)
@@ -129,9 +129,11 @@ def test_tracing_v2_context_manager() -> None:
 
 
 def test_tracing_v2_chain_with_tags() -> None:
-    from langchain.chains.constitutional_ai.base import ConstitutionalChain
-    from langchain.chains.constitutional_ai.models import ConstitutionalPrinciple
-    from langchain.chains.llm import LLMChain
+    from langchain_classic.chains.constitutional_ai.base import ConstitutionalChain
+    from langchain_classic.chains.constitutional_ai.models import (
+        ConstitutionalPrinciple,
+    )
+    from langchain_classic.chains.llm import LLMChain
 
     llm = OpenAI(temperature=0)
     chain = ConstitutionalChain.from_llm(
@@ -152,7 +154,7 @@ def test_tracing_v2_chain_with_tags() -> None:
 
 
 def test_tracing_v2_agent_with_metadata() -> None:
-    from langchain.agents import AgentType, initialize_agent, load_tools
+    from langchain_classic.agents import AgentType, initialize_agent, load_tools
 
     os.environ["LANGCHAIN_TRACING_V2"] = "true"
     llm = OpenAI(temperature=0)
@@ -169,7 +171,7 @@ def test_tracing_v2_agent_with_metadata() -> None:
 
 
 async def test_tracing_v2_async_agent_with_metadata() -> None:
-    from langchain.agents import AgentType, initialize_agent, load_tools
+    from langchain_classic.agents import AgentType, initialize_agent, load_tools
 
     os.environ["LANGCHAIN_TRACING_V2"] = "true"
     llm = OpenAI(temperature=0, metadata={"f": "g", "h": "i"})
@@ -189,7 +191,7 @@ async def test_tracing_v2_async_agent_with_metadata() -> None:
 
 
 def test_trace_as_group() -> None:
-    from langchain.chains.llm import LLMChain
+    from langchain_classic.chains.llm import LLMChain
 
     llm = OpenAI(temperature=0.9)
     prompt = PromptTemplate(
@@ -209,7 +211,7 @@ def test_trace_as_group() -> None:
 
 
 def test_trace_as_group_with_env_set() -> None:
-    from langchain.chains.llm import LLMChain
+    from langchain_classic.chains.llm import LLMChain
 
     os.environ["LANGCHAIN_TRACING_V2"] = "true"
     llm = OpenAI(temperature=0.9)
@@ -234,7 +236,7 @@ def test_trace_as_group_with_env_set() -> None:
 
 
 async def test_trace_as_group_async() -> None:
-    from langchain.chains.llm import LLMChain
+    from langchain_classic.chains.llm import LLMChain
 
     llm = OpenAI(temperature=0.9)
     prompt = PromptTemplate(
