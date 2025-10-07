@@ -185,7 +185,7 @@ class ChatCloudflareWorkersAI(BaseChatModel):
         self,
         tools: Sequence[Union[Dict[str, Any], Type, Callable[..., Any], BaseTool]],
         **kwargs: Any,
-    ) -> Runnable[LanguageModelInput, BaseMessage]:
+    ) -> Runnable[LanguageModelInput, AIMessage]:
         """Bind tools for use in model generation."""
         formatted_tools = [convert_to_openai_tool(tool) for tool in tools]
         return super().bind(tools=formatted_tools, **kwargs)
