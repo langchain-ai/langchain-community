@@ -91,7 +91,7 @@ def test_load_tools_with_callbacks_is_called() -> None:
     assert len(tools) == 1
     # Patch the requests.get() method to return a mock response
     with unittest.mock.patch(
-        "langchain.requests.TextRequestsWrapper.get",
+        "langchain_classic.requests.TextRequestsWrapper.get",
         return_value=Mock(text="Hello world!"),
     ):
         result = tools[0].run("https://www.google.com")
