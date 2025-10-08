@@ -34,10 +34,10 @@ def test_tinglestoredb_semantic_cache() -> None:
     params = llm.dict()
     params["stop"] = None
     llm_string = str(sorted([(k, v) for k, v in params.items()]))
-    get_llm_cache().update("foo", llm_string, [Generation(text="fizz")])
-    cache_output = get_llm_cache().lookup("bar", llm_string)
+    get_llm_cache().update("foo", llm_string, [Generation(text="fizz")])  # type: ignore[union-attr]
+    cache_output = get_llm_cache().lookup("bar", llm_string)  # type: ignore[union-attr]
     assert cache_output == [Generation(text="fizz")]
 
-    get_llm_cache().clear(llm_string=llm_string)
-    output = get_llm_cache().lookup("bar", llm_string)
+    get_llm_cache().clear(llm_string=llm_string)  # type: ignore[union-attr]
+    output = get_llm_cache().lookup("bar", llm_string)  # type: ignore[union-attr]
     assert output != [Generation(text="fizz")]

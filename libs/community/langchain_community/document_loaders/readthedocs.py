@@ -102,13 +102,13 @@ class ReadTheDocsLoader(BaseLoader):
 
         # reversed order. check the custom one first
         for tag, attrs in html_tags[::-1]:
-            element = soup.find(tag, attrs)
+            element = soup.find(tag, attrs)  # type: ignore[arg-type]
             # if found, break
             if element is not None:
                 break
 
-        if element is not None and _get_link_ratio(element) <= self.exclude_links_ratio:
-            text = _get_clean_text(element)
+        if element is not None and _get_link_ratio(element) <= self.exclude_links_ratio:  # type: ignore[arg-type]
+            text = _get_clean_text(element)  # type: ignore[arg-type]
         else:
             text = ""
         # trim empty lines
@@ -174,9 +174,9 @@ def _get_link_ratio(section: Tag) -> float:
         return 0
 
     link_text = "".join(
-        str(string.string.strip())
+        str(string.string.strip())  # type: ignore[union-attr]
         for link in links
-        for string in link.strings
+        for string in link.strings  # type: ignore[union-attr]
         if string
     )
     return len(link_text) / len(total_text)
