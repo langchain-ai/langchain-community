@@ -13,11 +13,13 @@ def get_random_news_url() -> str:
     soup = BeautifulSoup(response.text, "html.parser")
 
     article_links = [
-        a["href"] for a in soup.find_all("a", href=True) if "/articles/" in a["href"]
+        a["href"]  # type: ignore[index]
+        for a in soup.find_all("a", href=True)
+        if "/articles/" in a["href"]  # type: ignore[index]
     ]
     random_article_link = random.choice(article_links)
 
-    return "https://news.google.com" + random_article_link
+    return "https://news.google.com" + random_article_link  # type: ignore[operator]
 
 
 def test_news_loader() -> None:
