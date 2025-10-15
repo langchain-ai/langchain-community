@@ -12,6 +12,7 @@ from langchain_community.chat_models.snowflake import (
 )
 
 
+@pytest.mark.requires("snowflake.snowpark")
 def test_messages_to_prompt_dict_with_valid_messages() -> None:
     messages = [
         SystemMessage(content="System Prompt"),
@@ -31,6 +32,7 @@ def test_messages_to_prompt_dict_with_valid_messages() -> None:
     assert result == expected
 
 
+@pytest.mark.requires("snowflake.snowpark")
 def test_create_chat_with_invalid_config_in_env() -> None:
     os.environ["SNOWFLAKE_CONFIG"] = "{invalid json"
     try:
@@ -40,6 +42,7 @@ def test_create_chat_with_invalid_config_in_env() -> None:
         os.environ.pop("SNOWFLAKE_CONFIG", None)
 
 
+@pytest.mark.requires("snowflake.snowpark")
 def test_create_chat_with_config_in_args() -> None:
     os.environ.pop("SNOWFLAKE_CONFIG", None)
     with pytest.raises(
