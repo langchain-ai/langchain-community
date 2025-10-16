@@ -1,11 +1,12 @@
 from io import BytesIO
 from pathlib import Path
-from typing import Any, List, Tuple, Union
+from typing import Any, List, Tuple, Union, Optional
 
 import requests
 from langchain_core.documents import Document
 
 from langchain_community.document_loaders.base import BaseLoader
+from copy import deepcopy
 
 
 class ImageCaptionLoader(BaseLoader):
@@ -21,6 +22,8 @@ class ImageCaptionLoader(BaseLoader):
         images: Union[str, Path, bytes, List[Union[str, bytes, Path]]],
         blip_processor: str = "Salesforce/blip-image-captioning-base",
         blip_model: str = "Salesforce/blip-image-captioning-base",
+        decode_args: Optional[list[Any]] = None,
+        decode_kwargs: Optional[dict[str, Any]] = None,
     ):
         """Initialize with a list of image data (bytes) or file paths
 
@@ -37,19 +40,46 @@ class ImageCaptionLoader(BaseLoader):
 
         self.blip_processor = blip_processor
         self.blip_model = blip_model
+        # deepcopy to prevent modifying from outside,
+        # not sure should I use it or not considering probably few would modify those
+        if decode_args is None:
+            decode_args = []
+        self.decode_args = deepcopy(decode_args)
+
+        if decode_kwargs is None:
+            decode_kwargs = {}
+        self.decode_kwargs = deepcopy(decode_kwargs)
 
     def load(self) -> List[Document]:
         """Load from a list of image data or file paths"""
+        general_blip_processor = None
+        general_blip_for_conditional_generation = None
         try:
-            from transformers import BlipForConditionalGeneration, BlipProcessor
+            if "blip2" in self.blip_processor:
+                from transformers import Blip2Processor
+
+                general_blip_processor = Blip2Processor
+            else:
+                from transformers import BlipProcessor
+
+                general_blip_processor = BlipProcessor
+
+            if "blip2" in self.blip_model:
+                from transformers import Blip2ForConditionalGeneration
+
+                general_blip_for_conditional_generation = Blip2ForConditionalGeneration
+            else:
+                from transformers import BlipForConditionalGeneration
+
+                general_blip_for_conditional_generation = BlipForConditionalGeneration
         except ImportError:
             raise ImportError(
                 "`transformers` package not found, please install with "
                 "`pip install transformers`."
             )
 
-        processor = BlipProcessor.from_pretrained(self.blip_processor)
-        model = BlipForConditionalGeneration.from_pretrained(self.blip_model)
+        processor = general_blip_processor.from_pretrained(self.blip_processor)
+        model = general_blip_for_conditional_generation.from_pretrained(self.blip_model)
 
         results = []
         for image in self.images:
@@ -93,7 +123,9 @@ class ImageCaptionLoader(BaseLoader):
         inputs = processor(image, "an image of", return_tensors="pt")
         output = model.generate(**inputs)
 
-        caption: str = processor.decode(output[0])
+        caption: str = processor.decode(
+            output[0], *self.decode_args, **self.decode_kwargs
+        )
         if isinstance(image_source, bytes):
             metadata: dict = {"image_source": "Image bytes provided"}
         else:
