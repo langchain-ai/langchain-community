@@ -23,7 +23,7 @@ def fake_retriever_v1() -> BaseRetriever:
     ):
 
         class FakeRetrieverV1(BaseRetriever):
-            def get_relevant_documents(  # type: ignore[override]
+            def _get_relevant_documents(
                 self,
                 query: str,
             ) -> List[Document]:
@@ -32,7 +32,7 @@ def fake_retriever_v1() -> BaseRetriever:
                     Document(page_content=query, metadata={"uuid": "1234"}),
                 ]
 
-            async def aget_relevant_documents(  # type: ignore[override]
+            async def _aget_relevant_documents(
                 self,
                 query: str,
             ) -> List[Document]:
@@ -89,7 +89,7 @@ def fake_retriever_v1_with_kwargs() -> BaseRetriever:
     ):
 
         class FakeRetrieverV1(BaseRetriever):
-            def get_relevant_documents(  # type: ignore[override]
+            def _get_relevant_documents(
                 self, query: str, where_filter: Optional[Dict[str, object]] = None
             ) -> List[Document]:
                 assert isinstance(self, FakeRetrieverV1)
@@ -97,7 +97,7 @@ def fake_retriever_v1_with_kwargs() -> BaseRetriever:
                     Document(page_content=query, metadata=where_filter or {}),
                 ]
 
-            async def aget_relevant_documents(  # type: ignore[override]
+            async def _aget_relevant_documents(
                 self, query: str, where_filter: Optional[Dict[str, object]] = None
             ) -> List[Document]:
                 assert isinstance(self, FakeRetrieverV1)

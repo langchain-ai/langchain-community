@@ -142,7 +142,7 @@ class BeautifulSoupTransformer(BaseDocumentTransformer):
         soup = BeautifulSoup(html_content, "html.parser")
         text_parts: List[str] = []
         for element in soup.find_all():
-            if element.name in tags:  # type: ignore[union-attr, operator]
+            if element.name in tags:
                 # Extract all navigable strings recursively from this element.
                 text_parts += get_navigable_strings(
                     element, remove_comments=remove_comments
