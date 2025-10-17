@@ -26,6 +26,8 @@ def fake_retriever_v1() -> BaseRetriever:
             def _get_relevant_documents(
                 self,
                 query: str,
+                *,
+                run_manager: CallbackManagerForRetrieverRun,
             ) -> List[Document]:
                 assert isinstance(self, FakeRetrieverV1)
                 return [
@@ -35,6 +37,8 @@ def fake_retriever_v1() -> BaseRetriever:
             async def _aget_relevant_documents(
                 self,
                 query: str,
+                *,
+                run_manager: AsyncCallbackManagerForRetrieverRun,
             ) -> List[Document]:
                 assert isinstance(self, FakeRetrieverV1)
                 return [
@@ -43,7 +47,7 @@ def fake_retriever_v1() -> BaseRetriever:
                     ),
                 ]
 
-        return FakeRetrieverV1()  # type: ignore[abstract]
+        return FakeRetrieverV1()
 
 
 def test_fake_retriever_v1_upgrade(fake_retriever_v1: BaseRetriever) -> None:
@@ -90,7 +94,11 @@ def fake_retriever_v1_with_kwargs() -> BaseRetriever:
 
         class FakeRetrieverV1(BaseRetriever):
             def _get_relevant_documents(
-                self, query: str, where_filter: Optional[Dict[str, object]] = None
+                self,
+                query: str,
+                *,
+                run_manager: CallbackManagerForRetrieverRun,
+                where_filter: Optional[Dict[str, object]] = None,
             ) -> List[Document]:
                 assert isinstance(self, FakeRetrieverV1)
                 return [
@@ -98,7 +106,11 @@ def fake_retriever_v1_with_kwargs() -> BaseRetriever:
                 ]
 
             async def _aget_relevant_documents(
-                self, query: str, where_filter: Optional[Dict[str, object]] = None
+                self,
+                query: str,
+                *,
+                run_manager: AsyncCallbackManagerForRetrieverRun,
+                where_filter: Optional[Dict[str, object]] = None,
             ) -> List[Document]:
                 assert isinstance(self, FakeRetrieverV1)
                 return [
@@ -107,7 +119,7 @@ def fake_retriever_v1_with_kwargs() -> BaseRetriever:
                     ),
                 ]
 
-        return FakeRetrieverV1()  # type: ignore[abstract]
+        return FakeRetrieverV1()
 
 
 def test_fake_retriever_v1_with_kwargs_upgrade(
