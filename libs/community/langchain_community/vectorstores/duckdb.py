@@ -229,7 +229,7 @@ class DuckDB(VectorStore):
         docs = (
             self._table.select(
                 *[
-                    self.duckdb.StarExpression(exclude=[]),  # type: ignore[call-overload]
+                    self.duckdb.StarExpression(exclude=[]),
                     list_cosine_similarity.alias(SIMILARITY_ALIAS),
                 ]
             )
@@ -274,7 +274,7 @@ class DuckDB(VectorStore):
         docs = (
             self._table.select(
                 *[
-                    self.duckdb.StarExpression(exclude=[]),  # type: ignore[call-overload]
+                    self.duckdb.StarExpression(exclude=[]),
                     list_cosine_similarity.alias(SIMILARITY_ALIAS),
                 ]
             )
