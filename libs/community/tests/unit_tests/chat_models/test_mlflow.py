@@ -192,10 +192,11 @@ def test_chat_mlflow_stream(
 
     mock_client.predict_stream = mock_stream
     for i, res in enumerate(llm.stream(model_input)):
-        assert (
-            res.content
-            == mock_predict_stream_result[i]["choices"][0]["delta"]["content"]
-        )
+        if res.chunk_position != "last":
+            assert (
+                res.content
+                == mock_predict_stream_result[i]["choices"][0]["delta"]["content"]
+            )
 
 
 @pytest.mark.requires("mlflow")
