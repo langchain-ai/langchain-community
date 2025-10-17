@@ -294,8 +294,8 @@ class PebbloRetrievalQA(Chain):
     ) -> List[Document]:
         """Get docs."""
         set_enforcement_filters(self.retriever, auth_context, semantic_context)
-        return self.retriever.get_relevant_documents(
-            question, callbacks=run_manager.get_child()
+        return self.retriever.invoke(
+            question, config={"callbacks": run_manager.get_child()}
         )
 
     async def _aget_docs(
@@ -308,8 +308,8 @@ class PebbloRetrievalQA(Chain):
     ) -> List[Document]:
         """Get docs."""
         set_enforcement_filters(self.retriever, auth_context, semantic_context)
-        return await self.retriever.aget_relevant_documents(
-            question, callbacks=run_manager.get_child()
+        return await self.retriever.ainvoke(
+            question, config={"callbacks": run_manager.get_child()}
         )
 
     @staticmethod
