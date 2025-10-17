@@ -5,10 +5,10 @@ build-backend = "pdm.backend"
 [project]
 authors = []
 license = { text = "MIT" }
-requires-python = ">=3.9.0,<4.0.0"
+requires-python = ">=3.10.0,<4.0.0"
 dependencies = [
-    "langchain-core>=0.3.78,<2.0.0",
-    "langchain>=0.3.27,<2.0.0",
+    "langchain-core>=1.0.0,<2.0.0",
+    "langchain-classic>=1.0.0,<2.0.0",
     "SQLAlchemy>=1.4.0,<3.0.0",
     "requests>=2.32.5,<3.0.0",
     "PyYAML>=5.3.0,<7.0.0",
@@ -22,7 +22,7 @@ dependencies = [
     "numpy>=2.1.0; python_version>='3.13'",
 ]
 name = "langchain-community"
-version = "0.3.31"
+version = "0.4"
 description = "Community contributed LangChain integrations."
 readme = "README.md"
 
@@ -51,10 +51,10 @@ test = [
     "blockbuster>=1.5.18,<1.6.0",
     "cffi<1.17.1; python_version < \"3.10\"",
     "cffi; python_version >= \"3.10\"",
-    "langchain-tests",
+    "langchain-tests>=1.0.0,<2.0.0",
     "toml>=0.10.2,<1.0.0",
 ]
-test_integration = ["pytest-vcr>=1.0.2,<2.0.0", "vcrpy>=6.0.0,<7.0.0"]
+test_integration = ["vcrpy>=6.0.0"]
 lint = [
     "ruff>=0.13.1,<1.0.0",
     "cffi<1.17.1; python_version < \"3.10\"",
@@ -71,7 +71,7 @@ typing = [
     "types-redis>=4.3.21.6,<5.0.0.0",
     "mypy-protobuf>=3.0.0,<4.0.0",
     "langchain-core",
-    "langchain-text-splitters",
+    "langchain-text-splitters>=1.0.0,<2.0.0",
     "langchain",
 ]
 

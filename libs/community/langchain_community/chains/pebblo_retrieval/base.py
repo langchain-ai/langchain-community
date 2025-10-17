@@ -9,8 +9,8 @@ import logging
 from importlib.metadata import version
 from typing import Any, Dict, List, Optional
 
-from langchain.chains.base import Chain
-from langchain.chains.combine_documents.base import BaseCombineDocumentsChain
+from langchain_classic.chains.base import Chain
+from langchain_classic.chains.combine_documents.base import BaseCombineDocumentsChain
 from langchain_core.callbacks import (
     AsyncCallbackManagerForChainRun,
     CallbackManagerForChainRun,
@@ -234,7 +234,7 @@ class PebbloRetrievalQA(Chain):
         **kwargs: Any,
     ) -> "PebbloRetrievalQA":
         """Load chain from chain type."""
-        from langchain.chains.question_answering import load_qa_chain
+        from langchain_classic.chains.question_answering import load_qa_chain
 
         _chain_type_kwargs = chain_type_kwargs or {}
         combine_documents_chain = load_qa_chain(

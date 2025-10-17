@@ -49,7 +49,7 @@ Operation = Literal["GET", "POST", "PUT", "DELETE", "PATCH"]
 
 
 def _get_default_llm_chain(prompt: BasePromptTemplate) -> Any:
-    from langchain.chains.llm import LLMChain
+    from langchain_classic.chains.llm import LLMChain
 
     return LLMChain(
         llm=OpenAI(),
@@ -79,7 +79,7 @@ class RequestsGetToolWithParsing(BaseRequestsTool, BaseTool):
     """LLMChain used to extract the response."""
 
     def _run(self, text: str) -> str:
-        from langchain.output_parsers.json import parse_json_markdown
+        from langchain_classic.output_parsers.json import parse_json_markdown
 
         try:
             data = parse_json_markdown(text)
@@ -113,7 +113,7 @@ class RequestsPostToolWithParsing(BaseRequestsTool, BaseTool):
     """LLMChain used to extract the response."""
 
     def _run(self, text: str) -> str:
-        from langchain.output_parsers.json import parse_json_markdown
+        from langchain_classic.output_parsers.json import parse_json_markdown
 
         try:
             data = parse_json_markdown(text)
@@ -144,7 +144,7 @@ class RequestsPatchToolWithParsing(BaseRequestsTool, BaseTool):
     """LLMChain used to extract the response."""
 
     def _run(self, text: str) -> str:
-        from langchain.output_parsers.json import parse_json_markdown
+        from langchain_classic.output_parsers.json import parse_json_markdown
 
         try:
             data = parse_json_markdown(text)
@@ -177,7 +177,7 @@ class RequestsPutToolWithParsing(BaseRequestsTool, BaseTool):
     """LLMChain used to extract the response."""
 
     def _run(self, text: str) -> str:
-        from langchain.output_parsers.json import parse_json_markdown
+        from langchain_classic.output_parsers.json import parse_json_markdown
 
         try:
             data = parse_json_markdown(text)
@@ -209,7 +209,7 @@ class RequestsDeleteToolWithParsing(BaseRequestsTool, BaseTool):
     """The LLM chain used to parse the response."""
 
     def _run(self, text: str) -> str:
-        from langchain.output_parsers.json import parse_json_markdown
+        from langchain_classic.output_parsers.json import parse_json_markdown
 
         try:
             data = parse_json_markdown(text)
@@ -231,7 +231,7 @@ class RequestsDeleteToolWithParsing(BaseRequestsTool, BaseTool):
 def _create_api_planner_tool(
     api_spec: ReducedOpenAPISpec, llm: BaseLanguageModel
 ) -> Tool:
-    from langchain.chains.llm import LLMChain
+    from langchain_classic.chains.llm import LLMChain
 
     endpoint_descriptions = [
         f"{name} {description}" for name, description, _ in api_spec.endpoints
@@ -258,9 +258,9 @@ def _create_api_controller_agent(
     allow_dangerous_requests: bool,
     allowed_operations: Sequence[Operation],
 ) -> Any:
-    from langchain.agents.agent import AgentExecutor
-    from langchain.agents.mrkl.base import ZeroShotAgent
-    from langchain.chains.llm import LLMChain
+    from langchain_classic.agents.agent import AgentExecutor
+    from langchain_classic.agents.mrkl.base import ZeroShotAgent
+    from langchain_classic.chains.llm import LLMChain
 
     tools: List[BaseTool] = []
     if "GET" in allowed_operations:
@@ -426,9 +426,9 @@ def create_openapi_agent(
     Returns:
         The agent executor.
     """
-    from langchain.agents.agent import AgentExecutor
-    from langchain.agents.mrkl.base import ZeroShotAgent
-    from langchain.chains.llm import LLMChain
+    from langchain_classic.agents.agent import AgentExecutor
+    from langchain_classic.agents.mrkl.base import ZeroShotAgent
+    from langchain_classic.chains.llm import LLMChain
 
     tools = [
         _create_api_planner_tool(api_spec, llm),
