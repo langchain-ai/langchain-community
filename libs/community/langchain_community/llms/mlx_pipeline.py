@@ -156,7 +156,6 @@ class MLXPipeline(LLM):
         temp: float = pipeline_kwargs.get("temp", 0.0)
         max_tokens: int = pipeline_kwargs.get("max_tokens", 100)
         verbose: bool = pipeline_kwargs.get("verbose", False)
-        formatter: Optional[Callable] = pipeline_kwargs.get("formatter", None)
         repetition_penalty: Optional[float] = pipeline_kwargs.get(
             "repetition_penalty", None
         )
@@ -178,7 +177,6 @@ class MLXPipeline(LLM):
             prompt=prompt,
             max_tokens=max_tokens,
             verbose=verbose,
-            formatter=formatter,
             sampler=sampler,
             logits_processors=logits_processors,
         )
