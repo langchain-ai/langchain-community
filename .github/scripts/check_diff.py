@@ -44,7 +44,7 @@ if __name__ == "__main__":
         "dirs-to-test": list(dirs_to_run["test"]),
         "extended-tests": [
             {"working-directory": "libs/community", "python-version": py_v}
-            for py_v in ["3.9", "3.12"]
+            for py_v in ["3.10", "3.12"]
         ],
         "test-pydantic": [
             {

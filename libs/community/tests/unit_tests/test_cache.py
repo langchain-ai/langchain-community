@@ -20,7 +20,7 @@ try:
 except ImportError:
     from sqlalchemy.ext.declarative import declarative_base
 
-from langchain.globals import get_llm_cache, set_llm_cache
+from langchain_classic.globals import get_llm_cache, set_llm_cache
 from langchain_core.outputs import Generation, LLMResult
 
 from langchain_community.cache import SQLAlchemyCache
@@ -286,10 +286,10 @@ def test_sql_alchemy_cache() -> None:
     params = llm.dict()
     params["stop"] = None
     llm_string = str(sorted([(k, v) for k, v in params.items()]))
-    get_llm_cache().update("foo", llm_string, [Generation(text="fizz")])
+    get_llm_cache().update("foo", llm_string, [Generation(text="fizz")])  # type: ignore[union-attr]
     output = llm.generate(["foo", "bar", "foo"])
     expected_cache_output = [Generation(text="foo")]
-    cache_output = get_llm_cache().lookup("bar", llm_string)
+    cache_output = get_llm_cache().lookup("bar", llm_string)  # type: ignore[union-attr]
     assert cache_output == expected_cache_output
     set_llm_cache(None)
     expected_generations = [

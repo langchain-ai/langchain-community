@@ -187,9 +187,9 @@ class BlackboardLoader(WebBaseLoader):
         # Get all attachments
         attachments = []
         attachment: Tag
-        for attachment in content_list.find_all("ul", {"class": "attachments"}):  # type: ignore[assignment]
+        for attachment in content_list.find_all("ul", {"class": "attachments"}):
             link: Tag
-            for link in attachment.find_all("a"):  # type: ignore[assignment]
+            for link in attachment.find_all("a"):
                 href = link.get("href")
                 # Only add if href is not None and does not start with #
                 if href is not None and not href.startswith("#"):  # type: ignore[union-attr]

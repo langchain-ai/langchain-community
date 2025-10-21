@@ -98,11 +98,11 @@ class CHMParser(object):
             # <param name="Local" value="<...>">
             name = ""
             local = ""
-            for param in obj.find_all("param"):  # type: ignore[union-attr]
-                if param["name"] == "Name":  # type: ignore[index]
-                    name = param["value"]  # type: ignore[index]
-                if param["name"] == "Local":  # type: ignore[index]
-                    local = param["value"]  # type: ignore[index]
+            for param in obj.find_all("param"):
+                if param["name"] == "Name":
+                    name = param["value"]  # type: ignore[assignment]
+                if param["name"] == "Local":
+                    local = param["value"]  # type: ignore[assignment]
             if not name or not local:
                 continue
 
