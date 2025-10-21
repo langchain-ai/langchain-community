@@ -51,7 +51,7 @@ def test_openai_callback_batch_llm() -> None:
 
 
 def test_openai_callback_agent() -> None:
-    from langchain.agents import AgentType, initialize_agent, load_tools
+    from langchain_classic.agents import AgentType, initialize_agent, load_tools
 
     llm = OpenAI(temperature=0)
     tools = load_tools(["serpapi", "llm-math"], llm=llm)

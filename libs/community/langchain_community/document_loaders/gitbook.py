@@ -149,9 +149,9 @@ class GitbookLoader(BaseLoader):
         sitemap_tags = soup.find_all("sitemap")
         urls: List[str] = []
         for sitemap in sitemap_tags:
-            loc = sitemap.find("loc")  # type: ignore[union-attr]
-            if loc and loc.text:  # type: ignore # noqa: PGH003
-                self._safe_add_url(urls, loc.text, "sitemap")  # type: ignore[union-attr]
+            loc = sitemap.find("loc")
+            if loc and loc.text:
+                self._safe_add_url(urls, loc.text, "sitemap")
         return urls
 
     def _process_sitemap(

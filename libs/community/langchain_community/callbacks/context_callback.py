@@ -59,7 +59,7 @@ class ContextCallbackHandler(BaseCallbackHandler):
         >>> chat.invoke(messages)
 
     Chain Example:
-        >>> from langchain.chains import LLMChain
+        >>> from langchain_classic.chains import LLMChain
         >>> from langchain_community.chat_models import ChatOpenAI
         >>> from langchain_community.callbacks import ContextCallbackHandler
         >>> context_callback = ContextCallbackHandler(

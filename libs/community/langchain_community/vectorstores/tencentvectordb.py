@@ -130,9 +130,9 @@ def translate_filter(
     Returns:
         str: Translated filter.
     """
-    from langchain.chains.query_constructor.base import fix_filter_directive
-    from langchain.chains.query_constructor.parser import get_parser
-    from langchain.retrievers.self_query.tencentvectordb import (
+    from langchain_classic.chains.query_constructor.base import fix_filter_directive
+    from langchain_classic.chains.query_constructor.parser import get_parser
+    from langchain_classic.retrievers.self_query.tencentvectordb import (
         TencentVectorDBTranslator,
     )
     from langchain_core.structured_query import FilterDirective
