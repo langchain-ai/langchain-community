@@ -12,7 +12,7 @@ from langchain_community.document_loaders.base import BaseLoader
 @deprecated(
     since="0.4",
     removal="1.0",
-    alternative_import="langchain_azure_storage.document_loaders",
+    alternative_import="langchain_azure_storage.document_loaders.AzureBlobStorageLoader",
 )
 class AzureBlobStorageContainerLoader(BaseLoader):
     """Load from `Azure Blob Storage` container."""

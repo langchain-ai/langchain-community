@@ -12,7 +12,7 @@ from langchain_community.document_loaders.unstructured import UnstructuredFileLo
 @deprecated(
     since="0.4",
     removal="1.0",
-    alternative_import="langchain_azure_storage.document_loaders",
+    alternative_import="langchain_azure_storage.document_loaders.AzureBlobStorageLoader",
 )
 class AzureBlobStorageFileLoader(BaseLoader):
     """Load from `Azure Blob Storage` files."""
