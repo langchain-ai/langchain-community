@@ -2,8 +2,8 @@
 
 from pathlib import Path
 
-from langchain.chains import RetrievalQA
-from langchain.chains.loading import load_chain
+from langchain_classic.chains import RetrievalQA
+from langchain_classic.chains.loading import load_chain
 from langchain_text_splitters.character import CharacterTextSplitter
 
 from langchain_community.document_loaders import TextLoader

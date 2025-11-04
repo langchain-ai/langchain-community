@@ -46,11 +46,11 @@ class DuckDuckGoSearchAPIWrapper(BaseModel):
     def validate_environment(cls, values: Dict) -> Any:
         """Validate that python package exists in environment."""
         try:
-            from duckduckgo_search import DDGS  # noqa: F401
+            from ddgs import DDGS  # noqa: F401
         except ImportError:
             raise ImportError(
-                "Could not import duckduckgo-search python package. "
-                "Please install it with `pip install -U duckduckgo-search`."
+                "Could not import ddgs python package. "
+                "Please install it with `pip install -U ddgs`."
             )
         return values
 
@@ -58,7 +58,7 @@ class DuckDuckGoSearchAPIWrapper(BaseModel):
         self, query: str, max_results: Optional[int] = None
     ) -> List[Dict[str, str]]:
         """Run query through DuckDuckGo text search and return results."""
-        from duckduckgo_search import DDGS
+        from ddgs import DDGS
 
         with DDGS() as ddgs:
             ddgs_gen = ddgs.text(
@@ -77,7 +77,7 @@ class DuckDuckGoSearchAPIWrapper(BaseModel):
         self, query: str, max_results: Optional[int] = None
     ) -> List[Dict[str, str]]:
         """Run query through DuckDuckGo news search and return results."""
-        from duckduckgo_search import DDGS
+        from ddgs import DDGS
 
         with DDGS() as ddgs:
             ddgs_gen = ddgs.news(
@@ -95,7 +95,7 @@ class DuckDuckGoSearchAPIWrapper(BaseModel):
         self, query: str, max_results: Optional[int] = None
     ) -> List[Dict[str, str]]:
         """Run query through DuckDuckGo image search and return results."""
-        from duckduckgo_search import DDGS
+        from ddgs import DDGS
 
         with DDGS() as ddgs:
             ddgs_gen = ddgs.images(

@@ -424,8 +424,8 @@ class WandbTracer(BaseTracer):
                 If provided, the created trace is added as a child to the parent trace.
 
             Returns:
-                Optional[Trace]: The created trace.
-                 If an error occurs during the creation of the trace, None is returned.
+                The created trace. If an error occurs during the creation of the trace,
+                    None is returned.
 
             Raises:
                 Exception: If an error occurs during the creation of the trace,
@@ -443,7 +443,7 @@ class WandbTracer(BaseTracer):
                     r (Run): The run from which to extract metadata.
 
                 Returns:
-                    Dict[str, Any]: A dictionary containing the extracted metadata.
+                    `dict` containing the extracted metadata.
                 """
                 run_dict = json.loads(r.json())
                 metadata_dict = run_dict.get("metadata", {})

@@ -136,7 +136,7 @@ class JSONLoader(BaseLoader):
         """Load and return documents from the JSON file."""
         index = 0
         if self._json_lines:
-            with self.file_path.open(encoding="utf-8") as f:
+            with self.file_path.open(encoding="utf-8-sig") as f:
                 for line in f:
                     line = line.strip()
                     if line:
@@ -144,7 +144,9 @@ class JSONLoader(BaseLoader):
                             yield doc
                             index += 1
         else:
-            for doc in self._parse(self.file_path.read_text(encoding="utf-8"), index):
+            for doc in self._parse(
+                self.file_path.read_text(encoding="utf-8-sig"), index
+            ):
                 yield doc
                 index += 1
 

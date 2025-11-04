@@ -377,7 +377,7 @@ class CometCallbackHandler(BaseMetadataCallbackHandler, BaseCallbackHandler):
             text (str): The text to analyze.
 
         Returns:
-            (dict): A dictionary containing the complexity metrics.
+            `dict` containing the complexity metrics.
         """
         resp = {}
         if self.complexity_metrics:
@@ -397,7 +397,7 @@ class CometCallbackHandler(BaseMetadataCallbackHandler, BaseCallbackHandler):
             gen_idx (int): List index of the generated output
 
         Returns:
-            dict: A dictionary containing the custom metrics.
+            dict: `dict` containing the custom metrics.
         """
 
         resp = {}
