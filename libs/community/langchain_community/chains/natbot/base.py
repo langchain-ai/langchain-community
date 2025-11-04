@@ -1,3 +1,3 @@
-from langchain.chains import NatBotChain
+from langchain_classic.chains import NatBotChain
 
 __all__ = ["NatBotChain"]

@@ -12,7 +12,7 @@ from typing import (
 )
 
 from langchain_core.language_models import LanguageModelInput
-from langchain_core.messages import BaseMessage
+from langchain_core.messages import AIMessage
 from langchain_core.runnables import Runnable
 from langchain_core.tools import BaseTool
 from langchain_core.utils import convert_to_secret_str, get_from_dict_or_env, pre_init
@@ -116,7 +116,7 @@ class ChatOctoAI(ChatOpenAI):
         ] = None,
         strict: Optional[bool] = None,
         **kwargs: Any,
-    ) -> Runnable[LanguageModelInput, BaseMessage]:
+    ) -> Runnable[LanguageModelInput, AIMessage]:
         """Imitating bind_tool method from langchain_openai.ChatOpenAI"""
 
         formatted_tools = [
