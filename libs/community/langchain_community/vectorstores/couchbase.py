@@ -546,6 +546,15 @@ class CouchbaseVectorStore(VectorStore):
         embedding_key = kwargs.get("embedding_key", cls._default_embedding_key)
         scoped_index = kwargs.get("scoped_index", True)
 
+        if bucket_name is None:
+            raise ValueError("bucket_name must be provided")
+        if scope_name is None:
+            raise ValueError("scope_name must be provided")
+        if collection_name is None:
+            raise ValueError("collection_name must be provided")
+        if index_name is None:
+            raise ValueError("index_name must be provided")
+
         return cls(
             embedding=embedding,
             cluster=cluster,

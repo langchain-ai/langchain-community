@@ -301,14 +301,13 @@ class TiDBVectorStore(VectorStore):
         Perform a similarity search using the given query.
 
         Args:
-            query (str): The query string.
-            k (int, optional): The number of results to retrieve. Defaults to 4.
-            filter (dict, optional): A filter to apply to the search results.
-                Defaults to None.
+            query: The query string.
+            k: The number of results to retrieve. Defaults to 4.
+            filter: A filter to apply to the search results.
             kwargs: Additional keyword arguments.
 
         Returns:
-            List[Document]: A list of Document objects representing the search results.
+            A list of `Document` objects representing the search results.
         """
         result = self.similarity_search_with_score(query, k, filter, **kwargs)
         return [doc for doc, _ in result]
