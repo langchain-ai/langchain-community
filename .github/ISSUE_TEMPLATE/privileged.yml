@@ -1,0 +1,20 @@
+name: 🔒 Privileged
+description: You are a LangChain maintainer, or was asked directly by a maintainer to create an issue here. If not, check the other options.
+body:
+  - type: markdown
+    attributes:
+      value: |
+        If you are not a LangChain maintainer, employee, or were not asked directly by a maintainer to create an issue, then please start the conversation on the [LangChain Forum](https://forum.langchain.com/) instead.
+  - type: checkboxes
+    id: privileged
+    attributes:
+      label: Privileged issue
+      description: Confirm that you are allowed to create an issue here.
+      options:
+        - label: I am a LangChain maintainer, or was asked directly by a LangChain maintainer to create an issue here.
+          required: true
+  - type: textarea
+    id: content
+    attributes:
+      label: Issue Content
+      description: Add the content of the issue here.

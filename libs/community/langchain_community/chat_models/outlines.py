@@ -361,7 +361,7 @@ class ChatOutlines(BaseChatModel):
         *,
         tool_choice: Optional[Union[Dict, bool, str]] = None,
         **kwargs: Any,
-    ) -> Runnable[LanguageModelInput, BaseMessage]:
+    ) -> Runnable[LanguageModelInput, AIMessage]:
         """Bind tool-like objects to this chat model
 
         tool_choice: does not currently support "any", "auto" choices like OpenAI
@@ -500,7 +500,13 @@ class ChatOutlines(BaseChatModel):
         elif self.streaming:
             response = ""
             async for chunk in self._astream(messages, stop, run_manager, **kwargs):
-                response += chunk.message.content or ""
+                if isinstance(chunk.message.content, str):
+                    response += chunk.message.content
+                elif chunk.message.content is not None:
+                    raise ValueError(
+                        "Invalid content type, only str is supported, "
+                        f"got {type(chunk.message.content)}"
+                    )
             message = AIMessage(content=response)
             generation = ChatGeneration(message=message)
             return ChatResult(generations=[generation])
