@@ -110,6 +110,11 @@ class SQLDatabase:
         self._all_tables = set(
             list(self._inspector.get_table_names(schema=schema))
             + (self._inspector.get_view_names(schema=schema) if view_support else [])
+            + (
+                self._inspector.get_materialized_view_names(schema=schema)
+                if view_support
+                else []
+            )
         )
 
         self._include_tables = set(include_tables) if include_tables else set()
@@ -500,8 +505,7 @@ class SQLDatabase:
                     pass
                 elif self.dialect == "trino":
                     connection.exec_driver_sql(
-                        "USE ?",
-                        (self._schema,),
+                        f"USE {self._schema}",
                         execution_options=execution_options,
                     )
                 elif self.dialect == "duckdb":

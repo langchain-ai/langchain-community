@@ -13,7 +13,7 @@ if __name__ == "__main__":
     }
 
     if len(files) == 300:
-        # max diff length is 300 files - there are likely files missing
+        # Max diff length is 300 files - there are likely files missing
         raise ValueError("Max diff reached. Please manually run CI on changed libs.")
 
     for file in files:
@@ -26,7 +26,7 @@ if __name__ == "__main__":
                 ".github/scripts/check_diff.py",
             )
         ):
-            # add all LANGCHAIN_DIRS for infra changes
+            # Add all LANGCHAIN_DIRS for infra changes
             dirs_to_run["test"].update(LIB_DIRS)
 
         if any(file.startswith(dir_) for dir_ in LIB_DIRS):
