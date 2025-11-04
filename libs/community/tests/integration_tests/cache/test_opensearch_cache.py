@@ -1,4 +1,4 @@
-from langchain.globals import get_llm_cache, set_llm_cache
+from langchain_classic.globals import get_llm_cache, set_llm_cache
 from langchain_core.outputs import Generation
 
 from langchain_community.cache import OpenSearchSemanticCache
@@ -23,12 +23,12 @@ def test_opensearch_semantic_cache() -> None:
     params = llm.dict()
     params["stop"] = None
     llm_string = str(sorted([(k, v) for k, v in params.items()]))
-    get_llm_cache().update("foo", llm_string, [Generation(text="fizz")])
-    cache_output = get_llm_cache().lookup("bar", llm_string)
+    get_llm_cache().update("foo", llm_string, [Generation(text="fizz")])  # type: ignore[union-attr]
+    cache_output = get_llm_cache().lookup("bar", llm_string)  # type: ignore[union-attr]
     assert cache_output == [Generation(text="fizz")]
 
-    get_llm_cache().clear(llm_string=llm_string)
-    output = get_llm_cache().lookup("bar", llm_string)
+    get_llm_cache().clear(llm_string=llm_string)  # type: ignore[union-attr]
+    output = get_llm_cache().lookup("bar", llm_string)  # type: ignore[union-attr]
     assert output != [Generation(text="fizz")]
 
 
@@ -45,15 +45,15 @@ def test_opensearch_semantic_cache_multi() -> None:
     params = llm.dict()
     params["stop"] = None
     llm_string = str(sorted([(k, v) for k, v in params.items()]))
-    get_llm_cache().update(
+    get_llm_cache().update(  # type: ignore[union-attr]
         "foo", llm_string, [Generation(text="fizz"), Generation(text="Buzz")]
     )
 
     # foo and bar will have the same embedding produced by FakeEmbeddings
-    cache_output = get_llm_cache().lookup("bar", llm_string)
+    cache_output = get_llm_cache().lookup("bar", llm_string)  # type: ignore[union-attr]
     assert cache_output == [Generation(text="fizz"), Generation(text="Buzz")]
 
     # clear the cache
-    get_llm_cache().clear(llm_string=llm_string)
-    output = get_llm_cache().lookup("bar", llm_string)
+    get_llm_cache().clear(llm_string=llm_string)  # type: ignore[union-attr]
+    output = get_llm_cache().lookup("bar", llm_string)  # type: ignore[union-attr]
     assert output != [Generation(text="fizz"), Generation(text="Buzz")]

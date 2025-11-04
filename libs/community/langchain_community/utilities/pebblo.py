@@ -276,7 +276,7 @@ def get_runtime() -> Tuple[Framework, Runtime]:
     """
     runtime_env = get_runtime_environment()
     framework = Framework(
-        name="langchain", version=runtime_env.get("library_version", None)
+        name="langchain", version=runtime_env.get("library_version", "unknown")
     )
     uname = platform.uname()
     runtime = Runtime(

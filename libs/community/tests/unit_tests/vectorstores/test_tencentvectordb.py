@@ -9,7 +9,7 @@ def test_translate_filter() -> None:
         'eq("artist", "Katy Perry")), lt("length", 180))'
     )
     try:
-        importlib.util.find_spec("langchain.chains.query_constructor.base")
+        importlib.util.find_spec("langchain_classic.chains.query_constructor.base")
         translate_filter(raw_filter)
     except ModuleNotFoundError:
         try:
@@ -28,7 +28,7 @@ def test_translate_filter_with_in_comparison() -> None:
     raw_filter = 'in("artist", ["Taylor Swift", "Katy Perry"])'
 
     try:
-        importlib.util.find_spec("langchain.chains.query_constructor.base")
+        importlib.util.find_spec("langchain_classic.chains.query_constructor.base")
         translate_filter(raw_filter)
     except ModuleNotFoundError:
         try:

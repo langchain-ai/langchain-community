@@ -427,7 +427,7 @@ class ChatOpenAI(BaseChatModel):
         message_dicts, params = self._create_message_dicts(messages, stop)
         params = {**params, **kwargs, "stream": True}
 
-        default_chunk_class = AIMessageChunk
+        default_chunk_class: Type[BaseMessageChunk] = AIMessageChunk
         for chunk in self.completion_with_retry(
             messages=message_dicts, run_manager=run_manager, **params
         ):
@@ -521,7 +521,7 @@ class ChatOpenAI(BaseChatModel):
         message_dicts, params = self._create_message_dicts(messages, stop)
         params = {**params, **kwargs, "stream": True}
 
-        default_chunk_class = AIMessageChunk
+        default_chunk_class: Type[BaseMessageChunk] = AIMessageChunk
         async for chunk in await acompletion_with_retry(
             self, messages=message_dicts, run_manager=run_manager, **params
         ):
@@ -712,7 +712,9 @@ class ChatOpenAI(BaseChatModel):
             kwargs: Any additional parameters to pass to the
                 :class:`~langchain.runnable.Runnable` constructor.
         """
-        from langchain.chains.openai_functions.base import convert_to_openai_function
+        from langchain_classic.chains.openai_functions.base import (
+            convert_to_openai_function,
+        )
 
         formatted_functions = [convert_to_openai_function(fn) for fn in functions]
         if function_call is not None:
