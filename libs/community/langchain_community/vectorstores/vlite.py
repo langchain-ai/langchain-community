@@ -208,7 +208,7 @@ class VLite(VectorStore):
         .. code-block:: python
 
             from langchain import VLite
-            from langchain.embeddings import OpenAIEmbeddings
+            from langchain_classic.embeddings import OpenAIEmbeddings
 
             embeddings = OpenAIEmbeddings()
             vlite = VLite.from_texts(texts, embeddings)
@@ -237,7 +237,7 @@ class VLite(VectorStore):
         .. code-block:: python
 
             from langchain import VLite
-            from langchain.embeddings import OpenAIEmbeddings
+            from langchain_classic.embeddings import OpenAIEmbeddings
 
             embeddings = OpenAIEmbeddings()
             vlite = VLite.from_documents(documents, embeddings)

@@ -11,7 +11,10 @@ from typing import (
     Union,
 )
 
-from langchain.agents.openai_assistant.base import OpenAIAssistantRunnable, OutputType
+from langchain_classic.agents.openai_assistant.base import (
+    OpenAIAssistantRunnable,
+    OutputType,
+)
 from langchain_core._api import beta
 from langchain_core.callbacks import CallbackManager
 from langchain_core.load import dumpd
@@ -154,7 +157,7 @@ class OpenAIAssistantV2Runnable(OpenAIAssistantRunnable):
     Example using OpenAI tools:
         .. code-block:: python
 
-            from langchain.agents.openai_assistant import OpenAIAssistantV2Runnable
+            from langchain_classic.agents.openai_assistant import OpenAIAssistantV2Runnable
 
             assistant = OpenAIAssistantV2Runnable.create_assistant(
                 name="math assistant",
@@ -167,9 +170,9 @@ class OpenAIAssistantV2Runnable(OpenAIAssistantRunnable):
     Example using custom tools and AgentExecutor:
         .. code-block:: python
 
-            from langchain.agents.openai_assistant import OpenAIAssistantV2Runnable
-            from langchain.agents import AgentExecutor
-            from langchain.tools import E2BDataAnalysisTool
+            from langchain_classic.agents.openai_assistant import OpenAIAssistantV2Runnable
+            from langchain_classic.agents import AgentExecutor
+            from langchain_classic.tools import E2BDataAnalysisTool
 
 
             tools = [E2BDataAnalysisTool(api_key="...")]
@@ -187,10 +190,10 @@ class OpenAIAssistantV2Runnable(OpenAIAssistantRunnable):
     Example using custom tools and custom execution:
         .. code-block:: python
 
-            from langchain.agents.openai_assistant import OpenAIAssistantV2Runnable
-            from langchain.agents import AgentExecutor
+            from langchain_classic.agents.openai_assistant import OpenAIAssistantV2Runnable
+            from langchain_classic.agents import AgentExecutor
             from langchain_core.agents import AgentFinish
-            from langchain.tools import E2BDataAnalysisTool
+            from langchain_classic.tools import E2BDataAnalysisTool
 
 
             tools = [E2BDataAnalysisTool(api_key="...")]
