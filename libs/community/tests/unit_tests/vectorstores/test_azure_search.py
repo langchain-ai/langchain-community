@@ -244,7 +244,7 @@ def test_ids_used_correctly() -> None:
     def mock_upload_documents(
         self: SearchClient, documents: List[object]
     ) -> List[Response]:
-        # assume all documents uploaded successfuly
+        # assume all documents uploaded successfully
         response = [Response() for _ in documents]
         return response
 
