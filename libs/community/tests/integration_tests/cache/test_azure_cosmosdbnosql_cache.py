@@ -3,7 +3,7 @@
 from typing import Any, Dict
 
 import pytest
-from langchain.globals import get_llm_cache, set_llm_cache
+from langchain_classic.globals import get_llm_cache, set_llm_cache
 from langchain_core.outputs import Generation
 
 from langchain_community.cache import AzureCosmosDBNoSqlSemanticCache
@@ -73,14 +73,14 @@ def test_azure_cosmos_db_nosql_semantic_cache_cosine_quantizedflat(
     params = llm.dict()
     params["stop"] = None
     llm_string = str(sorted([(k, v) for k, v in params.items()]))
-    get_llm_cache().update("foo", llm_string, [Generation(text="fizz")])
+    get_llm_cache().update("foo", llm_string, [Generation(text="fizz")])  # type: ignore[union-attr]
 
     # foo and bar will have the same embedding produced by FakeEmbeddings
-    cache_output = get_llm_cache().lookup("bar", llm_string)
+    cache_output = get_llm_cache().lookup("bar", llm_string)  # type: ignore[union-attr]
     assert cache_output == [Generation(text="fizz")]
 
     # clear the cache
-    get_llm_cache().clear(llm_string=llm_string)
+    get_llm_cache().clear(llm_string=llm_string)  # type: ignore[union-attr]
 
 
 def test_azure_cosmos_db_nosql_semantic_cache_cosine_flat(
@@ -101,14 +101,14 @@ def test_azure_cosmos_db_nosql_semantic_cache_cosine_flat(
     params = llm.dict()
     params["stop"] = None
     llm_string = str(sorted([(k, v) for k, v in params.items()]))
-    get_llm_cache().update("foo", llm_string, [Generation(text="fizz")])
+    get_llm_cache().update("foo", llm_string, [Generation(text="fizz")])  # type: ignore[union-attr]
 
     # foo and bar will have the same embedding produced by FakeEmbeddings
-    cache_output = get_llm_cache().lookup("bar", llm_string)
+    cache_output = get_llm_cache().lookup("bar", llm_string)  # type: ignore[union-attr]
     assert cache_output == [Generation(text="fizz")]
 
     # clear the cache
-    get_llm_cache().clear(llm_string=llm_string)
+    get_llm_cache().clear(llm_string=llm_string)  # type: ignore[union-attr]
 
 
 def test_azure_cosmos_db_nosql_semantic_cache_dotproduct_quantizedflat(
@@ -129,16 +129,16 @@ def test_azure_cosmos_db_nosql_semantic_cache_dotproduct_quantizedflat(
     params = llm.dict()
     params["stop"] = None
     llm_string = str(sorted([(k, v) for k, v in params.items()]))
-    get_llm_cache().update(
+    get_llm_cache().update(  # type: ignore[union-attr]
         "foo", llm_string, [Generation(text="fizz"), Generation(text="Buzz")]
     )
 
     # foo and bar will have the same embedding produced by FakeEmbeddings
-    cache_output = get_llm_cache().lookup("bar", llm_string)
+    cache_output = get_llm_cache().lookup("bar", llm_string)  # type: ignore[union-attr]
     assert cache_output == [Generation(text="fizz"), Generation(text="Buzz")]
 
     # clear the cache
-    get_llm_cache().clear(llm_string=llm_string)
+    get_llm_cache().clear(llm_string=llm_string)  # type: ignore[union-attr]
 
 
 def test_azure_cosmos_db_nosql_semantic_cache_dotproduct_flat(
@@ -159,16 +159,16 @@ def test_azure_cosmos_db_nosql_semantic_cache_dotproduct_flat(
     params = llm.dict()
     params["stop"] = None
     llm_string = str(sorted([(k, v) for k, v in params.items()]))
-    get_llm_cache().update(
+    get_llm_cache().update(  # type: ignore[union-attr]
         "foo", llm_string, [Generation(text="fizz"), Generation(text="Buzz")]
     )
 
     # foo and bar will have the same embedding produced by FakeEmbeddings
-    cache_output = get_llm_cache().lookup("bar", llm_string)
+    cache_output = get_llm_cache().lookup("bar", llm_string)  # type: ignore[union-attr]
     assert cache_output == [Generation(text="fizz"), Generation(text="Buzz")]
 
     # clear the cache
-    get_llm_cache().clear(llm_string=llm_string)
+    get_llm_cache().clear(llm_string=llm_string)  # type: ignore[union-attr]
 
 
 def test_azure_cosmos_db_nosql_semantic_cache_euclidean_quantizedflat(
@@ -189,14 +189,14 @@ def test_azure_cosmos_db_nosql_semantic_cache_euclidean_quantizedflat(
     params = llm.dict()
     params["stop"] = None
     llm_string = str(sorted([(k, v) for k, v in params.items()]))
-    get_llm_cache().update("foo", llm_string, [Generation(text="fizz")])
+    get_llm_cache().update("foo", llm_string, [Generation(text="fizz")])  # type: ignore[union-attr]
 
     # foo and bar will have the same embedding produced by FakeEmbeddings
-    cache_output = get_llm_cache().lookup("bar", llm_string)
+    cache_output = get_llm_cache().lookup("bar", llm_string)  # type: ignore[union-attr]
     assert cache_output == [Generation(text="fizz")]
 
     # clear the cache
-    get_llm_cache().clear(llm_string=llm_string)
+    get_llm_cache().clear(llm_string=llm_string)  # type: ignore[union-attr]
 
 
 def test_azure_cosmos_db_nosql_semantic_cache_euclidean_flat(
@@ -217,11 +217,11 @@ def test_azure_cosmos_db_nosql_semantic_cache_euclidean_flat(
     params = llm.dict()
     params["stop"] = None
     llm_string = str(sorted([(k, v) for k, v in params.items()]))
-    get_llm_cache().update("foo", llm_string, [Generation(text="fizz")])
+    get_llm_cache().update("foo", llm_string, [Generation(text="fizz")])  # type: ignore[union-attr]
 
     # foo and bar will have the same embedding produced by FakeEmbeddings
-    cache_output = get_llm_cache().lookup("bar", llm_string)
+    cache_output = get_llm_cache().lookup("bar", llm_string)  # type: ignore[union-attr]
     assert cache_output == [Generation(text="fizz")]
 
     # clear the cache
-    get_llm_cache().clear(llm_string=llm_string)
+    get_llm_cache().clear(llm_string=llm_string)  # type: ignore[union-attr]
