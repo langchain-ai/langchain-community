@@ -14,7 +14,7 @@ from langchain_community.agent_toolkits.openapi.prompt import (
 from langchain_community.agent_toolkits.openapi.toolkit import OpenAPIToolkit
 
 if TYPE_CHECKING:
-    from langchain.agents.agent import AgentExecutor
+    from langchain_classic.agents.agent import AgentExecutor
 
 
 def create_openapi_agent(
@@ -69,9 +69,9 @@ def create_openapi_agent(
     Returns:
         The agent executor.
     """
-    from langchain.agents.agent import AgentExecutor
-    from langchain.agents.mrkl.base import ZeroShotAgent
-    from langchain.chains.llm import LLMChain
+    from langchain_classic.agents.agent import AgentExecutor
+    from langchain_classic.agents.mrkl.base import ZeroShotAgent
+    from langchain_classic.chains.llm import LLMChain
 
     tools = toolkit.get_tools()
     prompt_params = (
