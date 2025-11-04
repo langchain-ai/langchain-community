@@ -30,7 +30,12 @@ from langchain_core.language_models.chat_models import (
     agenerate_from_stream,
     generate_from_stream,
 )
-from langchain_core.messages import AIMessageChunk, BaseMessage, BaseMessageChunk
+from langchain_core.messages import (
+    AIMessage,
+    AIMessageChunk,
+    BaseMessage,
+    BaseMessageChunk,
+)
 from langchain_core.output_parsers import (
     JsonOutputParser,
     PydanticOutputParser,
@@ -314,7 +319,7 @@ class ChatOCIModelDeployment(BaseChatModel, BaseOCIModelDeployment):
                 the request is asynchronous.
 
         Returns:
-            Dict: A dictionary containing the appropriate headers for the request.
+            `dict` containing the appropriate headers for the request.
         """
         return {
             "route": DEFAULT_INFERENCE_ENDPOINT_CHAT,
@@ -756,7 +761,7 @@ class ChatOCIModelDeployment(BaseChatModel, BaseOCIModelDeployment):
         self,
         tools: Sequence[Union[Dict[str, Any], Type[BaseModel], Callable, BaseTool]],
         **kwargs: Any,
-    ) -> Runnable[LanguageModelInput, BaseMessage]:
+    ) -> Runnable[LanguageModelInput, AIMessage]:
         formatted_tools = [convert_to_openai_tool(tool) for tool in tools]
         return super().bind(tools=formatted_tools, **kwargs)
 
@@ -824,7 +829,7 @@ class ChatOCIModelDeploymentVLLM(ChatOCIModelDeployment):
     """Number of most likely tokens to consider at each step."""
 
     min_p: Optional[float] = 0.0
-    """Float that represents the minimum probability for a token to be considered. 
+    """Float that represents the minimum probability for a token to be considered.
     Must be in [0,1]. 0 to disable this."""
 
     repetition_penalty: Optional[float] = 1.0
@@ -848,7 +853,7 @@ class ChatOCIModelDeploymentVLLM(ChatOCIModelDeployment):
     the EOS token is generated."""
 
     min_tokens: Optional[int] = 0
-    """Minimum number of tokens to generate per output sequence before 
+    """Minimum number of tokens to generate per output sequence before
     EOS or stop_token_ids can be generated"""
 
     stop_token_ids: Optional[List[int]] = None
@@ -866,7 +871,7 @@ class ChatOCIModelDeploymentVLLM(ChatOCIModelDeployment):
     tool_choice: Optional[str] = None
     """Whether to use tool calling.
     Defaults to None, tool calling is disabled.
-    Tool calling requires model support and the vLLM to be configured 
+    Tool calling requires model support and the vLLM to be configured
     with `--tool-call-parser`.
     Set this to `auto` for the model to make tool calls automatically.
     Set this to `required` to force the model to always call one or more tools.
@@ -986,9 +991,9 @@ class ChatOCIModelDeploymentTGI(ChatOCIModelDeployment):
     """Total probability mass of tokens to consider at each step."""
 
     top_logprobs: Optional[int] = None
-    """An integer between 0 and 5 specifying the number of most 
-    likely tokens to return at each token position, each with an 
-    associated log probability. logprobs must be set to true if 
+    """An integer between 0 and 5 specifying the number of most
+    likely tokens to return at each token position, each with an
+    associated log probability. logprobs must be set to true if
     this parameter is used."""
 
     @property

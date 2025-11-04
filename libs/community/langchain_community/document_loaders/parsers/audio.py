@@ -44,7 +44,7 @@ class AzureOpenAIWhisperParser(BaseBlobParser):
     Example Usage:
         .. code-block:: python
 
-            from langchain.community import AzureOpenAIWhisperParser
+            from langchain_classic.community import AzureOpenAIWhisperParser
 
             whisper_parser = AzureOpenAIWhisperParser(
                 deployment_name="your-whisper-deployment",
@@ -559,10 +559,10 @@ class FasterWhisperParser(BaseBlobParser):
     Example: Load a YouTube video and transcribe the video speech into a document.
         .. code-block:: python
 
-            from langchain.document_loaders.generic import GenericLoader
+            from langchain_classic.document_loaders.generic import GenericLoader
             from langchain_community.document_loaders.parsers.audio
                 import FasterWhisperParser
-            from langchain.document_loaders.blob_loaders.youtube_audio
+            from langchain_classic.document_loaders.blob_loaders.youtube_audio
                 import YoutubeAudioLoader
 
 

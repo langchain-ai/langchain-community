@@ -2,7 +2,7 @@
 
 import uuid
 
-import langchain
+import langchain_classic
 import pytest
 from langchain_core.outputs import Generation, LLMResult
 
@@ -22,22 +22,26 @@ def random_string() -> str:
 def test_redis_cache_ttl() -> None:
     from upstash_redis import Redis
 
-    langchain.llm_cache = UpstashRedisCache(redis_=Redis(url=URL, token=TOKEN), ttl=1)
-    langchain.llm_cache.update("foo", "bar", [Generation(text="fizz")])
-    key = langchain.llm_cache._key("foo", "bar")
-    assert langchain.llm_cache.redis.pttl(key) > 0
+    langchain_classic.llm_cache = UpstashRedisCache(
+        redis_=Redis(url=URL, token=TOKEN), ttl=1
+    )
+    langchain_classic.llm_cache.update("foo", "bar", [Generation(text="fizz")])
+    key = langchain_classic.llm_cache._key("foo", "bar")
+    assert langchain_classic.llm_cache.redis.pttl(key) > 0
 
 
 @pytest.mark.requires("upstash_redis")
 def test_redis_cache() -> None:
     from upstash_redis import Redis
 
-    langchain.llm_cache = UpstashRedisCache(redis_=Redis(url=URL, token=TOKEN), ttl=1)
+    langchain_classic.llm_cache = UpstashRedisCache(
+        redis_=Redis(url=URL, token=TOKEN), ttl=1
+    )
     llm = FakeLLM()
     params = llm.dict()
     params["stop"] = None
     llm_string = str(sorted([(k, v) for k, v in params.items()]))
-    langchain.llm_cache.update("foo", llm_string, [Generation(text="fizz")])
+    langchain_classic.llm_cache.update("foo", llm_string, [Generation(text="fizz")])
     output = llm.generate(["foo"])
     expected_output = LLMResult(
         generations=[[Generation(text="fizz")]],
@@ -45,26 +49,28 @@ def test_redis_cache() -> None:
     )
     assert output == expected_output
 
-    lookup_output = langchain.llm_cache.lookup("foo", llm_string)
+    lookup_output = langchain_classic.llm_cache.lookup("foo", llm_string)
     if lookup_output and len(lookup_output) > 0:
         assert lookup_output == expected_output.generations[0]
 
-    langchain.llm_cache.clear()
+    langchain_classic.llm_cache.clear()
     output = llm.generate(["foo"])
 
     assert output != expected_output
-    langchain.llm_cache.redis.flushall()
+    langchain_classic.llm_cache.redis.flushall()
 
 
 def test_redis_cache_multi() -> None:
     from upstash_redis import Redis
 
-    langchain.llm_cache = UpstashRedisCache(redis_=Redis(url=URL, token=TOKEN), ttl=1)
+    langchain_classic.llm_cache = UpstashRedisCache(
+        redis_=Redis(url=URL, token=TOKEN), ttl=1
+    )
     llm = FakeLLM()
     params = llm.dict()
     params["stop"] = None
     llm_string = str(sorted([(k, v) for k, v in params.items()]))
-    langchain.llm_cache.update(
+    langchain_classic.llm_cache.update(
         "foo", llm_string, [Generation(text="fizz"), Generation(text="Buzz")]
     )
     output = llm.generate(
@@ -76,16 +82,18 @@ def test_redis_cache_multi() -> None:
     )
     assert output == expected_output
     # clear the cache
-    langchain.llm_cache.clear()
+    langchain_classic.llm_cache.clear()
 
 
 @pytest.mark.requires("upstash_redis")
 def test_redis_cache_chat() -> None:
     from upstash_redis import Redis
 
-    langchain.llm_cache = UpstashRedisCache(redis_=Redis(url=URL, token=TOKEN), ttl=1)
+    langchain_classic.llm_cache = UpstashRedisCache(
+        redis_=Redis(url=URL, token=TOKEN), ttl=1
+    )
     llm = FakeChatModel()
     params = llm.dict()
     params["stop"] = None
     llm.invoke("foo")
-    langchain.llm_cache.redis.flushall()
+    langchain_classic.llm_cache.redis.flushall()

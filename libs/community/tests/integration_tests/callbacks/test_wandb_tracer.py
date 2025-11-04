@@ -30,7 +30,7 @@ questions = [
 
 
 def test_tracing_sequential() -> None:
-    from langchain.agents import AgentType, initialize_agent, load_tools
+    from langchain_classic.agents import AgentType, initialize_agent, load_tools
 
     os.environ["LANGCHAIN_WANDB_TRACING"] = "true"
     os.environ["WANDB_PROJECT"] = "langchain-tracing"
@@ -48,7 +48,7 @@ def test_tracing_sequential() -> None:
 
 
 def test_tracing_session_env_var() -> None:
-    from langchain.agents import AgentType, initialize_agent, load_tools
+    from langchain_classic.agents import AgentType, initialize_agent, load_tools
 
     os.environ["LANGCHAIN_WANDB_TRACING"] = "true"
 
@@ -64,7 +64,7 @@ def test_tracing_session_env_var() -> None:
 
 
 async def test_tracing_concurrent() -> None:
-    from langchain.agents import AgentType, initialize_agent, load_tools
+    from langchain_classic.agents import AgentType, initialize_agent, load_tools
 
     os.environ["LANGCHAIN_WANDB_TRACING"] = "true"
     aiosession = ClientSession()
@@ -83,7 +83,7 @@ async def test_tracing_concurrent() -> None:
 
 
 def test_tracing_context_manager() -> None:
-    from langchain.agents import AgentType, initialize_agent, load_tools
+    from langchain_classic.agents import AgentType, initialize_agent, load_tools
 
     llm = OpenAI(temperature=0)
     tools = load_tools(
@@ -102,7 +102,7 @@ def test_tracing_context_manager() -> None:
 
 
 async def test_tracing_context_manager_async() -> None:
-    from langchain.agents import AgentType, initialize_agent, load_tools
+    from langchain_classic.agents import AgentType, initialize_agent, load_tools
 
     llm = OpenAI(temperature=0)
     async_tools = load_tools(
