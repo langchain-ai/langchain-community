@@ -1,0 +1,94 @@
+name: "\U0001F41B Bug Report"
+description: Report a bug in LangChain Community. To report a security issue, please instead use the security option below. For questions, please use the LangChain forum.
+labels: ["bug"]
+type: bug
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thank you for taking the time to file a bug report.
+
+        Use this to report BUGS in LangChain Community. For usage questions, feature requests and general design questions, please use the [LangChain Forum](https://forum.langchain.com/).
+
+        Relevant links to check before filing a bug report to see if your issue has already been reported, fixed or
+        if there's another way to solve your problem:
+
+        * [LangChain Forum](https://forum.langchain.com/),
+        * [LangChain documentation with the integrated search](https://docs.langchain.com/oss/python/langchain/overview),
+        * [API Reference](https://reference.langchain.com/python/),
+        * [LangChain ChatBot](https://chat.langchain.com/)
+        * [GitHub search](https://github.com/langchain-ai/langchain-community),
+  - type: checkboxes
+    id: checks
+    attributes:
+      label: Checked other resources
+      description: Please confirm and check all the following options.
+      options:
+        - label: This is a bug, not a usage question.
+          required: true
+        - label: I added a clear and descriptive title that summarizes this issue.
+          required: true
+        - label: I used the GitHub search to find a similar question and didn't find it.
+          required: true
+        - label: I am sure that this is a bug in LangChain Community rather than my code.
+          required: true
+        - label: The bug is not resolved by updating to the latest stable version of LangChain Community.
+          required: true
+        - label: I read what a minimal reproducible example is (https://stackoverflow.com/help/minimal-reproducible-example).
+          required: true
+        - label: I posted a self-contained, minimal, reproducible example. A maintainer can copy it and run it AS IS.
+          required: true
+  - type: textarea
+    id: reproduction
+    validations:
+      required: true
+    attributes:
+      label: Example Code
+      description: |
+        Please add a self-contained, [minimal, reproducible, example](https://stackoverflow.com/help/minimal-reproducible-example) with your use case.
+
+        If a maintainer can copy it, run it, and see it right away, there's a much higher chance that you'll be able to get help.
+
+        **Important!**
+
+        * Avoid screenshots when possible, as they are hard to read and (more importantly) don't allow others to copy-and-paste your code.
+        * Reduce your code to the minimum required to reproduce the issue if possible. This makes it much easier for others to help you.
+        * Use code tags (e.g., ```python ... ```) to correctly [format your code](https://help.github.com/en/github/writing-on-github/creating-and-highlighting-code-blocks#syntax-highlighting).
+        * INCLUDE the language label (e.g. `python`) after the first three backticks to enable syntax highlighting. (e.g., ```python rather than ```).
+
+      placeholder: |
+        The following code:
+
+        ```python
+        from langchain_core.runnables import RunnableLambda
+
+        def bad_code(inputs) -> int:
+          raise NotImplementedError('For demo purpose')
+
+          chain = RunnableLambda(bad_code)
+          chain.invoke('Hello!')
+        ```
+  - type: textarea
+    id: error
+    validations:
+      required: false
+    attributes:
+      label: Error Message and Stack Trace (if applicable)
+      description: |
+        If you are reporting an error, please include the full error message and stack trace.
+      placeholder: |
+        Exception + full stack trace
+  - type: textarea
+    id: description
+    attributes:
+      label: Description
+      description: |
+        What is the problem, question, or error?
+
+        Write a short description telling what you are doing, what you expect to happen, and what is currently happening.
+      placeholder: |
+        * I'm trying to use the `langchain-community` library to do X.
+        * I expect to see Y.
+        * Instead, it does Z.
+    validations:
+      required: true

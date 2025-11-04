@@ -1447,11 +1447,11 @@ class FAISS(VectorStore):
             supports logical operators ($and, $or, $not) and field-level filtering.
 
             Args:
-                filter (Dict[str, Any]): A dictionary containing filter conditions.
-                Can include:
-                    - Logical operators ($and, $or, $not) with lists of sub-filters
-                    - Field-level conditions with comparison or sequence operators
-                    - Direct field-value mappings for equality comparison
+                `dict` containing filter conditions.
+                    Can include:
+                        - Logical operators ($and, $or, $not) with lists of sub-filters
+                        - Field-level conditions with comparison or sequence operators
+                        - Direct field-value mappings for equality comparison
 
             Returns:
                 Callable[[Dict[str, Any]], bool]: A function that takes a document
