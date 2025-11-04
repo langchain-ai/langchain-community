@@ -115,13 +115,17 @@ def _messages_to_prompt_dict(
             if index != 0:
                 raise ChatGooglePalmError("System message must be first input message.")
             context = cast(str, input_message.content)
-        elif isinstance(input_message, HumanMessage) and input_message.example:
+        elif isinstance(
+            input_message, HumanMessage
+        ) and input_message.additional_kwargs.get("example"):
             if messages:
                 raise ChatGooglePalmError(
                     "Message examples must come before other messages."
                 )
             _, next_input_message = remaining.pop(0)
-            if isinstance(next_input_message, AIMessage) and next_input_message.example:
+            if isinstance(
+                next_input_message, AIMessage
+            ) and next_input_message.additional_kwargs.get("example"):
                 examples.extend(
                     [
                         genai.types.MessageDict(
@@ -137,7 +141,9 @@ def _messages_to_prompt_dict(
                     "Human example message must be immediately followed by an "
                     " AI example response."
                 )
-        elif isinstance(input_message, AIMessage) and input_message.example:
+        elif isinstance(
+            input_message, AIMessage
+        ) and input_message.additional_kwargs.get("example"):
             raise ChatGooglePalmError(
                 "AI example message must be immediately preceded by a Human "
                 "example message."

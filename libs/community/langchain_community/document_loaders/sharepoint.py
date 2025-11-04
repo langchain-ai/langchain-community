@@ -181,8 +181,8 @@ class SharePointLoader(O365BaseLoader, BaseLoader):
         Args:
             file_id (str): The ID of the file.
         Returns:
-            dict: A dictionary containing the extended metadata of the file,
-                  including size, owner, and full path.
+            `dict` containing the extended metadata of the file, including size, owner,
+                and full path.
         """
         data = self._fetch_access_token()
         access_token = data.get("access_token")

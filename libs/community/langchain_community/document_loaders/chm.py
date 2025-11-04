@@ -1,5 +1,8 @@
 from pathlib import Path
-from typing import TYPE_CHECKING, Any, Dict, List, Union
+from types import TracebackType
+from typing import TYPE_CHECKING, Any, Dict, List, Optional, Union
+
+from typing_extensions import Self
 
 from langchain_community.document_loaders.unstructured import UnstructuredFileLoader
 
@@ -65,10 +68,15 @@ class CHMParser(object):
         self.file = chm.CHMFile()
         self.file.LoadCHM(path)
 
-    def __enter__(self):  # type: ignore[no-untyped-def]
+    def __enter__(self) -> Self:
         return self
 
-    def __exit__(self, exc_type, exc_value, traceback):  # type: ignore[no-untyped-def]
+    def __exit__(
+        self,
+        exc_type: Optional[type[BaseException]],
+        exc_value: Optional[BaseException],
+        traceback: Optional[TracebackType],
+    ) -> None:
         if self.file:
             self.file.CloseCHM()
 
@@ -92,9 +100,9 @@ class CHMParser(object):
             local = ""
             for param in obj.find_all("param"):
                 if param["name"] == "Name":
-                    name = param["value"]
+                    name = param["value"]  # type: ignore[assignment]
                 if param["name"] == "Local":
-                    local = param["value"]
+                    local = param["value"]  # type: ignore[assignment]
             if not name or not local:
                 continue
 
