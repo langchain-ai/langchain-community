@@ -311,7 +311,7 @@ class AzureMLChatOnlineEndpoint(BaseChatModel, AzureMLBaseEndpoint):
         ]
         params = {"stream": True, "stop": stop, "model": None, **kwargs}
 
-        default_chunk_class = AIMessageChunk
+        default_chunk_class: Type[BaseMessageChunk] = AIMessageChunk
         for chunk in client.chat.completions.create(messages=message_dicts, **params):
             if not isinstance(chunk, dict):
                 chunk = chunk.dict()
@@ -366,7 +366,7 @@ class AzureMLChatOnlineEndpoint(BaseChatModel, AzureMLBaseEndpoint):
         ]
         params = {"stream": True, "stop": stop, "model": None, **kwargs}
 
-        default_chunk_class = AIMessageChunk
+        default_chunk_class: Type[BaseMessageChunk] = AIMessageChunk
         async for chunk in await async_client.chat.completions.create(
             messages=message_dicts,
             **params,

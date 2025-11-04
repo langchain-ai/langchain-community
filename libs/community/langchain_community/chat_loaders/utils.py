@@ -26,7 +26,7 @@ def merge_chat_runs_in_session(
             text = ""
             for content in message.content:
                 if isinstance(content, dict):
-                    text += content.get("text", None)
+                    text += content.get("text", "") or ""
                 else:
                     text += content
             message.content = text

@@ -15,7 +15,7 @@ from langchain_community.agent_toolkits.powerbi.toolkit import PowerBIToolkit
 from langchain_community.utilities.powerbi import PowerBIDataset
 
 if TYPE_CHECKING:
-    from langchain.agents import AgentExecutor
+    from langchain_classic.agents import AgentExecutor
 
 
 def create_pbi_agent(
@@ -54,9 +54,9 @@ def create_pbi_agent(
     Returns:
         The agent executor.
     """
-    from langchain.agents import AgentExecutor
-    from langchain.agents.mrkl.base import ZeroShotAgent
-    from langchain.chains.llm import LLMChain
+    from langchain_classic.agents import AgentExecutor
+    from langchain_classic.agents.mrkl.base import ZeroShotAgent
+    from langchain_classic.chains.llm import LLMChain
 
     if toolkit is None:
         if powerbi is None:
