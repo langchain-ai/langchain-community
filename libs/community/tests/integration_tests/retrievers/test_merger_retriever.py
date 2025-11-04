@@ -1,4 +1,4 @@
-from langchain.retrievers.merger_retriever import MergerRetriever
+from langchain_classic.retrievers.merger_retriever import MergerRetriever
 from langchain_core.vectorstores import InMemoryVectorStore
 
 from langchain_community.embeddings import OpenAIEmbeddings
