@@ -163,22 +163,24 @@ class _Event:
     """A combined event that is threadsafe and async safe."""
 
     _event: threading.Event
-    _aevent: asyncio.Event
+    _aevent: Optional[asyncio.Event]
 
     def __init__(self) -> None:
         """Initialize the event."""
         self._event = threading.Event()
-        self._aevent = asyncio.Event()
+        self._aevent = None
 
     def set(self) -> None:
         """Set the event."""
         self._event.set()
-        self._aevent.set()
+        if self._aevent is not None:
+            self._aevent.set()
 
     def clear(self) -> None:
         """Set the event."""
         self._event.clear()
-        self._aevent.clear()
+        if self._aevent is not None:
+            self._aevent.clear()
 
     def is_set(self) -> bool:
         """Indicate if the event is set."""
@@ -190,6 +192,10 @@ class _Event:
 
     async def async_wait(self) -> None:
         """Async wait for the event to be set."""
+        if self._aevent is None:
+            self._aevent = asyncio.Event()
+            if self._event.is_set():
+                self._aevent.set()
         await self._aevent.wait()
 
 
@@ -296,7 +302,8 @@ class AudioStream:
         while True:
             # get next item
             try:
-                next_val = await asyncio.get_event_loop().run_in_executor(
+                loop = asyncio.get_running_loop()
+                next_val = await loop.run_in_executor(
                     None, self._queue.get, True, _QUEUE_GET_TIMEOUT
                 )
             except queue.Empty:
@@ -351,7 +358,7 @@ class AudioStream:
 
     async def aput(self, item: StreamInputType, timeout: Optional[int] = None) -> None:
         """Async put a new item into the queue."""
-        loop = asyncio.get_event_loop()
+        loop = asyncio.get_running_loop()
         await asyncio.wait_for(loop.run_in_executor(None, self.put, item), timeout)
 
     def close(self, timeout: Optional[int] = None) -> None:

@@ -330,15 +330,15 @@ class TextGen(LLM):
             result = websocket_client.recv()
             result = json.loads(result)
 
-            if result["event"] == "text_stream":  # type: ignore[call-overload, index]
+            if result["event"] == "text_stream":
                 chunk = GenerationChunk(
-                    text=result["text"],  # type: ignore[call-overload, index]
+                    text=result["text"],
                     generation_info=None,
                 )
                 if run_manager:
                     run_manager.on_llm_new_token(token=chunk.text)
                 yield chunk
-            elif result["event"] == "stream_end":  # type: ignore[call-overload, index]
+            elif result["event"] == "stream_end":
                 websocket_client.close()
                 return
 
@@ -402,14 +402,14 @@ class TextGen(LLM):
             result = websocket_client.recv()
             result = json.loads(result)
 
-            if result["event"] == "text_stream":  # type: ignore[call-overload, index]
+            if result["event"] == "text_stream":
                 chunk = GenerationChunk(
-                    text=result["text"],  # type: ignore[call-overload, index]
+                    text=result["text"],
                     generation_info=None,
                 )
                 if run_manager:
                     await run_manager.on_llm_new_token(token=chunk.text)
                 yield chunk
-            elif result["event"] == "stream_end":  # type: ignore[call-overload, index]
+            elif result["event"] == "stream_end":
                 websocket_client.close()
                 return

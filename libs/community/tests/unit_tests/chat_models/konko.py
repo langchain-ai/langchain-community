@@ -89,7 +89,7 @@ def test_konko_streaming_callback_test() -> None:
         max_tokens=10,
         streaming=True,
         temperature=0,
-        callback_manager=callback_mgr,
+        callbacks=callback_mgr,
         verbose=True,
     )
     msg = HumanMessage(content="Hi")
@@ -112,7 +112,7 @@ def test_konko_streaming_info_test() -> None:
     chat_instance = ChatKonko(
         max_tokens=2,
         temperature=0,
-        callback_manager=callback_mgr,
+        callbacks=callback_mgr,
     )
     list(chat_instance.stream("hey"))
     gen_data = callback_instance.data_store["generation"]

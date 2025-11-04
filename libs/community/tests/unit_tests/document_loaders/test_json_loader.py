@@ -440,3 +440,34 @@ def test_load_json_with_nested_jq_parsable_content_key_with_metadata(
     result = loader.load()
 
     assert result == expected_docs
+
+
+def test_load_json_with_utf8_bom() -> None:
+    import tempfile
+
+    with tempfile.NamedTemporaryFile(
+        mode="w", suffix=".json", delete=False, encoding="utf-8-sig"
+    ) as temp_file:
+        temp_file.write('[{"text": "value1"}, {"text": "value2"}]')
+        temp_file_path = temp_file.name
+
+    try:
+        expected_docs = [
+            Document(
+                page_content="value1",
+                metadata={"source": temp_file_path, "seq_num": 1},
+            ),
+            Document(
+                page_content="value2",
+                metadata={"source": temp_file_path, "seq_num": 2},
+            ),
+        ]
+
+        loader = JSONLoader(
+            file_path=temp_file_path, jq_schema=".[].text", text_content=True
+        )
+        result = loader.load()
+
+        assert result == expected_docs
+    finally:
+        Path(temp_file_path).unlink()
