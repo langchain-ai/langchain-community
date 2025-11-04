@@ -60,7 +60,7 @@ class TelegramChatLoader(BaseChatLoader):
         results: List[Union[HumanMessage, AIMessage]] = []
         previous_sender = None
         for message in soup.select(".message.default"):
-            timestamp = message.select_one(".pull_right.date.details")["title"]
+            timestamp = message.select_one(".pull_right.date.details")["title"]  # type: ignore[index]
             from_name_element = message.select_one(".from_name")
             if from_name_element is None and previous_sender is None:
                 logger.debug("from_name not found in message")
@@ -69,7 +69,7 @@ class TelegramChatLoader(BaseChatLoader):
                 from_name = previous_sender
             else:
                 from_name = from_name_element.text.strip()
-            text = message.select_one(".text").text.strip()
+            text = message.select_one(".text").text.strip()  # type: ignore[union-attr]
             results.append(
                 HumanMessage(
                     content=text,
@@ -102,6 +102,8 @@ class TelegramChatLoader(BaseChatLoader):
             text = message.get("text", "")
             timestamp = message.get("date", "")
             from_name = message.get("from", "")
+            if from_name is None:
+                from_name = "Deleted Account"
 
             results.append(
                 HumanMessage(

@@ -65,7 +65,7 @@
     "lc": 1,
     "type": "constructor",
     "id": [
-      "langchain",
+      "langchain_classic",
       "chains",
       "llm",
       "LLMChain"
@@ -145,7 +145,7 @@
     "lc": 1,
     "type": "constructor",
     "id": [
-      "langchain",
+      "langchain_classic",
       "chains",
       "llm",
       "LLMChain"
@@ -250,7 +250,7 @@
     "lc": 1,
     "type": "constructor",
     "id": [
-      "langchain",
+      "langchain_classic",
       "chains",
       "llm",
       "LLMChain"

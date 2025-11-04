@@ -1,12 +1,18 @@
 from typing import Any, Dict, List
 
 import requests
+from langchain_core._api.deprecation import deprecated
 from langchain_core.embeddings import Embeddings
 from pydantic import BaseModel, ConfigDict
 
 DEFAULT_MODEL_NAME = "@cf/baai/bge-base-en-v1.5"
 
 
+@deprecated(
+    since="0.3.23",
+    removal="1.0",
+    alternative_import="langchain_cloudflare.CloudflareWorkersAIEmbeddings",
+)
 class CloudflareWorkersAIEmbeddings(BaseModel, Embeddings):
     """Cloudflare Workers AI embedding model.
 

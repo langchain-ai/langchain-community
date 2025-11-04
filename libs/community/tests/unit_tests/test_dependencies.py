@@ -42,7 +42,7 @@ def test_required_dependencies(uv_conf: Mapping[str, Any]) -> None:
             "requests",
             "pydantic-settings",
             "tenacity",
-            "langchain",
+            "langchain-classic",
         ]
     )
 
@@ -63,9 +63,7 @@ def test_test_group_dependencies(uv_conf: Mapping[str, Any]) -> None:
         [
             "duckdb-engine",
             "freezegun",
-            "langchain-core",
             "langchain-tests",
-            "langchain",
             "lark",
             "pandas",
             "pytest",
