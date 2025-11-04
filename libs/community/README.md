@@ -1,7 +1,14 @@
 # 🦜️🧑‍🤝‍🧑 LangChain Community
 
-[![Downloads](https://static.pepy.tech/badge/langchain_community/month)](https://pepy.tech/project/langchain_community)
-[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+[![PyPI - Version](https://img.shields.io/pypi/v/langchain-community?label=%20)](https://pypi.org/project/langchain-community/#history)
+[![PyPI - License](https://img.shields.io/pypi/l/langchain-community)](https://opensource.org/licenses/MIT)
+[![PyPI - Downloads](https://img.shields.io/pepy/dt/langchain-community)](https://pypistats.org/packages/langchain-community)
+[![Twitter](https://img.shields.io/twitter/url/https/twitter.com/langchainai.svg?style=social&label=Follow%20%40LangChainAI)](https://twitter.com/langchainai)
+
+Looking for the JS/TS community library? Check out [LangChain.js](https://github.com/langchain-ai/langchainjs/tree/main/libs/langchain-community).
+
+To help you ship LangChain apps to production faster, check out [LangSmith](https://smith.langchain.com).
+[LangSmith](https://smith.langchain.com) is a unified developer platform for building, testing, and monitoring LLM applications.
 
 ## Quick Install
 
@@ -9,22 +16,20 @@
 pip install langchain-community
 ```
 
-## What is it?
+## 🤔 What is this?
 
 LangChain Community contains third-party integrations that implement the base interfaces defined in LangChain Core, making them ready-to-use in any LangChain application.
 
-For full documentation see the [API reference](https://python.langchain.com/api_reference/community/index.html).
+## 📖 Documentation
 
-![Diagram outlining the hierarchical organization of the LangChain framework, displaying the interconnected parts across multiple layers.](https://raw.githubusercontent.com/langchain-ai/langchain/master/docs/static/svg/langchain_stack_112024.svg "LangChain Framework Overview")
+For full documentation, see the [API reference](https://reference.langchain.com/python/langchain_community/).
 
 ## 📕 Releases & Versioning
 
-`langchain-community` is currently on version `0.0.x`
-
-All changes will be accompanied by a patch version increase.
+See our [Releases](https://docs.langchain.com/oss/python/release-policy) and [Versioning](https://docs.langchain.com/oss/python/versioning) policies.
 
 ## 💁 Contributing
 
 As an open-source project in a rapidly developing field, we are extremely open to contributions, whether it be in the form of a new feature, improved infrastructure, or better documentation.
 
-For detailed information on how to contribute, see the [Contributing Guide](https://python.langchain.com/docs/contributing/).
+For detailed information on how to contribute, see the [Contributing Guide](https://docs.langchain.com/oss/python/contributing/overview).
