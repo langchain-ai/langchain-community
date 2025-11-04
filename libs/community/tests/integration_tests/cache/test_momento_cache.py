@@ -12,7 +12,7 @@ from datetime import timedelta
 from typing import Iterator
 
 import pytest
-from langchain.globals import set_llm_cache
+from langchain_classic.globals import set_llm_cache
 from langchain_core.outputs import Generation, LLMResult
 
 from langchain_community.cache import MomentoCache

@@ -10,6 +10,38 @@ from langchain_core.messages import AIMessage
 from langchain_core.outputs import ChatGeneration, LLMResult
 
 MODEL_COST_PER_1K_TOKENS = {
+    # GPT-5 input
+    "gpt-5": 0.00125,
+    "gpt-5-cached": 0.000125,
+    "gpt-5-2025-08-07": 0.00125,
+    "gpt-5-2025-08-07-cached": 0.000125,
+    # GPT-5 output
+    "gpt-5-completion": 0.01,
+    "gpt-5-2025-08-07-completion": 0.01,
+    # GPT-5-mini input
+    "gpt-5-mini": 0.00025,
+    "gpt-5-mini-cached": 0.000025,
+    "gpt-5-mini-2025-08-07": 0.00025,
+    "gpt-5-mini-2025-08-07-cached": 0.000025,
+    # GPT-5-mini output
+    "gpt-5-mini-completion": 0.002,
+    "gpt-5-mini-2025-08-07-completion": 0.002,
+    # GPT-5-nano input
+    "gpt-5-nano": 0.00005,
+    "gpt-5-nano-cached": 0.000005,
+    "gpt-5-nano-2025-08-07": 0.00005,
+    "gpt-5-nano-2025-08-07-cached": 0.000005,
+    # GPT-5-nano output
+    "gpt-5-nano-completion": 0.0004,
+    "gpt-5-nano-2025-08-07-completion": 0.0004,
+    # GPT-5-chat-latest input
+    "gpt-5-chat-latest": 0.00125,
+    "gpt-5-chat-latest-cached": 0.000125,
+    "gpt-5-chat-latest-2025-08-07": 0.00125,
+    "gpt-5-chat-latest-2025-08-07-cached": 0.000125,
+    # GPT-5-chat-latest output
+    "gpt-5-chat-latest-completion": 0.01,
+    "gpt-5-chat-latest-2025-08-07-completion": 0.01,
     # GPT-4.1 input
     "gpt-4.1": 0.002,
     "gpt-4.1-2025-04-14": 0.002,
@@ -319,7 +351,8 @@ def standardize_model_name(
     if "ft:" in model_name:
         model_name = model_name.split(":")[1] + "-finetuned"
     if token_type == TokenType.COMPLETION and (
-        model_name.startswith("gpt-4")
+        model_name.startswith("gpt-5")
+        or model_name.startswith("gpt-4")
         or model_name.startswith("gpt-3.5")
         or model_name.startswith("gpt-35")
         or model_name.startswith("o1-")
@@ -331,7 +364,8 @@ def standardize_model_name(
     if (
         token_type == TokenType.PROMPT_CACHED
         and (
-            model_name.startswith("gpt-4o")
+            model_name.startswith("gpt-5")
+            or model_name.startswith("gpt-4o")
             or model_name.startswith("gpt-4.1")
             or model_name.startswith("o1")
             or model_name.startswith("o3")

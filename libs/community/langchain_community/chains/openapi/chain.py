@@ -5,10 +5,10 @@ from __future__ import annotations
 import json
 from typing import Any, Dict, List, NamedTuple, Optional, cast
 
-from langchain.chains.api.openapi.requests_chain import APIRequesterChain
-from langchain.chains.api.openapi.response_chain import APIResponderChain
-from langchain.chains.base import Chain
-from langchain.chains.llm import LLMChain
+from langchain_classic.chains.api.openapi.requests_chain import APIRequesterChain
+from langchain_classic.chains.api.openapi.response_chain import APIResponderChain
+from langchain_classic.chains.base import Chain
+from langchain_classic.chains.llm import LLMChain
 from langchain_core.callbacks import CallbackManagerForChainRun, Callbacks
 from langchain_core.language_models import BaseLanguageModel
 from pydantic import BaseModel, Field
