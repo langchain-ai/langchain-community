@@ -1,7 +1,7 @@
-"""**Utilities** are the integrations with third-part systems and packages.
+"""**Utilities** are the integrations with third-party systems and packages.
 
-Other LangChain classes use **Utilities** to interact with third-part systems
-and packages.
+Other LangChain classes use **Utilities** to interact with third-party systems and
+packages.
 """
 
 import importlib

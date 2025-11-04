@@ -224,12 +224,12 @@ class DuckDB(VectorStore):
         list_cosine_similarity = self.duckdb.FunctionExpression(
             "list_cosine_similarity",
             self.duckdb.ColumnExpression(self._vector_key),
-            self.duckdb.ConstantExpression(embedding),
+            self.duckdb.ConstantExpression(json.dumps(embedding)),
         )
         docs = (
             self._table.select(
                 *[
-                    self.duckdb.StarExpression(exclude=[]),
+                    self.duckdb.StarExpression(),
                     list_cosine_similarity.alias(SIMILARITY_ALIAS),
                 ]
             )
@@ -269,12 +269,12 @@ class DuckDB(VectorStore):
         list_cosine_similarity = self.duckdb.FunctionExpression(
             "list_cosine_similarity",
             self.duckdb.ColumnExpression(self._vector_key),
-            self.duckdb.ConstantExpression(embedding),
+            self.duckdb.ConstantExpression(json.dumps(embedding)),
         )
         docs = (
             self._table.select(
                 *[
-                    self.duckdb.StarExpression(exclude=[]),
+                    self.duckdb.StarExpression(),
                     list_cosine_similarity.alias(SIMILARITY_ALIAS),
                 ]
             )
