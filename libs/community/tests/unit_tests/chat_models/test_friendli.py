@@ -143,7 +143,8 @@ def test_friendli_stream(
     mock_friendli_client.chat.completions.create.return_value = mock_stream
     stream = chat_friendli.stream("Hello langchain")
     for i, chunk in enumerate(stream):
-        assert chunk.content == mock_chunks[i].choices[0].delta.content
+        if chunk.chunk_position != "last":
+            assert chunk.content == mock_chunks[i].choices[0].delta.content
 
     mock_friendli_client.chat.completions.create.assert_called_once_with(
         messages=[{"role": "user", "content": "Hello langchain"}],
@@ -182,7 +183,8 @@ async def test_friendli_astream(
     mock_friendli_async_client.chat.completions.create.return_value = mock_stream
     stream = chat_friendli.astream("Hello langchain")
     async for i, chunk in aenumerate(stream):
-        assert chunk.content == mock_chunks[i].choices[0].delta.content
+        if chunk.chunk_position != "last":
+            assert chunk.content == mock_chunks[i].choices[0].delta.content
 
     mock_friendli_async_client.chat.completions.create.assert_awaited_once_with(
         messages=[{"role": "user", "content": "Hello langchain"}],

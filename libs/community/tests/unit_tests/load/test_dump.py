@@ -6,7 +6,7 @@ from typing import Any, Dict, List
 from unittest.mock import patch
 
 import pytest
-from langchain.chains.llm import LLMChain
+from langchain_classic.chains.llm import LLMChain
 from langchain_core.load.dump import dumps
 from langchain_core.load.serializable import Serializable
 from langchain_core.prompts.chat import ChatPromptTemplate, HumanMessagePromptTemplate

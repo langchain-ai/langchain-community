@@ -3,9 +3,9 @@ from __future__ import annotations
 import re
 from typing import Any, Dict, List, Optional
 
-from langchain.chains.base import Chain
-from langchain.chains.llm import LLMChain
-from langchain.chains.prompt_selector import ConditionalPromptSelector
+from langchain_classic.chains.base import Chain
+from langchain_classic.chains.llm import LLMChain
+from langchain_classic.chains.prompt_selector import ConditionalPromptSelector
 from langchain_core._api.deprecation import deprecated
 from langchain_core.callbacks import CallbackManagerForChainRun
 from langchain_core.language_models import BaseLanguageModel
