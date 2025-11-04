@@ -505,8 +505,7 @@ class SQLDatabase:
                     pass
                 elif self.dialect == "trino":
                     connection.exec_driver_sql(
-                        "USE ?",
-                        (self._schema,),
+                        f"USE {self._schema}",
                         execution_options=execution_options,
                     )
                 elif self.dialect == "duckdb":

@@ -64,7 +64,7 @@ def cosine_similarity_top_k(
     if len(X) == 0 or len(Y) == 0:
         return [], []
     score_array = cosine_similarity(X, Y)
-    score_threshold = score_threshold or -1.0
+    score_threshold = -1.0 if score_threshold is None else score_threshold
     score_array[score_array < score_threshold] = 0
     top_k = int(min(top_k or len(score_array), int(np.count_nonzero(score_array))))
     top_k_idxs = np.argpartition(score_array, -top_k, axis=None)[-top_k:]
