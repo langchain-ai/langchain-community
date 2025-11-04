@@ -14,7 +14,7 @@ from typing import (
     cast,
 )
 
-from langchain.chains import LLMChain
+from langchain_classic.chains import LLMChain
 from langchain_core.language_models import BaseLanguageModel
 from langchain_core.output_parsers import (
     BaseGenerationOutputParser,
@@ -240,7 +240,7 @@ def create_ernie_fn_runnable(
 
                 from typing import Optional
 
-                from langchain.chains.ernie_functions import create_ernie_fn_chain
+                from langchain_classic.chains.ernie_functions import create_ernie_fn_chain
                 from langchain_community.chat_models import ErnieBotChat
                 from langchain_core.prompts import ChatPromptTemplate
                 from pydantic import BaseModel, Field
@@ -314,7 +314,7 @@ def create_structured_output_runnable(
 
             from typing import Optional
 
-            from langchain.chains.ernie_functions import create_structured_output_chain
+            from langchain_classic.chains.ernie_functions import create_structured_output_chain
             from langchain_community.chat_models import ErnieBotChat
             from langchain_core.prompts import ChatPromptTemplate
             from pydantic import BaseModel, Field
@@ -411,7 +411,7 @@ def create_ernie_fn_chain(
 
                 from typing import Optional
 
-                from langchain.chains.ernie_functions import create_ernie_fn_chain
+                from langchain_classic.chains.ernie_functions import create_ernie_fn_chain
                 from langchain_community.chat_models import ErnieBotChat
                 from langchain_core.prompts import ChatPromptTemplate
 
@@ -498,7 +498,7 @@ def create_structured_output_chain(
 
                 from typing import Optional
 
-                from langchain.chains.ernie_functions import create_structured_output_chain
+                from langchain_classic.chains.ernie_functions import create_structured_output_chain
                 from langchain_community.chat_models import ErnieBotChat
                 from langchain_core.prompts import ChatPromptTemplate
 

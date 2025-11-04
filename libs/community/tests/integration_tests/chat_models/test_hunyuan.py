@@ -3,7 +3,7 @@ from operator import itemgetter
 from typing import Any
 
 import pytest
-from langchain.prompts.chat import (
+from langchain_classic.prompts.chat import (
     ChatPromptTemplate,
     HumanMessagePromptTemplate,
     SystemMessagePromptTemplate,

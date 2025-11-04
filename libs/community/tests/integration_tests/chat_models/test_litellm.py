@@ -55,7 +55,7 @@ def test_litellm_streaming_callback() -> None:
     chat = ChatLiteLLM(
         model="test",
         streaming=True,
-        callback_manager=callback_manager,
+        callbacks=callback_manager,
         verbose=True,
     )
     message = HumanMessage(content="Write me a sentence with 10 words.")
