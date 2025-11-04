@@ -34,8 +34,8 @@ from langchain_community.tools.sql_database.tool import (
 )
 
 if TYPE_CHECKING:
-    from langchain.agents.agent import AgentExecutor
-    from langchain.agents.agent_types import AgentType
+    from langchain_classic.agents.agent import AgentExecutor
+    from langchain_classic.agents.agent_types import AgentType
     from langchain_core.callbacks import BaseCallbackManager
     from langchain_core.language_models import BaseLanguageModel
     from langchain_core.tools import BaseTool
@@ -116,18 +116,18 @@ def create_sql_agent(
             agent_executor = create_sql_agent(llm, db=db, agent_type="tool-calling", verbose=True)
 
     """  # noqa: E501
-    from langchain.agents import (
+    from langchain_classic.agents import (
         create_openai_functions_agent,
         create_openai_tools_agent,
         create_react_agent,
         create_tool_calling_agent,
     )
-    from langchain.agents.agent import (
+    from langchain_classic.agents.agent import (
         AgentExecutor,
         RunnableAgent,
         RunnableMultiActionAgent,
     )
-    from langchain.agents.agent_types import AgentType
+    from langchain_classic.agents.agent_types import AgentType
 
     if toolkit is None and db is None:
         raise ValueError(
@@ -165,7 +165,7 @@ def create_sql_agent(
 
     if agent_type == AgentType.ZERO_SHOT_REACT_DESCRIPTION:
         if prompt is None:
-            from langchain.agents.mrkl import prompt as react_prompt
+            from langchain_classic.agents.mrkl import prompt as react_prompt
 
             format_instructions = (
                 format_instructions or react_prompt.FORMAT_INSTRUCTIONS
