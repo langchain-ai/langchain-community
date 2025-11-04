@@ -71,7 +71,7 @@ class Anyscale(BaseOpenAI):
 
     Example:
         .. code-block:: python
-            from langchain.llms import Anyscale
+            from langchain_classic.llms import Anyscale
             anyscalellm = Anyscale(anyscale_api_key="ANYSCALE_API_KEY")
             # To leverage Ray for parallel processing
             @ray.remote(num_cpus=1)

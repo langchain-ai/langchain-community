@@ -457,6 +457,10 @@ class PyPDFParser(BaseBlobParser):
                     logger.warning("Unknown PDF Filter!")
                 if np_image is not None:
                     image_bytes = io.BytesIO()
+
+                    if image_bytes.getbuffer().nbytes == 0:
+                        continue
+
                     Image.fromarray(np_image).save(image_bytes, format="PNG")
                     blob = Blob.from_data(image_bytes.getvalue(), mime_type="image/png")
                     image_text = next(self.images_parser.lazy_parse(blob)).page_content
@@ -1108,6 +1112,9 @@ class PyMuPDFParser(BaseBlobParser):
                     pix.height, pix.width, -1
                 )
                 image_bytes = io.BytesIO()
+                if image_bytes.getbuffer().nbytes == 0:
+                    continue
+
                 numpy.save(image_bytes, image)
                 blob = Blob.from_data(
                     image_bytes.getvalue(), mime_type="application/x-npy"

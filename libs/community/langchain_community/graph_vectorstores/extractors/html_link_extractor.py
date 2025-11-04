@@ -24,20 +24,20 @@ def _parse_url(link: Tag, page_url: str, drop_fragments: bool = True) -> Optiona
     href = link.get("href")
     if href is None:
         return None
-    url = urlparse(href)
+    url = urlparse(href)  # type: ignore[arg-type]
     if url.scheme not in ["http", "https", ""]:
         return None
 
     # Join the HREF with the page_url to convert relative paths to absolute.
-    url = str(urljoin(page_url, href))
+    url = str(urljoin(page_url, href))  # type: ignore[type-var, assignment]
 
     # Fragments would be useful if we chunked a page based on section.
     # Then, each chunk would have a different URL based on the fragment.
     # Since we aren't doing that yet, they just "break" links. So, drop
     # the fragment.
     if drop_fragments:
-        return urldefrag(url).url
-    return url
+        return urldefrag(url).url  # type: ignore[call-overload]
+    return url  # type: ignore[return-value]
 
 
 def _parse_hrefs(
