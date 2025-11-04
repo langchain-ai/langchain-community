@@ -1,4 +1,7 @@
-name: test
+# Runs unit tests with both current and minimum supported dependency versions
+# to ensure compatibility across the supported range.
+
+name: "🧪 Unit Testing"
 
 on:
   workflow_call:
@@ -7,6 +10,13 @@ on:
         required: true
         type: string
         description: "From which folder this pipeline executes"
+      python-version:
+        required: true
+        type: string
+        description: "Python version to use"
+
+permissions:
+  contents: read
 
 env:
   UV_FROZEN: "true"
@@ -18,30 +28,30 @@ jobs:
       run:
         working-directory: ${{ inputs.working-directory }}
     runs-on: ubuntu-latest
-    strategy:
-      matrix:
-        python-version:
-          - "3.10"
-          - "3.13"
-    name: "make test #${{ matrix.python-version }}"
+    timeout-minutes: 20
+    name: "Python ${{ inputs.python-version }}"
     steps:
-      - uses: actions/checkout@v4
+      - name: "📋 Checkout Code"
+        uses: actions/checkout@v5
 
-      - name: Set up Python ${{ matrix.python-version }} + uv
+      - name: "🐍 Set up Python ${{ inputs.python-version }} + UV"
         uses: "./.github/actions/uv_setup"
         id: setup-python
         with:
-          python-version: ${{ matrix.python-version }}
-      - name: Install dependencies
+          python-version: ${{ inputs.python-version }}
+          cache-suffix: test-${{ inputs.working-directory }}
+          working-directory: ${{ inputs.working-directory }}
+
+      - name: "📦 Install Test Dependencies"
         shell: bash
         run: uv sync --group test --dev
 
-      - name: Run core tests
+      - name: "🧪 Run Core Unit Tests"
         shell: bash
         run: |
           make test
 
-      - name: Ensure the tests did not create any additional files
+      - name: "🧹 Verify Clean Working Directory"
         shell: bash
         run: |
           set -eu
