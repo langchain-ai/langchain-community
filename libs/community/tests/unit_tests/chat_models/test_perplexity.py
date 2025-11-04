@@ -103,6 +103,8 @@ def test_perplexity_stream_includes_citations(mocker: MockerFixture) -> None:
     full: Optional[BaseMessageChunk] = None
     for i, chunk in enumerate(stream):
         full = chunk if full is None else full + chunk
+        if chunk.chunk_position == "last":
+            continue
         assert chunk.content == mock_chunks[i]["choices"][0]["delta"]["content"]
         if i == 0:
             assert chunk.additional_kwargs["citations"] == [
@@ -174,6 +176,8 @@ def test_perplexity_stream_includes_citations_and_images(mocker: MockerFixture) 
     full: Optional[BaseMessageChunk] = None
     for i, chunk in enumerate(stream):
         full = chunk if full is None else full + chunk
+        if chunk.chunk_position == "last":
+            continue
         assert chunk.content == mock_chunks[i]["choices"][0]["delta"]["content"]
         if i == 0:
             assert chunk.additional_kwargs["citations"] == [
@@ -252,6 +256,8 @@ def test_perplexity_stream_includes_citations_and_related_questions(
     full: Optional[BaseMessageChunk] = None
     for i, chunk in enumerate(stream):
         full = chunk if full is None else full + chunk
+        if chunk.chunk_position == "last":
+            continue
         assert chunk.content == mock_chunks[i]["choices"][0]["delta"]["content"]
         if i == 0:
             assert chunk.additional_kwargs["citations"] == [
