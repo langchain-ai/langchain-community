@@ -1,5 +1,11 @@
-name: release
-run-name: Release ${{ inputs.working-directory }} by @${{ github.actor }}
+# Builds and publishes LangChain packages to PyPI.
+#
+# Manually triggered, though can be used as a reusable workflow (workflow_call).
+#
+# Handles version bumping, building, and publishing to PyPI with authentication.
+
+name: "🚀 Package Release"
+run-name: "Release `langchain-community` ${{ inputs.release-version }}"
 on:
   workflow_call:
     inputs:
@@ -12,29 +18,41 @@ on:
       working-directory:
         required: true
         type: string
-        default: 'libs/community'
+        description: "From which folder this pipeline executes (do not change)"
+        default: "libs/community"
+      release-version:
+        required: true
+        type: string
+        default: "0.1.0"
+        description: "New version of community being released"
       dangerous-nonmaster-release:
         required: false
         type: boolean
         default: false
-        description: "Release from a non-master branch (danger!)"
+        description: "Release from a non-master branch (danger!) - Only use for hotfixes"
 
 env:
   PYTHON_VERSION: "3.11"
   UV_FROZEN: "true"
   UV_NO_SYNC: "true"
 
+permissions:
+  contents: write # Required for creating GitHub releases
+
 jobs:
+  # Build the distribution package and extract version info
   build:
     if: github.ref == 'refs/heads/main' || inputs.dangerous-nonmaster-release
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
 
     outputs:
       pkg-name: ${{ steps.check-version.outputs.pkg-name }}
       version: ${{ steps.check-version.outputs.version }}
 
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
 
       - name: Set up Python + uv
         uses: "./.github/actions/uv_setup"
@@ -43,8 +61,8 @@ jobs:
 
       # We want to keep this build stage *separate* from the release stage,
       # so that there's no sharing of permissions between them.
-      # The release stage has trusted publishing and GitHub repo contents write access,
-      # and we want to keep the scope of that access limited just to the release job.
+      # (Release stage has trusted publishing and GitHub repo contents write access,
+      #
       # Otherwise, a malicious `build` step (e.g. via a compromised dependency)
       # could get access to our GitHub or PyPI credentials.
       #
@@ -57,12 +75,12 @@ jobs:
         working-directory: ${{ inputs.working-directory }}
 
       - name: Upload build
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v5
         with:
           name: dist
           path: ${{ inputs.working-directory }}/dist/
 
-      - name: Check Version
+      - name: Check version
         id: check-version
         shell: python
         working-directory: ${{ inputs.working-directory }}
@@ -80,21 +98,47 @@ jobs:
   test-pypi-publish:
     needs:
       - build
-    uses:
-      ./.github/workflows/_test_release.yml
-    permissions: write-all
-    with:
-      working-directory: ${{ inputs.working-directory }}
-      dangerous-nonmaster-release: ${{ inputs.dangerous-nonmaster-release }}
-    secrets: inherit
+    runs-on: ubuntu-latest
+    permissions:
+      # This permission is used for trusted publishing:
+      # https://blog.pypi.org/posts/2023-04-20-introducing-trusted-publishers/
+      #
+      # Trusted publishing has to also be configured on PyPI for each package:
+      # https://docs.pypi.org/trusted-publishers/adding-a-publisher/
+      id-token: write
+
+    steps:
+      - uses: actions/checkout@v5
+
+      - uses: actions/download-artifact@v6
+        with:
+          name: dist
+          path: ${{ inputs.working-directory }}/dist/
+
+      - name: Publish to test PyPI
+        uses: pypa/gh-action-pypi-publish@release/v1
+        with:
+          packages-dir: ${{ inputs.working-directory }}/dist/
+          verbose: true
+          print-hash: true
+          repository-url: https://test.pypi.org/legacy/
+          # We overwrite any existing distributions with the same name and version.
+          # This is *only for CI use* and is *extremely dangerous* otherwise!
+          # https://github.com/pypa/gh-action-pypi-publish#tolerating-release-package-file-duplicates
+          skip-existing: true
+          # Temp workaround since attestations are on by default as of gh-action-pypi-publish v1.11.0
+          attestations: false
 
   pre-release-checks:
     needs:
       - build
       - test-pypi-publish
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    timeout-minutes: 20
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
 
       # We explicitly *don't* set up caching here. This ensures our tests are
       # maximally sensitive to catching breakage.
@@ -115,7 +159,7 @@ jobs:
         with:
           python-version: ${{ env.PYTHON_VERSION }}
 
-      - uses: actions/download-artifact@v4
+      - uses: actions/download-artifact@v6
         with:
           name: dist
           path: ${{ inputs.working-directory }}/dist/
@@ -127,7 +171,7 @@ jobs:
           PKG_NAME: ${{ needs.build.outputs.pkg-name }}
           VERSION: ${{ needs.build.outputs.version }}
         # Here we use:
-        # - The default regular PyPI index as the *primary* index, meaning 
+        # - The default regular PyPI index as the *primary* index, meaning
         #   that it takes priority (https://pypi.org/simple)
         # - The test PyPI index as an extra index, so that any dependencies that
         #   are not found on test PyPI can be resolved and installed anyway.
@@ -141,7 +185,8 @@ jobs:
 
           # Replace all dashes in the package name with underscores,
           # since that's how Python imports packages with dashes in the name.
-          IMPORT_NAME="$(echo "$PKG_NAME" | sed s/-/_/g)"
+          # also remove _official suffix
+          IMPORT_NAME="$(echo "$PKG_NAME" | sed s/-/_/g | sed s/_official//g)"
 
           uv run python -c "import $IMPORT_NAME; print(dir($IMPORT_NAME))"
 
@@ -164,6 +209,7 @@ jobs:
         working-directory: ${{ inputs.working-directory }}
 
       - name: Get minimum versions
+        # Find the minimum published versions that satisfies the given constraints
         working-directory: ${{ inputs.working-directory }}
         id: min-version
         run: |
@@ -178,7 +224,8 @@ jobs:
         env:
           MIN_VERSIONS: ${{ steps.min-version.outputs.min-versions }}
         run: |
-          VIRTUAL_ENV=.venv uv pip install $MIN_VERSIONS
+          VIRTUAL_ENV=.venv uv pip install --force-reinstall --editable .
+          VIRTUAL_ENV=.venv uv pip install --force-reinstall $MIN_VERSIONS
           make tests
         working-directory: ${{ inputs.working-directory }}
 
@@ -201,14 +248,14 @@ jobs:
         working-directory: ${{ inputs.working-directory }}
 
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
 
       - name: Set up Python + uv
         uses: "./.github/actions/uv_setup"
         with:
           python-version: ${{ env.PYTHON_VERSION }}
 
-      - uses: actions/download-artifact@v4
+      - uses: actions/download-artifact@v6
         with:
           name: dist
           path: ${{ inputs.working-directory }}/dist/
@@ -219,10 +266,11 @@ jobs:
           packages-dir: ${{ inputs.working-directory }}/dist/
           verbose: true
           print-hash: true
-          # Temp workaround since attestations are on by default as of gh-action-pypi-publish v1\.11\.0
+          # Temp workaround since attestations are on by default as of gh-action-pypi-publish v1.11.0
           attestations: false
 
   mark-release:
+    # Marks the GitHub release with the new version tag
     needs:
       - build
       - test-pypi-publish
@@ -231,7 +279,7 @@ jobs:
     runs-on: ubuntu-latest
     permissions:
       # This permission is needed by `ncipollo/release-action` to
-      # create the GitHub release.
+      # create the GitHub release/tag
       contents: write
 
     defaults:
@@ -239,19 +287,19 @@ jobs:
         working-directory: ${{ inputs.working-directory }}
 
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
 
       - name: Set up Python + uv
         uses: "./.github/actions/uv_setup"
         with:
           python-version: ${{ env.PYTHON_VERSION }}
 
-      - uses: actions/download-artifact@v4
+      - uses: actions/download-artifact@v6
         with:
           name: dist
           path: ${{ inputs.working-directory }}/dist/
 
-      - name: Create Release
+      - name: Create Tag
         uses: ncipollo/release-action@v1
         with:
           artifacts: "dist/*"

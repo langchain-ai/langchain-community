@@ -151,7 +151,7 @@ class MLXPipeline(LLM):
                 "Please install it with `pip install mlx_lm`."
             )
 
-        pipeline_kwargs = kwargs.get("pipeline_kwargs", self.pipeline_kwargs)
+        pipeline_kwargs = kwargs.get("pipeline_kwargs", self.pipeline_kwargs) or {}
 
         temp: float = pipeline_kwargs.get("temp", 0.0)
         max_tokens: int = pipeline_kwargs.get("max_tokens", 100)
@@ -201,7 +201,7 @@ class MLXPipeline(LLM):
                 "Please install it with `pip install mlx_lm`."
             )
 
-        pipeline_kwargs = kwargs.get("pipeline_kwargs", self.pipeline_kwargs)
+        pipeline_kwargs = kwargs.get("pipeline_kwargs", self.pipeline_kwargs) or {}
 
         temp: float = pipeline_kwargs.get("temp", 0.0)
         max_new_tokens: int = pipeline_kwargs.get("max_tokens", 100)
