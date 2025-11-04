@@ -192,7 +192,7 @@ class ChatCoze(BaseChatModel):
             chunk = _convert_delta_to_message_chunk(response["message"])
             cg_chunk = ChatGenerationChunk(message=chunk)
             if run_manager:
-                run_manager.on_llm_new_token(chunk.content, chunk=cg_chunk)
+                run_manager.on_llm_new_token(str(chunk.content), chunk=cg_chunk)
             yield cg_chunk
 
     def _chat(self, messages: List[BaseMessage], **kwargs: Any) -> requests.Response:

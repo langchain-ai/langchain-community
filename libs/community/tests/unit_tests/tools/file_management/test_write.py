@@ -36,3 +36,11 @@ def test_write_file() -> None:
         tool.run({"file_path": file_path, "text": "Hello, world!"})
         assert (Path(temp_dir) / "file.txt").exists()
         assert (Path(temp_dir) / "file.txt").read_text() == "Hello, world!"
+
+
+def test_write_file_in_subdir_of_root_dir() -> None:
+    """Test the WriteFile tool when the path is a subdirectory of the root dir."""
+    with TemporaryDirectory() as temp_dir:
+        tool = WriteFileTool(root_dir=temp_dir)
+        tool.run({"file_path": "a/b/file.txt", "text": "Hello, world!"})
+        assert (Path(temp_dir) / "a/b/file.txt").exists()
