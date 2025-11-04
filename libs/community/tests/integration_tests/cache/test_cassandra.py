@@ -6,7 +6,7 @@ import time
 from typing import Any, Iterator, Tuple
 
 import pytest
-from langchain.globals import get_llm_cache, set_llm_cache
+from langchain_classic.globals import get_llm_cache, set_llm_cache
 from langchain_core.outputs import Generation, LLMResult
 
 from langchain_community.cache import CassandraCache, CassandraSemanticCache
@@ -47,7 +47,7 @@ def test_cassandra_cache(cassandra_connection: Tuple[Any, str]) -> None:
     params = llm.dict()
     params["stop"] = None
     llm_string = str(sorted([(k, v) for k, v in params.items()]))
-    get_llm_cache().update("foo", llm_string, [Generation(text="fizz")])
+    get_llm_cache().update("foo", llm_string, [Generation(text="fizz")])  # type: ignore[union-attr]
     output = llm.generate(["foo"])
     expected_output = LLMResult(
         generations=[[Generation(text="fizz")]],
@@ -67,7 +67,7 @@ async def test_cassandra_cache_async(cassandra_connection: Tuple[Any, str]) -> N
     params = llm.dict()
     params["stop"] = None
     llm_string = str(sorted([(k, v) for k, v in params.items()]))
-    await get_llm_cache().aupdate("foo", llm_string, [Generation(text="fizz")])
+    await get_llm_cache().aupdate("foo", llm_string, [Generation(text="fizz")])  # type: ignore[union-attr]
     output = await llm.agenerate(["foo"])
     expected_output = LLMResult(
         generations=[[Generation(text="fizz")]],
@@ -85,7 +85,7 @@ def test_cassandra_cache_ttl(cassandra_connection: Tuple[Any, str]) -> None:
     params = llm.dict()
     params["stop"] = None
     llm_string = str(sorted([(k, v) for k, v in params.items()]))
-    get_llm_cache().update("foo", llm_string, [Generation(text="fizz")])
+    get_llm_cache().update("foo", llm_string, [Generation(text="fizz")])  # type: ignore[union-attr]
     expected_output = LLMResult(
         generations=[[Generation(text="fizz")]],
         llm_output={},
@@ -109,7 +109,7 @@ async def test_cassandra_cache_ttl_async(cassandra_connection: Tuple[Any, str]) 
     params = llm.dict()
     params["stop"] = None
     llm_string = str(sorted([(k, v) for k, v in params.items()]))
-    await get_llm_cache().aupdate("foo", llm_string, [Generation(text="fizz")])
+    await get_llm_cache().aupdate("foo", llm_string, [Generation(text="fizz")])  # type: ignore[union-attr]
     expected_output = LLMResult(
         generations=[[Generation(text="fizz")]],
         llm_output={},
@@ -135,7 +135,7 @@ def test_cassandra_semantic_cache(cassandra_connection: Tuple[Any, str]) -> None
     params = llm.dict()
     params["stop"] = None
     llm_string = str(sorted([(k, v) for k, v in params.items()]))
-    get_llm_cache().update("foo", llm_string, [Generation(text="fizz")])
+    get_llm_cache().update("foo", llm_string, [Generation(text="fizz")])  # type: ignore[union-attr]
     output = llm.generate(["bar"])  # same embedding as 'foo'
     expected_output = LLMResult(
         generations=[[Generation(text="fizz")]],
@@ -164,7 +164,7 @@ async def test_cassandra_semantic_cache_async(
     params = llm.dict()
     params["stop"] = None
     llm_string = str(sorted([(k, v) for k, v in params.items()]))
-    await get_llm_cache().aupdate("foo", llm_string, [Generation(text="fizz")])
+    await get_llm_cache().aupdate("foo", llm_string, [Generation(text="fizz")])  # type: ignore[union-attr]
     output = await llm.agenerate(["bar"])  # same embedding as 'foo'
     expected_output = LLMResult(
         generations=[[Generation(text="fizz")]],

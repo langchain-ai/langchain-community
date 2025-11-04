@@ -183,8 +183,8 @@ def extract_dict_elements_from_component_fields(
         component: The component to extract elements from.
 
     Returns:
-        A dictionary containing the elements from the input dictionary that are also
-        in the component.
+        `dict` containing the elements from the input dictionary that are also in the
+            component.
     """
     output = {}
     for attribute in fields(component):
@@ -212,7 +212,7 @@ def load_query(
         if fault_tolerant:
             return (
                 None,
-                f"""Input must be a valid JSON. Got the following error: {str(e)}. 
+                f"""Input must be a valid JSON. Got the following error: {str(e)}.
 "Please reformat and try again.""",
             )
         else:
@@ -460,7 +460,7 @@ class ClickupAPIWrapper(BaseModel):
 
         if params["attribute_name"] not in task:
             return {
-                "Error": f"""attribute_name = {params["attribute_name"]} was not 
+                "Error": f"""attribute_name = {params["attribute_name"]} was not
 found in task keys {task.keys()}. Please call again with one of the key names."""
             }
 

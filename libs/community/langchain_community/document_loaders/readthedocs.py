@@ -102,7 +102,7 @@ class ReadTheDocsLoader(BaseLoader):
 
         # reversed order. check the custom one first
         for tag, attrs in html_tags[::-1]:
-            element = soup.find(tag, attrs)
+            element = soup.find(tag, attrs)  # type: ignore[arg-type]
             # if found, break
             if element is not None:
                 break
