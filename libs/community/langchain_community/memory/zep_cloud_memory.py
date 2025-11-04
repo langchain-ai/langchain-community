@@ -5,7 +5,7 @@ from typing import Any, Dict, Optional
 from langchain_community.chat_message_histories import ZepCloudChatMessageHistory
 
 try:
-    from langchain.memory import ConversationBufferMemory
+    from langchain_classic.memory import ConversationBufferMemory
     from zep_cloud import MemoryGetRequestMemoryType
 
     class ZepCloudMemory(ConversationBufferMemory):
