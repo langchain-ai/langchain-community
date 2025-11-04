@@ -558,7 +558,7 @@ class BedrockBase(BaseModel, ABC):
         # Verify and raise a callback error if any intervention occurs or a signal is
         # sent from a Bedrock service,
         # such as when guardrails are triggered.
-        services_trace = self._get_bedrock_services_signal(body)  # type: ignore[arg-type]
+        services_trace = self._get_bedrock_services_signal(body)
 
         if services_trace.get("signal") and run_manager is not None:
             run_manager.on_llm_error(
