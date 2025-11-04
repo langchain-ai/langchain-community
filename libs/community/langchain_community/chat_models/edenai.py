@@ -426,7 +426,7 @@ class ChatEdenAI(BaseChatModel):
             Union[dict, str, Literal["auto", "none", "required", "any"], bool]
         ] = None,
         **kwargs: Any,
-    ) -> Runnable[LanguageModelInput, BaseMessage]:
+    ) -> Runnable[LanguageModelInput, AIMessage]:
         formatted_tools = [convert_to_openai_tool(tool)["function"] for tool in tools]
         formatted_tool_choice = "required" if tool_choice == "any" else tool_choice
         return super().bind(
