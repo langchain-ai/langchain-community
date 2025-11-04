@@ -344,7 +344,7 @@ class ChatLlamaCpp(BaseChatModel):
         *,
         tool_choice: Optional[Union[dict, bool, str]] = None,
         **kwargs: Any,
-    ) -> Runnable[LanguageModelInput, BaseMessage]:
+    ) -> Runnable[LanguageModelInput, AIMessage]:
         """Bind tool-like objects to this chat model
 
         tool_choice: does not currently support "any", "auto" choices like OpenAI

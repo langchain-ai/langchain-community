@@ -2,7 +2,7 @@
 
 from typing import Any, Dict, List, Optional
 
-from langchain.chains.natbot.base import NatBotChain
+from langchain_classic.chains.natbot.base import NatBotChain
 from langchain_core.callbacks.manager import CallbackManagerForLLMRun
 from langchain_core.language_models.llms import LLM
 
