@@ -15,7 +15,7 @@ import os
 from typing import AsyncIterator, Iterator
 
 import pytest
-from langchain.globals import get_llm_cache, set_llm_cache
+from langchain_classic.globals import get_llm_cache, set_llm_cache
 from langchain_core.caches import BaseCache
 from langchain_core.language_models import LLM
 from langchain_core.outputs import Generation, LLMResult
@@ -132,7 +132,7 @@ class TestAstraDBCaches:
         params = llm.dict()
         params["stop"] = None
         llm_string = str(sorted([(k, v) for k, v in params.items()]))
-        get_llm_cache().update("foo", llm_string, [Generation(text="fizz")])
+        get_llm_cache().update("foo", llm_string, [Generation(text="fizz")])  # type: ignore[union-attr]
         output = llm.generate([prompt])
         expected_output = LLMResult(
             generations=[[Generation(text="fizz")]],
@@ -148,7 +148,7 @@ class TestAstraDBCaches:
         params = llm.dict()
         params["stop"] = None
         llm_string = str(sorted([(k, v) for k, v in params.items()]))
-        await get_llm_cache().aupdate("foo", llm_string, [Generation(text="fizz")])
+        await get_llm_cache().aupdate("foo", llm_string, [Generation(text="fizz")])  # type: ignore[union-attr]
         output = await llm.agenerate([prompt])
         expected_output = LLMResult(
             generations=[[Generation(text="fizz")]],

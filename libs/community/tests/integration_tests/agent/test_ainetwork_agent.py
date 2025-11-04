@@ -8,7 +8,7 @@ from typing import Any
 from urllib.error import HTTPError
 
 import pytest
-from langchain.agents import AgentType, initialize_agent
+from langchain_classic.agents import AgentType, initialize_agent
 
 from langchain_community.agent_toolkits.ainetwork.toolkit import AINetworkToolkit
 from langchain_community.chat_models import ChatOpenAI

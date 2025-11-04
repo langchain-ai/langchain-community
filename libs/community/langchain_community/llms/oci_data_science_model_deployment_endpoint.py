@@ -135,7 +135,7 @@ class BaseOCIModelDeployment(Serializable):
                 the request is asynchronous.
 
         Returns:
-            Dict: A dictionary containing the appropriate headers for the request.
+            `dict` containing the appropriate headers for the request.
         """
         headers = self.default_headers or {}
         if is_async:
@@ -510,7 +510,7 @@ class OCIModelDeploymentLLM(BaseLLM, BaseOCIModelDeployment):
                 the request is asynchronous.
 
         Returns:
-            Dict: A dictionary containing the appropriate headers for the request.
+            Dict: `dict` containing the appropriate headers for the request.
         """
         return {
             "route": DEFAULT_INFERENCE_ENDPOINT,
