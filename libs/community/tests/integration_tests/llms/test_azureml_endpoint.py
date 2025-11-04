@@ -127,12 +127,16 @@ def test_invalid_request_format() -> None:
         llm.invoke("Foo")
 
 
-def test_incorrect_url() -> None:
+@pytest.mark.parametrize(
+    "endpoint_url",
+    ["https://endpoint.inference.com", "https://endpoint.inference.com/"],
+)
+def test_incorrect_url(endpoint_url: str) -> None:
     """Testing AzureML Endpoint for an incorrect URL"""
     with pytest.raises(ValidationError):
         llm = AzureMLOnlineEndpoint(
             endpoint_api_key=os.getenv("OSS_ENDPOINT_API_KEY"),  # type: ignore[arg-type]
-            endpoint_url="https://endpoint.inference.com",
+            endpoint_url=endpoint_url,
             deployment_name=os.getenv("OSS_DEPLOYMENT_NAME"),  # type: ignore[arg-type]
             content_formatter=OSSContentFormatter(),
         )

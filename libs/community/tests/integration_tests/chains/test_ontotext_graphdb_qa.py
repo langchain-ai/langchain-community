@@ -1,7 +1,7 @@
 from unittest.mock import MagicMock, Mock
 
 import pytest
-from langchain.chains import LLMChain
+from langchain_classic.chains import LLMChain
 
 from langchain_community.chains.graph_qa.ontotext_graphdb import OntotextGraphDBQAChain
 from langchain_community.graphs import OntotextGraphDBGraph
