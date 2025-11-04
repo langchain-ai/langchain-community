@@ -26,9 +26,9 @@ def get_user(user_id: str, verbose: bool = False) -> User:
 - Check if the function/class is exported in `__init__.py`
 - Look for existing usage patterns in tests and examples
 - Use keyword-only arguments for new parameters: `*, new_param: str = "default"`
-- Mark experimental features clearly with docstring admonitions (using MkDocs Material, like `!!! warning`)
+- Mark experimental features clearly with docstring warnings (using MkDocs Material admonitions, like `!!! warning`)
 
-🧠 _Ask yourself:_ "Would this change break someone's code if they used it last week?"
+🧠 *Ask yourself:* "Would this change break someone's code if they used it last week?"
 
 ### 2. Code Quality Standards
 
@@ -130,7 +130,7 @@ def load_config(path: str) -> dict:
 
 ### 5. Documentation Standards
 
-**Use Google-style docstrings with Args and Returns sections for all public functions.**
+**Use Google-style docstrings with Args section for all public functions.**
 
 ❌ **Insufficient Documentation:**
 
@@ -149,25 +149,27 @@ def send_email(to: str, msg: str, *, priority: str = "normal") -> bool:
     Args:
         to: The email address of the recipient.
         msg: The message body to send.
-        priority: Email priority level.
+        priority: Email priority level (`'low'`, `'normal'`, `'high'`).
 
     Returns:
-        True if email was sent successfully, False otherwise.
+        `True` if email was sent successfully, `False` otherwise.
 
     Raises:
-        InvalidEmailError: If the email address format is invalid.
-        SMTPConnectionError: If unable to connect to email server.
+        `InvalidEmailError`: If the email address format is invalid.
+        `SMTPConnectionError`: If unable to connect to email server.
     """
 ```
 
 **Documentation Guidelines:**
 
 - Types go in function signatures, NOT in docstrings
+  - If a default is present, DO NOT repeat it in the docstring unless there is post-processing or it is set conditionally.
 - Focus on "why" rather than "what" in descriptions
 - Document all parameters, return values, and exceptions
 - Keep descriptions concise but clear
+- Ensure American English spelling (e.g., "behavior", not "behaviour")
 
-📌 _Tip:_ Keep descriptions concise but clear. Only document return values if non-obvious.
+📌 *Tip:* Keep descriptions concise but clear. Only document return values if non-obvious.
 
 ### 6. Architectural Improvements
 
@@ -203,14 +205,7 @@ class DataProcessor:
         self.email = email_client
 
     def process(self, data: List[dict]) -> ProcessingResult:
-        """Process and store data with notifications.
-
-        Args:
-            data: List of data items to process.
-
-        Returns:
-            ProcessingResult with details of the operation.
-        """
+        """Process and store data with notifications."""
         validated = self._validate_data(data)
         result = self.db.save(validated)
         self._notify_completion(result)
@@ -297,7 +292,7 @@ def search_database(query: str) -> str:
 **Use Conventional Commits format for PR titles:**
 
 - `feat(core): add multi-tenant support`
-- `!fix(cli): resolve flag parsing error` (breaking change uses exclamation mark)
+- `fix(cli): resolve flag parsing error`
 - `docs: update API usage examples`
 - `docs(openai): update API usage examples`
 

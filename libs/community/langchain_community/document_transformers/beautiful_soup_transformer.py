@@ -42,15 +42,15 @@ class BeautifulSoupTransformer(BaseDocumentTransformer):
         **kwargs: Any,
     ) -> Sequence[Document]:
         """
-        Transform a list of Document objects by cleaning their HTML content.
+        Transform a list of `Document` objects by cleaning their HTML content.
 
         Args:
-            documents: A sequence of Document objects containing HTML content.
+            documents: A sequence of `Document` objects containing HTML content.
             unwanted_tags: A list of tags to be removed from the HTML.
             tags_to_extract: A list of tags whose content will be extracted.
-            remove_lines: If set to True, unnecessary lines will be removed.
+            remove_lines: If set to `True`, unnecessary lines will be removed.
             unwanted_classnames: A list of class names to be removed from the HTML
-            remove_comments: If set to True, comments will be removed.
+            remove_comments: If set to `True`, comments will be removed.
 
         Returns:
             A sequence of Document objects with transformed content.
