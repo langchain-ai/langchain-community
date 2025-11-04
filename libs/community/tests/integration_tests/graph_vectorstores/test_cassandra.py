@@ -445,10 +445,7 @@ class TestCassandraGraphVectorStore:
             search_type="traversal", search_kwargs={"k": 2, "depth": 2}
         )
 
-        ts_labels = {
-            doc.metadata["label"]
-            for doc in retriever.get_relevant_documents(query="[2, 10]")
-        }
+        ts_labels = {doc.metadata["label"] for doc in retriever.invoke("[2, 10]")}
         assert ts_labels == {"AR", "A0", "BR", "B0", "TR", "T0"}
 
     async def test_gvs_traversal_search_async(
@@ -470,8 +467,7 @@ class TestCassandraGraphVectorStore:
         )
 
         ts_labels = {
-            doc.metadata["label"]
-            for doc in await retriever.aget_relevant_documents(query="[2, 10]")
+            doc.metadata["label"] for doc in await retriever.ainvoke("[2, 10]")
         }
         assert ts_labels == {"AR", "A0", "BR", "B0", "TR", "T0"}
 

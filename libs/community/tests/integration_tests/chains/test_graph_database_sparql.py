@@ -4,7 +4,7 @@ import pathlib
 import re
 from unittest.mock import MagicMock, Mock
 
-from langchain.chains import LLMChain
+from langchain_classic.chains import LLMChain
 
 from langchain_community.chains.graph_qa.sparql import GraphSparqlQAChain
 from langchain_community.graphs import RdfGraph

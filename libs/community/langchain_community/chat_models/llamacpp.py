@@ -310,7 +310,7 @@ class ChatLlamaCpp(BaseChatModel):
             messages=message_dicts, stream=True, **params
         )
 
-        default_chunk_class = AIMessageChunk
+        default_chunk_class: Type[BaseMessageChunk] = AIMessageChunk
         count = 0
         for chunk in result:
             count += 1
@@ -344,7 +344,7 @@ class ChatLlamaCpp(BaseChatModel):
         *,
         tool_choice: Optional[Union[dict, bool, str]] = None,
         **kwargs: Any,
-    ) -> Runnable[LanguageModelInput, BaseMessage]:
+    ) -> Runnable[LanguageModelInput, AIMessage]:
         """Bind tool-like objects to this chat model
 
         tool_choice: does not currently support "any", "auto" choices like OpenAI
