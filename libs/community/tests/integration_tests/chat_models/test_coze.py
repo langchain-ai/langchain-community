@@ -16,7 +16,7 @@ def test_chat_coze_default() -> None:
         streaming=True,
     )
     message = HumanMessage(content="请完整背诵将进酒，背诵5遍")
-    response = chat([message])
+    response = chat.invoke([message])
     assert isinstance(response, AIMessage)
     assert isinstance(response.content, str)
 
@@ -31,6 +31,6 @@ def test_chat_coze_default_non_streaming() -> None:
         streaming=False,
     )
     message = HumanMessage(content="请完整背诵将进酒，背诵5遍")
-    response = chat([message])
+    response = chat.invoke([message])
     assert isinstance(response, AIMessage)
     assert isinstance(response.content, str)
