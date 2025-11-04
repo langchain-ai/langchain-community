@@ -1,5 +1,6 @@
 from typing import List
 
+from langchain_core._api.deprecation import deprecated
 from langchain_core.documents import Document
 
 from langchain_community.document_loaders.azure_blob_storage_file import (
@@ -8,6 +9,11 @@ from langchain_community.document_loaders.azure_blob_storage_file import (
 from langchain_community.document_loaders.base import BaseLoader
 
 
+@deprecated(
+    since="0.4",
+    removal="1.0",
+    alternative_import="langchain_azure_storage.document_loaders.AzureBlobStorageLoader",
+)
 class AzureBlobStorageContainerLoader(BaseLoader):
     """Load from `Azure Blob Storage` container."""
 

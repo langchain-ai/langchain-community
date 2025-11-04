@@ -1,4 +1,4 @@
-from langchain.chains.ernie_functions.base import (
+from langchain_classic.chains.ernie_functions.base import (
     convert_to_ernie_function,
     create_ernie_fn_chain,
     create_ernie_fn_runnable,

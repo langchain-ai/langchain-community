@@ -87,7 +87,7 @@ def analyze_text(
         textstat: The textstat library to use for complexity metrics calculation.
 
     Returns:
-        (dict): A dictionary containing the complexity metrics and visualization
+        `dict` containing the complexity metrics and visualization
             files serialized to  HTML string.
     """
     resp: Dict[str, Any] = {}
