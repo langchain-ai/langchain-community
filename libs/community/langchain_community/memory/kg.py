@@ -13,13 +13,13 @@ from langchain_community.graphs.networkx_graph import (
 )
 
 try:
-    from langchain.chains.llm import LLMChain
-    from langchain.memory.chat_memory import BaseChatMemory
-    from langchain.memory.prompt import (
+    from langchain_classic.chains.llm import LLMChain
+    from langchain_classic.memory.chat_memory import BaseChatMemory
+    from langchain_classic.memory.prompt import (
         ENTITY_EXTRACTION_PROMPT,
         KNOWLEDGE_TRIPLE_EXTRACTION_PROMPT,
     )
-    from langchain.memory.utils import get_prompt_input_key
+    from langchain_classic.memory.utils import get_prompt_input_key
 
     class ConversationKGMemory(BaseChatMemory):
         """Knowledge graph conversation memory.
