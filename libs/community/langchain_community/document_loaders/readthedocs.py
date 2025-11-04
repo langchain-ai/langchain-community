@@ -107,8 +107,8 @@ class ReadTheDocsLoader(BaseLoader):
             if element is not None:
                 break
 
-        if element is not None and _get_link_ratio(element) <= self.exclude_links_ratio:  # type: ignore[arg-type]
-            text = _get_clean_text(element)  # type: ignore[arg-type]
+        if element is not None and _get_link_ratio(element) <= self.exclude_links_ratio:
+            text = _get_clean_text(element)
         else:
             text = ""
         # trim empty lines
@@ -174,9 +174,9 @@ def _get_link_ratio(section: Tag) -> float:
         return 0
 
     link_text = "".join(
-        str(string.string.strip())  # type: ignore[union-attr]
+        str(string.string.strip())
         for link in links
-        for string in link.strings  # type: ignore[union-attr]
+        for string in link.strings
         if string
     )
     return len(link_text) / len(total_text)

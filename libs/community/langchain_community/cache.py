@@ -2399,8 +2399,8 @@ class OpenSearchSemanticCache(BaseCache):
         Example:
         .. code-block:: python
             import langchain
-            from langchain.cache import OpenSearchSemanticCache
-            from langchain.embeddings import OpenAIEmbeddings
+            from langchain_classic.cache import OpenSearchSemanticCache
+            from langchain_classic.embeddings import OpenAIEmbeddings
             langchain.llm_cache = OpenSearchSemanticCache(
                 opensearch_url="http//localhost:9200",
                 embedding=OpenAIEmbeddings()
@@ -2619,8 +2619,8 @@ class SingleStoreDBSemanticCache(BaseCache):
             .. code-block:: python
 
                 import langchain
-                from langchain.cache import SingleStoreDBSemanticCache
-                from langchain.embeddings import OpenAIEmbeddings
+                from langchain_classic.cache import SingleStoreDBSemanticCache
+                from langchain_classic.embeddings import OpenAIEmbeddings
 
                 langchain.llm_cache = SingleStoreDBSemanticCache(
                     embedding=OpenAIEmbeddings(),
@@ -2632,8 +2632,8 @@ class SingleStoreDBSemanticCache(BaseCache):
             .. code-block:: python
 
                 import langchain
-                from langchain.cache import SingleStoreDBSemanticCache
-                from langchain.embeddings import OpenAIEmbeddings
+                from langchain_classic.cache import SingleStoreDBSemanticCache
+                from langchain_classic.embeddings import OpenAIEmbeddings
 
                 langchain.llm_cache = = SingleStoreDBSemanticCache(
                     embeddings=OpenAIEmbeddings(),
@@ -2731,7 +2731,7 @@ class MemcachedCache(BaseCache):
                 (Client, PooledClient, HashClient)
         Example:
         .. code-block:: python
-            ifrom langchain.globals import set_llm_cache
+            ifrom langchain_classic.globals import set_llm_cache
             from langchain_openai import OpenAI
 
             from langchain_community.cache import MemcachedCache

@@ -2,8 +2,11 @@ import pathlib
 from typing import Any, Dict, List
 
 import pandas as pd
-from langchain.chains.graph_qa.prompts import CYPHER_GENERATION_PROMPT, CYPHER_QA_PROMPT
-from langchain.memory import ConversationBufferMemory, ReadOnlySharedMemory
+from langchain_classic.chains.graph_qa.prompts import (
+    CYPHER_GENERATION_PROMPT,
+    CYPHER_QA_PROMPT,
+)
+from langchain_classic.memory import ConversationBufferMemory, ReadOnlySharedMemory
 from langchain_core.prompts import PromptTemplate
 
 from langchain_community.chains.graph_qa.cypher import (

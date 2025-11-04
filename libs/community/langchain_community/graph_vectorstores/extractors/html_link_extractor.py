@@ -43,7 +43,7 @@ def _parse_url(link: Tag, page_url: str, drop_fragments: bool = True) -> Optiona
 def _parse_hrefs(
     soup: BeautifulSoup, url: str, drop_fragments: bool = True
 ) -> Set[str]:
-    soup_links: List[Tag] = soup.find_all("a")  # type: ignore[assignment]
+    soup_links: List[Tag] = soup.find_all("a")
     links: Set[str] = set()
 
     for link in soup_links:

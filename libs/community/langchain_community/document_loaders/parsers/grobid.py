@@ -55,16 +55,16 @@ class GrobidParser(BaseBlobParser):
             title = "No title found"
         chunks = []
         for section in sections:
-            sect = section.find("head")  # type: ignore[union-attr]
+            sect = section.find("head")
             if sect is not None:
-                for i, paragraph in enumerate(section.find_all("p")):  # type: ignore[union-attr]
+                for i, paragraph in enumerate(section.find_all("p")):
                     chunk_bboxes = []
                     paragraph_text = []
                     for i, sentence in enumerate(paragraph.find_all("s")):
                         paragraph_text.append(sentence.text)
                         sbboxes = []
                         if sentence.get("coords") is not None:
-                            for bbox in sentence.get("coords").split(";"):
+                            for bbox in sentence.get("coords").split(";"):  # type: ignore[union-attr]
                                 box = bbox.split(",")
                                 sbboxes.append(
                                     {
@@ -82,8 +82,8 @@ class GrobidParser(BaseBlobParser):
                                 "text": sentence.text,
                                 "para": str(i),
                                 "bboxes": [sbboxes],
-                                "section_title": sect.text,  # type: ignore[union-attr]
-                                "section_number": sect.get("n"),  # type: ignore[union-attr]
+                                "section_title": sect.text,
+                                "section_number": sect.get("n"),
                                 "pages": (fpage, lpage),
                             }
                             chunks.append(sentence_dict)
@@ -96,8 +96,8 @@ class GrobidParser(BaseBlobParser):
                             "text": "".join(paragraph_text),
                             "para": str(i),
                             "bboxes": chunk_bboxes,
-                            "section_title": sect.text,  # type: ignore[union-attr]
-                            "section_number": sect.get("n"),  # type: ignore[union-attr]
+                            "section_title": sect.text,
+                            "section_number": sect.get("n"),
                             "pages": (fpage, lpage),
                         }
                         chunks.append(paragraph_dict)

@@ -4,7 +4,7 @@ localhost default port (11211) and pymemcache
 """
 
 import pytest
-from langchain.globals import get_llm_cache, set_llm_cache
+from langchain_classic.globals import get_llm_cache, set_llm_cache
 from langchain_core.outputs import Generation, LLMResult
 
 from langchain_community.cache import MemcachedCache
@@ -24,7 +24,7 @@ def test_memcached_cache() -> None:
     params = llm.dict()
     params["stop"] = None
     llm_string = str(sorted([(k, v) for k, v in params.items()]))
-    get_llm_cache().update("foo", llm_string, [Generation(text="fizz")])
+    get_llm_cache().update("foo", llm_string, [Generation(text="fizz")])  # type: ignore[union-attr]
     output = llm.generate(["foo"])
     expected_output = LLMResult(
         generations=[[Generation(text="fizz")]],
@@ -32,7 +32,7 @@ def test_memcached_cache() -> None:
     )
     assert output == expected_output
     # clear the cache
-    get_llm_cache().clear()
+    get_llm_cache().clear()  # type: ignore[union-attr]
 
 
 @pytest.mark.requires("pymemcache")
@@ -46,7 +46,7 @@ def test_memcached_cache_flush() -> None:
     params = llm.dict()
     params["stop"] = None
     llm_string = str(sorted([(k, v) for k, v in params.items()]))
-    get_llm_cache().update("foo", llm_string, [Generation(text="fizz")])
+    get_llm_cache().update("foo", llm_string, [Generation(text="fizz")])  # type: ignore[union-attr]
     output = llm.generate(["foo"])
     expected_output = LLMResult(
         generations=[[Generation(text="fizz")]],
@@ -54,7 +54,7 @@ def test_memcached_cache_flush() -> None:
     )
     assert output == expected_output
     # clear the cache
-    get_llm_cache().clear(delay=0, noreply=False)
+    get_llm_cache().clear(delay=0, noreply=False)  # type: ignore[union-attr]
 
     # After cache has been cleared, the result shouldn't be the same
     output = llm.generate(["foo"])
