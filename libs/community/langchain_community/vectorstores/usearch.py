@@ -66,9 +66,13 @@ class USearch(VectorStore):
         for i, text in enumerate(texts):
             metadata = metadatas[i] if metadatas else {}
             documents.append(Document(page_content=text, metadata=metadata))
-        last_id = int(self.ids[-1]) + 1
+
         if ids is None:
-            ids = np.array([str(last_id + id) for id, _ in enumerate(texts)])
+            if self.ids:
+                last_id = int(self.ids[-1]) + 1
+                ids = np.array([str(last_id + id) for id, _ in enumerate(texts)])
+            else:
+                ids = np.array([str(id) for id, _ in enumerate(texts)])
         elif isinstance(ids, list):
             ids = np.array(ids)
 

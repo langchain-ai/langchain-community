@@ -69,6 +69,20 @@ def _check_telegram_chat_loader(path: str) -> None:
                     "events": [{"message_time": "23.08.2023 13:15:35 UTC-08:00"}],
                 },
             ),
+            AIMessage(
+                content="this is bold text: BOLD TEXT",
+                additional_kwargs={
+                    "sender": "Batman & Robin",
+                    "events": [{"message_time": "23.08.2023 13:16:20 UTC-08:00"}],
+                },
+            ),
+            HumanMessage(
+                content="this is an email: admin@example.com",
+                additional_kwargs={
+                    "sender": "Jimmeny Marvelton",
+                    "events": [{"message_time": "23.08.2023 13:17:10 UTC-08:00"}],
+                },
+            ),
         ]
         _assert_messages_are_equal(session["messages"], expected_content)
 

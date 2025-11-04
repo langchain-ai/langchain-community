@@ -80,7 +80,7 @@ class DatadogLogsLoader(BaseLoader):
         Get logs from Datadog.
 
         Returns:
-            A list of Document objects.
+            A list of `Document` objects.
                 - page_content
                 - metadata
                     - id

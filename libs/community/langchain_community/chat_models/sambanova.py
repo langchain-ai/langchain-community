@@ -343,7 +343,7 @@ class ChatSambaNovaCloud(BaseChatModel):
         tool_choice: Optional[Union[Dict[str, Any], bool, str]] = None,
         parallel_tool_calls: Optional[bool] = False,
         **kwargs: Any,
-    ) -> Runnable[LanguageModelInput, BaseMessage]:
+    ) -> Runnable[LanguageModelInput, AIMessage]:
         """Bind tool-like objects to this chat model
 
         tool_choice: does not currently support "any", choice like
@@ -1255,7 +1255,7 @@ class ChatSambaStudio(BaseChatModel):
         tool_choice: Optional[Union[Dict[str, Any], bool, str]] = None,
         parallel_tool_calls: Optional[bool] = False,
         **kwargs: Any,
-    ) -> Runnable[LanguageModelInput, BaseMessage]:
+    ) -> Runnable[LanguageModelInput, AIMessage]:
         """Bind tool-like objects to this chat model
 
         tool_choice: does not currently support "any", choice like
