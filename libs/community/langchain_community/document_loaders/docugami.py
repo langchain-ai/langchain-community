@@ -109,7 +109,7 @@ class DocugamiLoader(BaseLoader, BaseModel):
         document_name: Optional[str] = None,
         additional_doc_metadata: Optional[Mapping] = None,
     ) -> List[Document]:
-        """Parse a single DGML document into a list of Documents."""
+        """Parse a single DGML document into a list of `Document` objects."""
         try:
             from lxml import etree
         except ImportError:
