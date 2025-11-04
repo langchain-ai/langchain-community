@@ -69,7 +69,7 @@ class UnstructuredMarkdownLoader(UnstructuredFileLoader):
 
     References
     ----------
-    https://unstructured-io.github.io/unstructured/core/partition.html#partition-md
+    https://docs.unstructured.io/open-source/core-functionality/partitioning#partition-md
     """  # noqa: E501
 
     def __init__(

@@ -100,9 +100,9 @@ class CHMParser(object):
             local = ""
             for param in obj.find_all("param"):
                 if param["name"] == "Name":
-                    name = param["value"]
+                    name = param["value"]  # type: ignore[assignment]
                 if param["name"] == "Local":
-                    local = param["value"]
+                    local = param["value"]  # type: ignore[assignment]
             if not name or not local:
                 continue
 

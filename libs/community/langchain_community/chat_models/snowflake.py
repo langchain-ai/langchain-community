@@ -310,8 +310,8 @@ class ChatSnowflakeCortex(BaseChatModel):
         sql_stmt = f"""
             select snowflake.cortex.{self.cortex_function}(
                 '{self.model}',
-                parse_json('{message_json}'),
-                parse_json('{options_json}')
+                parse_json($${message_json}$$),
+                parse_json($${options_json}$$)
             ) as llm_response;
         """
 
@@ -397,8 +397,8 @@ class ChatSnowflakeCortex(BaseChatModel):
         sql_stmt = f"""
             select snowflake.cortex.{self.cortex_function}(
                 '{self.model}',
-                parse_json('{message_json}'),
-                parse_json('{options_json}')
+                parse_json($${message_json}$$),
+                parse_json($${options_json}$$)
             ) as llm_stream_response;
         """
 
