@@ -1,4 +1,11 @@
-name: lint
+# Runs linting.
+#
+# Uses the package's Makefile to run the checks, specifically the
+# `lint_package` and `lint_tests` targets.
+#
+# Called as part of check_diffs.yml workflow.
+
+name: "🧹 Linting"
 
 on:
   workflow_call:
@@ -7,62 +14,54 @@ on:
         required: true
         type: string
         description: "From which folder this pipeline executes"
+      python-version:
+        required: true
+        type: string
+        description: "Python version to use"
+
+permissions:
+  contents: read
 
 env:
-  UV_FROZEN: "true"
   WORKDIR: ${{ inputs.working-directory == '' && '.' || inputs.working-directory }}
 
   # This env var allows us to get inline annotations when ruff has complaints.
   RUFF_OUTPUT_FORMAT: github
 
-jobs:
-  build:
-    name: "make lint"
-    runs-on: ubuntu-latest
-    strategy:
-      matrix:
-        # Only lint on the min and max supported Python versions.
-        # It's extremely unlikely that there's a lint issue on any version in between
-        # that doesn't show up on the min or max versions.
-        #
-        # GitHub rate-limits how many jobs can be running at any one time.
-        # Starting new jobs is also relatively slow,
-        # so linting on fewer versions makes CI faster.
-        python-version:
-          - "3.10"
-          - "3.13"
-    steps:
-      - uses: actions/checkout@v4
+  UV_FROZEN: "true"
 
-      - name: Set up Python ${{ matrix.python-version }} + uv
+jobs:
+  # Linting job - runs quality checks on package and test code
+  build:
+    name: "Python ${{ inputs.python-version }}"
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - name: "📋 Checkout Code"
+        uses: actions/checkout@v5
+
+      - name: "🐍 Set up Python ${{ inputs.python-version }} + UV"
         uses: "./.github/actions/uv_setup"
         with:
-          python-version: ${{ matrix.python-version }}
+          python-version: ${{ inputs.python-version }}
+          cache-suffix: lint-${{ inputs.working-directory }}
+          working-directory: ${{ inputs.working-directory }}
 
-      - name: Install dependencies
-        # Also installs dev/lint/test/typing dependencies, to ensure we have
-        # type hints for as many of our libraries as possible.
-        # This helps catch errors that require dependencies to be spotted, for example:
-        # https://github.com/langchain-ai/langchain/pull/10249/files#diff-935185cd488d015f026dcd9e19616ff62863e8cde8c0bee70318d3ccbca98341
-        #
-        # If you change this configuration, make sure to change the `cache-key`
-        # in the `poetry_setup` action above to stop using the old cache.
-        # It doesn't matter how you change it, any change will cause a cache-bust.
+      - name: "📦 Install Lint & Typing Dependencies"
         working-directory: ${{ inputs.working-directory }}
         run: |
           uv sync --group lint --group typing
 
-      - name: Analysing the code with our lint
+      - name: "🔍 Analyze Package Code with Linters"
         working-directory: ${{ inputs.working-directory }}
         run: |
           make lint_package
-
-      - name: Install unit+integration test dependencies
+      - name: "📦 Install Test Dependencies"
         working-directory: ${{ inputs.working-directory }}
         run: |
           uv sync --inexact --group test --group test_integration
 
-      - name: Analysing the code with our lint
+      - name: "🔍 Analyze Test Code with Linters"
         working-directory: ${{ inputs.working-directory }}
         run: |
           make lint_tests

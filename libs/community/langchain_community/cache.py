@@ -2153,7 +2153,7 @@ class AzureCosmosDBSemanticCache(BaseCache):
         self._validate_enum_value(kind, CosmosDBVectorSearchType)
 
         if not cosmosdb_connection_string:
-            raise ValueError(" CosmosDB connection string can be empty.")
+            raise ValueError("CosmosDB connection string can't be empty.")
 
         self.cosmosdb_connection_string = cosmosdb_connection_string
         self.cosmosdb_client = cosmosdb_client

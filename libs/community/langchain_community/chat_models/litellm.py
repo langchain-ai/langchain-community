@@ -579,7 +579,7 @@ class ChatLiteLLM(BaseChatModel):
         formatted_tools = [convert_to_openai_tool(tool) for tool in tools]
 
         # In case of openai if tool_choice is `any` or if bool has been provided we
-        # change it to `required` as that is suppored by openai.
+        # change it to `required` as that is supported by openai.
         if (
             (self.model is not None and "azure" in self.model)
             or (self.model_name is not None and "azure" in self.model_name)
