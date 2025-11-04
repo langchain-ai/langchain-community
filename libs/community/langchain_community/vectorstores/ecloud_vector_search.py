@@ -28,8 +28,8 @@ class EcloudESVectorStore(VectorStore):
     Example:
         .. code-block:: python
 
-            from langchain.vectorstores import EcloudESVectorStore
-            from langchain.embeddings.openai import OpenAIEmbeddings
+            from langchain_classic.vectorstores import EcloudESVectorStore
+            from langchain_classic.embeddings.openai import OpenAIEmbeddings
 
             embeddings = OpenAIEmbeddings()
             vectorstore = EcloudESVectorStore(

@@ -1,7 +1,7 @@
 """Test RetrievalQA functionality."""
 
-from langchain.chains import RetrievalQAWithSourcesChain
-from langchain.chains.loading import load_chain
+from langchain_classic.chains import RetrievalQAWithSourcesChain
+from langchain_classic.chains.loading import load_chain
 from langchain_text_splitters.character import CharacterTextSplitter
 
 from langchain_community.document_loaders import DirectoryLoader

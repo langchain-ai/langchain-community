@@ -3,7 +3,9 @@ from __future__ import annotations
 from copy import deepcopy
 from typing import TYPE_CHECKING, Any, Dict, List, Optional, Sequence, Union
 
-from langchain.retrievers.document_compressors.base import BaseDocumentCompressor
+from langchain_classic.retrievers.document_compressors.base import (
+    BaseDocumentCompressor,
+)
 from langchain_core.callbacks.manager import Callbacks
 from langchain_core.documents import Document
 from pydantic import ConfigDict, model_validator
