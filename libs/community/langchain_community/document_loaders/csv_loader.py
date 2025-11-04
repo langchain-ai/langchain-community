@@ -14,7 +14,7 @@ from langchain_community.document_loaders.unstructured import (
 
 
 class CSVLoader(BaseLoader):
-    """Load a `CSV` file into a list of Documents.
+    """Load a `CSV` file into a list of `Document` objects.
 
     Each document represents one row of the CSV file. Every row is converted
     into a key/value pair and outputted to a new line in the document's

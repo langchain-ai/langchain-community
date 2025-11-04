@@ -1,4 +1,4 @@
-from langchain.chains.natbot.crawler import (
+from langchain_classic.chains.natbot.crawler import (
     Crawler,
     ElementInViewPort,
     black_listed_elements,
