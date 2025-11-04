@@ -62,7 +62,7 @@ class GraphIndexCreator(BaseModel):
         # Temporary local scoped import while community does not depend on
         # langchain explicitly
         try:
-            from langchain.chains import LLMChain
+            from langchain_classic.chains import LLMChain
         except ImportError:
             raise ImportError(
                 "Please install langchain to use this functionality. "
@@ -85,7 +85,7 @@ class GraphIndexCreator(BaseModel):
         # Temporary local scoped import while community does not depend on
         # langchain explicitly
         try:
-            from langchain.chains import LLMChain
+            from langchain_classic.chains import LLMChain
         except ImportError:
             raise ImportError(
                 "Please install langchain to use this functionality. "
