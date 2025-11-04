@@ -89,6 +89,7 @@ jobs:
 
   # Test compatibility with different Pydantic versions for affected packages
   test-pydantic:
+    name: cd ${{ matrix.job-configs.working-directory }}
     needs: [build]
     if: ${{ needs.build.outputs.test-pydantic != '[]' }}
     strategy:
