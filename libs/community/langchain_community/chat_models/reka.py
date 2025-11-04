@@ -386,7 +386,7 @@ class ChatReka(BaseChatModel):
         tool_choice: Optional[Union[str, Literal["any"]]] = "auto",
         strict: Optional[bool] = None,
         **kwargs: Any,
-    ) -> Runnable[LanguageModelInput, BaseMessage]:
+    ) -> Runnable[LanguageModelInput, AIMessage]:
         """Bind tool-like objects to this chat model.
 
         The `tool_choice` parameter controls how the model uses the tools you pass.
