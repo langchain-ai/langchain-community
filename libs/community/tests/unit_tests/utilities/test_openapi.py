@@ -1,7 +1,7 @@
 from pathlib import Path
 
 import pytest
-from langchain.chains.openai_functions.openapi import openapi_spec_to_openai_fn
+from langchain_classic.chains.openai_functions.openapi import openapi_spec_to_openai_fn
 
 from langchain_community.utilities.openapi import (  # noqa: E402 # ignore: community-import
     OpenAPISpec,

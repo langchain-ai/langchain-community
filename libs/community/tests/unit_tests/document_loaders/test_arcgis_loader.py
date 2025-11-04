@@ -50,7 +50,7 @@ def mock_gis() -> GIS:
 @pytest.mark.usefixtures("arcgis_mocks")
 def test_lazy_load(mock_feature_layer: FeatureLayer, mock_gis: GIS) -> None:
     loader = ArcGISLoader(layer=mock_feature_layer, gis=mock_gis)
-    loader.BEAUTIFULSOUP = None
+    loader.BEAUTIFULSOUP = None  # type: ignore[assignment]
 
     documents = list(loader.lazy_load())
 
