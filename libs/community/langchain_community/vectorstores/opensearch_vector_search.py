@@ -17,7 +17,7 @@ IMPORT_OPENSEARCH_PY_ERROR = (
 )
 IMPORT_ASYNC_OPENSEARCH_PY_ERROR = """
 Could not import AsyncOpenSearch.
-Please install it with `pip install opensearch-py`."""
+Please install it with `pip install opensearch-py[async]`."""
 
 SCRIPT_SCORING_SEARCH = "script_scoring"
 PAINLESS_SCRIPTING_SEARCH = "painless_scripting"

@@ -166,8 +166,7 @@ class GitLabAPIWrapper(BaseModel):
             commits are already in the master branch"""
         else:
             try:
-                title = pr_query.split("\n")[0]
-                body = pr_query[len(title) + 2 :]
+                title, body = pr_query.split("\n", 1)
                 pr = self.gitlab_repo_instance.mergerequests.create(
                     {
                         "source_branch": self.gitlab_branch,
@@ -218,8 +217,7 @@ class GitLabAPIWrapper(BaseModel):
                 f"to the {self.gitlab_base_branch} branch, which is protected. "
                 "Please create a new branch and try again."
             )
-        file_path = file_query.split("\n")[0]
-        file_contents = file_query[len(file_path) + 2 :]
+        file_path, file_contents = file_query.split("\n", 1)
         try:
             self.gitlab_repo_instance.files.get(file_path, self.gitlab_branch)
             return f"File already exists at {file_path}. Use update_file instead"
