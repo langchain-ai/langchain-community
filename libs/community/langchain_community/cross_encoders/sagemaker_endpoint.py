@@ -45,7 +45,7 @@ class SagemakerEndpointCrossEncoder(BaseModel, BaseCrossEncoder):
        .. code-block:: python
 
 
-           from langchain.embeddings import SagemakerEndpointCrossEncoder
+           from langchain_classic.embeddings import SagemakerEndpointCrossEncoder
            endpoint_name = (
                "my-endpoint-name"
            )

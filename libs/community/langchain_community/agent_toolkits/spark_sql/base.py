@@ -11,7 +11,7 @@ from langchain_community.agent_toolkits.spark_sql.prompt import SQL_PREFIX, SQL_
 from langchain_community.agent_toolkits.spark_sql.toolkit import SparkSQLToolkit
 
 if TYPE_CHECKING:
-    from langchain.agents.agent import AgentExecutor
+    from langchain_classic.agents.agent import AgentExecutor
 
 
 def create_spark_sql_agent(
@@ -54,9 +54,9 @@ def create_spark_sql_agent(
     Returns:
         The agent executor.
     """
-    from langchain.agents.agent import AgentExecutor
-    from langchain.agents.mrkl.base import ZeroShotAgent
-    from langchain.chains.llm import LLMChain
+    from langchain_classic.agents.agent import AgentExecutor
+    from langchain_classic.agents.mrkl.base import ZeroShotAgent
+    from langchain_classic.chains.llm import LLMChain
 
     tools = toolkit.get_tools()
     prefix = prefix.format(top_k=top_k)

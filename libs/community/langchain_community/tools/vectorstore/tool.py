@@ -50,7 +50,7 @@ class VectorStoreQATool(BaseVectorStoreTool, BaseTool):
         run_manager: Optional[CallbackManagerForToolRun] = None,
     ) -> str:
         """Use the tool."""
-        from langchain.chains.retrieval_qa.base import RetrievalQA
+        from langchain_classic.chains.retrieval_qa.base import RetrievalQA
 
         chain = RetrievalQA.from_chain_type(
             self.llm, retriever=self.vectorstore.as_retriever()
@@ -66,7 +66,7 @@ class VectorStoreQATool(BaseVectorStoreTool, BaseTool):
         run_manager: Optional[AsyncCallbackManagerForToolRun] = None,
     ) -> str:
         """Use the tool asynchronously."""
-        from langchain.chains.retrieval_qa.base import RetrievalQA
+        from langchain_classic.chains.retrieval_qa.base import RetrievalQA
 
         chain = RetrievalQA.from_chain_type(
             self.llm, retriever=self.vectorstore.as_retriever()
@@ -102,7 +102,7 @@ class VectorStoreQAWithSourcesTool(BaseVectorStoreTool, BaseTool):
     ) -> str:
         """Use the tool."""
 
-        from langchain.chains.qa_with_sources.retrieval import (
+        from langchain_classic.chains.qa_with_sources.retrieval import (
             RetrievalQAWithSourcesChain,
         )
 
@@ -123,7 +123,7 @@ class VectorStoreQAWithSourcesTool(BaseVectorStoreTool, BaseTool):
         run_manager: Optional[AsyncCallbackManagerForToolRun] = None,
     ) -> str:
         """Use the tool asynchronously."""
-        from langchain.chains.qa_with_sources.retrieval import (
+        from langchain_classic.chains.qa_with_sources.retrieval import (
             RetrievalQAWithSourcesChain,
         )
 
