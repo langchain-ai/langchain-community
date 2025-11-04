@@ -130,6 +130,11 @@ class HuggingFaceEmbeddings(BaseModel, Embeddings):
         return self.embed_documents([text])[0]
 
 
+@deprecated(
+    since="0.2.2",
+    removal="1.0",
+    alternative_import="langchain_huggingface.HuggingFaceEmbeddings",
+)
 class HuggingFaceInstructEmbeddings(BaseModel, Embeddings):
     """Wrapper around sentence_transformers embedding models.
 
@@ -400,6 +405,11 @@ class HuggingFaceBgeEmbeddings(BaseModel, Embeddings):
         return embedding.tolist()
 
 
+@deprecated(
+    since="0.2.2",
+    removal="1.0",
+    alternative_import="langchain_huggingface.HuggingFaceEndpointEmbeddings",
+)
 class HuggingFaceInferenceAPIEmbeddings(BaseModel, Embeddings):
     """Embed texts using the HuggingFace API.
 

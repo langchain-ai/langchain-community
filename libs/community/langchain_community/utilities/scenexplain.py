@@ -35,7 +35,7 @@ class SceneXplainAPIWrapper(BaseModel):
             "data": [
                 {
                     "image": image,
-                    "algorithm": "Ember",
+                    "algorithm": "Jelly",
                     "languages": ["en"],
                 }
             ]

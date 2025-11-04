@@ -2,7 +2,7 @@
 
 import os
 
-from langchain.chains.loading import load_chain
+from langchain_classic.chains.loading import load_chain
 
 from langchain_community.chains.graph_qa.cypher import GraphCypherQAChain
 from langchain_community.graphs import Neo4jGraph

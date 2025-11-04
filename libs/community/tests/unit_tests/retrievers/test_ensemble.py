@@ -1,5 +1,5 @@
 import pytest
-from langchain.retrievers.ensemble import EnsembleRetriever
+from langchain_classic.retrievers.ensemble import EnsembleRetriever
 from langchain_core.documents import Document
 from langchain_core.embeddings import FakeEmbeddings
 

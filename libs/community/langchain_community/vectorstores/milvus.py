@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 import logging
-from typing import Any, Iterable, List, Optional, Tuple, Union
+from typing import TYPE_CHECKING, Any, Iterable, List, Optional, Tuple, Union
 from uuid import uuid4
 
 import numpy as np
@@ -11,6 +11,9 @@ from langchain_core.embeddings import Embeddings
 from langchain_core.vectorstores import VectorStore
 
 from langchain_community.vectorstores.utils import maximal_marginal_relevance
+
+if TYPE_CHECKING:
+    from pymilvus.orm.mutation import MutationResult
 
 logger = logging.getLogger(__name__)
 
@@ -235,10 +238,10 @@ class Milvus(VectorStore):
         from pymilvus import MilvusException, connections
 
         # Grab the connection arguments that are used for checking existing connection
-        host: str = connection_args.get("host", None)
-        port: Union[str, int] = connection_args.get("port", None)
-        address: str = connection_args.get("address", None)
-        uri: str = connection_args.get("uri", None)
+        host: Optional[str] = connection_args.get("host", None)
+        port: Optional[Union[str, int]] = connection_args.get("port", None)
+        address: Optional[str] = connection_args.get("address", None)
+        uri: Optional[str] = connection_args.get("uri", None)
         user = connection_args.get("user", None)
 
         # Order of use is host/port, uri, address
@@ -938,9 +941,9 @@ class Milvus(VectorStore):
                 ret.append(documents[x])
         return ret
 
-    def delete(  # type: ignore[no-untyped-def]
-        self, ids: Optional[List[str]] = None, expr: Optional[str] = None, **kwargs: str
-    ):
+    def delete(
+        self, ids: Optional[List[str]] = None, expr: Optional[str] = None, **kwargs: Any
+    ) -> MutationResult:
         """Delete by vector ID or boolean expression.
         Refer to [Milvus documentation](https://milvus.io/docs/delete_data.md)
         for notes and examples of expressions.
