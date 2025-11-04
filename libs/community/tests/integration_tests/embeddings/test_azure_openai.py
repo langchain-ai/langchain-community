@@ -122,3 +122,9 @@ def test_embed_documents_normalized() -> None:
 def test_embed_query_normalized() -> None:
     output = _get_embeddings().embed_query("foo walked to the market")
     assert np.isclose(np.linalg.norm(output), 1.0)
+
+@pytest.mark.scheduled
+def test_azure_openai_chunk_size_not_provided() -> None:
+    """Test chunk_size defaults correctly when not provided."""
+    embedding = _get_embeddings()
+    assert embedding.chunk_size <= 2048

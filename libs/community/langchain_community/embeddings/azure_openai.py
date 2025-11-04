@@ -102,7 +102,7 @@ class AzureOpenAIEmbeddings(OpenAIEmbeddings):
         # Azure OpenAI embedding models allow a maximum of 2048 texts
         # at a time in each batch
         # See: https://learn.microsoft.com/en-us/azure/ai-services/openai/reference#embeddings
-        values["chunk_size"] = min(values["chunk_size"], 2048)
+        values["chunk_size"] = min(values.get("chunk_size") or 2048, 2048)
         try:
             import openai  # noqa: F401
         except ImportError:
