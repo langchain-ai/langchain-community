@@ -98,7 +98,7 @@ class Xinference(LLM):
     .. code-block:: python
 
         from langchain_community.llms import Xinference
-        from langchain.prompts import PromptTemplate
+        from langchain_classic.prompts import PromptTemplate
 
         llm = Xinference(
             server_url="http://0.0.0.0:9997",

@@ -2,8 +2,8 @@ import logging
 import re
 from typing import Any, List, Optional
 
-from langchain.chains import LLMChain
-from langchain.chains.prompt_selector import ConditionalPromptSelector
+from langchain_classic.chains import LLMChain
+from langchain_classic.chains.prompt_selector import ConditionalPromptSelector
 from langchain_core.callbacks import (
     AsyncCallbackManagerForRetrieverRun,
     CallbackManagerForRetrieverRun,

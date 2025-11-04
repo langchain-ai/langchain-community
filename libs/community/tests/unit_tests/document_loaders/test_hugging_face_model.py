@@ -1,8 +1,8 @@
 import json
-from typing import Tuple
+from typing import Dict, Tuple
 
 import responses
-from requests import Request
+from requests import PreparedRequest
 
 from langchain_community.document_loaders import HuggingFaceModelLoader
 
@@ -44,10 +44,10 @@ MOCKED_README_CONTENT = {
 }
 
 
-def response_callback(request: Request) -> Tuple[int, dict, str]:
-    if "/api/models" in request.url:
+def response_callback(request: PreparedRequest) -> Tuple[int, Dict[str, str], str]:
+    if request.url and "/api/models" in request.url:
         return (200, {}, json.dumps(MOCKED_MODELS_RESPONSE))
-    elif "README.md" in request.url:
+    elif request.url and "README.md" in request.url:
         model_id = (
             request.url.split("/")[3] + "/" + request.url.split("/")[4]
         )  # Extract model_id
@@ -62,14 +62,14 @@ def test_load_models_with_readme() -> None:
     responses.add_callback(
         responses.GET,
         "https://huggingface.co/api/models",
-        callback=response_callback,  # type: ignore[arg-type]
+        callback=response_callback,
         content_type="application/json",
     )
     responses.add_callback(
         responses.GET,
         # Use a regex or update this placeholder
         "https://huggingface.co/microsoft/phi-2/raw/main/README.md",
-        callback=response_callback,  # type: ignore[arg-type]
+        callback=response_callback,
         content_type="text/plain",
     )
 

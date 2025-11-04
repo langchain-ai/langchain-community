@@ -3,7 +3,7 @@
 from typing import Dict, List, Union
 
 import pytest
-from langchain.chains.llm import LLMChain
+from langchain_classic.chains.llm import LLMChain
 from langchain_core.output_parsers import BaseOutputParser
 from langchain_core.prompts import PromptTemplate
 
