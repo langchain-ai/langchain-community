@@ -2,7 +2,7 @@ import os
 from typing import Any, Callable, Union
 
 import pytest
-from langchain.globals import get_llm_cache, set_llm_cache
+from langchain_classic.globals import get_llm_cache, set_llm_cache
 from langchain_core.outputs import Generation
 
 from langchain_community.cache import GPTCache
@@ -53,10 +53,10 @@ def test_gptcache_caching(
     params = llm.dict()
     params["stop"] = None
     llm_string = str(sorted([(k, v) for k, v in params.items()]))
-    get_llm_cache().update("foo", llm_string, [Generation(text="fizz")])
+    get_llm_cache().update("foo", llm_string, [Generation(text="fizz")])  # type: ignore[union-attr]
     _ = llm.generate(["foo", "bar", "foo"])
-    cache_output = get_llm_cache().lookup("foo", llm_string)
+    cache_output = get_llm_cache().lookup("foo", llm_string)  # type: ignore[union-attr]
     assert cache_output == [Generation(text="fizz")]
 
-    get_llm_cache().clear()
-    assert get_llm_cache().lookup("bar", llm_string) is None
+    get_llm_cache().clear()  # type: ignore[union-attr]
+    assert get_llm_cache().lookup("bar", llm_string) is None  # type: ignore[union-attr]

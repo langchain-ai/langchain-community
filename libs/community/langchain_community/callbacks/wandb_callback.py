@@ -56,7 +56,7 @@ def analyze_text(
         output_dir (str): The directory to save the visualization files to.
 
     Returns:
-        (dict): A dictionary containing the complexity metrics and visualization
+        `dict` containing the complexity metrics and visualization
             files serialized in a wandb.Html element.
     """
     resp = {}

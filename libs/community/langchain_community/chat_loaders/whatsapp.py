@@ -38,7 +38,7 @@ class WhatsAppChatLoader(BaseChatLoader):
             flags=re.IGNORECASE,
         )
         self._message_line_regex = re.compile(
-            r"\u200E*\[?(\d{1,2}/\d{1,2}/\d{2,4}, \d{1,2}:\d{2}:\d{2} (?:AM|PM))\]?[ \u200E]*([^:]+): (.+)",  # noqa
+            r"\u200E*\[?(\d{1,2}\/\d{1,2}\/\d{2,4}, \d{1,2}:\d{2}:\d{2}(?: AM| PM)?)\]?[ \u200E]*([^:]+): (.+)",  # noqa
             flags=re.IGNORECASE,
         )
 

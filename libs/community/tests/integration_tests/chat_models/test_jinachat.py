@@ -89,7 +89,7 @@ def test_jinachat_streaming() -> None:
         max_tokens=10,
         streaming=True,
         temperature=0,
-        callback_manager=callback_manager,
+        callbacks=callback_manager,
         verbose=True,
     )
     message = HumanMessage(content="Hello")
@@ -121,7 +121,7 @@ async def test_async_jinachat_streaming() -> None:
         max_tokens=10,
         streaming=True,
         temperature=0,
-        callback_manager=callback_manager,
+        callbacks=callback_manager,
         verbose=True,
     )
     message = HumanMessage(content="Hello")
