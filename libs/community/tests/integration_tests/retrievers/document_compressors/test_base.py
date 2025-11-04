@@ -1,6 +1,6 @@
 """Integration test for compression pipelines."""
 
-from langchain.retrievers.document_compressors import (
+from langchain_classic.retrievers.document_compressors import (
     DocumentCompressorPipeline,
     EmbeddingsFilter,
 )

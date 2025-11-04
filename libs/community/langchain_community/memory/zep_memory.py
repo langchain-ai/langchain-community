@@ -5,7 +5,7 @@ from typing import Any, Dict, Optional
 from langchain_community.chat_message_histories import ZepChatMessageHistory
 
 try:
-    from langchain.memory import ConversationBufferMemory
+    from langchain_classic.memory import ConversationBufferMemory
 
     class ZepMemory(ConversationBufferMemory):
         """Persist your chain history to the Zep MemoryStore.
