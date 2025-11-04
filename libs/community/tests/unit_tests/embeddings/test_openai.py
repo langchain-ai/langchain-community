@@ -23,9 +23,14 @@ def test_openai_incorrect_field() -> None:
 
 @pytest.mark.requires("openai")
 def test_embed_documents_with_custom_chunk_size() -> None:
-    with patch("openai.OpenAI") as mock_openai_class:
+    with patch("openai.OpenAI") as mock_openai_class, \
+         patch("tiktoken.encoding_for_model") as mock_tiktoken:
         mock_client = mock_openai_class.return_value
         mock_embeddings_client = mock_client.embeddings
+        
+        # Mock tiktoken encoding
+        mock_encoding = mock_tiktoken.return_value
+        mock_encoding.encode.side_effect = [[1342, 19], [1342, 19], [1342, 19], [1342, 19]]
 
         embeddings = OpenAIEmbeddings(chunk_size=2)
         texts = ["text1", "text2", "text3", "text4"]

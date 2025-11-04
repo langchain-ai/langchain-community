@@ -1,4 +1,4 @@
-"""**Adapters** are used to adapt LangChain models to other APIs.
+"""Adapters are used to adapt LangChain models to other APIs.
 
 LangChain integrates with many model providers.
 
