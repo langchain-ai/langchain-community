@@ -46,7 +46,7 @@ class ArcGISLoader(BaseLoader):
             self.BEAUTIFULSOUP = BeautifulSoup
         except ImportError:
             warnings.warn("BeautifulSoup not found. HTML will not be parsed.")
-            self.BEAUTIFULSOUP = None
+            self.BEAUTIFULSOUP = None  # type: ignore[assignment]
 
         self.gis = gis or arcgis.gis.GIS()
 
@@ -93,7 +93,7 @@ class ArcGISLoader(BaseLoader):
         if lyr_desc is None:
             # retrieve description from the FeatureLayer if not provided
             try:
-                if self.BEAUTIFULSOUP:
+                if self.BEAUTIFULSOUP:  # type: ignore[truthy-function]
                     lyr_desc = self.BEAUTIFULSOUP(props["description"]).text
                 else:
                     lyr_desc = props["description"]
@@ -109,7 +109,7 @@ class ArcGISLoader(BaseLoader):
                 raw_desc = item.description
             except AttributeError:
                 raw_desc = item.properties.description
-            if self.BEAUTIFULSOUP:
+            if self.BEAUTIFULSOUP:  # type: ignore  # noqa: PGH003
                 item_desc = self.BEAUTIFULSOUP(raw_desc).text
             else:
                 item_desc = raw_desc

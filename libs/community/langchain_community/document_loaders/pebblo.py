@@ -208,7 +208,7 @@ class PebbloSafeLoader(BaseLoader):
                 classified documents with pb_id as key.
 
         Returns:
-            List[Document]: A list of Document objects with added semantic metadata.
+            A list of `Document` objects with added semantic metadata.
         """
         indexed_docs = {
             doc.pb_id: Document(page_content=doc.page_content, metadata=doc.metadata)
@@ -226,10 +226,10 @@ class PebbloSafeLoader(BaseLoader):
 
     def _unindex_docs(self) -> List[Document]:
         """
-        Converts a list of IndexedDocument objects to a list of Document objects.
+        Converts a list of `IndexedDocument` objects to a list of `Document` objects.
 
         Returns:
-            List[Document]: A list of Document objects.
+            A list of `Document` objects.
         """
         docs = [
             Document(page_content=doc.page_content, metadata=doc.metadata)
@@ -243,7 +243,7 @@ class PebbloSafeLoader(BaseLoader):
 
         Args:
             doc (Document): A Document object.
-            classified_doc (dict): A dictionary containing the classified document.
+            classified_doc: `dict` containing the classified document.
 
         Returns:
             Document: The Document object with added semantic metadata.

@@ -137,6 +137,7 @@ def _get_search_index_query(
                 "CALL db.idx.vector.queryNodes($entity_label, "
                 "$entity_property, $k, vecf32($embedding)) "
                 "YIELD node, score "
+                "WITH node, (2 - score) / 2 AS score "
             )
         elif search_type == SearchType.HYBRID:
             return (
@@ -176,7 +177,7 @@ def process_index_data(data: List[List[Any]]) -> List[Dict[str, Any]]:
 
     Args:
         data (List[List[Any]]): A nested list containing
-        details about entitys, their properties, index
+        details about entities, their properties, index
         types, and configuration information.
 
     Returns:
@@ -208,7 +209,7 @@ def process_index_data(data: List[List[Any]]) -> List[Dict[str, Any]]:
         - If the index type includes 'VECTOR', additional
           details such as dimension and similarity function
           are extracted from the entity configuration.
-        - The function handles cases where entitys have
+        - The function handles cases where entities have
           multiple index types (e.g., both 'FULLTEXT' and 'VECTOR').
     """
 
@@ -275,7 +276,7 @@ class FalkorDBVector(VectorStore):
         pre_delete_collection: If True, will delete
                 existing data if it exists.(default:
                 False). Useful for testing.
-        search_type: Similiarity search type to use.
+        search_type: Similarity search type to use.
                 Could be either SearchType.VECTOR or
                 SearchType.HYBRID (default:
                 SearchType.VECTOR)
@@ -1245,8 +1246,8 @@ class FalkorDBVector(VectorStore):
                 f"MATCH (n:`{node_label}`) "
                 f"WHERE n.`{embedding_node_property}` IS null "
                 "AND any(k IN $props WHERE n[k] IS NOT null) "
-                "RETURN id(n) AS id, "
-                "coalesce(n.text, '') AS text "
+                "RETURN id(n) AS id, reduce(str='',"
+                "k IN $props | str + '\\n' + k + ':' + coalesce(n[k], '')) AS text "
                 "LIMIT 1000"
             )
             data = store._query(fetch_query, params={"props": text_node_properties})
