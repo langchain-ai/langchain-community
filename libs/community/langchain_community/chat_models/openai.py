@@ -712,7 +712,9 @@ class ChatOpenAI(BaseChatModel):
             kwargs: Any additional parameters to pass to the
                 :class:`~langchain.runnable.Runnable` constructor.
         """
-        from langchain.chains.openai_functions.base import convert_to_openai_function
+        from langchain_classic.chains.openai_functions.base import (
+            convert_to_openai_function,
+        )
 
         formatted_functions = [convert_to_openai_function(fn) for fn in functions]
         if function_call is not None:

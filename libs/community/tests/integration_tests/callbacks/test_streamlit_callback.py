@@ -14,7 +14,7 @@ from langchain_community.llms import OpenAI
 @pytest.mark.requires("streamlit")
 def test_streamlit_callback_agent() -> None:
     import streamlit as st
-    from langchain.agents import AgentType, initialize_agent, load_tools
+    from langchain_classic.agents import AgentType, initialize_agent, load_tools
 
     streamlit_callback = StreamlitCallbackHandler(st.container())
 
