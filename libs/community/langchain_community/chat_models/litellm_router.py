@@ -5,7 +5,7 @@ Deprecated LiteLLM wrapper.
    `from langchain_litellm import ChatLiteLLMRouter` instead.
 """
 
-from typing import Any, AsyncIterator, Iterator, List, Mapping, Optional
+from typing import Any, AsyncIterator, Iterator, List, Mapping, Optional, Type
 
 from langchain_core._api.deprecation import deprecated
 from langchain_core.callbacks.manager import (
@@ -16,7 +16,7 @@ from langchain_core.language_models.chat_models import (
     agenerate_from_stream,
     generate_from_stream,
 )
-from langchain_core.messages import AIMessageChunk, BaseMessage
+from langchain_core.messages import AIMessageChunk, BaseMessage, BaseMessageChunk
 from langchain_core.outputs import ChatGeneration, ChatGenerationChunk, ChatResult
 
 from langchain_community.chat_models.litellm import (
@@ -117,7 +117,7 @@ class ChatLiteLLMRouter(ChatLiteLLM):
         run_manager: Optional[CallbackManagerForLLMRun] = None,
         **kwargs: Any,
     ) -> Iterator[ChatGenerationChunk]:
-        default_chunk_class = AIMessageChunk
+        default_chunk_class: Type[BaseMessageChunk] = AIMessageChunk
         message_dicts, params = self._create_message_dicts(messages, stop)
         params = {**params, **kwargs, "stream": True}
         self._prepare_params_for_router(params)
@@ -130,7 +130,9 @@ class ChatLiteLLMRouter(ChatLiteLLM):
             default_chunk_class = chunk.__class__
             cg_chunk = ChatGenerationChunk(message=chunk)
             if run_manager:
-                run_manager.on_llm_new_token(chunk.content, chunk=cg_chunk, **params)
+                run_manager.on_llm_new_token(
+                    str(chunk.content), chunk=cg_chunk, **params
+                )
             yield cg_chunk
 
     async def _astream(
@@ -140,7 +142,7 @@ class ChatLiteLLMRouter(ChatLiteLLM):
         run_manager: Optional[AsyncCallbackManagerForLLMRun] = None,
         **kwargs: Any,
     ) -> AsyncIterator[ChatGenerationChunk]:
-        default_chunk_class = AIMessageChunk
+        default_chunk_class: Type[BaseMessageChunk] = AIMessageChunk
         message_dicts, params = self._create_message_dicts(messages, stop)
         params = {**params, **kwargs, "stream": True}
         self._prepare_params_for_router(params)
@@ -156,7 +158,7 @@ class ChatLiteLLMRouter(ChatLiteLLM):
             cg_chunk = ChatGenerationChunk(message=chunk)
             if run_manager:
                 await run_manager.on_llm_new_token(
-                    chunk.content, chunk=cg_chunk, **params
+                    str(chunk.content), chunk=cg_chunk, **params
                 )
             yield cg_chunk
 

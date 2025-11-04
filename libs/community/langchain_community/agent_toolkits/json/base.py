@@ -11,7 +11,7 @@ from langchain_community.agent_toolkits.json.prompt import JSON_PREFIX, JSON_SUF
 from langchain_community.agent_toolkits.json.toolkit import JsonToolkit
 
 if TYPE_CHECKING:
-    from langchain.agents.agent import AgentExecutor
+    from langchain_classic.agents.agent import AgentExecutor
 
 
 def create_json_agent(
@@ -43,9 +43,9 @@ def create_json_agent(
     Returns:
         The agent executor.
     """
-    from langchain.agents.agent import AgentExecutor
-    from langchain.agents.mrkl.base import ZeroShotAgent
-    from langchain.chains.llm import LLMChain
+    from langchain_classic.agents.agent import AgentExecutor
+    from langchain_classic.agents.mrkl.base import ZeroShotAgent
+    from langchain_classic.chains.llm import LLMChain
 
     tools = toolkit.get_tools()
     prompt_params = (

@@ -64,7 +64,7 @@ class GrobidParser(BaseBlobParser):
                         paragraph_text.append(sentence.text)
                         sbboxes = []
                         if sentence.get("coords") is not None:
-                            for bbox in sentence.get("coords").split(";"):
+                            for bbox in sentence.get("coords").split(";"):  # type: ignore[union-attr]
                                 box = bbox.split(",")
                                 sbboxes.append(
                                     {
