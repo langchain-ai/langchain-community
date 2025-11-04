@@ -138,7 +138,7 @@ class TestWriterLLM:
 
         llm = Writer(
             api_key=SecretStr("key"),
-            callback_manager=callback_manager,
+            callbacks=callback_manager,
         )
 
         with mock.patch.object(llm, "client", mock_client):
@@ -188,7 +188,7 @@ class TestWriterLLM:
 
         llm = Writer(
             api_key=SecretStr("key"),
-            callback_manager=callback_manager,
+            callbacks=callback_manager,
         )
 
         with mock.patch.object(llm, "async_client", mock_async_client):

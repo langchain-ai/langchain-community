@@ -373,9 +373,8 @@ class GitHubAPIWrapper(BaseModel):
         Parameters:
             issue_number(int): The number for the github issue
         Returns:
-            dict: A dictionary containing the issue's title,
-            body, comments as a string, and the username of the user
-            who opened the issue
+            `dict` containing the issue's title, body, comments as a string, and the
+                username of the user who opened the issue
         """
         issue = self.github_repo_instance.get_issue(number=issue_number)
         page = 0
@@ -408,8 +407,7 @@ class GitHubAPIWrapper(BaseModel):
             pr_number(int): The number of the pull request on Github
 
         Returns:
-            dict: A dictionary containing the issue's title,
-            body, and comments as a string
+            `dict` containing the issue's title, body, and comments as a string
         """
         tiktoken = _import_tiktoken()
         MAX_TOKENS_FOR_FILES = 3_000
@@ -472,8 +470,7 @@ class GitHubAPIWrapper(BaseModel):
             pr_number(int): The number for the Github pull
             max_tokens(int): The maximum number of tokens in the response
         Returns:
-            dict: A dictionary containing the pull's title, body,
-            and comments as a string
+            `dict` containing the pull's title, body, and comments as a string
         """
         max_tokens = 2_000
         pull = self.github_repo_instance.get_pull(number=pr_number)
@@ -538,7 +535,7 @@ class GitHubAPIWrapper(BaseModel):
             str: A success or failure message
         """
         if self.github_base_branch == self.active_branch:
-            return """Cannot make a pull request because 
+            return """Cannot make a pull request because
             commits are already in the main or master branch."""
         else:
             try:
