@@ -56,7 +56,7 @@ jobs:
         working-directory: ${{ inputs.working-directory }}
         run: |
           make lint_package
-      - name: "📦 Install Test Dependencies
+      - name: "📦 Install Test Dependencies"
         working-directory: ${{ inputs.working-directory }}
         run: |
           uv sync --inexact --group test --group test_integration

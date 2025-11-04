@@ -72,6 +72,7 @@ jobs:
     uses: ./.github/workflows/_lint.yml
     with:
       working-directory: ${{ matrix.working-directory }}
+      python-version: "3.11"
     secrets: inherit
 
   # Run unit tests only on packages that have changed files
@@ -85,6 +86,7 @@ jobs:
     uses: ./.github/workflows/_test.yml
     with:
       working-directory: ${{ matrix.working-directory }}
+      python-version: "3.11"
     secrets: inherit
 
   # Test compatibility with different Pydantic versions for affected packages
@@ -113,6 +115,7 @@ jobs:
     uses: ./.github/workflows/_compile_integration_test.yml
     with:
       working-directory: ${{ matrix.working-directory }}
+      python-version: "3.11"
     secrets: inherit
 
   # Run extended test suites that require additional dependencies
