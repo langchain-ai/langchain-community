@@ -6,7 +6,7 @@ from collections import defaultdict
 if sys.version_info >= (3, 11):
     import tomllib
 else:
-    # For Python 3.10 and below, which doesnt have stdlib tomllib
+    # For Python 3.10 and below, which doesn't have stdlib tomllib
     import tomli as tomllib
 
 import re
