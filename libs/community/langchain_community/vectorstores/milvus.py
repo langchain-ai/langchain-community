@@ -238,10 +238,10 @@ class Milvus(VectorStore):
         from pymilvus import MilvusException, connections
 
         # Grab the connection arguments that are used for checking existing connection
-        host: str = connection_args.get("host", None)
-        port: Union[str, int] = connection_args.get("port", None)
-        address: str = connection_args.get("address", None)
-        uri: str = connection_args.get("uri", None)
+        host: Optional[str] = connection_args.get("host", None)
+        port: Optional[Union[str, int]] = connection_args.get("port", None)
+        address: Optional[str] = connection_args.get("address", None)
+        uri: Optional[str] = connection_args.get("uri", None)
         user = connection_args.get("user", None)
 
         # Order of use is host/port, uri, address

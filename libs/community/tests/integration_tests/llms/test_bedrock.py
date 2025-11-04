@@ -27,7 +27,7 @@ GUARDRAILS_TRIGGER = os.environ.get(
 
 
 class BedrockAsyncCallbackHandler(AsyncCallbackHandler):
-    """Async callback handler that can be used to handle callbacks from langchain."""
+    """Async callback handler."""
 
     guardrails_intervened: bool = False
 
