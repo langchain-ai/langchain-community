@@ -13,7 +13,7 @@ class MongoDBByteStore(BaseStore[str, bytes]):
         .. code-block:: python
 
             # Instantiate the MongoDBByteStore with a MongoDB connection
-            from langchain.storage import MongoDBByteStore
+            from langchain_classic.storage import MongoDBByteStore
 
             mongo_conn_str = "mongodb://localhost:27017/"
             mongodb_store = MongoDBBytesStore(mongo_conn_str, db_name="test-db",
@@ -133,7 +133,7 @@ class MongoDBStore(BaseStore[str, Document]):
         .. code-block:: python
 
             # Instantiate the MongoDBStore with a MongoDB connection
-            from langchain.storage import MongoDBStore
+            from langchain_classic.storage import MongoDBStore
 
             mongo_conn_str = "mongodb://localhost:27017/"
             mongodb_store = MongoDBStore(mongo_conn_str, db_name="test-db",
