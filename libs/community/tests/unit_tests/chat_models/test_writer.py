@@ -322,7 +322,7 @@ class TestChatWriterCustom:
 
         chat = ChatWriter(
             api_key=SecretStr("key"),
-            callback_manager=callback_manager,
+            callbacks=callback_manager,
             max_tokens=10,
         )
 
@@ -350,7 +350,7 @@ class TestChatWriterCustom:
 
         chat = ChatWriter(
             api_key=SecretStr("key"),
-            callback_manager=callback_manager,
+            callbacks=callback_manager,
             max_tokens=10,
         )
 

@@ -18,7 +18,7 @@ class TextLoader(BaseLoader):
         file_path: Path to the file to load.
 
         encoding: File encoding to use. If `None`, the file will be loaded
-        with the default system encoding.
+            with the default system encoding.
 
         autodetect_encoding: Whether to try to autodetect the file encoding
             if the specified encoding fails.

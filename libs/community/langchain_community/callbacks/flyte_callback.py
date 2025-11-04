@@ -48,7 +48,7 @@ def analyze_text(
         nlp (spacy.lang): The spacy language model to use for visualization.
 
     Returns:
-        (dict): A dictionary containing the complexity metrics and visualization
+        `dict` containing the complexity metrics and visualization
             files serialized to HTML string.
     """
     resp: Dict[str, Any] = {}

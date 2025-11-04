@@ -574,7 +574,7 @@ class DatabricksVectorSearch(VectorStore):
     def _parse_search_response(
         self, search_resp: Dict, ignore_cols: Optional[List[str]] = None
     ) -> List[Tuple[Document, float]]:
-        """Parse the search response into a list of Documents with score."""
+        """Parse the search response into a list of `Document` objects with score."""
         if ignore_cols is None:
             ignore_cols = []
 
