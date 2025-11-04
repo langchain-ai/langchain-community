@@ -446,8 +446,8 @@ class OracleVS(VectorStore):
     Example:
         .. code-block:: python
 
-            from langchain.vectorstores import OracleVS
-            from langchain.embeddings.openai import OpenAIEmbeddings
+            from langchain_classic.vectorstores import OracleVS
+            from langchain_classic.embeddings.openai import OpenAIEmbeddings
             import oracledb
 
             with oracledb.connect(user = user, passwd = pwd, dsn = dsn) as
