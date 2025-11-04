@@ -44,10 +44,10 @@ class WikipediaLoader(BaseLoader):
 
     def lazy_load(self) -> Iterator[Document]:
         """
-        Loads the query result from Wikipedia into a list of Documents.
+        Loads the query result from Wikipedia into a list of `Document` objects.
 
         Returns:
-            A list of Document objects representing the loaded
+            A list of `Document` objects representing the loaded
                 Wikipedia pages.
         """
         client = WikipediaAPIWrapper(  # type: ignore[call-arg]

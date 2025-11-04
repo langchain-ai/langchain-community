@@ -96,7 +96,7 @@ def test_chat_openai_streaming() -> None:
         max_tokens=10,
         streaming=True,
         temperature=0,
-        callback_manager=callback_manager,
+        callbacks=callback_manager,
         verbose=True,
     )
     message = HumanMessage(content="Hello")
@@ -125,7 +125,7 @@ def test_chat_openai_streaming_generation_info() -> None:
     chat = ChatOpenAI(
         max_tokens=2,
         temperature=0,
-        callback_manager=callback_manager,
+        callbacks=callback_manager,
     )
     list(chat.stream("hi"))
     generation = callback.saved_things["generation"]
@@ -188,7 +188,7 @@ async def test_async_chat_openai_streaming() -> None:
         max_tokens=10,
         streaming=True,
         temperature=0,
-        callback_manager=callback_manager,
+        callbacks=callback_manager,
         verbose=True,
     )
     message = HumanMessage(content="Hello")

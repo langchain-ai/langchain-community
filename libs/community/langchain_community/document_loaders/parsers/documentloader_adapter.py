@@ -1,7 +1,7 @@
 import inspect
 from typing import Any, Dict, Iterator, Type
 
-from langchain.document_loaders.base import BaseBlobParser, BaseLoader
+from langchain_classic.document_loaders.base import BaseBlobParser, BaseLoader
 from langchain_core._api import beta
 from langchain_core.documents import Document
 from langchain_core.documents.base import Blob
