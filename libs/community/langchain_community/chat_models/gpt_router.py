@@ -28,7 +28,16 @@ from langchain_core.language_models.chat_models import (
     generate_from_stream,
 )
 from langchain_core.language_models.llms import create_base_retry_decorator
-from langchain_core.messages import AIMessageChunk, BaseMessage, BaseMessageChunk
+from langchain_core.messages import (
+    AIMessageChunk,
+    BaseMessage,
+    BaseMessageChunk,
+    ChatMessageChunk,
+    FunctionMessageChunk,
+    HumanMessageChunk,
+    SystemMessageChunk,
+    ToolMessageChunk,
+)
 from langchain_core.outputs import ChatGeneration, ChatGenerationChunk, ChatResult
 from langchain_core.utils import convert_to_secret_str, get_from_dict_or_env
 from pydantic import BaseModel, Field, SecretStr, model_validator
@@ -38,7 +47,6 @@ from langchain_community.adapters.openai import (
     convert_dict_to_message,
     convert_message_to_dict,
 )
-from langchain_community.chat_models.openai import _convert_delta_to_message_chunk
 
 if TYPE_CHECKING:
     from gpt_router.models import ChunkedGenerationResponse, GenerationResponse
@@ -47,6 +55,36 @@ if TYPE_CHECKING:
 logger = logging.getLogger(__name__)
 
 DEFAULT_API_BASE_URL = "https://gpt-router-preview.writesonic.com"
+
+
+def _convert_delta_to_message_chunk(
+    _dict: Mapping[str, Any], default_class: Type[BaseMessageChunk]
+) -> BaseMessageChunk:
+    role = _dict.get("role")
+    content = _dict.get("content") or ""
+    additional_kwargs: Dict = {}
+    if _dict.get("function_call"):
+        function_call = dict(_dict["function_call"])
+        if "name" in function_call and function_call["name"] is None:
+            function_call["name"] = ""
+        additional_kwargs["function_call"] = function_call
+    if _dict.get("tool_calls"):
+        additional_kwargs["tool_calls"] = _dict["tool_calls"]
+
+    if role == "user" or default_class == HumanMessageChunk:
+        return HumanMessageChunk(content=content)
+    elif role == "assistant" or default_class == AIMessageChunk:
+        return AIMessageChunk(content=content, additional_kwargs=additional_kwargs)
+    elif role == "system" or default_class == SystemMessageChunk:
+        return SystemMessageChunk(content=content)
+    elif role == "function" or default_class == FunctionMessageChunk:
+        return FunctionMessageChunk(content=content, name=_dict["name"])
+    elif role == "tool" or default_class == ToolMessageChunk:
+        return ToolMessageChunk(content=content, tool_call_id=_dict["tool_call_id"])
+    elif role or default_class == ChatMessageChunk:
+        return ChatMessageChunk(content=content, role=role)  # type: ignore[arg-type]
+    else:
+        return default_class(content=content)  # type: ignore[call-arg]
 
 
 class GPTRouterException(Exception):
