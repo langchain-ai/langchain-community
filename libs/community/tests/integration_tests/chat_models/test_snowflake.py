@@ -24,7 +24,7 @@ def chat() -> ChatSnowflakeCortex:
 def test_chat_snowflake_cortex(chat: ChatSnowflakeCortex) -> None:
     """Test ChatSnowflakeCortex."""
     message = HumanMessage(content="Hello")
-    response = chat([message])
+    response = chat.invoke([message])
     assert isinstance(response, BaseMessage)
     assert isinstance(response.content, str)
 
@@ -33,7 +33,7 @@ def test_chat_snowflake_cortex_system_message(chat: ChatSnowflakeCortex) -> None
     """Test ChatSnowflakeCortex for system message"""
     system_message = SystemMessage(content="You are to chat with the user.")
     human_message = HumanMessage(content="Hello")
-    response = chat([system_message, human_message])
+    response = chat.invoke([system_message, human_message])
     assert isinstance(response, BaseMessage)
     assert isinstance(response.content, str)
 
@@ -57,3 +57,18 @@ def test_chat_snowflake_cortex_generate(chat: ChatSnowflakeCortex) -> None:
             assert isinstance(generation, ChatGeneration)
             assert isinstance(generation.text, str)
             assert generation.text == generation.message.content
+
+
+def test_chat_snowflake_cortex_message_with_special_characters(
+    chat: ChatSnowflakeCortex,
+) -> None:
+    """Test ChatSnowflakeCortex with messages containing special characters.
+
+    Args:
+        chat: The ChatSnowflakeCortex instance to test with.
+    """
+    system_message = SystemMessage(content="You are to chat with the user.")
+    human_message = HumanMessage(content="Can you give me the weather in Tokyo?\n\n")
+    response = chat.invoke([system_message, human_message])
+    assert isinstance(response, BaseMessage)
+    assert isinstance(response.content, str)
