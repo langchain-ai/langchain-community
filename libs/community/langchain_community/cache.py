@@ -485,7 +485,7 @@ class RedisCache(_RedisCacheBase):
         # Read from a Redis HASH
         try:
             results = self.redis.hgetall(self._key(prompt, llm_string))
-            return self._get_generations(results)  # type: ignore[arg-type]
+            return self._get_generations(results)
         except Exception as e:
             logger.error(f"Redis lookup failed: {e}")
             return None
@@ -558,7 +558,7 @@ class AsyncRedisCache(_RedisCacheBase):
         """Look up based on prompt and llm_string. Async version."""
         try:
             results = await self.redis.hgetall(self._key(prompt, llm_string))
-            return self._get_generations(results)  # type: ignore[arg-type]
+            return self._get_generations(results)
         except Exception as e:
             logger.error(f"Redis async lookup failed: {e}")
             return None
@@ -2153,7 +2153,7 @@ class AzureCosmosDBSemanticCache(BaseCache):
         self._validate_enum_value(kind, CosmosDBVectorSearchType)
 
         if not cosmosdb_connection_string:
-            raise ValueError(" CosmosDB connection string can be empty.")
+            raise ValueError("CosmosDB connection string can't be empty.")
 
         self.cosmosdb_connection_string = cosmosdb_connection_string
         self.cosmosdb_client = cosmosdb_client
@@ -2399,8 +2399,8 @@ class OpenSearchSemanticCache(BaseCache):
         Example:
         .. code-block:: python
             import langchain
-            from langchain.cache import OpenSearchSemanticCache
-            from langchain.embeddings import OpenAIEmbeddings
+            from langchain_classic.cache import OpenSearchSemanticCache
+            from langchain_classic.embeddings import OpenAIEmbeddings
             langchain.llm_cache = OpenSearchSemanticCache(
                 opensearch_url="http//localhost:9200",
                 embedding=OpenAIEmbeddings()
@@ -2619,8 +2619,8 @@ class SingleStoreDBSemanticCache(BaseCache):
             .. code-block:: python
 
                 import langchain
-                from langchain.cache import SingleStoreDBSemanticCache
-                from langchain.embeddings import OpenAIEmbeddings
+                from langchain_classic.cache import SingleStoreDBSemanticCache
+                from langchain_classic.embeddings import OpenAIEmbeddings
 
                 langchain.llm_cache = SingleStoreDBSemanticCache(
                     embedding=OpenAIEmbeddings(),
@@ -2632,8 +2632,8 @@ class SingleStoreDBSemanticCache(BaseCache):
             .. code-block:: python
 
                 import langchain
-                from langchain.cache import SingleStoreDBSemanticCache
-                from langchain.embeddings import OpenAIEmbeddings
+                from langchain_classic.cache import SingleStoreDBSemanticCache
+                from langchain_classic.embeddings import OpenAIEmbeddings
 
                 langchain.llm_cache = = SingleStoreDBSemanticCache(
                     embeddings=OpenAIEmbeddings(),
@@ -2731,7 +2731,7 @@ class MemcachedCache(BaseCache):
                 (Client, PooledClient, HashClient)
         Example:
         .. code-block:: python
-            ifrom langchain.globals import set_llm_cache
+            ifrom langchain_classic.globals import set_llm_cache
             from langchain_openai import OpenAI
 
             from langchain_community.cache import MemcachedCache

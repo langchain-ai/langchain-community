@@ -17,7 +17,7 @@ def get_random_news_url() -> str:
     ]
     random_article_link = random.choice(article_links)
 
-    return "https://news.google.com" + random_article_link
+    return "https://news.google.com" + random_article_link  # type: ignore[operator]
 
 
 def test_news_loader() -> None:

@@ -42,7 +42,7 @@ def test_required_dependencies(uv_conf: Mapping[str, Any]) -> None:
             "requests",
             "pydantic-settings",
             "tenacity",
-            "langchain",
+            "langchain-classic",
         ]
     )
 
