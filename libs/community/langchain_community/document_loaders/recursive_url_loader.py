@@ -45,9 +45,9 @@ def _metadata_extractor(
     if title := soup.find("title"):
         metadata["title"] = title.get_text()
     if description := soup.find("meta", attrs={"name": "description"}):
-        metadata["description"] = description.get("content", None)  # type: ignore[attr-defined]
+        metadata["description"] = description.get("content", None)
     if html := soup.find("html"):
-        metadata["language"] = html.get("lang", None)  # type: ignore[attr-defined]
+        metadata["language"] = html.get("lang", None)
     return metadata
 
 

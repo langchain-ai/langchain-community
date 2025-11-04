@@ -323,7 +323,7 @@ class ClearMLCallbackHandler(BaseMetadataCallbackHandler, BaseCallbackHandler):
             text (str): The text to analyze.
 
         Returns:
-            (dict): A dictionary containing the complexity metrics.
+            `dict` containing the complexity metrics.
         """
         resp = {}
         textstat = import_textstat()
