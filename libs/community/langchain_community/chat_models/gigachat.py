@@ -128,7 +128,7 @@ class GigaChat(_BaseGigaChat, BaseChatModel):
         .. code-block:: python
 
             from langchain_community.chat_models import GigaChat
-            giga = GigaChat(credentials=..., scope=..., verify_ssl_certs=False)
+            giga = GigaChat(credentials=..., scope=..., verify_ssl_certs=...)
     """
 
     def _build_payload(self, messages: List[BaseMessage], **kwargs: Any) -> gm.Chat:
