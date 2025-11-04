@@ -334,7 +334,7 @@ class GPTRouter(BaseChatModel):
 
             if run_manager:
                 run_manager.on_llm_new_token(
-                    token=chunk.message.content, chunk=chunk.message
+                    token=str(chunk.message.content), chunk=chunk
                 )
 
             yield chunk
@@ -367,7 +367,7 @@ class GPTRouter(BaseChatModel):
 
             if run_manager:
                 await run_manager.on_llm_new_token(
-                    token=chunk.message.content, chunk=chunk.message
+                    token=str(chunk.message.content), chunk=chunk
                 )
 
             yield chunk

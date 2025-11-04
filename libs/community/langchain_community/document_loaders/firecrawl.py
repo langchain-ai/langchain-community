@@ -1,5 +1,6 @@
-import warnings
-from typing import Iterator, Literal, Optional
+import dataclasses
+import os
+from typing import Any, Iterator, Literal, Optional
 
 from langchain_core.document_loaders import BaseLoader
 from langchain_core.documents import Document
@@ -64,166 +65,13 @@ class FireCrawlLoader(BaseLoader):
 
     """  # noqa: E501
 
-    def legacy_crawler_options_adapter(self, params: dict) -> dict:
-        use_legacy_options = False
-        legacy_keys = [
-            "includes",
-            "excludes",
-            "allowBackwardCrawling",
-            "allowExternalContentLinks",
-            "pageOptions",
-        ]
-        for key in legacy_keys:
-            if params.get(key):
-                use_legacy_options = True
-                break
-
-        if use_legacy_options:
-            warnings.warn(
-                "Deprecated parameters detected. See Firecrawl v1 docs for updates.",
-                DeprecationWarning,
-            )
-            if "includes" in params:
-                if params["includes"] is True:
-                    params["includePaths"] = params["includes"]
-                del params["includes"]
-
-            if "excludes" in params:
-                if params["excludes"] is True:
-                    params["excludePaths"] = params["excludes"]
-                del params["excludes"]
-
-            if "allowBackwardCrawling" in params:
-                if params["allowBackwardCrawling"] is True:
-                    params["allowBackwardLinks"] = params["allowBackwardCrawling"]
-                del params["allowBackwardCrawling"]
-
-            if "allowExternalContentLinks" in params:
-                if params["allowExternalContentLinks"] is True:
-                    params["allowExternalLinks"] = params["allowExternalContentLinks"]
-                del params["allowExternalContentLinks"]
-
-            if "pageOptions" in params:
-                if isinstance(params["pageOptions"], dict):
-                    params["scrapeOptions"] = self.legacy_scrape_options_adapter(
-                        params["pageOptions"]
-                    )
-                del params["pageOptions"]
-
-        return params
-
-    def legacy_scrape_options_adapter(self, params: dict) -> dict:
-        use_legacy_options = False
-        formats = ["markdown"]
-
-        if "extractorOptions" in params:
-            if "mode" in params["extractorOptions"]:
-                if (
-                    params["extractorOptions"]["mode"] == "llm-extraction"
-                    or params["extractorOptions"]["mode"]
-                    == "llm-extraction-from-raw-html"
-                    or params["extractorOptions"]["mode"]
-                    == "llm-extraction-from-markdown"
-                ):
-                    use_legacy_options = True
-                    if "extractionPrompt" in params["extractorOptions"]:
-                        if params["extractorOptions"]["extractionPrompt"]:
-                            params["prompt"] = params["extractorOptions"][
-                                "extractionPrompt"
-                            ]
-                        else:
-                            params["prompt"] = params["extractorOptions"].get(
-                                "extractionPrompt",
-                                "Extract page information based on the schema.",
-                            )
-
-                    if "extractionSchema" in params["extractorOptions"]:
-                        if params["extractorOptions"]["extractionSchema"]:
-                            params["schema"] = params["extractorOptions"][
-                                "extractionSchema"
-                            ]
-
-                    if "userPrompt" in params["extractorOptions"]:
-                        if params["extractorOptions"]["userPrompt"]:
-                            params["prompt"] = params["extractorOptions"]["userPrompt"]
-
-                    del params["extractorOptions"]
-
-        scrape_keys = [
-            "includeMarkdown",
-            "includeHtml",
-            "includeRawHtml",
-            "includeExtract",
-            "includeLinks",
-            "screenshot",
-            "fullPageScreenshot",
-            "onlyIncludeTags",
-            "removeTags",
-        ]
-        for key in scrape_keys:
-            if params.get(key):
-                use_legacy_options = True
-                break
-
-        if use_legacy_options:
-            warnings.warn(
-                "Deprecated parameters detected. See Firecrawl v1 docs for updates.",
-                DeprecationWarning,
-            )
-            if "includeMarkdown" in params:
-                if params["includeMarkdown"] is False:
-                    formats.remove("markdown")
-                del params["includeMarkdown"]
-
-            if "includeHtml" in params:
-                if params["includeHtml"] is True:
-                    formats.append("html")
-                del params["includeHtml"]
-
-            if "includeRawHtml" in params:
-                if params["includeRawHtml"] is True:
-                    formats.append("rawHtml")
-                del params["includeRawHtml"]
-
-            if "includeExtract" in params:
-                if params["includeExtract"] is True:
-                    formats.append("extract")
-                del params["includeExtract"]
-
-            if "includeLinks" in params:
-                if params["includeLinks"] is True:
-                    formats.append("links")
-                del params["includeLinks"]
-
-            if "screenshot" in params:
-                if params["screenshot"] is True:
-                    formats.append("screenshot")
-                del params["screenshot"]
-
-            if "fullPageScreenshot" in params:
-                if params["fullPageScreenshot"] is True:
-                    formats.append("screenshot@fullPage")
-                del params["fullPageScreenshot"]
-
-            if "onlyIncludeTags" in params:
-                if params["onlyIncludeTags"] is True:
-                    params["includeTags"] = params["onlyIncludeTags"]
-                del params["onlyIncludeTags"]
-
-            if "removeTags" in params:
-                if params["removeTags"] is True:
-                    params["excludeTags"] = params["removeTags"]
-                del params["removeTags"]
-
-        if "formats" not in params:
-            params["formats"] = formats
-
-        return params
+    # No legacy support in v2-only implementation
 
     def __init__(
         self,
-        url: str,
+        url: Optional[str] = None,
         *,
+        query: Optional[str] = None,
         api_key: Optional[str] = None,
         api_url: Optional[str] = None,
         mode: Literal["crawl", "scrape", "map", "extract", "search"] = "crawl",
@@ -260,62 +108,302 @@ class FireCrawlLoader(BaseLoader):
                 Allowed: 'crawl', 'scrape', 'search', 'map', 'extract', 'search'."""
             )
 
-        if not url:
-            raise ValueError("Url must be provided")
+        if mode in ("scrape", "crawl", "map", "extract") and not url:
+            raise ValueError("Url must be provided for modes other than 'search'")
+        if mode == "search" and not (query or (params and params.get("query"))):
+            raise ValueError("Query must be provided for search mode")
 
         api_key = api_key or get_from_env("api_key", "FIRECRAWL_API_KEY")
-        self.firecrawl = FirecrawlApp(api_key=api_key, api_url=api_url)
-        self.url = url
+        # Ensure we never pass None for api_url (v2 client validates as str).
+        # Avoid get_from_env to prevent raising.
+        resolved_api_url = (
+            api_url or os.getenv("FIRECRAWL_API_URL") or "https://api.firecrawl.dev"
+        )
+        self.firecrawl = FirecrawlApp(api_key=api_key, api_url=resolved_api_url)
+        self.url = url or ""
         self.mode = mode
         self.params = params or {}
+        if query is not None:
+            self.params["query"] = query
 
     def lazy_load(self) -> Iterator[Document]:
-        self.params["integration"] = "langchain"
+        # Prepare integration tag and filter params per method
+        firecrawl_docs: list[Any] = []
         if self.mode == "scrape":
-            firecrawl_docs = [
-                self.firecrawl.scrape_url(
-                    self.url, params=self.legacy_scrape_options_adapter(self.params)
-                )
-            ]
+            allowed = {
+                "formats",
+                "headers",
+                "include_tags",
+                "exclude_tags",
+                "only_main_content",
+                "timeout",
+                "wait_for",
+                "mobile",
+                "parsers",
+                "actions",
+                "location",
+                "skip_tls_verification",
+                "remove_base64_images",
+                "fast_mode",
+                "use_mock",
+                "block_ads",
+                "proxy",
+                "max_age",
+                "store_in_cache",
+            }
+            kwargs = {k: v for k, v in self.params.items() if k in allowed}
+            kwargs["integration"] = "langchain"
+            firecrawl_docs = [self.firecrawl.scrape(self.url, **kwargs)]
         elif self.mode == "crawl":
             if not self.url:
                 raise ValueError("URL is required for crawl mode")
-            crawl_response = self.firecrawl.crawl_url(
-                self.url, params=self.legacy_crawler_options_adapter(self.params)
-            )
-            firecrawl_docs = crawl_response.get("data", [])
+            allowed = {
+                "prompt",
+                "exclude_paths",
+                "include_paths",
+                "max_discovery_depth",
+                "ignore_sitemap",
+                "ignore_query_parameters",
+                "limit",
+                "crawl_entire_domain",
+                "allow_external_links",
+                "allow_subdomains",
+                "delay",
+                "max_concurrency",
+                "webhook",
+                "scrape_options",
+                "zero_data_retention",
+                "poll_interval",
+                "timeout",
+            }
+            kwargs = {k: v for k, v in self.params.items() if k in allowed}
+            kwargs["integration"] = "langchain"
+            crawl_response = self.firecrawl.crawl(self.url, **kwargs)
+            # Support dict or object with 'data'
+            if isinstance(crawl_response, dict):
+                data = crawl_response.get("data", [])
+                firecrawl_docs = list(data) if isinstance(data, list) else []
+            else:
+                data = getattr(crawl_response, "data", [])
+                firecrawl_docs = list(data) if isinstance(data, list) else []
         elif self.mode == "map":
             if not self.url:
                 raise ValueError("URL is required for map mode")
-            firecrawl_docs = self.firecrawl.map_url(self.url, params=self.params)
+            allowed = {
+                "search",
+                "include_subdomains",
+                "limit",
+                "sitemap",
+                "timeout",
+                "location",
+            }
+            kwargs = {k: v for k, v in self.params.items() if k in allowed}
+            kwargs["integration"] = "langchain"
+            map_response = self.firecrawl.map(self.url, **kwargs)
+            # Firecrawl v2 (>=4.3.6) returns an object with a `links` array
+            # Fallback to legacy list response if needed
+            if isinstance(map_response, dict):
+                links = map_response.get("links")
+                firecrawl_docs = list(links) if isinstance(links, list) else []
+            elif hasattr(map_response, "links"):
+                links = getattr(map_response, "links")
+                firecrawl_docs = list(links) if isinstance(links, list) else []
+            else:
+                is_list = isinstance(map_response, list)
+                firecrawl_docs = list(map_response) if is_list else []
         elif self.mode == "extract":
             if not self.url:
                 raise ValueError("URL is required for extract mode")
-            firecrawl_docs = [
-                str(self.firecrawl.extract([self.url], params=self.params))
-            ]
+            allowed = {
+                "prompt",
+                "schema",
+                "system_prompt",
+                "allow_external_links",
+                "enable_web_search",
+                "show_sources",
+                "scrape_options",
+                "ignore_invalid_urls",
+                "poll_interval",
+                "timeout",
+                "agent",
+            }
+            kwargs = {k: v for k, v in self.params.items() if k in allowed}
+            kwargs["integration"] = "langchain"
+            firecrawl_docs = [str(self.firecrawl.extract([self.url], **kwargs))]
         elif self.mode == "search":
-            firecrawl_docs = self.firecrawl.search(
-                query=self.params.get("query"),
-                params=self.params,
+            allowed = {
+                "sources",
+                "categories",
+                "limit",
+                "tbs",
+                "location",
+                "ignore_invalid_urls",
+                "timeout",
+                "scrape_options",
+            }
+            kwargs = {k: v for k, v in self.params.items() if k in allowed}
+            kwargs["integration"] = "langchain"
+            search_data = self.firecrawl.search(
+                query=self.params.get("query"), **kwargs
             )
+            # If SDK already returns a list[dict], use it directly
+            if isinstance(search_data, list):
+                firecrawl_docs = list(search_data)
+            else:
+                # Normalize typed SearchData into list of dicts with markdown + metadata
+                results: list[dict[str, Any]] = []
+                containers = []
+                if isinstance(search_data, dict):
+                    containers = [
+                        search_data.get("web"),
+                        search_data.get("news"),
+                        search_data.get("images"),
+                    ]
+                else:
+                    containers = [
+                        getattr(search_data, "web", None),
+                        getattr(search_data, "news", None),
+                        getattr(search_data, "images", None),
+                    ]
+                for kind, items in (
+                    ("web", containers[0]),
+                    ("news", containers[1]),
+                    ("images", containers[2]),
+                ):
+                    if not items:
+                        continue
+                    for item in items:
+                        url_val = (
+                            getattr(item, "url", None)
+                            if not isinstance(item, dict)
+                            else item.get("url")
+                        )
+                        title_val = (
+                            getattr(item, "title", None)
+                            if not isinstance(item, dict)
+                            else item.get("title")
+                        )
+                        desc_val = (
+                            getattr(item, "description", None)
+                            if not isinstance(item, dict)
+                            else item.get("description")
+                        )
+                        content_val = desc_val or title_val or url_val or ""
+                        metadata_val = {
+                            k: v
+                            for k, v in {
+                                "url": url_val,
+                                "title": title_val,
+                                "category": getattr(item, "category", None)
+                                if not isinstance(item, dict)
+                                else item.get("category"),
+                                "type": kind,
+                            }.items()
+                            if v is not None
+                        }
+                        results.append(
+                            {"markdown": content_val, "metadata": metadata_val}
+                        )
+                firecrawl_docs = results
         else:
             raise ValueError(
                 f"""Invalid mode '{self.mode}'.
                 Allowed: 'crawl', 'scrape', 'map', 'extract', 'search'."""
             )
         for doc in firecrawl_docs:
-            if self.mode == "map" or self.mode == "extract":
-                page_content = doc
-                metadata = {}
+            if self.mode == "map":
+                # Support both legacy string list and v2 link objects
+                if isinstance(doc, str):
+                    page_content: str = doc
+                    meta: dict[str, Any] = {}
+                elif isinstance(doc, dict):
+                    page_content_value = doc.get("url") or doc.get("href") or ""
+                    page_content = (
+                        page_content_value
+                        if isinstance(page_content_value, str)
+                        else str(page_content_value or "")
+                    )
+                    meta = {
+                        k: v
+                        for k, v in {
+                            "title": doc.get("title"),
+                            "description": doc.get("description"),
+                        }.items()
+                        if v is not None
+                    }
+                elif hasattr(doc, "url") or hasattr(doc, "title"):
+                    page_content_value = getattr(doc, "url", "") or getattr(
+                        doc, "href", ""
+                    )
+                    page_content = (
+                        page_content_value
+                        if isinstance(page_content_value, str)
+                        else str(page_content_value or "")
+                    )
+                    meta = {}
+                    title = getattr(doc, "title", None)
+                    description = getattr(doc, "description", None)
+                    if title is not None:
+                        meta["title"] = title
+                    if description is not None:
+                        meta["description"] = description
+                else:
+                    page_content = str(doc)
+                    meta = {}
+            elif self.mode == "extract":
+                page_content = str(doc)
+                meta = {}
+            elif self.mode == "search":
+                # Already normalized to dicts with markdown/metadata above
+                if isinstance(doc, dict):
+                    markdown_value = doc.get("markdown") or ""
+                    page_content = (
+                        markdown_value
+                        if isinstance(markdown_value, str)
+                        else str(markdown_value or "")
+                    )
+                    metadata_obj = doc.get("metadata", {})
+                    meta = metadata_obj if isinstance(metadata_obj, dict) else {}
+                else:
+                    page_content = str(doc)
+                    meta = {}
             else:
-                page_content = (
-                    doc.get("markdown") or doc.get("html") or doc.get("rawHtml", "")
-                )
-                metadata = doc.get("metadata", {})
+                if isinstance(doc, dict):
+                    content_value = (
+                        doc.get("markdown") or doc.get("html") or doc.get("rawHtml", "")
+                    )
+                    page_content = (
+                        content_value
+                        if isinstance(content_value, str)
+                        else str(content_value or "")
+                    )
+                    meta = doc.get("metadata", {})
+                else:
+                    content_value = (
+                        getattr(doc, "markdown", None)
+                        or getattr(doc, "html", None)
+                        or getattr(doc, "rawHtml", "")
+                    )
+                    page_content = (
+                        content_value
+                        if isinstance(content_value, str)
+                        else str(content_value or "")
+                    )
+                    meta = getattr(doc, "metadata", {}) or {}
+
+                # Normalize metadata to plain dict for LangChain Document
+                if not isinstance(meta, dict):
+                    if hasattr(meta, "model_dump") and callable(meta.model_dump):
+                        meta = meta.model_dump()
+                    elif dataclasses.is_dataclass(meta):
+                        meta = dataclasses.asdict(meta)  # type: ignore[arg-type]
+                    elif hasattr(meta, "__dict__"):
+                        meta = dict(vars(meta))
+                    else:
+                        meta = {"value": str(meta)}
             if not page_content:
                 continue
             yield Document(
                 page_content=page_content,
-                metadata=metadata,
+                metadata=meta,
             )

@@ -92,4 +92,4 @@ def test_parsers(
         parser = parser_class()
         _assert_with_parser(parser, **params)
     except ModuleNotFoundError:
-        pytest.skip(f"{parser_factory} skiped. Require '{require}'")
+        pytest.skip(f"{parser_factory} skipped. Require '{require}'")
