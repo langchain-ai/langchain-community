@@ -5,7 +5,9 @@ from enum import Enum
 from importlib.metadata import version
 from typing import TYPE_CHECKING, Any, Dict, Optional, Sequence
 
-from langchain.retrievers.document_compressors.base import BaseDocumentCompressor
+from langchain_classic.retrievers.document_compressors.base import (
+    BaseDocumentCompressor,
+)
 from langchain_core.callbacks.manager import Callbacks
 from langchain_core.documents import Document
 from langchain_core.utils import get_from_dict_or_env

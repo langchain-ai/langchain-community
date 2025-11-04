@@ -146,7 +146,7 @@ class LlamaEdgeChatService(BaseChatModel):
     ) -> Iterator[ChatGenerationChunk]:
         res = self._chat(messages, **kwargs)
 
-        default_chunk_class = AIMessageChunk
+        default_chunk_class: Type[BaseMessageChunk] = AIMessageChunk
         substring = '"object":"chat.completion.chunk"}'
         for line in res.iter_lines():
             chunks = []
