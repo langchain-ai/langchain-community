@@ -343,7 +343,7 @@ class QianfanChatEndpoint(BaseChatModel):
     """  # noqa: E501
 
     init_kwargs: Dict[str, Any] = Field(default_factory=dict)
-    """init kwargs for qianfan client init, such as `query_per_second` which is 
+    """init kwargs for qianfan client init, such as `query_per_second` which is
         associated with qianfan resource object to limit QPS"""
 
     model_kwargs: Dict[str, Any] = Field(default_factory=dict)
@@ -375,7 +375,7 @@ class QianfanChatEndpoint(BaseChatModel):
     model: Optional[str] = Field(default=None)
     """Model name.
     you could get from https://cloud.baidu.com/doc/WENXINWORKSHOP/s/Nlks5zkzu
-    
+
     preset models are mapping to an endpoint.
     `model` will be ignored if `endpoint` is set.
     Default is set by `qianfan` SDK, not here
@@ -475,8 +475,7 @@ class QianfanChatEndpoint(BaseChatModel):
             resulting dictionary.
 
         Returns:
-            Dict[str, Any]: A dictionary containing the message content and default
-            parameters.
+            `dict` containing the message content and default parameters.
 
         """
         messages_dict: Dict[str, Any] = {
