@@ -23,9 +23,7 @@ def test_openai_incorrect_field() -> None:
 
 @pytest.mark.requires("openai")
 def test_embed_documents_with_custom_chunk_size() -> None:
-    with patch(
-        "langchain_community.embeddings.openai.openai.OpenAI"
-    ) as mock_openai_class:
+    with patch("openai.OpenAI") as mock_openai_class:
         mock_client = mock_openai_class.return_value
         mock_embeddings_client = mock_client.embeddings
 
