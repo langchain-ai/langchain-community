@@ -601,12 +601,14 @@ class ChatTongyi(BaseChatModel):
                 if prev_message.get("tool_calls"):
                     prev_function = prev_message["tool_calls"][index]["function"]
 
-                    function["name"] = function["name"].replace(
-                        prev_function["name"], ""
-                    )
-                    function["arguments"] = function["arguments"].replace(
-                        prev_function["arguments"], ""
-                    )
+                    if "name" in function:
+                        function["name"] = function["name"].replace(
+                            prev_function["name"], ""
+                        )
+                    if "arguments" in function:
+                        function["arguments"] = function["arguments"].replace(
+                            prev_function["arguments"], ""
+                        )
 
         return resp_copy
 
@@ -832,7 +834,7 @@ class ChatTongyi(BaseChatModel):
         self,
         tools: Sequence[Union[Dict[str, Any], Type[BaseModel], Callable, BaseTool]],
         **kwargs: Any,
-    ) -> Runnable[LanguageModelInput, BaseMessage]:
+    ) -> Runnable[LanguageModelInput, AIMessage]:
         """Bind tool-like objects to this chat model.
 
         Args:

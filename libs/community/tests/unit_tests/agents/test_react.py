@@ -2,7 +2,7 @@
 
 from typing import Union
 
-from langchain.agents.react.base import ReActChain, ReActDocstoreAgent
+from langchain_classic.agents.react.base import ReActChain, ReActDocstoreAgent
 from langchain_core.agents import AgentAction
 from langchain_core.documents import Document
 from langchain_core.language_models import FakeListLLM
