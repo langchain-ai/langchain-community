@@ -30,7 +30,7 @@ from langchain_community.tools.powerbi.tool import (
 from langchain_community.utilities.powerbi import PowerBIDataset
 
 if TYPE_CHECKING:
-    from langchain.chains.llm import LLMChain
+    from langchain_classic.chains.llm import LLMChain
 
 
 class PowerBIToolkit(BaseToolkit):
@@ -84,7 +84,7 @@ class PowerBIToolkit(BaseToolkit):
 
     def _get_chain(self) -> LLMChain:
         """Construct the chain based on the callback manager and model type."""
-        from langchain.chains.llm import LLMChain
+        from langchain_classic.chains.llm import LLMChain
 
         if isinstance(self.llm, BaseLanguageModel):
             return LLMChain(

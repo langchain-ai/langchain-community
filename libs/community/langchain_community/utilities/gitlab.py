@@ -24,11 +24,11 @@ class GitLabAPIWrapper(BaseModel):
     gitlab_personal_access_token: Optional[str] = None
     """Personal access token for the GitLab service, used for authentication."""
     gitlab_branch: Optional[str] = None
-    """The specific branch in the GitLab repository where the bot will make 
+    """The specific branch in the GitLab repository where the bot will make
         its commits. Defaults to 'main'.
     """
     gitlab_base_branch: Optional[str] = None
-    """The base branch in the GitLab repository, used for comparisons. 
+    """The base branch in the GitLab repository, used for comparisons.
         Usually 'main' or 'master'. Defaults to 'main'.
     """
 
@@ -125,8 +125,7 @@ class GitLabAPIWrapper(BaseModel):
         Parameters:
             issue_number(int): The number for the gitlab issue
         Returns:
-            dict: A dictionary containing the issue's title,
-            body, and comments as a string
+            `dict` containing the issue's title, body, and comments as a string
         """
         issue = self.gitlab_repo_instance.issues.get(issue_number)
         page = 0
@@ -163,12 +162,11 @@ class GitLabAPIWrapper(BaseModel):
             str: A success or failure message
         """
         if self.gitlab_base_branch == self.gitlab_branch:
-            return """Cannot make a pull request because 
+            return """Cannot make a pull request because
             commits are already in the master branch"""
         else:
             try:
-                title = pr_query.split("\n")[0]
-                body = pr_query[len(title) + 2 :]
+                title, body = pr_query.split("\n", 1)
                 pr = self.gitlab_repo_instance.mergerequests.create(
                     {
                         "source_branch": self.gitlab_branch,
@@ -219,8 +217,7 @@ class GitLabAPIWrapper(BaseModel):
                 f"to the {self.gitlab_base_branch} branch, which is protected. "
                 "Please create a new branch and try again."
             )
-        file_path = file_query.split("\n")[0]
-        file_contents = file_query[len(file_path) + 2 :]
+        file_path, file_contents = file_query.split("\n", 1)
         try:
             self.gitlab_repo_instance.files.get(file_path, self.gitlab_branch)
             return f"File already exists at {file_path}. Use update_file instead"
