@@ -681,7 +681,10 @@ class LanceDB(VectorStore):
         if filter:
             tbl.delete(filter)
         elif ids:
-            tbl.delete(f"{self._id_key} in ('{{}}')".format(",".join(ids)))
+            quoted_ids = ["'" + id_val.replace("'", "''") + "'" for id_val in ids]
+            ids_clause = ",".join(quoted_ids)
+            delete_filter = f"{self._id_key} IN ({ids_clause})"
+            tbl.delete(delete_filter)
         elif drop_columns:
             if self.api_key is not None:
                 raise NotImplementedError(

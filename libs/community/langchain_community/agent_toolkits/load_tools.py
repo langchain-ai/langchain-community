@@ -181,7 +181,7 @@ DANGEROUS_TOOLS = {
 
 def _get_llm_math(llm: BaseLanguageModel) -> BaseTool:
     try:
-        from langchain.chains.llm_math.base import LLMMathChain
+        from langchain_classic.chains.llm_math.base import LLMMathChain
     except ImportError:
         raise ImportError(
             "LLM Math tools require the library `langchain` to be installed."
@@ -197,8 +197,8 @@ def _get_llm_math(llm: BaseLanguageModel) -> BaseTool:
 
 def _get_open_meteo_api(llm: BaseLanguageModel) -> BaseTool:
     try:
-        from langchain.chains.api.base import APIChain
-        from langchain.chains.api import (
+        from langchain_classic.chains.api.base import APIChain
+        from langchain_classic.chains.api import (
             open_meteo_docs,
         )
     except ImportError:
@@ -227,8 +227,8 @@ _LLM_TOOLS: Dict[str, Callable[[BaseLanguageModel], BaseTool]] = {
 def _get_news_api(llm: BaseLanguageModel, **kwargs: Any) -> BaseTool:
     news_api_key = kwargs["news_api_key"]
     try:
-        from langchain.chains.api.base import APIChain
-        from langchain.chains.api import (
+        from langchain_classic.chains.api.base import APIChain
+        from langchain_classic.chains.api import (
             news_docs,
         )
     except ImportError:
@@ -252,8 +252,8 @@ def _get_news_api(llm: BaseLanguageModel, **kwargs: Any) -> BaseTool:
 def _get_tmdb_api(llm: BaseLanguageModel, **kwargs: Any) -> BaseTool:
     tmdb_bearer_token = kwargs["tmdb_bearer_token"]
     try:
-        from langchain.chains.api.base import APIChain
-        from langchain.chains.api import (
+        from langchain_classic.chains.api.base import APIChain
+        from langchain_classic.chains.api import (
             tmdb_docs,
         )
     except ImportError:
@@ -277,8 +277,8 @@ def _get_tmdb_api(llm: BaseLanguageModel, **kwargs: Any) -> BaseTool:
 def _get_podcast_api(llm: BaseLanguageModel, **kwargs: Any) -> BaseTool:
     listen_api_key = kwargs["listen_api_key"]
     try:
-        from langchain.chains.api.base import APIChain
-        from langchain.chains.api import (
+        from langchain_classic.chains.api.base import APIChain
+        from langchain_classic.chains.api import (
             podcast_docs,
         )
     except ImportError:

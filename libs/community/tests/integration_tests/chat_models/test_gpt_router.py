@@ -100,7 +100,7 @@ def test_gpt_router_streaming_callback() -> None:
     chat = GPTRouter(
         models_priority_list=[anthropic_claude],
         streaming=True,
-        callback_manager=callback_manager,
+        callbacks=callback_manager,
         verbose=True,
     )
     message = HumanMessage(content="Write me a 5 line poem.")

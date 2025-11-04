@@ -208,7 +208,7 @@ class ChatFireworks(BaseChatModel):
         **kwargs: Any,
     ) -> Iterator[ChatGenerationChunk]:
         message_dicts = self._create_message_dicts(messages)
-        default_chunk_class = AIMessageChunk
+        default_chunk_class: Type[BaseMessageChunk] = AIMessageChunk
         params = {
             "model": self.model,
             "messages": message_dicts,
@@ -241,7 +241,7 @@ class ChatFireworks(BaseChatModel):
         **kwargs: Any,
     ) -> AsyncIterator[ChatGenerationChunk]:
         message_dicts = self._create_message_dicts(messages)
-        default_chunk_class = AIMessageChunk
+        default_chunk_class: Type[BaseMessageChunk] = AIMessageChunk
         params = {
             "model": self.model,
             "messages": message_dicts,
@@ -263,7 +263,7 @@ class ChatFireworks(BaseChatModel):
                 message=chunk, generation_info=generation_info
             )
             if run_manager:
-                await run_manager.on_llm_new_token(token=chunk.text, chunk=cg_chunk)
+                await run_manager.on_llm_new_token(token=cg_chunk.text, chunk=cg_chunk)
             yield cg_chunk
 
 

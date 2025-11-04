@@ -254,7 +254,7 @@ class ChatYuan2(BaseChatModel):
         message_dicts, params = self._create_message_dicts(messages, stop)
         params = {**params, **kwargs, "stream": True}
 
-        default_chunk_class = AIMessageChunk
+        default_chunk_class: Type[BaseMessageChunk] = AIMessageChunk
         for chunk in self.completion_with_retry(messages=message_dicts, **params):
             if not isinstance(chunk, dict):
                 chunk = chunk.model_dump()
@@ -274,7 +274,12 @@ class ChatYuan2(BaseChatModel):
                 generation_info=generation_info,
             )
             if run_manager:
-                run_manager.on_llm_new_token(chunk.content, chunk=cg_chunk)
+                token = (
+                    chunk.content
+                    if isinstance(chunk.content, str)
+                    else str(chunk.content)
+                )
+                run_manager.on_llm_new_token(token, chunk=cg_chunk)
             yield cg_chunk
 
     def _generate(
@@ -337,7 +342,7 @@ class ChatYuan2(BaseChatModel):
         message_dicts, params = self._create_message_dicts(messages, stop)
         params = {**params, **kwargs, "stream": True}
 
-        default_chunk_class = AIMessageChunk
+        default_chunk_class: Type[BaseMessageChunk] = AIMessageChunk
         async for chunk in await acompletion_with_retry(
             self, messages=message_dicts, **params
         ):
@@ -359,7 +364,12 @@ class ChatYuan2(BaseChatModel):
                 generation_info=generation_info,
             )
             if run_manager:
-                await run_manager.on_llm_new_token(chunk.content, chunk=cg_chunk)
+                token = (
+                    chunk.content
+                    if isinstance(chunk.content, str)
+                    else str(chunk.content)
+                )
+                await run_manager.on_llm_new_token(token, chunk=cg_chunk)
             yield cg_chunk
 
     async def _agenerate(

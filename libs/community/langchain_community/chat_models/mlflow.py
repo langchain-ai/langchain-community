@@ -174,14 +174,14 @@ class ChatMlflow(BaseChatModel):
         *,
         stop: Optional[List[str]] = None,
         **kwargs: Any,
-    ) -> Iterator[BaseMessageChunk]:
+    ) -> Iterator[AIMessageChunk]:
         # We need to override `stream` to handle the case
         # that `self._client` does not implement `predict_stream`
         if not hasattr(self._client, "predict_stream"):
             # MLflow deployment client does not implement streaming,
             # so use default implementation
             yield cast(
-                BaseMessageChunk, self.invoke(input, config=config, stop=stop, **kwargs)
+                AIMessageChunk, self.invoke(input, config=config, stop=stop, **kwargs)
             )
         else:
             yield from super().stream(input, config, stop=stop, **kwargs)
@@ -410,7 +410,7 @@ class ChatMlflow(BaseChatModel):
             Union[dict, str, Literal["auto", "none", "required", "any"], bool]
         ] = None,
         **kwargs: Any,
-    ) -> Runnable[LanguageModelInput, BaseMessage]:
+    ) -> Runnable[LanguageModelInput, AIMessage]:
         """Bind tool-like objects to this chat model.
 
         Assumes model is compatible with OpenAI tool-calling API.
