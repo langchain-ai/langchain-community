@@ -177,7 +177,7 @@ def process_index_data(data: List[List[Any]]) -> List[Dict[str, Any]]:
 
     Args:
         data (List[List[Any]]): A nested list containing
-        details about entitys, their properties, index
+        details about entities, their properties, index
         types, and configuration information.
 
     Returns:
@@ -209,7 +209,7 @@ def process_index_data(data: List[List[Any]]) -> List[Dict[str, Any]]:
         - If the index type includes 'VECTOR', additional
           details such as dimension and similarity function
           are extracted from the entity configuration.
-        - The function handles cases where entitys have
+        - The function handles cases where entities have
           multiple index types (e.g., both 'FULLTEXT' and 'VECTOR').
     """
 
@@ -276,7 +276,7 @@ class FalkorDBVector(VectorStore):
         pre_delete_collection: If True, will delete
                 existing data if it exists.(default:
                 False). Useful for testing.
-        search_type: Similiarity search type to use.
+        search_type: Similarity search type to use.
                 Could be either SearchType.VECTOR or
                 SearchType.HYBRID (default:
                 SearchType.VECTOR)
