@@ -40,7 +40,7 @@ class WriteFileTool(BaseFileToolMixin, BaseTool):
         except FileValidationError:
             return INVALID_PATH_TEMPLATE.format(arg_name="file_path", value=file_path)
         try:
-            write_path.parent.mkdir(exist_ok=True, parents=False)
+            write_path.parent.mkdir(exist_ok=True, parents=True)
             mode = "a" if append else "w"
             with write_path.open(mode, encoding="utf-8") as f:
                 f.write(text)

@@ -2,6 +2,7 @@
 
 from typing import Any, Dict, List, Literal, Optional, Tuple, Type, Union
 
+from langchain_core._api import deprecated
 from langchain_core.callbacks import (
     AsyncCallbackManagerForToolRun,
     CallbackManagerForToolRun,
@@ -18,6 +19,11 @@ class TavilyInput(BaseModel):
     query: str = Field(description="search query to look up")
 
 
+@deprecated(
+    since="0.3.25",
+    removal="1.0",
+    alternative_import="langchain_tavily.TavilySearch",
+)
 class TavilySearchResults(BaseTool):
     """Tool that queries the Tavily Search API and gets back json.
 
@@ -202,6 +208,11 @@ class TavilySearchResults(BaseTool):
         return self.api_wrapper.clean_results(raw_results["results"]), raw_results
 
 
+@deprecated(
+    since="0.3.25",
+    removal="1.0",
+    alternative_import="langchain_tavily.TavilySearch",
+)
 class TavilyAnswer(BaseTool):
     """Tool that queries the Tavily Search API and gets back an answer."""
 
