@@ -15,13 +15,13 @@ from langchain_community.agent_toolkits.slack.toolkit import SlackToolkit
 
 
 @pytest.fixture
-def mock_webclient():
+def mock_webclient() -> MagicMock:
     mock_client = MagicMock()
     mock_client.api_test.return_value = {"ok": True}
     return mock_client
 
 
-def test_slack_toolkit_default_instantiation():
+def test_slack_toolkit_default_instantiation() -> None:
     """Test SlackToolkit can be instantiated with default settings."""
     toolkit = SlackToolkit()
     assert toolkit is not None
@@ -33,7 +33,7 @@ def test_slack_toolkit_default_instantiation():
         assert tool.client == toolkit.client
 
 
-def test_slack_toolkit_get_tools_provided_client(mock_webclient):
+def test_slack_toolkit_get_tools_provided_client(mock_webclient: MagicMock) -> None:
     """Test that get_tools() creates tools with the provided client."""
     toolkit = SlackToolkit(client=mock_webclient)
 
@@ -44,7 +44,7 @@ def test_slack_toolkit_get_tools_provided_client(mock_webclient):
         assert tool.client == mock_webclient
 
 
-def test_slack_toolkit_provided_client_reuse(mock_webclient):
+def test_slack_toolkit_provided_client_reuse(mock_webclient: MagicMock) -> None:
     """Test that provided client instance is reused across multiple get_tools()
     calls."""
     toolkit = SlackToolkit(client=mock_webclient)
