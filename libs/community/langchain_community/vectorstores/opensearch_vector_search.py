@@ -2,7 +2,17 @@ from __future__ import annotations
 
 import uuid
 import warnings
-from typing import TYPE_CHECKING, Any, Callable, Dict, Iterable, List, Optional, Tuple
+from typing import (
+    TYPE_CHECKING,
+    Any,
+    Callable,
+    Dict,
+    Iterable,
+    List,
+    Optional,
+    Tuple,
+    cast,
+)
 
 import numpy as np
 from langchain_core.documents import Document
@@ -211,7 +221,7 @@ def _default_scripting_text_mapping(
     routing_required: bool = False,
 ) -> Dict[str, Any]:
     """For Painless Scripting or Script Scoring,the default mapping to create index."""
-    mapping = {
+    mapping: Dict[str, Any] = {
         "mappings": {
             "properties": {
                 vector_field: {"type": "knn_vector", "dimension": dim},
@@ -219,9 +229,11 @@ def _default_scripting_text_mapping(
         }
     }
 
+    mappings_section = cast(Dict[str, Any], mapping["mappings"])
+
     # Add routing requirement if specified
     if routing_required:
-        mapping["mappings"]["_routing"] = {"required": True}
+        mappings_section["_routing"] = {"required": True}
 
     return mapping
 
@@ -237,7 +249,7 @@ def _default_text_mapping(
     routing_required: bool = False,
 ) -> Dict[str, Any]:
     """For Approximate k-NN Search, this is the default mapping to create index."""
-    mapping = {
+    mapping: Dict[str, Any] = {
         "settings": {"index": {"knn": True, "knn.algo_param.ef_search": ef_search}},
         "mappings": {
             "properties": {
@@ -255,9 +267,11 @@ def _default_text_mapping(
         },
     }
 
+    mappings_section = cast(Dict[str, Any], mapping["mappings"])
+
     # Add routing requirement if specified
     if routing_required:
-        mapping["mappings"]["_routing"] = {"required": True}
+        mappings_section["_routing"] = {"required": True}
 
     return mapping
 
