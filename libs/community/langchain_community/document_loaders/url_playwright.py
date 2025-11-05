@@ -205,7 +205,9 @@ class PlaywrightURLLoader(BaseLoader):
             for url in self.urls:
                 try:
                     page = context.new_page()
-                    response = page.goto(url, timeout=self.timeout, wait_until=self.wait_until)
+                    response = page.goto(
+                        url, timeout=self.timeout, wait_until=self.wait_until
+                    )
                     if response is None:
                         raise ValueError(f"page.goto() returned None for url {url}")
 
@@ -260,11 +262,15 @@ class PlaywrightURLLoader(BaseLoader):
             for url in self.urls:
                 try:
                     page = await context.new_page()
-                    response = await page.goto(url, timeout=self.timeout, wait_until=self.wait_until)
+                    response = await page.goto(
+                        url, timeout=self.timeout, wait_until=self.wait_until
+                    )
                     if response is None:
                         raise ValueError(f"page.goto() returned None for url {url}")
 
-                    await page.wait_for_load_state(self.wait_until, timeout=self.timeout)
+                    await page.wait_for_load_state(
+                        self.wait_until, timeout=self.timeout
+                    )
 
                     text = await self.evaluator.evaluate_async(page, browser, response)
                     await page.close()
