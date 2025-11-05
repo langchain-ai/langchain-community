@@ -399,7 +399,6 @@ class RecursiveUrlLoader(BaseLoader):
             url: The URL to crawl.
             visited: A set of visited URLs.
             depth: Current depth of recursion. Stop when depth >= max_depth.
-            verify: Whether to verify SSL certificates. Defaults to True.
         """
 
         if depth >= self.max_depth:
