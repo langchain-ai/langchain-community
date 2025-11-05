@@ -100,28 +100,33 @@ def convert_dict_to_message(
         if "tool_calls" in _dict:
             additional_kwargs = {"tool_calls": _dict["tool_calls"]}
 
-            for index, value in enumerate(_dict["tool_calls"]):
+            for enum_index, tool_call_data in enumerate(_dict["tool_calls"]):
                 if is_chunk:
                     try:
+                        # For incremental streaming: newer Qwen models provide proper
+                        # index to prevent parallel tool calls from being merged
+                        # incorrectly. Fall back to enumeration index if not provided.
+                        api_index = tool_call_data.get("index", enum_index)
+
                         tool_calls.append(
                             {
-                                "name": value["function"].get("name"),
-                                "args": value["function"].get("arguments"),
-                                "id": value.get("id"),
-                                # Tongyi does not respond with index,
-                                # use index in the list instead
-                                "index": index,
+                                "name": tool_call_data["function"].get("name"),
+                                "args": tool_call_data["function"].get("arguments"),
+                                "id": tool_call_data.get("id"),
+                                "index": api_index,
                             }
                         )
                     except KeyError:
                         pass
                 else:
                     try:
-                        parsed_tool = parse_tool_call(value, return_id=True)
+                        parsed_tool = parse_tool_call(tool_call_data, return_id=True)
                         if parsed_tool:
                             tool_calls.append(parsed_tool)
                     except Exception as e:
-                        invalid_tool_calls.append(make_invalid_tool_call(value, str(e)))
+                        invalid_tool_calls.append(
+                            make_invalid_tool_call(tool_call_data, str(e))
+                        )
         elif "reasoning_content" in _dict:
             additional_kwargs = {"reasoning_content": _dict["reasoning_content"]}
         elif "partial" in _dict and isinstance(_dict["partial"], bool):
