@@ -12,6 +12,7 @@ sys.modules["slack_sdk"] = mock_slack_sdk
 # We need to import the toolkit after patching sys.modules.
 # ruff: noqa: E402
 from langchain_community.agent_toolkits.slack.toolkit import SlackToolkit
+from langchain_community.tools.slack.base import SlackBaseTool
 
 
 @pytest.fixture
@@ -30,6 +31,7 @@ def test_slack_toolkit_default_instantiation() -> None:
 
     assert len(tools) == 4
     for tool in tools:
+        assert isinstance(tool, SlackBaseTool)
         assert tool.client == toolkit.client
 
 
@@ -41,6 +43,7 @@ def test_slack_toolkit_get_tools_provided_client(mock_webclient: MagicMock) -> N
 
     assert len(tools) == 4
     for tool in tools:
+        assert isinstance(tool, SlackBaseTool)
         assert tool.client == mock_webclient
 
 
@@ -52,4 +55,6 @@ def test_slack_toolkit_provided_client_reuse(mock_webclient: MagicMock) -> None:
     tools2 = toolkit.get_tools()
 
     for i in range(len(tools1)):
+        assert isinstance(tools1[i], SlackBaseTool)
+        assert isinstance(tools2[i], SlackBaseTool)
         assert tools1[i].client == tools2[i].client == mock_webclient
