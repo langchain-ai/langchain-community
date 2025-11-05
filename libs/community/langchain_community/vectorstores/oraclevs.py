@@ -28,6 +28,7 @@ if TYPE_CHECKING:
     from oracledb import Connection
 
 import numpy as np
+from langchain_core._api import deprecated
 from langchain_core.documents import Document
 from langchain_core.embeddings import Embeddings
 from langchain_core.vectorstores import VectorStore
@@ -435,6 +436,18 @@ def drop_index_if_exists(client: Any, index_name: str) -> None:
     return
 
 
+@deprecated(
+    since="0.3.30",
+    removal="1.0",
+    message=(
+        "This class is deprecated and will be removed in a future release. "
+        "Instead, please use `OracleVS` from the "
+        "`langchain-oracledb` package. "
+        "For more information, refer to <https://github.com/oracle/langchain-oracle/tree/main/libs/oracledb>."
+    ),
+    alternative="from langchain_oracledb.vectorstores import OracleVS;",
+    pending=False,
+)
 class OracleVS(VectorStore):
     """`OracleVS` vector store.
 
