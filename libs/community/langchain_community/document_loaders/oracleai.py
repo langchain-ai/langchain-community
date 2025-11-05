@@ -19,6 +19,7 @@ import traceback
 from html.parser import HTMLParser
 from typing import TYPE_CHECKING, Any, Dict, List, Optional, Tuple, Union
 
+from langchain_core._api import deprecated
 from langchain_core.document_loaders import BaseLoader
 from langchain_core.documents import Document
 from langchain_text_splitters import TextSplitter
@@ -181,6 +182,18 @@ class OracleDocReader:
 """OracleDocLoader class"""
 
 
+@deprecated(
+    since="0.3.30",
+    removal="1.0",
+    message=(
+        "This class is deprecated and will be removed in a future release. "
+        "Instead, please use `OracleDocLoader` from the "
+        "`langchain-oracledb` package. "
+        "For more information, refer to <https://github.com/oracle/langchain-oracle/tree/main/libs/oracledb>."
+    ),
+    alternative="from langchain_oracledb.document_loaders import OracleDocLoader;",
+    pending=False,
+)
 class OracleDocLoader(BaseLoader):
     """Read documents using OracleDocLoader
     Args:
@@ -377,6 +390,18 @@ class OracleDocLoader(BaseLoader):
             raise
 
 
+@deprecated(
+    since="0.3.30",
+    removal="1.0",
+    message=(
+        "This class is deprecated and will be removed in a future release. "
+        "Instead, please use `OracleTextSplitter` from the "
+        "`langchain-oracledb` package. "
+        "For more information, refer to <https://github.com/oracle/langchain-oracle/tree/main/libs/oracledb>."
+    ),
+    alternative="from langchain_oracledb.document_loaders import OracleTextSplitter;",
+    pending=False,
+)
 class OracleTextSplitter(TextSplitter):
     """Splitting text using Oracle chunker."""
 
