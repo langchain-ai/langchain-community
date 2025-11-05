@@ -250,7 +250,7 @@ class SupabaseVectorStore(VectorStore):
                 "and", f"({postgrest_filter})"
             )
 
-        query_builder.params = query_builder.params.set("limit", k)
+        query_builder = query_builder.limit(k)
 
         res = query_builder.execute()
 
@@ -295,7 +295,7 @@ class SupabaseVectorStore(VectorStore):
                 "and", f"({postgrest_filter})"
             )
 
-        query_builder.params = query_builder.params.set("limit", k)
+        query_builder = query_builder.limit(k)
 
         res = query_builder.execute()
 

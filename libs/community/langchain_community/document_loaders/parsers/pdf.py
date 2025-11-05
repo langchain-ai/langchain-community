@@ -73,22 +73,21 @@ def extract_from_images_with_rapidocr(
         Text extracted from images.
 
     Raises:
-        ImportError: If `rapidocr-onnxruntime` package is not installed.
+        ImportError: If `rapidocr` package is not installed.
     """
     try:
-        from rapidocr_onnxruntime import RapidOCR
+        from rapidocr import RapidOCR
     except ImportError:
         raise ImportError(
-            "`rapidocr-onnxruntime` package not found, please install it with "
-            "`pip install rapidocr-onnxruntime`"
+            "`rapidocr` package not found, please install it with "
+            "`pip install rapidocr`"
         )
     ocr = RapidOCR()
     text = ""
     for img in images:
-        result, _ = ocr(img)
-        if result:
-            result = [text[1] for text in result]
-            text += "\n".join(result)
+        result = ocr(img)
+        if result and result.txts:
+            text += "\n".join(result.txts)
     return text
 
 
