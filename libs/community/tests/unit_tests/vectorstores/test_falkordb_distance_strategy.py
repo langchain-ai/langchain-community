@@ -10,6 +10,7 @@ filter search query.
 The tests use unittest.mock to avoid requiring a live FalkorDB
 instance.  They focus on the behaviour of the wrapper itself.
 """
+
 import pytest
 
 pytest.importorskip("falkordb")
@@ -19,6 +20,7 @@ from unittest.mock import MagicMock
 
 import pytest
 from langchain_core.documents import Document
+from langchain_core.embeddings import Embeddings
 
 from langchain_community.vectorstores.falkordb_vector import (
     FalkorDBVector,
@@ -27,11 +29,11 @@ from langchain_community.vectorstores.falkordb_vector import (
 from langchain_community.vectorstores.utils import DistanceStrategy
 
 
-class DummyEmbeddings:
+class DummyEmbeddings(Embeddings):
     """A minimal embeddings implementation for testing.
 
     This class implements the methods expected by FalkorDBVector
-    but returns trivial fixed‑size vectors so that tests can run
+    but returns trivial fixed-size vectors so that tests can run
     without access to external embedding models.
     """
 
@@ -120,7 +122,8 @@ def test_similarity_search_with_score_by_vector_uses_correct_distance() -> None:
     # Patch the _query method to capture the query string
     store._query = fake_query  # type: ignore[assignment]
 
-    # Perform a similarity search with a metadata filter; query should contain cosine distance
+    # Perform a similarity search with a metadata filter;
+    # query should contain cosine distance
     store.similarity_search_with_score_by_vector(
         embedding=[0.1, 0.2], k=1, filter={"lang": "en"}
     )
