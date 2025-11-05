@@ -13,6 +13,7 @@ import logging
 import traceback
 from typing import TYPE_CHECKING, Any, Dict, List, Optional
 
+from langchain_core._api import deprecated
 from langchain_core.documents import Document
 
 if TYPE_CHECKING:
@@ -23,6 +24,18 @@ logger = logging.getLogger(__name__)
 """OracleSummary class"""
 
 
+@deprecated(
+    since="0.3.30",
+    removal="1.0",
+    message=(
+        "This class is deprecated and will be removed in a future release. "
+        "Instead, please use `OracleSummary` from the "
+        "`langchain-oracledb` package. "
+        "For more information, refer to <https://github.com/oracle/langchain-oracle/tree/main/libs/oracledb>."
+    ),
+    alternative="from langchain_oracledb.utilities import OracleSummary;",
+    pending=False,
+)
 class OracleSummary:
     """Get Summary
     Args:
