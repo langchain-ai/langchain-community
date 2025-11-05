@@ -36,6 +36,7 @@ class _FakeLLM(MLXPipeline):
     pipeline_kwargs: dict = {}
 
     def __init__(self) -> None:
+        super().__init__()
         self.tokenizer = _FakeTokenizer()
 
     def _generate(self, prompts, stop=None, run_manager=None, **kwargs):
