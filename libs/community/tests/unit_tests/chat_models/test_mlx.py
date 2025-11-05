@@ -1,11 +1,13 @@
 """Test MLX Chat wrapper."""
 
 from importlib import import_module
+from typing import Any
 
 import pytest
 from langchain_core.messages import HumanMessage
 
 from langchain_community.chat_models.mlx import ChatMLX
+from langchain_community.llms.mlx_pipeline import MLXPipeline
 
 
 class _FakeTokenizer:
@@ -24,7 +26,12 @@ class _FakeTokenizer:
         return "prompt"
 
 
-class _FakeLLM:
+class _FakeLLM(MLXPipeline):
+    model_id: str = "fake-model"
+    model: Any = None
+    tokenizer: Any = None
+    pipeline_kwargs: dict = {}
+
     def __init__(self) -> None:
         self.tokenizer = _FakeTokenizer()
 

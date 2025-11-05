@@ -73,9 +73,7 @@ def _parse_react_tool_calls(
     invalid_tool_calls: list[InvalidToolCall] = []
 
     bracket_pattern = r"Action:\s*(?P<name>[\w.-]+)\[(?P<input>[^\]]+)\]"
-    separate_pattern = (
-        r"Action:\s*(?P<name>[^\n]+)\nAction Input:\s*(?P<input>[^\n]+)"
-    )
+    separate_pattern = r"Action:\s*(?P<name>[^\n]+)\nAction Input:\s*(?P<input>[^\n]+)"
 
     matches = list(re.finditer(bracket_pattern, text))
     if not matches:
