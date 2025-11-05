@@ -91,7 +91,10 @@ def _parse_react_tool_calls(
 
     if not tool_calls and "Action:" in text:
         invalid_tool_calls.append(
-            make_invalid_tool_call(text, "Could not parse ReAct tool call")
+            make_invalid_tool_call(
+                {"name": "unknown", "args": text},
+                "Could not parse ReAct tool call",
+            )
         )
         return None, invalid_tool_calls
 
