@@ -10,7 +10,7 @@ from langchain_community.chat_models import ChatOpenAI
 from langchain_community.llms.solar import SOLAR_SERVICE_URL_BASE, SolarCommon
 
 
-@deprecated(  # type: ignore[arg-type]
+@deprecated(
     since="0.0.34", removal="1.0", alternative_import="langchain_upstage.ChatUpstage"
 )
 class SolarChat(SolarCommon, ChatOpenAI):

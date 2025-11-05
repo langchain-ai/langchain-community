@@ -8,7 +8,7 @@ from langchain_community.tools.ddg_search.tool import (
 
 def ddg_installed() -> bool:
     try:
-        from duckduckgo_search import DDGS  # noqa: F401
+        from ddgs import DDGS  # noqa: F401
 
         return True
     except Exception as e:
