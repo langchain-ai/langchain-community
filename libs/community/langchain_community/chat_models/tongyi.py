@@ -758,7 +758,7 @@ class ChatTongyi(BaseChatModel):
             messages=messages, stop=stop, stream=True, **kwargs
         )
         async for stream_resp, is_last_chunk in agenerate_with_last_element_mark(
-            self.astream_completion_with_retry(**params)  # type: ignore[reportCallIssue]
+            self.astream_completion_with_retry(**params)
         ):
             chunk = ChatGenerationChunk(
                 **self._chat_generation_from_qwen_resp(
