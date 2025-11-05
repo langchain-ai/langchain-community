@@ -492,9 +492,10 @@ class FalkorDBVector(VectorStore):
         Check if the vector index exists in the FalkorDB database
         and returns its embedding dimension, entity_type,
         entity_label, entity_property
-        
-         This version also validates the similarity_function against the configured
-        distance_strategy, so we don't silently reuse an index with the wrong distance metric.
+
+        This version also validates the similarity_function against
+        the configured distance_strategy, so we don't silently
+        reuse an index with the wrong distance metric.
 
         This method;
         1. queries the FalkorDB database for existing indexes
@@ -550,10 +551,13 @@ class FalkorDBVector(VectorStore):
                 if similarity_function and similarity_function != desired_sim:
                     raise ValueError(
                         f"Existing index on {entity_label}.{entity_property} "
-                        f"uses similarity_function='{similarity_function}', "
-                        f"but requested distance_strategy is '{self._distance_strategy}' "
+                        f"uses"
+                        f"similarity_function='{similarity_function}', "
+                        f"but requested distance_strategy is"
+                        f"'{self._distance_strategy}' "
                         f"({desired_sim}). "
-                        "Drop/recreate the index or change the distance_strategy."
+                        "Drop/recreate the index or"
+                        "change the distance_strategy."
                     )
 
                 return embedding_dimension, entity_type, entity_label, entity_property
@@ -977,8 +981,7 @@ class FalkorDBVector(VectorStore):
             search_type=search_type,
             distance_strategy=distance_strategy,
             **kwargs,
-            )
-
+        )
 
         # Check if the vector index already exists
         embedding_dimension, index_type, entity_label, entity_property = (
@@ -1156,7 +1159,7 @@ class FalkorDBVector(VectorStore):
         *,
         search_type: SearchType = DEFAULT_SEARCH_TYPE,
         retrieval_query: str = "",
-        distance_strategy = DEFAULT_DISTANCE_STRATEGY,
+        distance_strategy: DistanceStrategy = DEFAULT_DISTANCE_STRATEGY,
         **kwargs: Any,
     ) -> FalkorDBVector:
         """
@@ -1465,13 +1468,15 @@ class FalkorDBVector(VectorStore):
 
             if self._distance_strategy == DistanceStrategy.COSINE:
                 base_distance_query = (
-                " WITH n as node, "
-                f" vec.cosineDistance(n.{self.embedding_node_property}, vecf32($embedding)) as score "  
+                    " WITH n as node, "
+                    f" vec.cosineDistance(n.{self.embedding_node_property},"
+                    f" vecf32($embedding)) as score "
                 )
             else:
                 base_distance_query = (
                     " WITH n as node, "
-                    f" vec.euclideanDistance(n.{self.embedding_node_property}, vecf32($embedding)) as score "
+                    f" vec.euclideanDistance(n.{self.embedding_node_property},"
+                    f"vecf32($embedding)) as score "
                 )
             filter_snippets, filter_params = construct_metadata_filter(filter)
 

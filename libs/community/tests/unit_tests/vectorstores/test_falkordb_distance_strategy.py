@@ -10,6 +10,9 @@ filter search query.
 The tests use unittest.mock to avoid requiring a live FalkorDB
 instance.  They focus on the behaviour of the wrapper itself.
 """
+import pytest
+
+pytest.importorskip("falkordb")
 
 from typing import Any, List
 from unittest.mock import MagicMock
