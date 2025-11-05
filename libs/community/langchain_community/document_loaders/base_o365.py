@@ -94,13 +94,13 @@ class O365BaseLoader(BaseLoader, BaseModel):
     """
     Provide custom handlers for MimeTypeBasedParser.
 
-    Pass a dictionary mapping either file extensions (like "doc", "pdf", etc.) 
-    or MIME types (like "application/pdf", "text/plain", etc.) to parsers. 
-    Note that you must use either file extensions or MIME types exclusively and 
+    Pass a dictionary mapping either file extensions (like "doc", "pdf", etc.)
+    or MIME types (like "application/pdf", "text/plain", etc.) to parsers.
+    Note that you must use either file extensions or MIME types exclusively and
     cannot mix them.
 
     Do not include the leading dot for file extensions.
-    
+
     Example using file extensions:
     ```python
         handlers = {
@@ -109,7 +109,7 @@ class O365BaseLoader(BaseLoader, BaseModel):
             "txt": TextParser()
         }
     ```
-    
+
     Example using MIME types:
     ```python
         handlers = {
@@ -201,9 +201,15 @@ class O365BaseLoader(BaseLoader, BaseModel):
                                 r"Doc.aspx\?sourcedoc=.*file=([^&]+)", file.web_url
                             ):
                                 file_parent = file._parent or file.get_parent()
-                                if file_parent and getattr(file_parent, "web_url", None):
-                                    source = file_parent.web_url + "/" + urllib.parse.quote(file.name)
-                            
+                                if file_parent and getattr(
+                                    file_parent, "web_url", None
+                                ):
+                                    source = (
+                                        file_parent.web_url
+                                        + "/"
+                                        + urllib.parse.quote(file.name)
+                                    )
+
                             file.download(to_path=temp_dir, chunk_size=self.chunk_size)
                             metadata_dict[file.name] = {
                                 "source": source,
@@ -266,8 +272,12 @@ class O365BaseLoader(BaseLoader, BaseModel):
                         ):
                             file_parent = file._parent or file.get_parent()
                             if file_parent and getattr(file_parent, "web_url", None):
-                                source = file_parent.web_url + "/" + urllib.parse.quote(file.name)
-                        
+                                source = (
+                                    file_parent.web_url
+                                    + "/"
+                                    + urllib.parse.quote(file.name)
+                                )
+
                         file.download(to_path=temp_dir, chunk_size=self.chunk_size)
                         metadata_dict[file.name] = {
                             "source": source,
