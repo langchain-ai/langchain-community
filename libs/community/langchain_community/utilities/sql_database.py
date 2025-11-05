@@ -639,7 +639,7 @@ class SQLDatabase:
         *,
         parameters: Optional[Dict[str, Any]] = None,
         execution_options: Optional[Dict[str, Any]] = None,
-    ) -> Union[str, Sequence[Dict[str, Any]], Result[Any]]:
+    ) -> Union[str, Sequence[Dict[str, Any]], Result[Any], Tuple[str, Any]]:
         """Execute a SQL command and return a string representing the results.
 
         If the statement returns rows, a string of the results is returned.
