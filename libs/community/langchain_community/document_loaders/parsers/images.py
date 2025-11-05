@@ -99,18 +99,18 @@ class RapidOCRBlobParser(BaseImageBlobParser):
         """
         if not self.ocr:
             try:
-                from rapidocr_onnxruntime import RapidOCR
+                from rapidocr import RapidOCR
 
                 self.ocr = RapidOCR()
             except ImportError:
                 raise ImportError(
-                    "`rapidocr-onnxruntime` package not found, please install it with "
-                    "`pip install rapidocr-onnxruntime`"
+                    "`rapidocr` package not found, please install it with "
+                    "`pip install rapidocr`"
                 )
-        ocr_result, _ = self.ocr(np.array(img))  # type: ignore[misc]
+        ocr_result = self.ocr(np.array(img))  # type: ignore[misc]
         content = ""
-        if ocr_result:
-            content = ("\n".join([text[1] for text in ocr_result])).strip()
+        if ocr_result and ocr_result.txts:
+            content = ("\n".join(ocr_result.txts)).strip()
         return content
 
 
