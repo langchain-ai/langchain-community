@@ -1,6 +1,5 @@
 from __future__ import annotations
 
-import uuid
 import warnings
 from itertools import repeat
 from typing import (
@@ -121,7 +120,6 @@ class SupabaseVectorStore(VectorStore):
         ids: Optional[List[str]] = None,
         **kwargs: Any,
     ) -> List[str]:
-        ids = ids or [str(uuid.uuid4()) for _ in texts]
         docs = self._texts_to_documents(texts, metadatas)
 
         vectors = self._embedding.embed_documents(list(texts))
@@ -149,7 +147,6 @@ class SupabaseVectorStore(VectorStore):
             raise ValueError("Supabase document table_name is required.")
 
         embeddings = embedding.embed_documents(texts)
-        ids = [str(uuid.uuid4()) for _ in texts]
         docs = cls._texts_to_documents(texts, metadatas)
         cls._add_vectors(
             client, table_name, embeddings, docs, ids, chunk_size, **kwargs
@@ -167,7 +164,7 @@ class SupabaseVectorStore(VectorStore):
         self,
         vectors: List[List[float]],
         documents: List[Document],
-        ids: List[str],
+        ids: Optional[List[str]] = None,
     ) -> List[str]:
         return self._add_vectors(
             self._client, self.table_name, vectors, documents, ids, self.chunk_size
@@ -250,7 +247,7 @@ class SupabaseVectorStore(VectorStore):
                 "and", f"({postgrest_filter})"
             )
 
-        query_builder.params = query_builder.params.set("limit", k)
+        query_builder = query_builder.limit(k)
 
         res = query_builder.execute()
 
@@ -295,7 +292,7 @@ class SupabaseVectorStore(VectorStore):
                 "and", f"({postgrest_filter})"
             )
 
-        query_builder.params = query_builder.params.set("limit", k)
+        query_builder = query_builder.limit(k)
 
         res = query_builder.execute()
 
@@ -340,22 +337,24 @@ class SupabaseVectorStore(VectorStore):
         table_name: str,
         vectors: List[List[float]],
         documents: List[Document],
-        ids: List[str],
+        ids: Optional[List[str]],
         chunk_size: int,
         **kwargs: Any,
     ) -> List[str]:
         """Add vectors to Supabase table."""
 
-        rows: List[Dict[str, Any]] = [
-            {
-                "id": ids[idx],
+        rows: List[Dict[str, Any]] = []
+        for idx, embedding in enumerate(vectors):
+            row = {
                 "content": documents[idx].page_content,
                 "embedding": embedding,
                 "metadata": documents[idx].metadata,
                 **kwargs,
             }
-            for idx, embedding in enumerate(vectors)
-        ]
+            if ids is not None:
+                row["id"] = ids[idx]
+            rows.append(row)
+
         id_list: List[str] = []
         for i in range(0, len(rows), chunk_size):
             chunk = rows[i : i + chunk_size]
