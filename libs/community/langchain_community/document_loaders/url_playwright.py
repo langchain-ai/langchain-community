@@ -116,13 +116,16 @@ class PlaywrightURLLoader(BaseLoader):
             through the specified proxy.
         browser_session (Optional[Union[str, os.PathLike[str]]]): Path to a file with
             browser session data that can be used to restore the browser session.
-        timeout (Optional[int]): Timeout in milliseconds for page navigation. Defaults to 30000 (30 seconds).
-        wait_until (Optional[str]): When to consider navigation succeeded. Can be one of:
+        timeout (Optional[int]): Timeout in milliseconds for page navigation.
+        wait_until (Optional[str]): When to consider navigation succeeded.
+
+            Can be one of:
+
             - "load": wait for the "load" event to fire
             - "domcontentloaded": wait for the "DOMContentLoaded" event to fire
-            - "networkidle": wait until there are no network connections for at least 500ms
+            - "networkidle": wait until there are no network connections for at least
+                500ms
             - "commit": wait for the first network request to be sent
-            Defaults to "load".
 
     Example:
         .. code-block:: python
