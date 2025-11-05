@@ -401,8 +401,13 @@ class ChatSparkLLM(BaseChatModel):
             if "data" not in content:
                 continue
             delta = content["data"]
+            generation_info = {}
+            if "reasoning_content" in delta:
+                generation_info["reasoning_content"] = delta.pop("reasoning_content")
             chunk = _convert_delta_to_message_chunk(delta, default_chunk_class)
-            cg_chunk = ChatGenerationChunk(message=chunk)
+            cg_chunk = ChatGenerationChunk(
+                message=chunk, generation_info=generation_info or None
+            )
             if run_manager:
                 run_manager.on_llm_new_token(str(chunk.content), chunk=cg_chunk)
             yield cg_chunk
@@ -435,8 +440,13 @@ class ChatSparkLLM(BaseChatModel):
             if "data" not in content:
                 continue
             completion = content["data"]
+        generation_info = {}
+        if "reasoning_content" in completion:
+            generation_info["reasoning_content"] = completion.pop("reasoning_content")
         message = convert_dict_to_message(completion)
-        generations = [ChatGeneration(message=message)]
+        generations = [
+            ChatGeneration(message=message, generation_info=generation_info or None)
+        ]
         return ChatResult(generations=generations, llm_output=llm_output)
 
     @property
@@ -602,11 +612,16 @@ class _SparkLLMClient:
         else:
             choices = data["payload"]["choices"]
             status = choices["status"]
-            content = choices["text"][0]["content"]
+            text_chunk = choices["text"][0]
+            content = text_chunk.get("content", "")
             if ws.streaming:
-                self.queue.put({"data": choices["text"][0]})
+                self.queue.put({"data": text_chunk})
             else:
                 self.blocking_message["content"] += content
+                if "reasoning_content" in text_chunk:
+                    self.blocking_message["reasoning_content"] = text_chunk[
+                        "reasoning_content"
+                    ]
             if status == 2:
                 if not ws.streaming:
                     self.queue.put({"data": self.blocking_message})
