@@ -2,7 +2,17 @@ from __future__ import annotations
 
 import uuid
 import warnings
-from typing import TYPE_CHECKING, Any, Callable, Dict, Iterable, List, Optional, Tuple
+from typing import (
+    TYPE_CHECKING,
+    Any,
+    Callable,
+    Dict,
+    Iterable,
+    List,
+    Optional,
+    Tuple,
+    cast,
+)
 
 import numpy as np
 from langchain_core.documents import Document
@@ -103,6 +113,7 @@ def _bulk_ingest_embeddings(
     mapping: Optional[Dict] = None,
     max_chunk_bytes: Optional[int] = 1 * 1024 * 1024,
     is_aoss: bool = False,
+    routing: Optional[str] = None,
 ) -> List[str]:
     """Bulk Ingest Embeddings into given index."""
     if not mapping:
@@ -136,6 +147,8 @@ def _bulk_ingest_embeddings(
             request["id"] = _id
         else:
             request["_id"] = _id
+        if routing:
+            request["_routing"] = routing
         requests.append(request)
         return_ids.append(_id)
     bulk(client, requests, max_chunk_bytes=max_chunk_bytes)
@@ -156,6 +169,7 @@ async def _abulk_ingest_embeddings(
     mapping: Optional[Dict] = None,
     max_chunk_bytes: Optional[int] = 1 * 1024 * 1024,
     is_aoss: bool = False,
+    routing: Optional[str] = None,
 ) -> List[str]:
     """Bulk Ingest Embeddings into given index asynchronously using AsyncOpenSearch."""
     if not mapping:
@@ -189,6 +203,8 @@ async def _abulk_ingest_embeddings(
             request["id"] = _id
         else:
             request["_id"] = _id
+        if routing:
+            request["_routing"] = routing
         requests.append(request)
         return_ids.append(_id)
 
@@ -202,15 +218,24 @@ async def _abulk_ingest_embeddings(
 def _default_scripting_text_mapping(
     dim: int,
     vector_field: str = "vector_field",
+    routing_required: bool = False,
 ) -> Dict[str, Any]:
     """For Painless Scripting or Script Scoring,the default mapping to create index."""
-    return {
+    mapping: Dict[str, Any] = {
         "mappings": {
             "properties": {
                 vector_field: {"type": "knn_vector", "dimension": dim},
             }
         }
     }
+
+    mappings_section = cast(Dict[str, Any], mapping["mappings"])
+
+    # Add routing requirement if specified
+    if routing_required:
+        mappings_section["_routing"] = {"required": True}
+
+    return mapping
 
 
 def _default_text_mapping(
@@ -221,9 +246,10 @@ def _default_text_mapping(
     ef_construction: int = 512,
     m: int = 16,
     vector_field: str = "vector_field",
+    routing_required: bool = False,
 ) -> Dict[str, Any]:
     """For Approximate k-NN Search, this is the default mapping to create index."""
-    return {
+    mapping: Dict[str, Any] = {
         "settings": {"index": {"knn": True, "knn.algo_param.ef_search": ef_search}},
         "mappings": {
             "properties": {
@@ -240,6 +266,14 @@ def _default_text_mapping(
             }
         },
     }
+
+    mappings_section = cast(Dict[str, Any], mapping["mappings"])
+
+    # Add routing requirement if specified
+    if routing_required:
+        mappings_section["_routing"] = {"required": True}
+
+    return mapping
 
 
 def _default_approximate_search_query(
@@ -463,6 +497,7 @@ class OpenSearchVectorSearch(VectorStore):
         self.async_client = _get_async_opensearch_client(opensearch_url, **kwargs)
         self.engine = kwargs.get("engine", "nmslib")
         self.bulk_size = kwargs.get("bulk_size", 500)
+        self.routing = kwargs.get("routing")
 
     @property
     def embeddings(self) -> Embeddings:
@@ -495,7 +530,14 @@ class OpenSearchVectorSearch(VectorStore):
         _validate_aoss_with_engines(self.is_aoss, engine)
 
         mapping = _default_text_mapping(
-            dim, engine, space_type, ef_search, ef_construction, m, vector_field
+            dim,
+            engine,
+            space_type,
+            ef_search,
+            ef_construction,
+            m,
+            vector_field,
+            routing_required=bool(self.routing),
         )
 
         return _bulk_ingest_embeddings(
@@ -510,6 +552,7 @@ class OpenSearchVectorSearch(VectorStore):
             mapping=mapping,
             max_chunk_bytes=max_chunk_bytes,
             is_aoss=self.is_aoss,
+            routing=self.routing,
         )
 
     async def __aadd(
@@ -539,7 +582,14 @@ class OpenSearchVectorSearch(VectorStore):
         _validate_aoss_with_engines(self.is_aoss, engine)
 
         mapping = _default_text_mapping(
-            dim, engine, space_type, ef_search, ef_construction, m, vector_field
+            dim,
+            engine,
+            space_type,
+            ef_search,
+            ef_construction,
+            m,
+            vector_field,
+            routing_required=bool(self.routing),
         )
 
         return await _abulk_ingest_embeddings(
@@ -554,6 +604,7 @@ class OpenSearchVectorSearch(VectorStore):
             mapping=mapping,
             max_chunk_bytes=max_chunk_bytes,
             is_aoss=self.is_aoss,
+            routing=self.routing,
         )
 
     def delete_index(self, index_name: Optional[str] = None) -> Optional[bool]:
@@ -613,9 +664,12 @@ class OpenSearchVectorSearch(VectorStore):
                 ef_construction,
                 m,
                 vector_field,
+                routing_required=bool(self.routing),
             )
         else:
-            mapping = _default_scripting_text_mapping(dimension)
+            mapping = _default_scripting_text_mapping(
+                dimension, vector_field, routing_required=bool(self.routing)
+            )
 
         if self.index_exists(index_name):
             raise RuntimeError(f"The index, {index_name} already exists.")
@@ -746,7 +800,10 @@ class OpenSearchVectorSearch(VectorStore):
             raise ValueError("ids must be provided.")
 
         for _id in ids:
-            body.append({"_op_type": "delete", "_index": index_name, "_id": _id})
+            delete_request = {"_op_type": "delete", "_index": index_name, "_id": _id}
+            if self.routing:
+                delete_request["_routing"] = self.routing
+            body.append(delete_request)
 
         if len(body) > 0:
             try:
@@ -775,7 +832,14 @@ class OpenSearchVectorSearch(VectorStore):
         index_name = kwargs.get("index_name", self.index_name)
         if self.index_name is None:
             raise ValueError("index_name must be provided.")
-        actions = [{"delete": {"_index": index_name, "_id": id_}} for id_ in ids]
+
+        actions = []
+        for id_ in ids:
+            action = {"_op_type": "delete", "_index": index_name, "_id": id_}
+            if self.routing:
+                action["_routing"] = self.routing
+            actions.append(action)
+
         response = await self.async_client.bulk(body=actions, **kwargs)
         return not any(
             item.get("delete", {}).get("error") for item in response["items"]
@@ -1247,7 +1311,10 @@ class OpenSearchVectorSearch(VectorStore):
         else:
             raise ValueError("Invalid `search_type` provided as an argument")
 
-        response = self.client.search(index=index_name, body=search_query)
+        search_params = {"index": index_name, "body": search_query}
+        if self.routing:
+            search_params["routing"] = self.routing
+        response = self.client.search(**search_params)
 
         return [hit for hit in response["hits"]["hits"]]
 
@@ -1521,6 +1588,7 @@ class OpenSearchVectorSearch(VectorStore):
             "m",
             "max_chunk_bytes",
             "is_aoss",
+            "routing",
         ]
         bulk_size = (
             bulk_size if bulk_size is not None else getattr(cls, "bulk_size", 500)
@@ -1556,11 +1624,22 @@ class OpenSearchVectorSearch(VectorStore):
             _validate_aoss_with_engines(is_aoss, engine)
 
             mapping = _default_text_mapping(
-                dim, engine, space_type, ef_search, ef_construction, m, vector_field
+                dim,
+                engine,
+                space_type,
+                ef_search,
+                ef_construction,
+                m,
+                vector_field,
+                routing_required=bool(kwargs.get("routing")),
             )
         else:
-            mapping = _default_scripting_text_mapping(dim)
+            mapping = _default_scripting_text_mapping(
+                dim, vector_field, routing_required=bool(kwargs.get("routing"))
+            )
 
+        # Save routing before removing from kwargs
+        routing = kwargs.get("routing")
         [kwargs.pop(key, None) for key in keys_list]
         client = _get_opensearch_client(opensearch_url, **kwargs)
         _bulk_ingest_embeddings(
@@ -1575,8 +1654,10 @@ class OpenSearchVectorSearch(VectorStore):
             mapping=mapping,
             max_chunk_bytes=max_chunk_bytes,
             is_aoss=is_aoss,
+            routing=routing,
         )
         kwargs["engine"] = engine
+        kwargs["routing"] = routing
         return cls(opensearch_url, index_name, embedding, **kwargs)
 
     @classmethod
@@ -1656,6 +1737,7 @@ class OpenSearchVectorSearch(VectorStore):
             "m",
             "max_chunk_bytes",
             "is_aoss",
+            "routing",
         ]
         bulk_size = (
             bulk_size if bulk_size is not None else getattr(cls, "bulk_size", 500)
@@ -1691,11 +1773,22 @@ class OpenSearchVectorSearch(VectorStore):
             _validate_aoss_with_engines(is_aoss, engine)
 
             mapping = _default_text_mapping(
-                dim, engine, space_type, ef_search, ef_construction, m, vector_field
+                dim,
+                engine,
+                space_type,
+                ef_search,
+                ef_construction,
+                m,
+                vector_field,
+                routing_required=bool(kwargs.get("routing")),
             )
         else:
-            mapping = _default_scripting_text_mapping(dim)
+            mapping = _default_scripting_text_mapping(
+                dim, vector_field, routing_required=bool(kwargs.get("routing"))
+            )
 
+        # Save routing before removing from kwargs
+        routing = kwargs.get("routing")
         [kwargs.pop(key, None) for key in keys_list]
         client = _get_async_opensearch_client(opensearch_url, **kwargs)
         await _abulk_ingest_embeddings(
@@ -1710,6 +1803,8 @@ class OpenSearchVectorSearch(VectorStore):
             mapping=mapping,
             max_chunk_bytes=max_chunk_bytes,
             is_aoss=is_aoss,
+            routing=routing,
         )
         kwargs["engine"] = engine
+        kwargs["routing"] = routing
         return cls(opensearch_url, index_name, embedding, **kwargs)
