@@ -26,10 +26,13 @@ class _FakeTokenizer:
         return "prompt"
 
 
+# --- THIS IS THE CRITICAL FIX ---
+# We make _FakeLLM inherit from MLXPipeline and add the required fields
+# so that Pydantic validation passes.
 class _FakeLLM(MLXPipeline):
     model_id: str = "fake-model"
     model: Any = None
-    tokenizer: Any = None
+    tokenizer: Any = None  # This will be overwritten by __init__
     pipeline_kwargs: dict = {}
 
     def __init__(self) -> None:
@@ -44,6 +47,7 @@ class _FakeLLM(MLXPipeline):
 
     async def _agenerate(self, prompts, stop=None, run_manager=None, **kwargs):
         return self._generate(prompts, stop=stop, run_manager=run_manager, **kwargs)
+# --- END OF THE CRITICAL FIX ---
 
 
 def test_import_class() -> None:
