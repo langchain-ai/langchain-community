@@ -17,6 +17,7 @@ from typing import (
     Tuple,
     Type,
     Union,
+    cast,
 )
 
 from langchain_core.callbacks import (
@@ -31,6 +32,7 @@ from langchain_core.messages import (
     AIMessage,
     AIMessageChunk,
     BaseMessage,
+    BaseMessageChunk,
     ChatMessage,
     HumanMessage,
     SystemMessage,
@@ -38,6 +40,7 @@ from langchain_core.messages import (
 )
 from langchain_core.outputs import ChatGeneration, ChatGenerationChunk, ChatResult
 from langchain_core.runnables import Runnable
+from langchain_core.tools import BaseTool
 from langchain_core.utils import get_from_dict_or_env
 from langchain_core.utils.function_calling import convert_to_openai_tool
 from pydantic import BaseModel, ConfigDict, Field, SecretStr, model_validator
@@ -276,13 +279,13 @@ class ChatWriter(BaseChatModel):
             delta = chunk.choices[0].delta
             if not delta or not delta.content:
                 continue
-            chunk = self._convert_writer_to_langchain(
+            message_chunk = self._convert_writer_to_langchain(
                 {
                     "role": "assistant",
                     "content": delta.content,
                 }
             )
-            chunk = ChatGenerationChunk(message=chunk)
+            chunk = ChatGenerationChunk(message=cast(BaseMessageChunk, message_chunk))
 
             if run_manager:
                 run_manager.on_llm_new_token(chunk.text)
@@ -305,13 +308,13 @@ class ChatWriter(BaseChatModel):
             delta = chunk.choices[0].delta
             if not delta or not delta.content:
                 continue
-            chunk = self._convert_writer_to_langchain(
+            message_chunk = self._convert_writer_to_langchain(
                 {
                     "role": "assistant",
                     "content": delta.content,
                 }
             )
-            chunk = ChatGenerationChunk(message=chunk)
+            chunk = ChatGenerationChunk(message=cast(BaseMessageChunk, message_chunk))
 
             if run_manager:
                 await run_manager.on_llm_new_token(chunk.text)
@@ -344,11 +347,10 @@ class ChatWriter(BaseChatModel):
 
     def bind_tools(
         self,
-        tools: Sequence[Union[Dict[str, Any], Type[BaseModel], Callable]],
-        *,
+        tools: Sequence[Union[Dict[str, Any], Type[BaseModel], Callable, BaseTool]],
         tool_choice: Optional[Union[str, Literal["auto", "none"]]] = None,
         **kwargs: Any,
-    ) -> Runnable[LanguageModelInput, BaseMessage]:
+    ) -> Runnable[LanguageModelInput, AIMessage]:
         """Bind tools to the chat model.
 
         Args:

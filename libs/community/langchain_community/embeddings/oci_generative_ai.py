@@ -43,7 +43,7 @@ class OCIGenAIEmbeddings(BaseModel, Embeddings):
     Example:
         .. code-block:: python
 
-            from langchain.embeddings import OCIGenAIEmbeddings
+            from langchain_classic.embeddings import OCIGenAIEmbeddings
 
             embeddings = OCIGenAIEmbeddings(
                 model_id="MY_EMBEDDING_MODEL",

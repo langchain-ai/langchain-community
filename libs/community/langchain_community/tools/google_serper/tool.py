@@ -21,7 +21,7 @@ class GoogleSerperRun(BaseTool):
         "Useful for when you need to answer questions about current events."
         "Input should be a search query."
     )
-    api_wrapper: GoogleSerperAPIWrapper
+    api_wrapper: GoogleSerperAPIWrapper = Field(default_factory=GoogleSerperAPIWrapper)
 
     def _run(
         self,
