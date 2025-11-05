@@ -5,7 +5,7 @@ import json
 import logging
 import uuid
 import warnings
-from typing import Any, Iterable, List, Optional, Type
+from typing import Any, Iterable, List, Optional, Type, cast
 
 from langchain_core.documents import Document
 from langchain_core.embeddings import Embeddings
@@ -224,12 +224,12 @@ class DuckDB(VectorStore):
         list_cosine_similarity = self.duckdb.FunctionExpression(
             "list_cosine_similarity",
             self.duckdb.ColumnExpression(self._vector_key),
-            self.duckdb.ConstantExpression(embedding),
+            self.duckdb.ConstantExpression(cast(str, embedding)),
         )
         docs = (
             self._table.select(
                 *[
-                    self.duckdb.StarExpression(exclude=[]),
+                    self.duckdb.StarExpression(),
                     list_cosine_similarity.alias(SIMILARITY_ALIAS),
                 ]
             )
@@ -269,12 +269,12 @@ class DuckDB(VectorStore):
         list_cosine_similarity = self.duckdb.FunctionExpression(
             "list_cosine_similarity",
             self.duckdb.ColumnExpression(self._vector_key),
-            self.duckdb.ConstantExpression(embedding),
+            self.duckdb.ConstantExpression(cast(str, embedding)),
         )
         docs = (
             self._table.select(
                 *[
-                    self.duckdb.StarExpression(exclude=[]),
+                    self.duckdb.StarExpression(),
                     list_cosine_similarity.alias(SIMILARITY_ALIAS),
                 ]
             )
