@@ -1,0 +1,147 @@
+# Label PRs (config)
+# Automatically applies labels based on changed files and branch patterns
+
+adapters:
+  - changed-files:
+      - any-glob-to-any-file:
+          - "libs/community/adapters/**/*"
+
+agent_toolkits:
+  - changed-files:
+      - any-glob-to-any-file:
+          - "libs/community/agent_toolkits/**/*"
+
+agents:
+  - changed-files:
+      - any-glob-to-any-file:
+          - "libs/community/agents/**/*"
+
+callbacks:
+  - changed-files:
+      - any-glob-to-any-file:
+          - "libs/community/callbacks/**/*"
+
+chains:
+  - changed-files:
+      - any-glob-to-any-file:
+          - "libs/community/chains/**/*"
+
+chat_loaders:
+  - changed-files:
+      - any-glob-to-any-file:
+          - "libs/community/chat_loaders/**/*"
+
+chat_message_histories:
+  - changed-files:
+      - any-glob-to-any-file:
+          - "libs/community/chat_message_histories/**/*"
+
+chat_models:
+  - changed-files:
+      - any-glob-to-any-file:
+          - "libs/community/chat_models/**/*"
+
+cross_encoders:
+  - changed-files:
+      - any-glob-to-any-file:
+          - "libs/community/cross_encoders/**/*"
+
+docstore:
+  - changed-files:
+      - any-glob-to-any-file:
+          - "libs/community/docstore/**/*"
+
+document_compressors:
+  - changed-files:
+      - any-glob-to-any-file:
+          - "libs/community/document_compressors/**/*"
+
+document_loaders:
+  - changed-files:
+      - any-glob-to-any-file:
+          - "libs/community/document_loaders/**/*"
+
+document_transformers:
+  - changed-files:
+      - any-glob-to-any-file:
+          - "libs/community/document_transformers/**/*"
+
+embeddings:
+  - changed-files:
+      - any-glob-to-any-file:
+          - "libs/community/embeddings/**/*"
+
+example_selectors:
+  - changed-files:
+      - any-glob-to-any-file:
+          - "libs/community/example_selectors/**/*"
+
+graph_vectorstores:
+  - changed-files:
+      - any-glob-to-any-file:
+          - "libs/community/graph_vectorstores/**/*"
+
+graphs:
+  - changed-files:
+      - any-glob-to-any-file:
+          - "libs/community/graphs/**/*"
+
+indexes:
+  - changed-files:
+      - any-glob-to-any-file:
+          - "libs/community/indexes/**/*"
+
+llms:
+  - changed-files:
+      - any-glob-to-any-file:
+          - "libs/community/llms/**/*"
+
+memory:
+  - changed-files:
+      - any-glob-to-any-file:
+          - "libs/community/memory/**/*"
+
+output_parsers:
+  - changed-files:
+      - any-glob-to-any-file:
+          - "libs/community/output_parsers/**/*"
+
+query_constructors:
+  - changed-files:
+      - any-glob-to-any-file:
+          - "libs/community/query_constructors/**/*"
+
+retrievers:
+  - changed-files:
+      - any-glob-to-any-file:
+          - "libs/community/retrievers/**/*"
+
+storage:
+  - changed-files:
+      - any-glob-to-any-file:
+          - "libs/community/storage/**/*"
+
+tools:
+  - changed-files:
+      - any-glob-to-any-file:
+          - "libs/community/tools/**/*"
+
+utilities:
+  - changed-files:
+      - any-glob-to-any-file:
+          - "libs/community/utilities/**/*"
+
+utils:
+  - changed-files:
+      - any-glob-to-any-file:
+          - "libs/community/utils/**/*"
+
+vectorstores:
+  - changed-files:
+      - any-glob-to-any-file:
+          - "libs/community/vectorstores/**/*"
+
+cache:
+  - changed-files:
+      - any-glob-to-any-file:
+          - "libs/community/cache/**/*"
