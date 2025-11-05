@@ -55,6 +55,8 @@ def test_slack_toolkit_provided_client_reuse(mock_webclient: MagicMock) -> None:
     tools2 = toolkit.get_tools()
 
     for i in range(len(tools1)):
-        assert isinstance(tools1[i], SlackBaseTool)
-        assert isinstance(tools2[i], SlackBaseTool)
-        assert tools1[i].client == tools2[i].client == mock_webclient
+        tool1 = tools1[i]
+        tool2 = tools2[i]
+        assert isinstance(tool1, SlackBaseTool)
+        assert isinstance(tool2, SlackBaseTool)
+        assert tool1.client == tool2.client == mock_webclient
