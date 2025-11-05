@@ -32,7 +32,7 @@
 #   document_loaders, document_transformers, embeddings, example_selectors,
 #   graph_vectorstores, graphs, indexes, llms, memory, output_parsers,
 #   query_constructors, retrievers, storage, tools, utilities, utils, vectorstores,
-#   cache
+#   cache, infra
 #
 # Rules:
 #   1. The 'Type' must start with a lowercase letter.
@@ -107,6 +107,7 @@ jobs:
             utils
             vectorstores
             cache
+            infra
           requireScope: false
           disallowScopes: |
             release
