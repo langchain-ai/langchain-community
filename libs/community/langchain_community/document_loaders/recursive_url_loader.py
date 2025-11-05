@@ -391,7 +391,7 @@ class RecursiveUrlLoader(BaseLoader):
         return f"{parsed_url.scheme}://{parsed_url.netloc}/"
 
     def _get_child_links_recursive(
-        self, url: str, visited: Set[str], *, depth: int = 0, verify: bool = True
+        self, url: str, visited: Set[str], *, depth: int = 0
     ) -> Iterator[Document]:
         """Recursively get all child links starting with the path of the input URL.
 
@@ -409,7 +409,11 @@ class RecursiveUrlLoader(BaseLoader):
         visited.add(url)
         try:
             response = requests.get(
-                url, timeout=self.timeout, headers=self.headers, proxies=self.proxies, verify=verify
+                url,
+                timeout=self.timeout,
+                headers=self.headers,
+                proxies=self.proxies,
+                verify=self.ssl,
             )
 
             if self.encoding is not None:
@@ -449,7 +453,7 @@ class RecursiveUrlLoader(BaseLoader):
             # Check all unvisited links
             if link not in visited:
                 yield from self._get_child_links_recursive(
-                    link, visited, depth=depth + 1, verify=verify
+                    link, visited, depth=depth + 1
                 )
 
     async def _async_get_child_links_recursive(
@@ -489,7 +493,7 @@ class RecursiveUrlLoader(BaseLoader):
         )
         visited.add(url)
         try:
-            async with session.get(url) as response:
+            async with session.get(url, ssl=self.ssl) as response:
                 text = await response.text()
                 if self.check_response_status and 400 <= response.status <= 599:
                     raise ValueError(f"Received HTTP status {response.status}")
