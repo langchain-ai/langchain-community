@@ -124,8 +124,8 @@ class RSSFeedLoader(BaseLoader):
                     )
                     article = loader.load()[0]
                     article.metadata["feed"] = url
-                    # If the publish date is not set by newspaper,
-                    # try to extract it from the feed entry.
+                    # If the publish date is not set by newspaper, try to extract it
+                    # from the feed entry
                     if article.metadata.get("publish_date") is None:
                         from datetime import datetime
 
