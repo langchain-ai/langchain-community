@@ -1,7 +1,7 @@
 # flake8: noqa
 """Tools for interacting with a SQL database."""
 
-from typing import Any, Dict, Optional, Sequence, Type, Union
+from typing import Any, Dict, Optional, Sequence, Tuple, Type, Union
 
 from sqlalchemy.engine import Result
 
@@ -54,7 +54,12 @@ class QuerySQLDatabaseTool(BaseSQLDatabaseTool, BaseTool):
         self,
         query: str,
         run_manager: Optional[CallbackManagerForToolRun] = None,
-    ) -> Union[str, Sequence[Dict[str, Any]], Result, Tuple[str, Any]]:
+    ) -> Union[
+        str,
+        Sequence[Dict[str, Any]],
+        Sequence[Tuple[Any, ...]],
+        Result[Any],
+    ]:
         """Execute the query, return the results or an error message."""
         return self.db.run_no_throw(query)
 

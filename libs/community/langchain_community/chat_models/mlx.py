@@ -16,6 +16,7 @@ from typing import (
     Tuple,
     Type,
     Union,
+    cast,
 )
 
 from langchain_core.callbacks.manager import (
@@ -368,7 +369,9 @@ class ChatMLX(BaseChatModel):
                 :class:`~langchain.runnable.Runnable` constructor.
         """
 
-        formatted_tools = [convert_to_openai_tool(tool) for tool in tools]
+        formatted_tools: List[Dict[str, Any]] = [
+            convert_to_openai_tool(tool) for tool in tools
+        ]
         if tool_choice is not None and tool_choice:
             if len(formatted_tools) != 1:
                 raise ValueError(
@@ -398,4 +401,7 @@ class ChatMLX(BaseChatModel):
                     f"Received: {tool_choice}"
                 )
             kwargs["tool_choice"] = tool_choice
-        return super().bind(tools=formatted_tools, **kwargs)
+        return super().bind(
+            tools=cast(Sequence[Dict[str, Any]], formatted_tools),
+            **kwargs,
+        )
