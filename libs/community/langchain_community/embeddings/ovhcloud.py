@@ -1,4 +1,3 @@
-import json
 import logging
 import time
 from typing import Any, List
@@ -21,8 +20,11 @@ class OVHCloudEmbeddings(BaseModel, Embeddings):
     """ OVHcloud AI Endpoints model name for embeddings generation"""
     model_name: str = ""
 
-    """ OVHcloud AI Endpoints region"""
+    """ OVHcloud AI Endpoints region (deprecated, kept for backward compatibility)"""
     region: str = "kepler"
+
+    """ OVHcloud AI Endpoints base URL"""
+    base_url: str = "https://oai.endpoints.kepler.ai.cloud.ovh.net/v1"
 
     model_config = ConfigDict(extra="forbid", protected_namespaces=())
 
@@ -32,8 +34,6 @@ class OVHCloudEmbeddings(BaseModel, Embeddings):
             raise ValueError("Access token is required for OVHCloud embeddings.")
         if self.model_name == "":
             raise ValueError("Model name is required for OVHCloud embeddings.")
-        if self.region == "":
-            raise ValueError("Region is required for OVHCloud embeddings.")
 
     def _generate_embedding(self, text: str) -> List[float]:
         """Generate embeddings from OVHCLOUD AIE.
@@ -42,8 +42,7 @@ class OVHCloudEmbeddings(BaseModel, Embeddings):
         Returns:
             List[float]: Embeddings for the text.
         """
-
-        return self._send_request_to_ai_endpoints("text/plain", text, "text2vec")
+        return self._send_request_to_ai_endpoints([text])[0]
 
     def embed_documents(self, texts: List[str]) -> List[List[float]]:
         """Embed a list of documents.
@@ -54,10 +53,7 @@ class OVHCloudEmbeddings(BaseModel, Embeddings):
            List[List[float]]: List of embeddings, one for each input text.
 
         """
-
-        return self._send_request_to_ai_endpoints(
-            "application/json", json.dumps(texts), "batch_text2vec"
-        )
+        return self._send_request_to_ai_endpoints(texts)
 
     def embed_query(self, text: str) -> List[float]:
         """Embed a single query text.
@@ -68,29 +64,31 @@ class OVHCloudEmbeddings(BaseModel, Embeddings):
         """
         return self._generate_embedding(text)
 
-    def _send_request_to_ai_endpoints(
-        self, contentType: str, payload: str, route: str
-    ) -> Any:
-        """Send a HTTPS request to OVHcloud AI Endpoints
+    def _send_request_to_ai_endpoints(self, texts: List[str]) -> List[List[float]]:
+        """Send a HTTPS request to OVHcloud AI Endpoints using OpenAI-compatible API
         Args:
-            contentType (str): The content type of the request, application/json or text/plain.
-            payload (str): The payload of the request.
-            route (str): The route of the request, batch_text2vec or text2vec.
-        """  # noqa: E501
+            texts (List[str]): The list of texts to embed.
+        Returns:
+            List[List[float]]: List of embeddings, one for each input text.
+        """
         headers = {
-            "content-type": contentType,
+            "Content-Type": "application/json",
             "Authorization": f"Bearer {self.access_token}",
+        }
+
+        # Prepare request body in OpenAI format
+        # OpenAI API accepts both string and array, but we always use array for consistency
+        payload = {
+            "model": self.model_name,
+            "input": texts,
         }
 
         session = requests.session()
         while True:
             response = session.post(
-                (
-                    f"https://{self.model_name}.endpoints.{self.region}"
-                    f".ai.cloud.ovh.net/api/{route}"
-                ),
+                f"{self.base_url}/embeddings",
                 headers=headers,
-                data=payload,
+                json=payload,
             )
             if response.status_code != 200:
                 if response.status_code == 429:
@@ -112,4 +110,8 @@ class OVHCloudEmbeddings(BaseModel, Embeddings):
                         status_code=response.status_code, text=response.text
                     )
                 )
-            return response.json()
+            # Parse OpenAI-compatible response format
+            response_data = response.json()
+            # OpenAI format: {"data": [{"embedding": [...]}, ...]}
+            embeddings = [item["embedding"] for item in response_data["data"]]
+            return embeddings

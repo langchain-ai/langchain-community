@@ -140,6 +140,9 @@ if TYPE_CHECKING:
     from langchain_community.chat_models.ollama import (
         ChatOllama,
     )
+    from langchain_community.chat_models.ovhcloud import (
+        ChatOVHcloud,
+    )
     from langchain_community.chat_models.openai import (
         ChatOpenAI,
     )
@@ -204,6 +207,7 @@ __all__ = [
     "ChatCohere",
     "ChatCoze",
     "ChatOctoAI",
+    "ChatOVHcloud",
     "ChatDatabricks",
     "ChatDeepInfra",
     "ChatEdenAI",
@@ -290,6 +294,7 @@ _module_lookup = {
     "ChatMlflow": "langchain_community.chat_models.mlflow",
     "ChatNebula": "langchain_community.chat_models.symblai_nebula",
     "ChatOctoAI": "langchain_community.chat_models.octoai",
+    "ChatOVHcloud": "langchain_community.chat_models.ovhcloud",
     "ChatOCIGenAI": "langchain_community.chat_models.oci_generative_ai",
     "ChatOCIModelDeployment": "langchain_community.chat_models.oci_data_science",
     "ChatOCIModelDeploymentVLLM": "langchain_community.chat_models.oci_data_science",
