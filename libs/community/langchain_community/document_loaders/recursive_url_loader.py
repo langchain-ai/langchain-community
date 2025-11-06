@@ -408,7 +408,11 @@ class RecursiveUrlLoader(BaseLoader):
         visited.add(url)
         try:
             response = requests.get(
-                url, timeout=self.timeout, headers=self.headers, proxies=self.proxies
+                url,
+                timeout=self.timeout,
+                headers=self.headers,
+                proxies=self.proxies,
+                verify=self.ssl,
             )
 
             if self.encoding is not None:
@@ -488,7 +492,7 @@ class RecursiveUrlLoader(BaseLoader):
         )
         visited.add(url)
         try:
-            async with session.get(url) as response:
+            async with session.get(url, ssl=self.ssl) as response:
                 text = await response.text()
                 if self.check_response_status and 400 <= response.status <= 599:
                     raise ValueError(f"Received HTTP status {response.status}")
