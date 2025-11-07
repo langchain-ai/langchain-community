@@ -401,8 +401,8 @@ class VertexAI(_VertexAICommon, BaseLLM):
 class VertexAIModelGarden(_VertexAIBase, BaseLLM):
     """Vertex AI Model Garden large language models."""
 
-    client: "PredictionServiceClient" = None  # type: ignore[assignment]
-    async_client: "PredictionServiceAsyncClient" = None  # type: ignore[assignment]
+    client: "PredictionServiceClient" = None
+    async_client: "PredictionServiceAsyncClient" = None
     endpoint_id: str
     "A name of an endpoint where the model has been deployed."
     allowed_model_args: Optional[List[str]] = None
