@@ -35,7 +35,7 @@ class AzureMLEndpointClient(object):
         """Initialize the class."""
         if not endpoint_api_key or not endpoint_url:
             raise ValueError(
-                """A key/token and REST endpoint should 
+                """A key/token and REST endpoint should
                 be provided to invoke the endpoint"""
             )
         self.endpoint_url = endpoint_url
@@ -89,25 +89,25 @@ class ContentFormatterBase:
     """
     Example:
         .. code-block:: python
-        
+
             class ContentFormatter(ContentFormatterBase):
                 content_type = "application/json"
                 accepts = "application/json"
-                
+
                 def format_request_payload(
-                    self, 
-                    prompt: str, 
+                    self,
+                    prompt: str,
                     model_kwargs: Dict,
                     api_type: AzureMLEndpointApiType,
                 ) -> bytes:
                     input_str = json.dumps(
                         {
-                            "inputs": {"input_string": [prompt]}, 
+                            "inputs": {"input_string": [prompt]},
                             "parameters": model_kwargs,
                         }
                     )
                     return str.encode(input_str)
-                    
+
                 def format_response_payload(
                         self, output: str, api_type: AzureMLEndpointApiType
                     ) -> str:
@@ -216,8 +216,8 @@ class OSSContentFormatter(GPT2ContentFormatter):
     def __init__(self) -> None:
         super().__init__()
         warnings.warn(
-            """`OSSContentFormatter` will be deprecated in the future. 
-                      Please use `GPT2ContentFormatter` instead.  
+            """`OSSContentFormatter` will be deprecated in the future.
+                      Please use `GPT2ContentFormatter` instead.
                       """
         )
 
@@ -356,8 +356,8 @@ class LlamaContentFormatter(CustomOpenAIContentFormatter):
     def __init__(self) -> None:
         super().__init__()
         warnings.warn(
-            """`LlamaContentFormatter` will be deprecated in the future. 
-                Please use `CustomOpenAIContentFormatter` instead.  
+            """`LlamaContentFormatter` will be deprecated in the future.
+                Please use `CustomOpenAIContentFormatter` instead.
             """
         )
 
@@ -366,11 +366,11 @@ class AzureMLBaseEndpoint(BaseModel):
     """Azure ML Online Endpoint models."""
 
     endpoint_url: str = ""
-    """URL of pre-existing Endpoint. Should be passed to constructor or specified as 
+    """URL of pre-existing Endpoint. Should be passed to constructor or specified as
         env var `AZUREML_ENDPOINT_URL`."""
 
     endpoint_api_type: AzureMLEndpointApiType = AzureMLEndpointApiType.dedicated
-    """Type of the endpoint being consumed. Possible values are `serverless` for 
+    """Type of the endpoint being consumed. Possible values are `serverless` for
         pay-as-you-go and `dedicated` for dedicated endpoints. """
 
     endpoint_api_key: SecretStr = convert_to_secret_str("")
@@ -378,13 +378,13 @@ class AzureMLBaseEndpoint(BaseModel):
         env var `AZUREML_ENDPOINT_API_KEY`."""
 
     deployment_name: str = ""
-    """Deployment Name for Endpoint. NOT REQUIRED to call endpoint. Should be passed 
+    """Deployment Name for Endpoint. NOT REQUIRED to call endpoint. Should be passed
         to constructor or specified as env var `AZUREML_DEPLOYMENT_NAME`."""
 
     timeout: int = DEFAULT_TIMEOUT
     """Request timeout for calls to the endpoint"""
 
-    http_client: Any = None  #: :meta private:
+    http_client: Any = None
 
     max_retries: int = 1
 

@@ -15,21 +15,27 @@ if TYPE_CHECKING:
 class GitLabAPIWrapper(BaseModel):
     """Wrapper for GitLab API."""
 
-    gitlab: Any = None  #: :meta private:
-    gitlab_repo_instance: Any = None  #: :meta private:
+    gitlab: Any = None
+
+    gitlab_repo_instance: Any = None
+
     gitlab_url: Optional[str] = None
     """The url of the GitLab instance."""
+
     gitlab_repository: Optional[str] = None
     """The name of the GitLab repository, in the form {username}/{repo-name}."""
+
     gitlab_personal_access_token: Optional[str] = None
     """Personal access token for the GitLab service, used for authentication."""
+
     gitlab_branch: Optional[str] = None
     """The specific branch in the GitLab repository where the bot will make
-        its commits. Defaults to 'main'.
+        its commits. Defaults to `'main'`.
     """
+
     gitlab_base_branch: Optional[str] = None
     """The base branch in the GitLab repository, used for comparisons.
-        Usually 'main' or 'master'. Defaults to 'main'.
+        Usually `'main'` or `'master'`. Defaults to `'main'`.
     """
 
     model_config = ConfigDict(

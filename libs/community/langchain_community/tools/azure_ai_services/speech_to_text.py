@@ -24,10 +24,10 @@ class AzureAiServicesSpeechToTextTool(BaseTool):
     https://learn.microsoft.com/en-us/azure/ai-services/speech-service/get-started-speech-to-text?pivots=programming-language-python
     """
 
-    azure_ai_services_key: str = ""  #: :meta private:
-    azure_ai_services_region: str = ""  #: :meta private:
-    speech_language: str = "en-US"  #: :meta private:
-    speech_config: Any  #: :meta private:
+    azure_ai_services_key: str = ""
+    azure_ai_services_region: str = ""
+    speech_language: str = "en-US"
+    speech_config: Any
 
     name: str = "azure_ai_services_speech_to_text"
     description: str = (

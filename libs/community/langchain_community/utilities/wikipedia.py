@@ -21,10 +21,14 @@ class WikipediaAPIWrapper(BaseModel):
     It limits the Document content by doc_content_chars_max.
     """
 
-    wiki_client: Any  #: :meta private:
+    wiki_client: Any
+
     top_k_results: int = 3
+
     lang: str = "en"
+
     load_all_available_meta: bool = False
+
     doc_content_chars_max: int = 4000
 
     @model_validator(mode="before")

@@ -61,8 +61,8 @@ class ClovaXEmbeddings(BaseModel, Embeddings):
             output = embedding.embed_documents(documents)
     """  # noqa: E501
 
-    client: Optional[httpx.Client] = Field(default=None)  #: :meta private:
-    async_client: Optional[httpx.AsyncClient] = Field(default=None)  #: :meta private:
+    client: Optional[httpx.Client] = Field(default=None)
+    async_client: Optional[httpx.AsyncClient] = Field(default=None)
 
     ncp_clovastudio_api_key: Optional[SecretStr] = Field(default=None, alias="api_key")
     """Automatically inferred from env are `NCP_CLOVASTUDIO_API_KEY` if not provided."""

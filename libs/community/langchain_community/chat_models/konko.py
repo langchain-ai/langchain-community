@@ -68,7 +68,7 @@ class ChatKonko(ChatOpenAI):
         """Return whether this model can be serialized by Langchain."""
         return False
 
-    client: Any = None  #: :meta private:
+    client: Any = None
     model: str = Field(default=DEFAULT_MODEL, alias="model")
     """Model name to use."""
     temperature: float = 0.7
