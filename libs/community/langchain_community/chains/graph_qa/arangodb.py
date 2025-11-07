@@ -39,8 +39,8 @@ class ArangoGraphQAChain(Chain):
     aql_generation_chain: LLMChain
     aql_fix_chain: LLMChain
     qa_chain: LLMChain
-    input_key: str = "query"  #: :meta private:
-    output_key: str = "result"  #: :meta private:
+    input_key: str = "query"
+    output_key: str = "result"
 
     # Specifies the maximum number of AQL Query Results to return
     top_k: int = 10

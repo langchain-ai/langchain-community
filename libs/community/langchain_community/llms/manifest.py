@@ -9,7 +9,7 @@ from pydantic import ConfigDict
 class ManifestWrapper(LLM):
     """HazyResearch's Manifest library."""
 
-    client: Any = None  #: :meta private:
+    client: Any = None
     llm_kwargs: Optional[Dict] = None
 
     model_config = ConfigDict(

@@ -40,7 +40,7 @@ class ClarifaiEmbeddings(BaseModel, Embeddings):
     """Clarifai personal access token to use."""
     token: Optional[str] = Field(default=None, exclude=True)
     """Clarifai session token to use."""
-    model: Any = Field(default=None, exclude=True)  #: :meta private:
+    model: Any = Field(default=None, exclude=True)
     api_base: str = "https://api.clarifai.com"
 
     model_config = ConfigDict(extra="forbid", protected_namespaces=())

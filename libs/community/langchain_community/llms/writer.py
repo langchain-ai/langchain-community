@@ -31,8 +31,8 @@ class Writer(LLM):
             )
     """
 
-    client: Any = Field(default=None, exclude=True)  #: :meta private:
-    async_client: Any = Field(default=None, exclude=True)  #: :meta private:
+    client: Any = Field(default=None, exclude=True)
+    async_client: Any = Field(default=None, exclude=True)
 
     api_key: Optional[SecretStr] = Field(default=None)
     """Writer API key."""
@@ -44,17 +44,17 @@ class Writer(LLM):
     """The maximum number of tokens that the model can generate in the response."""
 
     temperature: Optional[float] = 0.7
-    """Controls the randomness of the model's outputs. Higher values lead to more 
+    """Controls the randomness of the model's outputs. Higher values lead to more
     random outputs, while lower values make the model more deterministic."""
 
     top_p: Optional[float] = None
     """Used to control the nucleus sampling, where only the most probable tokens
-     with a cumulative probability of top_p are considered for sampling, providing 
+     with a cumulative probability of top_p are considered for sampling, providing
      a way to fine-tune the randomness of predictions."""
 
     stop: Optional[List[str]] = None
     """Specifies stopping conditions for the model's output generation. This can
-     be an array of strings or a single string that the model will look for as a 
+     be an array of strings or a single string that the model will look for as a
      signal to stop generating further tokens."""
 
     best_of: Optional[int] = None

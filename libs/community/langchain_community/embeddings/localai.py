@@ -141,7 +141,7 @@ class LocalAIEmbeddings(BaseModel, Embeddings):
 
     """
 
-    client: Any = None  #: :meta private:
+    client: Any = None
     model: str = "text-embedding-ada-002"
     deployment: str = model
     openai_api_version: Optional[str] = None

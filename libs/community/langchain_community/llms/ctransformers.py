@@ -23,7 +23,7 @@ class CTransformers(LLM):
             llm = CTransformers(model="/path/to/ggml-gpt-2.bin", model_type="gpt2")
     """
 
-    client: Any  #: :meta private:
+    client: Any
 
     model: str
     """The path to a model file or directory or the name of a Hugging Face Hub

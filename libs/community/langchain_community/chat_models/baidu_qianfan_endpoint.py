@@ -349,7 +349,7 @@ class QianfanChatEndpoint(BaseChatModel):
     model_kwargs: Dict[str, Any] = Field(default_factory=dict)
     """extra params for model invoke using with `do`."""
 
-    client: Any = None  #: :meta private:
+    client: Any = None
 
     # It could be empty due to the use of Console API
     # And they're not list here
@@ -719,18 +719,25 @@ class QianfanChatEndpoint(BaseChatModel):
         """Model wrapper that returns outputs formatted to match the given schema.
 
         Args:
-            schema: The output schema as a dict or a Pydantic class. If a Pydantic class
+            schema: The output schema as a dict or a Pydantic class.If a Pydantic class
                 then the model output will be an object of that class. If a dict then
                 the model output will be a dict. With a Pydantic class the returned
                 attributes will be validated, whereas with a dict they will not be. If
                 `method` is "function_calling" and `schema` is a dict, then the dict
                 must match the OpenAI function-calling spec.
-            include_raw: If False then only the parsed structured output is returned. If
-                an error occurs during model output parsing it will be raised. If True
-                then both the raw model response (a BaseMessage) and the parsed model
-                response will be returned. If an error occurs during output parsing it
-                will be caught and returned as well. The final output is always a dict
-                with keys "raw", "parsed", and "parsing_error".
+            include_raw:
+                If `False` then only the parsed structured output is returned.
+
+                If an error occurs during model output parsing it will be raised.
+
+                If `True` then both the raw model response (a `BaseMessage`) and the
+                parsed model response will be returned.
+
+                If an error occurs during output parsing it will be caught and returned
+                as well.
+
+                The final output is always a `dict` with keys `'raw'`, `'parsed'`, and
+                `'parsing_error'`.
 
         Returns:
             A Runnable that takes any ChatModel input and returns as output:

@@ -23,31 +23,38 @@ class PubMedAPIWrapper(BaseModel):
     Parameters:
         top_k_results: number of the top-scored document used for the PubMed tool
         MAX_QUERY_LENGTH: maximum length of the query.
-          Default is 300 characters.
+            Default is 300 characters.
         doc_content_chars_max: maximum length of the document content.
-          Content will be truncated if it exceeds this length.
-          Default is 2000 characters.
+            Content will be truncated if it exceeds this length.
+            Default is 2000 characters.
         max_retry: maximum number of retries for a request. Default is 5.
         sleep_time: time to wait between retries.
-          Default is 0.2 seconds.
+            Default is 0.2 seconds.
         email: email address to be used for the PubMed API.
         api_key: API key to be used for the PubMed API.
     """
 
-    parse: Any  #: :meta private:
+    parse: Any
 
     base_url_esearch: str = (
         "https://eutils.ncbi.nlm.nih.gov/entrez/eutils/esearch.fcgi?"
     )
+
     base_url_efetch: str = "https://eutils.ncbi.nlm.nih.gov/entrez/eutils/efetch.fcgi?"
+
     max_retry: int = 5
+
     sleep_time: float = 0.2
 
     # Default values for the parameters
     top_k_results: int = 3
+
     MAX_QUERY_LENGTH: int = 300
+
     doc_content_chars_max: int = 2000
+
     email: str = "your_email@example.com"
+
     api_key: str = ""
 
     @model_validator(mode="before")
