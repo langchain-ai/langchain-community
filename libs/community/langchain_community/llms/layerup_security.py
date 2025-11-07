@@ -45,7 +45,7 @@ class LayerupSecurity(LLM):
     handle_response_guardrail_violation: Callable[[dict], str] = (
         default_guardrail_violation_handler
     )
-    client: Any  #: :meta private:
+    client: Any
 
     @model_validator(mode="before")
     @classmethod

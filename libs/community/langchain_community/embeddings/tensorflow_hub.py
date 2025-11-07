@@ -19,7 +19,7 @@ class TensorflowHubEmbeddings(BaseModel, Embeddings):
             tf = TensorflowHubEmbeddings(model_url=url)
     """
 
-    embed: Any = None  #: :meta private:
+    embed: Any = None
     model_url: str = DEFAULT_MODEL_URL
     """Model name to use."""
 

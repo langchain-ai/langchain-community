@@ -269,18 +269,18 @@ class ChatSparkLLM(BaseChatModel):
             "spark_llm_domain": "IFLYTEK_SPARK_LLM_DOMAIN",
         }
 
-    client: Any = None  #: :meta private:
+    client: Any = None
     spark_app_id: Optional[str] = Field(default=None, alias="app_id")
-    """Automatically inferred from env var `IFLYTEK_SPARK_APP_ID` 
+    """Automatically inferred from env var `IFLYTEK_SPARK_APP_ID`
         if not provided."""
     spark_api_key: Optional[str] = Field(default=None, alias="api_key")
-    """Automatically inferred from env var `IFLYTEK_SPARK_API_KEY` 
+    """Automatically inferred from env var `IFLYTEK_SPARK_API_KEY`
         if not provided."""
     spark_api_secret: Optional[str] = Field(default=None, alias="api_secret")
-    """Automatically inferred from env var `IFLYTEK_SPARK_API_SECRET` 
+    """Automatically inferred from env var `IFLYTEK_SPARK_API_SECRET`
         if not provided."""
     spark_api_url: Optional[str] = Field(default=None, alias="api_url")
-    """Base URL path for API requests, leave blank if not using a proxy or service 
+    """Base URL path for API requests, leave blank if not using a proxy or service
         emulator."""
     spark_llm_domain: Optional[str] = Field(default=None, alias="model")
     """Model name to use."""

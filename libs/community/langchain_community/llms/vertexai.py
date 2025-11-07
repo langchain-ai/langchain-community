@@ -125,8 +125,8 @@ class _VertexAIBase(BaseModel):
 
 
 class _VertexAICommon(_VertexAIBase):
-    client: "_LanguageModel" = None  #: :meta private:
-    client_preview: "_LanguageModel" = None  #: :meta private:
+    client: "_LanguageModel" = None
+    client_preview: "_LanguageModel" = None
     model_name: str
     "Underlying model name."
     temperature: float = 0.0
@@ -401,12 +401,8 @@ class VertexAI(_VertexAICommon, BaseLLM):
 class VertexAIModelGarden(_VertexAIBase, BaseLLM):
     """Vertex AI Model Garden large language models."""
 
-    client: "PredictionServiceClient" = (
-        None  #: :meta private:  # type: ignore[assignment]
-    )
-    async_client: "PredictionServiceAsyncClient" = (
-        None  #: :meta private:  # type: ignore[assignment]
-    )
+    client: "PredictionServiceClient" = None
+    async_client: "PredictionServiceAsyncClient" = None
     endpoint_id: str
     "A name of an endpoint where the model has been deployed."
     allowed_model_args: Optional[List[str]] = None

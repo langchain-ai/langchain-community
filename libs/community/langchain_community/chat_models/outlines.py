@@ -73,17 +73,17 @@ class ChatOutlines(BaseChatModel):
 
     """  # noqa: E501
 
-    client: Any = None  # :meta private:
+    client: Any = None
 
     model: str
     """Identifier for the model to use with Outlines.
-    
+
     The model identifier should be a string specifying:
     - A Hugging Face model name (e.g., "meta-llama/Llama-2-7b-chat-hf")
     - A local path to a model
     - For GGUF models, the format is "repo_id/file_name"
       (e.g., "TheBloke/Llama-2-7B-Chat-GGUF/llama-2-7b-chat.Q4_K_M.gguf")
-    
+
     Examples:
     - "TheBloke/Llama-2-7B-Chat-GGUF/llama-2-7b-chat.Q4_K_M.gguf"
     - "meta-llama/Llama-2-7b-chat-hf"
@@ -93,14 +93,14 @@ class ChatOutlines(BaseChatModel):
         "llamacpp", "transformers", "transformers_vision", "vllm", "mlxlm"
     ] = "transformers"
     """Specifies the backend to use for the model.
-    
+
     Supported backends are:
     - "llamacpp": For GGUF models using llama.cpp
     - "transformers": For Hugging Face Transformers models (default)
     - "transformers_vision": For vision-language models (e.g., LLaVA)
     - "vllm": For models using the vLLM library
     - "mlxlm": For models using the MLX framework
-    
+
     Note: Ensure you have the necessary dependencies installed for the chosen backend.
     The system will attempt to import required packages and may raise an ImportError
     if they are not available.
@@ -117,35 +117,35 @@ class ChatOutlines(BaseChatModel):
 
     regex: Optional[str] = None
     """Regular expression for structured generation.
-    
+
     If provided, Outlines will guarantee that the generated text matches this regex.
     This can be useful for generating structured outputs like IP addresses, dates, etc.
-    
+
     Example: (valid IP address)
         regex = r"((25[0-5]|2[0-4]\\d|[01]?\\d\\d?)\\.){3}(25[0-5]|2[0-4]\\d|[01]?\\d\\d?)"
-    
+
     Note: Computing the regex index can take some time, so it's recommended to reuse
     the same regex for multiple generations if possible.
-    
+
     For more details, see: https://dottxt-ai.github.io/outlines/reference/generation/regex/
     """  # noqa: E501
 
     type_constraints: Optional[Union[type, str]] = None
     """Type constraints for structured generation.
-    
+
     Restricts the output to valid Python types. Supported types include:
     int, float, bool, datetime.date, datetime.time, datetime.datetime.
-    
+
     Example:
         type_constraints = int
-    
+
     For more details, see: https://dottxt-ai.github.io/outlines/reference/generation/format/
     """
 
     json_schema: Optional[Union[Any, Dict, Callable]] = None
     """Pydantic model, JSON Schema, or callable (function signature)
     for structured JSON generation.
-    
+
     Outlines can generate JSON output that follows a specified structure,
     which is useful for:
     1. Parsing the answer (e.g., with Pydantic), storing it, or returning it to a user.
@@ -163,13 +163,13 @@ class ChatOutlines(BaseChatModel):
 
     grammar: Optional[str] = None
     """Context-free grammar for structured generation.
-    
+
     If provided, Outlines will generate text that adheres to the specified grammar.
     The grammar should be defined in EBNF format.
-    
+
     This can be useful for generating structured outputs like mathematical expressions,
     programming languages, or custom domain-specific languages.
-    
+
     Example:
         grammar = '''
             ?start: expression
@@ -178,10 +178,10 @@ class ChatOutlines(BaseChatModel):
             ?factor: NUMBER | "-" factor | "(" expression ")"
             %import common.NUMBER
         '''
-    
+
     Note: Grammar-based generation is currently experimental and may have performance
     limitations. It uses greedy generation to mitigate these issues.
-    
+
     For more details and examples, see:
     https://dottxt-ai.github.io/outlines/reference/generation/cfg/
     """
@@ -191,7 +191,7 @@ class ChatOutlines(BaseChatModel):
 
     model_kwargs: Dict[str, Any] = Field(default_factory=dict)
     """Additional parameters to pass to the underlying model.
-    
+
     Example:
         model_kwargs = {"temperature": 0.8, "seed": 42}
     """

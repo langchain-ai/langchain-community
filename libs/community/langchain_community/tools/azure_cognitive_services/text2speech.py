@@ -19,10 +19,10 @@ class AzureCogsText2SpeechTool(BaseTool):
     https://learn.microsoft.com/en-us/azure/cognitive-services/speech-service/get-started-text-to-speech?pivots=programming-language-python
     """
 
-    azure_cogs_key: str = ""  #: :meta private:
-    azure_cogs_region: str = ""  #: :meta private:
-    speech_language: str = "en-US"  #: :meta private:
-    speech_config: Any  #: :meta private:
+    azure_cogs_key: str = ""
+    azure_cogs_region: str = ""
+    speech_language: str = "en-US"
+    speech_config: Any
 
     name: str = "azure_cognitive_services_text2speech"
     description: str = (

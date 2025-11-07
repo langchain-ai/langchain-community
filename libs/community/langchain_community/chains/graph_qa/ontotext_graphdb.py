@@ -43,8 +43,8 @@ class OntotextGraphDBQAChain(Chain):
     sparql_fix_chain: LLMChain
     max_fix_retries: int
     qa_chain: LLMChain
-    input_key: str = "query"  #: :meta private:
-    output_key: str = "result"  #: :meta private:
+    input_key: str = "query"
+    output_key: str = "result"
 
     allow_dangerous_requests: bool = False
     """Forced user opt-in to acknowledge that the chain can make dangerous requests.

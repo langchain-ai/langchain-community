@@ -26,10 +26,10 @@ class AzureAiServicesTextToSpeechTool(BaseTool):
     )
     return_direct: bool = True
 
-    azure_ai_services_key: str = ""  #: :meta private:
-    azure_ai_services_region: str = ""  #: :meta private:
-    speech_language: str = "en-US"  #: :meta private:
-    speech_config: Any  #: :meta private:
+    azure_ai_services_key: str = ""
+    azure_ai_services_region: str = ""
+    speech_language: str = "en-US"
+    speech_config: Any
 
     @model_validator(mode="before")
     @classmethod

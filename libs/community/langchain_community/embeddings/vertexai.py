@@ -29,7 +29,7 @@ class VertexAIEmbeddings(_VertexAICommon, Embeddings):
     """Google Cloud VertexAI embedding models."""
 
     # Instance context
-    instance: Dict[str, Any] = {}  #: :meta private:
+    instance: Dict[str, Any] = {}
     show_progress_bar: bool = False
     """Whether to show a tqdm progress bar. Must have `tqdm` installed."""
 

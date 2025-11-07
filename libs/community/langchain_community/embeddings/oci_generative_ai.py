@@ -52,24 +52,24 @@ class OCIGenAIEmbeddings(BaseModel, Embeddings):
             )
     """
 
-    client: Any = None  #: :meta private:
+    client: Any = None
 
-    service_models: Any = None  #: :meta private:
+    service_models: Any = None
 
     auth_type: Optional[str] = "API_KEY"
-    """Authentication type, could be 
+    """Authentication type, could be
 
-    API_KEY, 
-    SECURITY_TOKEN, 
-    INSTANCE_PRINCIPLE, 
+    API_KEY,
+    SECURITY_TOKEN,
+    INSTANCE_PRINCIPLE,
     RESOURCE_PRINCIPLE
-    
+
     If not specified, API_KEY will be used
     """
 
     auth_profile: Optional[str] = "DEFAULT"
     """The name of the profile in ~/.oci/config
-    If not specified , DEFAULT will be used 
+    If not specified , DEFAULT will be used
     """
 
     auth_file_location: Optional[str] = "~/.oci/config"

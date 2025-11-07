@@ -54,7 +54,7 @@ class InfinityEmbeddingsLocal(BaseModel, Embeddings):
     model_warmup: bool = True
     "Warmup the model with the max batch size."
 
-    engine: Any = None  #: :meta private:
+    engine: Any = None
     """Infinity's AsyncEmbeddingEngine."""
 
     # LLM call kwargs

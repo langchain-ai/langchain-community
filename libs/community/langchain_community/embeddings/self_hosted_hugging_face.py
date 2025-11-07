@@ -76,7 +76,7 @@ class SelfHostedHuggingFaceEmbeddings(SelfHostedEmbeddings):
             hf = SelfHostedHuggingFaceEmbeddings(model_id=model_id, hardware=gpu)
     """
 
-    client: Any  #: :meta private:
+    client: Any
     model_id: str = DEFAULT_MODEL_NAME
     """Model name to use."""
     model_reqs: List[str] = ["./", "sentence_transformers", "torch"]

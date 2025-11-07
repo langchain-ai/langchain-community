@@ -39,14 +39,20 @@ class JiraAPIWrapper(BaseModel):
         {"access_token": "your_access_token","token_type": "bearer"}}'
     """
 
-    jira: Any = None  #: :meta private:
+    jira: Any = None
+
     confluence: Any = None
+
     jira_username: Optional[str] = None
+
     jira_api_token: Optional[str] = None
     """Jira API token when you choose to connect to Jira with api token."""
+
     jira_oauth2: Optional[Union[JiraOauth2, str]] = None
     """Jira OAuth2 token when you choose to connect to Jira with oauth2."""
+
     jira_instance_url: Optional[str] = None
+
     jira_cloud: Optional[bool] = None
 
     model_config = ConfigDict(

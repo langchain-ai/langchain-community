@@ -22,9 +22,9 @@ class AzureCogsFormRecognizerTool(BaseTool):
     https://learn.microsoft.com/en-us/azure/applied-ai-services/form-recognizer/quickstarts/get-started-sdks-rest-api?view=form-recog-3.0.0&pivots=programming-language-python
     """
 
-    azure_cogs_key: str = ""  #: :meta private:
-    azure_cogs_endpoint: str = ""  #: :meta private:
-    doc_analysis_client: Any  #: :meta private:
+    azure_cogs_key: str = ""
+    azure_cogs_endpoint: str = ""
+    doc_analysis_client: Any
 
     name: str = "azure_cognitive_services_form_recognizer"
     description: str = (
