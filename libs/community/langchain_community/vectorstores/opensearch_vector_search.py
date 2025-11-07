@@ -454,10 +454,10 @@ def _hybrid_search_query_with_filter(
         query_text: The query text to search for.
         query_vector: The embedding vector to search for.
         k: Number of Documents to return.
-        filter: The post filter to apply.
+        filter: The filter to apply.
 
     Returns:
-        dict: The payload for hybrid search with post filter.
+        dict: The payload for hybrid search with filter.
     """
     payload = {
         "_source": {"exclude": ["vector_field"]},
@@ -481,7 +481,7 @@ def _hybrid_search_query_with_filter(
                     {
                         "knn": {
                             "vector_field": {
-                                "vector": query_vector, 
+                                "vector": query_vector,
                                 "k": k,
                                 "filter": filters
                             }
