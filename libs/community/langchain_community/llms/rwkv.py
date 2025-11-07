@@ -64,15 +64,15 @@ class RWKV(LLM, BaseModel):
     max_tokens_per_generation: int = 256
     """Maximum number of tokens to generate."""
 
-    client: Any = None  #: :meta private:
+    client: Any = None
 
-    tokenizer: Any = None  #: :meta private:
+    tokenizer: Any = None
 
-    pipeline: Any = None  #: :meta private:
+    pipeline: Any = None
 
-    model_tokens: Any = None  #: :meta private:
+    model_tokens: Any = None
 
-    model_state: Any = None  #: :meta private:
+    model_state: Any = None
 
     model_config = ConfigDict(
         extra="forbid",

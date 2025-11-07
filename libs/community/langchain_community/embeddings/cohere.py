@@ -30,9 +30,9 @@ class CohereEmbeddings(BaseModel, Embeddings):
             )
     """
 
-    client: Any = None  #: :meta private:
+    client: Any = None
     """Cohere client."""
-    async_client: Any = None  #: :meta private:
+    async_client: Any = None
     """Cohere async client."""
     model: str = "embed-english-v2.0"
     """Model name to use."""

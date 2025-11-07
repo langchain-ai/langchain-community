@@ -45,7 +45,7 @@ class GoogleDocumentAIWarehouseRetriever(BaseRetriever):
     If nothing is provided, all documents in the project will be searched."""
     qa_size_limit: int = 5
     """The limit on the number of documents returned."""
-    client: "DocumentServiceClient" = None  #: :meta private:
+    client: "DocumentServiceClient" = None
 
     @pre_init
     def validate_environment(cls, values: Dict) -> Dict:

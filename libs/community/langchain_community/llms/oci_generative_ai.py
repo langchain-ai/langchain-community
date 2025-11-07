@@ -61,14 +61,14 @@ class OCIAuthType(Enum):
 class OCIGenAIBase(BaseModel, ABC):
     """Base class for OCI GenAI models"""
 
-    client: Any = Field(default=None, exclude=True)  #: :meta private:
+    client: Any = Field(default=None, exclude=True)
 
     auth_type: Optional[str] = "API_KEY"
-    """Authentication type, could be 
-    
-    API_KEY, 
-    SECURITY_TOKEN, 
-    INSTANCE_PRINCIPAL, 
+    """Authentication type, could be
+
+    API_KEY,
+    SECURITY_TOKEN,
+    INSTANCE_PRINCIPAL,
     RESOURCE_PRINCIPAL
 
     If not specified, API_KEY will be used
@@ -76,7 +76,7 @@ class OCIGenAIBase(BaseModel, ABC):
 
     auth_profile: Optional[str] = "DEFAULT"
     """The name of the profile in ~/.oci/config
-    If not specified , DEFAULT will be used 
+    If not specified , DEFAULT will be used
     """
 
     auth_file_location: Optional[str] = "~/.oci/config"
@@ -88,7 +88,7 @@ class OCIGenAIBase(BaseModel, ABC):
     """Id of the model to call, e.g., cohere.command"""
 
     provider: Optional[str] = None
-    """Provider name of the model. Default to None, 
+    """Provider name of the model. Default to None,
     will try to be derived from the model_id
     otherwise, requires user input
     """
@@ -181,7 +181,7 @@ class OCIGenAIBase(BaseModel, ABC):
         except Exception as e:
             raise ValueError(
                 """Could not authenticate with OCI client.
-                If INSTANCE_PRINCIPAL or RESOURCE_PRINCIPAL is used, 
+                If INSTANCE_PRINCIPAL or RESOURCE_PRINCIPAL is used,
                 please check the specified
                 auth_profile, auth_file_location and auth_type are valid.""",
                 e,
