@@ -677,9 +677,13 @@ class AzureSearch(VectorStore):
         data = []
         for i, (text, embedding) in enumerate(text_embeddings):
             # Use provided key otherwise use default key
-            key = keys[i] if keys else str(uuid.uuid4())
-            # Encoding key for Azure Search valid characters
-            key = base64.urlsafe_b64encode(bytes(key, "utf-8")).decode("ascii")
+            if keys:
+                key = keys[i]
+            else:
+                key = str(uuid.uuid4())
+                # Encoding key for Azure Search valid characters
+                key = base64.urlsafe_b64encode(bytes(key, "utf-8")).decode("ascii")
+            
             metadata = metadatas[i] if metadatas else {}
             # Add data to index
             # Additional metadata to fields mapping
