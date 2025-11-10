@@ -823,7 +823,7 @@ class TestCassandraVectorStore:
         self,
         vector_store_d2: Cassandra,
     ) -> None:
-        """Add/delete/update behaviour."""
+        """Add/delete/update behavior."""
         vstore = vector_store_d2
 
         res0 = vstore.similarity_search("[-1,-1]", k=2)
@@ -907,7 +907,7 @@ class TestCassandraVectorStore:
         self,
         vector_store_d2: Cassandra,
     ) -> None:
-        """Add/delete/update behaviour, async version."""
+        """Add/delete/update behavior, async version."""
         vstore = vector_store_d2
 
         res0 = await vstore.asimilarity_search("[-1,-1]", k=2)
