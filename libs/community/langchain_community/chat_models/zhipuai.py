@@ -760,12 +760,19 @@ class ChatZhipuAI(BaseChatModel):
                 or "json_mode". ZhipuAI only supports "function_calling" which
                 converts the schema to a OpenAI function and the model will make use of the
                 function-calling API.
-            include_raw: If False then only the parsed structured output is returned. If
-                an error occurs during model output parsing it will be raised. If True
-                then both the raw model response (a BaseMessage) and the parsed model
-                response will be returned. If an error occurs during output parsing it
-                will be caught and returned as well. The final output is always a dict
-                with keys "raw", "parsed", and "parsing_error".
+            include_raw:
+                If `False` then only the parsed structured output is returned.
+
+                If an error occurs during model output parsing it will be raised.
+
+                If `True` then both the raw model response (a `BaseMessage`) and the
+                parsed model response will be returned.
+
+                If an error occurs during output parsing it will be caught and returned
+                as well.
+
+                The final output is always a `dict` with keys `'raw'`, `'parsed'`, and
+                `'parsing_error'`.
 
         Returns:
             A Runnable that takes any ChatModel input and returns as output:

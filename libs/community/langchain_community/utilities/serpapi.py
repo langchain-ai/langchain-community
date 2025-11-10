@@ -34,13 +34,14 @@ class SerpAPIWrapper(BaseModel):
     `serpapi_api_key` as a named parameter to the constructor.
 
     Example:
-        .. code-block:: python
-
-            from langchain_community.utilities import SerpAPIWrapper
-            serpapi = SerpAPIWrapper()
+        ```python
+        from langchain_community.utilities import SerpAPIWrapper
+        serpapi = SerpAPIWrapper()
+        ```
     """
 
-    search_engine: Any = None  #: :meta private:
+    search_engine: Any = None
+
     params: dict = Field(
         default={
             "engine": "google",
@@ -49,7 +50,9 @@ class SerpAPIWrapper(BaseModel):
             "hl": "en",
         }
     )
+
     serpapi_api_key: Optional[str] = None
+
     aiosession: Optional[aiohttp.ClientSession] = None
 
     model_config = ConfigDict(

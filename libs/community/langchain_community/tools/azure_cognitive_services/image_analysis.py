@@ -22,10 +22,10 @@ class AzureCogsImageAnalysisTool(BaseTool):
     https://learn.microsoft.com/en-us/azure/cognitive-services/computer-vision/quickstarts-sdk/image-analysis-client-library-40
     """
 
-    azure_cogs_key: str = ""  #: :meta private:
-    azure_cogs_endpoint: str = ""  #: :meta private:
-    vision_service: Any  #: :meta private:
-    analysis_options: Any  #: :meta private:
+    azure_cogs_key: str = ""
+    azure_cogs_endpoint: str = ""
+    vision_service: Any
+    analysis_options: Any
 
     name: str = "azure_cognitive_services_image_analysis"
     description: str = (

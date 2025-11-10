@@ -18,9 +18,9 @@ class AzureCogsTextAnalyticsHealthTool(BaseTool):
     https://learn.microsoft.com/en-us/azure/ai-services/language-service/text-analytics-for-health/quickstart?tabs=windows&pivots=programming-language-python
     """
 
-    azure_cogs_key: str = ""  #: :meta private:
-    azure_cogs_endpoint: str = ""  #: :meta private:
-    text_analytics_client: Any  #: :meta private:
+    azure_cogs_key: str = ""
+    azure_cogs_endpoint: str = ""
+    text_analytics_client: Any
 
     name: str = "azure_cognitive_services_text_analyics_health"
     description: str = (

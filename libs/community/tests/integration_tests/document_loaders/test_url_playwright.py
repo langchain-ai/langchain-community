@@ -42,6 +42,20 @@ def test_playwright_url_loader() -> None:
     assert len(docs) > 0
 
 
+def test_playwright_url_loader_with_timeout() -> None:
+    """Test Playwright URL loader with custom timeout and wait_until."""
+    urls = ["https://techmeme.com"]
+    loader = PlaywrightURLLoader(
+        urls=urls,
+        timeout=60000,  # 60 second timeout
+        wait_until="domcontentloaded",  # Wait for DOM content to load
+        continue_on_failure=False,
+        headless=True,
+    )
+    docs = loader.load()
+    assert len(docs) > 0
+
+
 async def test_playwright_async_url_loader() -> None:
     """Test Playwright async URL loader."""
     urls = [
@@ -53,6 +67,20 @@ async def test_playwright_async_url_loader() -> None:
     loader = PlaywrightURLLoader(
         urls=urls,
         remove_selectors=["header", "footer"],
+        continue_on_failure=False,
+        headless=True,
+    )
+    docs = await loader.aload()
+    assert len(docs) > 0
+
+
+async def test_playwright_async_url_loader_with_timeout() -> None:
+    """Test Playwright async URL loader with custom timeout and wait_until."""
+    urls = ["https://techmeme.com"]
+    loader = PlaywrightURLLoader(
+        urls=urls,
+        timeout=60000,  # 60 second timeout
+        wait_until="domcontentloaded",  # Wait for DOM content to load
         continue_on_failure=False,
         headless=True,
     )

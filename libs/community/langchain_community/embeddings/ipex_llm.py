@@ -49,7 +49,7 @@ class IpexLLMBgeEmbeddings(BaseModel, Embeddings):
             )
     """
 
-    client: Any = None  #: :meta private:
+    client: Any = None
     model_name: str = DEFAULT_BGE_MODEL
     """Model name to use."""
     cache_folder: Optional[str] = None

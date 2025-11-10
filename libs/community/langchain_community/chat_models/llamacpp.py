@@ -67,7 +67,7 @@ class ChatLlamaCpp(BaseChatModel):
 
     """
 
-    client: Any = None  #: :meta private:
+    client: Any = None
 
     model_path: str
     """The path to the Llama model file."""
@@ -165,8 +165,8 @@ class ChatLlamaCpp(BaseChatModel):
     """
     grammar: Any = None
     """
-    grammar: formal grammar for constraining model outputs. For instance, the grammar 
-    can be used to force the model to generate valid JSON or to speak exclusively in 
+    grammar: formal grammar for constraining model outputs. For instance, the grammar
+    can be used to force the model to generate valid JSON or to speak exclusively in
     emojis. At most one of grammar_path and grammar should be passed in.
     """
 
@@ -380,7 +380,7 @@ class ChatLlamaCpp(BaseChatModel):
                 tool_choice = formatted_tools[0]
             else:
                 raise ValueError(
-                    """Unrecognized tool_choice type. Expected dict having format like 
+                    """Unrecognized tool_choice type. Expected dict having format like
                     this {"type": "function", "function": {"name": <<tool_name>>}}"""
                     f"Received: {tool_choice}"
                 )
@@ -406,12 +406,19 @@ class ChatLlamaCpp(BaseChatModel):
                 `method` is "function_calling" and `schema` is a dict, then the dict
                 must match the OpenAI function-calling spec or be a valid JSON schema
                 with top level 'title' and 'description' keys specified.
-            include_raw: If False then only the parsed structured output is returned. If
-                an error occurs during model output parsing it will be raised. If True
-                then both the raw model response (a BaseMessage) and the parsed model
-                response will be returned. If an error occurs during output parsing it
-                will be caught and returned as well. The final output is always a dict
-                with keys "raw", "parsed", and "parsing_error".
+            include_raw:
+                If `False` then only the parsed structured output is returned.
+
+                If an error occurs during model output parsing it will be raised.
+
+                If `True` then both the raw model response (a `BaseMessage`) and the
+                parsed model response will be returned.
+
+                If an error occurs during output parsing it will be caught and returned
+                as well.
+
+                The final output is always a `dict` with keys `'raw'`, `'parsed'`, and
+                `'parsing_error'`.
             kwargs: Any other args to bind to model, ``self.bind(..., **kwargs)``.
 
         Returns:
