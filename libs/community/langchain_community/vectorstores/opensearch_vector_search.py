@@ -1302,9 +1302,15 @@ class OpenSearchVectorSearch(VectorStore):
                 # hybrid search without post filter
                 payload = _default_hybrid_search_query(query_text, embeded_query, k)
 
-            response = self.client.transport.perform_request(
-                method="GET", url=path, body=payload
-            )
+            request_args: Dict[str, Any] = {
+                "method": "GET",
+                "url": path,
+                "body": payload,
+            }
+            if self.routing:
+                request_args["params"] = {"routing": self.routing}
+
+            response = self.client.transport.perform_request(**request_args)
 
             return [hit for hit in response["hits"]["hits"]]
 
