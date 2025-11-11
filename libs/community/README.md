@@ -22,7 +22,7 @@ LangChain Community contains third-party integrations that implement the base in
 
 ## 📖 Documentation
 
-For full documentation, see the [API reference](https://reference.langchain.com/python/langchain_community/).
+For full documentation, see the [API reference](https://reference.langchain.com/python/langchain_community/). For conceptual guides, tutorials, and examples on using LangChain, see the [LangChain Docs](https://docs.langchain.com/oss/python/langchain/overview).
 
 ## 📕 Releases & Versioning
 
