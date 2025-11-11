@@ -167,7 +167,7 @@ def convert_message_to_dict(message: BaseMessage) -> dict:
 
         # CRITICAL FIX: Langchain 1.0+ has tool_calls as direct attribute
         # Check this FIRST before falling back to additional_kwargs
-        if hasattr(message, 'tool_calls') and message.tool_calls:
+        if hasattr(message, "tool_calls") and message.tool_calls:
             # Convert from Langchain 1.0 format to OpenAI format
             message_dict["tool_calls"] = [
                 {
@@ -175,8 +175,8 @@ def convert_message_to_dict(message: BaseMessage) -> dict:
                     "type": "function",
                     "function": {
                         "name": tc.get("name", ""),
-                        "arguments": str(tc.get("args", "{}"))
-                    }
+                        "arguments": str(tc.get("args", "{}")),
+                    },
                 }
                 for tc in message.tool_calls
             ]
@@ -272,7 +272,7 @@ def _convert_message_chunk(chunk: BaseMessageChunk, i: int) -> dict:
 
     # CRITICAL FIX: Langchain 1.0+ has tool_call_chunks for streaming
     # Check this FIRST before falling back to additional_kwargs
-    if hasattr(chunk, 'tool_call_chunks') and chunk.tool_call_chunks:
+    if hasattr(chunk, "tool_call_chunks") and chunk.tool_call_chunks:
         tool_calls = []
 
         for tc in chunk.tool_call_chunks:
@@ -294,7 +294,9 @@ def _convert_message_chunk(chunk: BaseMessageChunk, i: int) -> dict:
             if "args" in tc:
                 # args can be a string (partial JSON) or empty string
                 args_val = tc["args"]
-                function["arguments"] = args_val if isinstance(args_val, str) else str(args_val)
+                function["arguments"] = (
+                    args_val if isinstance(args_val, str) else str(args_val)
+                )
 
             # Only add function if it has content
             if function:
@@ -593,7 +595,8 @@ chat = Chat()
 #
 # FIXED (2 functions):
 # ✓ convert_message_to_dict - NOW handles AIMessage.tool_calls attribute (Langchain 1.0)
-# ✓ _convert_message_chunk - NOW handles AIMessageChunk.tool_call_chunks attribute (Langchain 1.0)
+# ✓ _convert_message_chunk -
+#   NOW handles AIMessageChunk.tool_call_chunks attribute (Langchain 1.0)
 #
 # All other functions are correct and properly use the fixed conversion functions.
 # =============================================================================
