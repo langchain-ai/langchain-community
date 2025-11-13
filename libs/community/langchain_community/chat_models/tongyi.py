@@ -445,7 +445,7 @@ class ChatTongyi(BaseChatModel):
     def lc_secrets(self) -> Dict[str, str]:
         return {"dashscope_api_key": "DASHSCOPE_API_KEY"}
 
-    client: Any = None  #: :meta private:
+    client: Any = None
     model_name: str = Field(default="qwen-turbo", alias="model")
     """Model name to use.
     callable multimodal model:
@@ -870,12 +870,19 @@ class ChatTongyi(BaseChatModel):
                 attributes will be validated, whereas with a dict they will not be. If
                 `method` is "function_calling" and `schema` is a dict, then the dict
                 must match the OpenAI function-calling spec.
-            include_raw: If False then only the parsed structured output is returned. If
-                an error occurs during model output parsing it will be raised. If True
-                then both the raw model response (a BaseMessage) and the parsed model
-                response will be returned. If an error occurs during output parsing it
-                will be caught and returned as well. The final output is always a dict
-                with keys "raw", "parsed", and "parsing_error".
+            include_raw:
+                If `False` then only the parsed structured output is returned.
+
+                If an error occurs during model output parsing it will be raised.
+
+                If `True` then both the raw model response (a `BaseMessage`) and the
+                parsed model response will be returned.
+
+                If an error occurs during output parsing it will be caught and returned
+                as well.
+
+                The final output is always a `dict` with keys `'raw'`, `'parsed'`, and
+                `'parsing_error'`.
 
         Returns:
             A Runnable that takes any ChatModel input and returns as output:

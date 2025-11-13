@@ -18,7 +18,7 @@ class NeuralDBRetriever(BaseRetriever):
     thirdai_key: SecretStr
     """ThirdAI API Key"""
 
-    db: Any = None  #: :meta private:
+    db: Any = None
     """NeuralDB instance"""
 
     model_config = ConfigDict(

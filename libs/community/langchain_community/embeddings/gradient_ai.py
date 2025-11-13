@@ -47,7 +47,7 @@ class GradientEmbeddings(BaseModel, Embeddings):
     query_prompt_for_retrieval: Optional[str] = None
     """Query pre-prompt"""
 
-    client: Any = None  #: :meta private:
+    client: Any = None
     """Gradient client."""
 
     # LLM call kwargs
@@ -161,7 +161,7 @@ class GradientEmbeddings(BaseModel, Embeddings):
         return embeddings[0]
 
 
-class TinyAsyncGradientEmbeddingClient:  #: :meta private:
+class TinyAsyncGradientEmbeddingClient:
     """Deprecated, TinyAsyncGradientEmbeddingClient was removed.
 
     This class is just for backwards compatibility with older versions
