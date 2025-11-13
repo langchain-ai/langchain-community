@@ -19,7 +19,7 @@ from langchain_core.utils import convert_to_secret_str, get_from_dict_or_env, pr
 from langchain_core.utils.function_calling import convert_to_openai_tool
 from pydantic import Field, SecretStr
 
-from langchain_community.chat_models.openai import ChatOpenAI
+from langchain_openai import ChatOpenAI
 from langchain_community.utils.openai import is_openai_v1
 
 DEFAULT_API_BASE = "https://oai.endpoints.kepler.ai.cloud.ovh.net/v1"
