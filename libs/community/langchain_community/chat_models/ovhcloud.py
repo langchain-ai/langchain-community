@@ -15,9 +15,9 @@ from langchain_core.language_models import LanguageModelInput
 from langchain_core.messages import AIMessage
 from langchain_core.runnables import Runnable
 from langchain_core.tools import BaseTool
-from langchain_core.utils import convert_to_secret_str, get_from_dict_or_env, pre_init
+from langchain_core.utils import convert_to_secret_str, get_from_dict_or_env
 from langchain_core.utils.function_calling import convert_to_openai_tool
-from pydantic import Field, SecretStr
+from pydantic import Field, SecretStr, model_validator
 
 from langchain_openai import ChatOpenAI
 from langchain_community.utils.openai import is_openai_v1
@@ -62,9 +62,12 @@ class ChatOVHcloud(ChatOpenAI):
     def is_lc_serializable(cls) -> bool:
         return False
 
-    @pre_init
-    def validate_environment(cls, values: Dict) -> Dict:
+    @model_validator(mode="before")
+    @classmethod
+    def validate_environment(cls, values: Any) -> Any:
         """Validate that api key and python package exists in environment."""
+        if not isinstance(values, dict):
+            return values
         values["ovhcloud_api_base"] = get_from_dict_or_env(
             values,
             "ovhcloud_api_base",

@@ -62,6 +62,7 @@ def test_test_group_dependencies(uv_conf: Mapping[str, Any]) -> None:
         [
             "duckdb-engine",
             "freezegun",
+            "langchain-openai",
             "langchain-tests",
             "lark",
             "mypy-extensions",

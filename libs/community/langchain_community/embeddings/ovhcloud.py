@@ -3,7 +3,6 @@ import time
 from typing import Any, List
 
 import requests
-from langchain_core._api.deprecation import deprecated
 from langchain_core.embeddings import Embeddings
 from pydantic import BaseModel, ConfigDict
 
@@ -20,13 +19,6 @@ class OVHCloudEmbeddings(BaseModel, Embeddings):
 
     """ OVHcloud AI Endpoints model name for embeddings generation"""
     model_name: str = ""
-
-    @deprecated(
-        since="0.4.2",
-        removal="1.0",
-    )
-    """ OVHcloud AI Endpoints region (deprecated, kept for backward compatibility)"""
-    region: str = "kepler"
 
     """ OVHcloud AI Endpoints base URL"""
     base_url: str = "https://oai.endpoints.kepler.ai.cloud.ovh.net/v1"
