@@ -216,6 +216,10 @@ if TYPE_CHECKING:
     from langchain_community.tools.openweathermap.tool import (
         OpenWeatherMapQueryRun,
     )
+    from langchain_community.tools.parallel_search.tool import (
+        ParallelSearchResults,
+        ParallelSearchRun,
+    )
     from langchain_community.tools.playwright import (
         ClickTool,
         CurrentWebPageTool,
@@ -446,6 +450,8 @@ __all__ = [
     "O365SendMessage",
     "OpenAPISpec",
     "OpenWeatherMapQueryRun",
+    "ParallelSearchResults",
+    "ParallelSearchRun",
     "PolygonAggregates",
     "PolygonFinancials",
     "PolygonLastQuote",
@@ -600,6 +606,8 @@ _module_lookup = {
     "O365SendMessage": "langchain_community.tools.office365.send_message",
     "OpenAPISpec": "langchain_community.tools.openapi.utils.openapi_utils",
     "OpenWeatherMapQueryRun": "langchain_community.tools.openweathermap.tool",
+    "ParallelSearchResults": "langchain_community.tools.parallel_search.tool",
+    "ParallelSearchRun": "langchain_community.tools.parallel_search.tool",
     "PolygonAggregates": "langchain_community.tools.polygon.aggregates",
     "PolygonFinancials": "langchain_community.tools.polygon.financials",
     "PolygonLastQuote": "langchain_community.tools.polygon.last_quote",

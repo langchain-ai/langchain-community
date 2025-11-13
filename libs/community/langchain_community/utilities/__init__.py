@@ -113,6 +113,9 @@ if TYPE_CHECKING:
     from langchain_community.utilities.outline import (
         OutlineAPIWrapper,
     )
+    from langchain_community.utilities.parallel_search import (
+        ParallelSearchAPIWrapper,
+    )
     from langchain_community.utilities.passio_nutrition_ai import (
         NutritionAIAPI,
     )
@@ -185,6 +188,7 @@ __all__ = [
     "BingSearchAPIWrapper",
     "BraveSearchWrapper",
     "DataheraldAPIWrapper",
+    "ParallelSearchAPIWrapper",
     "DriaAPIWrapper",
     "DuckDuckGoSearchAPIWrapper",
     "GoldenQueryAPIWrapper",
@@ -249,6 +253,7 @@ _module_lookup = {
     "BingSearchAPIWrapper": "langchain_community.utilities.bing_search",
     "BraveSearchWrapper": "langchain_community.utilities.brave_search",
     "DataheraldAPIWrapper": "langchain_community.utilities.dataherald",
+    "ParallelSearchAPIWrapper": "langchain_community.utilities.parallel_search",
     "DriaAPIWrapper": "langchain_community.utilities.dria_index",
     "DuckDuckGoSearchAPIWrapper": "langchain_community.utilities.duckduckgo_search",
     "GoldenQueryAPIWrapper": "langchain_community.utilities.golden_query",
