@@ -15,7 +15,10 @@
 
 This repository contains community-maintained LangChain integrations in the [`langchain-community`](https://pypi.org/project/langchain-community/) package.
 
-**Documentation**: To learn more about LangChain, check out [the docs](https://docs.langchain.com/oss/python/langchain/overview).
+**Documentation**:
+
+- [docs.langchain.com](https://docs.langchain.com/oss/python/langchain/overview) – Comprehensive documentation, including conceptual overviews and guides
+- [reference.langchain.com/python](https://reference.langchain.com/python/langchain_community/) – API reference docs for community integrations
 
 **Discussions**: Visit the [LangChain Forum](https://forum.langchain.com) to connect with the community and share all of your technical questions, ideas, and feedback.
 
@@ -24,6 +27,5 @@ This repository contains community-maintained LangChain integrations in the [`la
 
 ## Additional resources
 
-- [API Reference](https://reference.langchain.com/python): Detailed reference on navigating base packages and integrations for LangChain.
-- [Contributing Guide](https://docs.langchain.com/oss/python/contributing/overview): Learn how to contribute to LangChain and find good first issues.
+- [Contributing Guide](https://docs.langchain.com/oss/python/contributing/overview): Learn how to contribute to LangChain projects and find good first issues.
 - [Code of Conduct](https://github.com/langchain-ai/langchain-community/blob/master/.github/CODE_OF_CONDUCT.md): Our community guidelines and standards for participation.

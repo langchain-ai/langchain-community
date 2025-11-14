@@ -28,7 +28,7 @@ class DeepSparse(LLM):
             llm = DeepSparse(model="zoo:nlg/text_generation/codegen_mono-350m/pytorch/huggingface/bigpython_bigquery_thepile/base_quant-none")
     """  # noqa: E501
 
-    pipeline: Any  #: :meta private:
+    pipeline: Any
 
     model: str
     """The path to a model file or directory or the name of a SparseZoo model stub."""

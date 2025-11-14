@@ -39,7 +39,7 @@ try:
         llm: BaseLanguageModel
         summary_message_cls: Type[BaseMessage] = SystemMessage
         """Number of previous utterances to include in the context."""
-        memory_key: str = "history"  #: :meta private:
+        memory_key: str = "history"
 
         def load_memory_variables(self, inputs: Dict[str, Any]) -> Dict[str, Any]:
             """Return history buffer."""
@@ -65,10 +65,7 @@ try:
 
         @property
         def memory_variables(self) -> List[str]:
-            """Will always return list of memory variables.
-
-            :meta private:
-            """
+            """Will always return list of memory variables."""
             return [self.memory_key]
 
         def _get_prompt_input_key(self, inputs: Dict[str, Any]) -> str:

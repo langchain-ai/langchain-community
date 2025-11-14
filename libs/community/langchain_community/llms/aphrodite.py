@@ -17,7 +17,7 @@ class Aphrodite(BaseLLM):
     """The number of GPUs to use for distributed execution with tensor parallelism."""
 
     trust_remote_code: Optional[bool] = False
-    """Trust remote code (e.g., from HuggingFace) when downloading the model 
+    """Trust remote code (e.g., from HuggingFace) when downloading the model
     and tokenizer."""
 
     n: int = 1
@@ -30,12 +30,12 @@ class Aphrodite(BaseLLM):
     `use_beam_search` is True. By default, `best_of` is set to `n`."""
 
     presence_penalty: float = 0.0
-    """Float that penalizes new tokens based on whether they appear in the 
+    """Float that penalizes new tokens based on whether they appear in the
     generated text so far. Values > 0 encourage the model to generate new
     tokens, while values < 0 encourage the model to repeat tokens."""
 
     frequency_penalty: float = 0.0
-    """Float that penalizes new tokens based on their frequency in the 
+    """Float that penalizes new tokens based on their frequency in the
     generated text so far. Applied additively to the logits."""
 
     repetition_penalty: float = 1.0
@@ -116,7 +116,7 @@ class Aphrodite(BaseLLM):
     are special tokens."""
 
     ignore_eos: bool = False
-    """Whether to ignore the EOS token and continue generating tokens after 
+    """Whether to ignore the EOS token and continue generating tokens after
     the EOS token is generated."""
 
     max_tokens: int = 512
@@ -146,7 +146,7 @@ class Aphrodite(BaseLLM):
     """The data type for the model weights and activations."""
 
     download_dir: Optional[str] = None
-    """Directory to download and load the weights. (Default to the default 
+    """Directory to download and load the weights. (Default to the default
     cache dir of huggingface)"""
 
     quantization: Optional[str] = None
@@ -156,7 +156,7 @@ class Aphrodite(BaseLLM):
     """Holds any model parameters valid for `aphrodite.LLM` call not explicitly
     specified."""
 
-    client: Any = None  #: :meta private:
+    client: Any = None
 
     @pre_init
     def validate_environment(cls, values: Dict) -> Dict:

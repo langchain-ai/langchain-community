@@ -46,7 +46,13 @@ class SlackToolkit(BaseToolkit):
 
             from langchain_community.agent_toolkits import SlackToolkit
 
+            # Using environment variables (default)
             toolkit = SlackToolkit()
+
+            # Or with an existing WebClient instance
+            from slack_sdk import WebClient
+            client = WebClient(token="your-user-token")
+            toolkit = SlackToolkit(client=client)
 
     Tools:
         .. code-block:: python
@@ -105,8 +111,8 @@ class SlackToolkit(BaseToolkit):
     def get_tools(self) -> List[BaseTool]:
         """Get the tools in the toolkit."""
         return [
-            SlackGetChannel(),
-            SlackGetMessage(),
-            SlackScheduleMessage(),
-            SlackSendMessage(),
+            SlackGetChannel(client=self.client),
+            SlackGetMessage(client=self.client),
+            SlackScheduleMessage(client=self.client),
+            SlackSendMessage(client=self.client),
         ]

@@ -35,8 +35,8 @@ class HuggingFaceHubEmbeddings(BaseModel, Embeddings):
             )
     """
 
-    client: Any = None  #: :meta private:
-    async_client: Any = None  #: :meta private:
+    client: Any = None
+    async_client: Any = None
     model: Optional[str] = None
     """Model name to use."""
     repo_id: Optional[str] = None
