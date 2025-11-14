@@ -92,15 +92,15 @@ class O365BaseLoader(BaseLoader, BaseModel):
     must be timezone aware."""
     handlers: Optional[Dict[str, Any]] = {}
     """
-    Provide custom handlers for MimeTypeBasedParser.
+    Provide custom handlers for `MimeTypeBasedParser`.
 
-    Pass a dictionary mapping either file extensions (like "doc", "pdf", etc.) 
-    or MIME types (like "application/pdf", "text/plain", etc.) to parsers. 
-    Note that you must use either file extensions or MIME types exclusively and 
+    Pass a dictionary mapping either file extensions (like "doc", "pdf", etc.)
+    or MIME types (like "application/pdf", "text/plain", etc.) to parsers.
+    Note that you must use either file extensions or MIME types exclusively and
     cannot mix them.
 
     Do not include the leading dot for file extensions.
-    
+
     Example using file extensions:
     ```python
         handlers = {
@@ -109,7 +109,7 @@ class O365BaseLoader(BaseLoader, BaseModel):
             "txt": TextParser()
         }
     ```
-    
+
     Example using MIME types:
     ```python
         handlers = {

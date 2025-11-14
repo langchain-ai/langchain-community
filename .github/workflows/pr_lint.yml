@@ -26,13 +26,15 @@
 #   * revert     — reverts a previous commit
 #   * release    — prepare a new release
 #
-# Allowed Scopes (optional):
+# Allowed Scope(s) (optional):
 #   adapters, agent_toolkits, agents, callbacks, chains, chat_loaders,
 #   chat_message_histories, chat_models, cross_encoders, docstore, document_compressors,
 #   document_loaders, document_transformers, embeddings, example_selectors,
 #   graph_vectorstores, graphs, indexes, llms, memory, output_parsers,
 #   query_constructors, retrievers, storage, tools, utilities, utils, vectorstores,
 #   cache, infra
+#
+# Multiple scopes can be used by separating them with a comma.
 #
 # Rules:
 #   1. The 'Type' must start with a lowercase letter.

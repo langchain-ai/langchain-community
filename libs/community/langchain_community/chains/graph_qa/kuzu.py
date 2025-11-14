@@ -70,8 +70,8 @@ class KuzuQAChain(Chain):
     graph: KuzuGraph = Field(exclude=True)
     cypher_generation_chain: LLMChain
     qa_chain: LLMChain
-    input_key: str = "query"  #: :meta private:
-    output_key: str = "result"  #: :meta private:
+    input_key: str = "query"
+    output_key: str = "result"
 
     allow_dangerous_requests: bool = False
     """Forced user opt-in to acknowledge that the chain can make dangerous requests.
@@ -106,18 +106,12 @@ class KuzuQAChain(Chain):
 
     @property
     def input_keys(self) -> List[str]:
-        """Return the input keys.
-
-        :meta private:
-        """
+        """Return the input keys."""
         return [self.input_key]
 
     @property
     def output_keys(self) -> List[str]:
-        """Return the output keys.
-
-        :meta private:
-        """
+        """Return the output keys."""
         _output_keys = [self.output_key]
         return _output_keys
 

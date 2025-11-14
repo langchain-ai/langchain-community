@@ -52,8 +52,8 @@ class ArxivAPIWrapper(BaseModel):
             arxiv.run("tree of thought llm")
     """
 
-    arxiv_search: Any  #: :meta private:
-    arxiv_exceptions: Any  # :meta private:
+    arxiv_search: Any
+    arxiv_exceptions: Any
     top_k_results: int = 3
     ARXIV_MAX_QUERY_LENGTH: int = 300
     continue_on_failure: bool = False

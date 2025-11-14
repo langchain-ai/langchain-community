@@ -73,7 +73,7 @@ class FastEmbedEmbeddings(BaseModel, Embeddings):
     Defaults to `None`.
     """
 
-    model: Any = None  # : :meta private:
+    model: Any = None
 
     model_config = ConfigDict(extra="allow", protected_namespaces=())
 

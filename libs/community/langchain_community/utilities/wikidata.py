@@ -84,12 +84,18 @@ class WikidataAPIWrapper(BaseModel):
     It limits the Document content by doc_content_chars_max.
     """
 
-    wikidata_mw: Any  #: :meta private:
-    wikidata_rest: Any  # : :meta private:
+    wikidata_mw: Any
+
+    wikidata_rest: Any
+
     top_k_results: int = 2
+
     load_all_available_meta: bool = False
+
     doc_content_chars_max: int = 4000
+
     wikidata_props: List[str] = DEFAULT_PROPERTIES
+
     lang: str = DEFAULT_LANG_CODE
 
     @model_validator(mode="before")
