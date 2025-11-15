@@ -14,8 +14,8 @@ from langchain_community.tools.playwright.navigate import NavigateTool
 from langchain_community.tools.playwright.navigate_back import NavigateBackTool
 from langchain_community.tools.playwright.press_key import PressKeyTool
 from langchain_community.tools.playwright.screenshot import ScreenshotTool
-from langchain_community.tools.playwright.select_option import SelectOptionTool
 from langchain_community.tools.playwright.scroll import ScrollTool
+from langchain_community.tools.playwright.select_option import SelectOptionTool
 
 __all__ = [
     "NavigateTool",
@@ -31,5 +31,5 @@ __all__ = [
     "SelectOptionTool",
     "CheckTool",
     "ScreenshotTool",
-    "ScrollTool"
+    "ScrollTool",
 ]

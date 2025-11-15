@@ -18,10 +18,11 @@ from langchain_community.tools.playwright.utils import (
 class CheckToolInput(BaseModel):
     """Input for CheckTool."""
 
-    selector: str = Field(..., description="CSS selector for the checkbox or radio element")
+    selector: str = Field(
+        ..., description="CSS selector for the checkbox or radio element"
+    )
     check: bool = Field(
-        True, 
-        description="Whether to check (True) or uncheck (False) the element"
+        True, description="Whether to check (True) or uncheck (False) the element"
     )
 
 
@@ -54,7 +55,7 @@ class CheckTool(BaseBrowserTool):
         if self.sync_browser is None:
             raise ValueError(f"Synchronous browser not provided to {self.name}")
         page = get_current_page(self.sync_browser)
-        
+
         # Navigate to the desired webpage before using this tool
         selector_effective = self._selector_effective(selector=selector)
         from playwright.sync_api import TimeoutError as PlaywrightTimeoutError
@@ -77,8 +78,11 @@ class CheckTool(BaseBrowserTool):
         except PlaywrightTimeoutError:
             return f"Unable to {'check' if check else 'uncheck'} element '{selector}'"
         except Exception as e:
-            return f"Error {'checking' if check else 'unchecking'} element '{selector}': {str(e)}"
-            
+            return (
+                f"Error {'checking' if check else 'unchecking'} "
+                f"element '{selector}': {str(e)}"
+            )
+
         return f"{action} element '{selector}'"
 
     async def _arun(
@@ -91,7 +95,7 @@ class CheckTool(BaseBrowserTool):
         if self.async_browser is None:
             raise ValueError(f"Asynchronous browser not provided to {self.name}")
         page = await aget_current_page(self.async_browser)
-        
+
         # Navigate to the desired webpage before using this tool
         selector_effective = self._selector_effective(selector=selector)
         from playwright.async_api import TimeoutError as PlaywrightTimeoutError
@@ -114,6 +118,9 @@ class CheckTool(BaseBrowserTool):
         except PlaywrightTimeoutError:
             return f"Unable to {'check' if check else 'uncheck'} element '{selector}'"
         except Exception as e:
-            return f"Error {'checking' if check else 'unchecking'} element '{selector}': {str(e)}"
-            
-        return f"{action} element '{selector}'" 
+            return (
+                f"Error {'checking' if check else 'unchecking'} "
+                f"element '{selector}': {str(e)}"
+            )
+
+        return f"{action} element '{selector}'"

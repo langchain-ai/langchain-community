@@ -1,21 +1,28 @@
 from __future__ import annotations
-from typing import ClassVar, Optional, Type, Any, Dict
-from pydantic import BaseModel, Field
-from langchain_core.callbacks import AsyncCallbackManagerForToolRun, CallbackManagerForToolRun
-from langchain_core.tools.base import BaseTool
+
+from typing import Any, Dict, Optional, Type
+
 import httpx
+from langchain_core.callbacks import (
+    AsyncCallbackManagerForToolRun,
+    CallbackManagerForToolRun,
+)
+from langchain_core.tools.base import BaseTool
+from pydantic import BaseModel
+
 
 class HttpRequestToolInput(BaseModel):
     method: str
     url: str
     headers: Optional[Dict[str, Any]] = None
     params: Optional[Dict[str, Any]] = None
-    json_body: Optional[Any] = None   # ← renamed
+    json_body: Optional[Any] = None  # ← renamed
     data: Optional[Any] = None
 
+
 class HttpRequestTool(BaseTool):
-    name: ClassVar[str] = "http_request"
-    description: ClassVar[str] = "Make HTTP requests using httpx..."
+    name: str = "http_request"
+    description: str = "Make HTTP requests using httpx..."
     args_schema: Type[BaseModel] = HttpRequestToolInput
 
     def _run(

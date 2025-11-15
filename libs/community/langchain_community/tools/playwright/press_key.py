@@ -19,12 +19,13 @@ class PressKeyToolInput(BaseModel):
     """Input for PressKeyTool."""
 
     key: str = Field(
-        ..., 
-        description="Key to press (e.g., 'Enter', 'Tab', 'ArrowDown', 'a', etc.)"
+        ..., description="Key to press (e.g., 'Enter', 'Tab', 'ArrowDown', 'a', etc.)"
     )
     selector: Optional[str] = Field(
-        None, 
-        description="Optional CSS selector for the element to focus before pressing key"
+        None,
+        description=(
+            "Optional CSS selector for the element to focus before pressing key"
+        ),
     )
 
 
@@ -60,9 +61,9 @@ class PressKeyTool(BaseBrowserTool):
         if self.sync_browser is None:
             raise ValueError(f"Synchronous browser not provided to {self.name}")
         page = get_current_page(self.sync_browser)
-        
+
         from playwright.sync_api import TimeoutError as PlaywrightTimeoutError
-        
+
         try:
             if selector:
                 selector_effective = self._selector_effective(selector=selector)
@@ -75,10 +76,10 @@ class PressKeyTool(BaseBrowserTool):
                     )
                 except PlaywrightTimeoutError:
                     return f"Unable to focus element '{selector}'"
-                
+
                 # Press the key on the focused element
                 page.press(
-                    selector_effective, 
+                    selector_effective,
                     key,
                     strict=self.playwright_strict,
                     timeout=self.playwright_timeout,
@@ -101,9 +102,9 @@ class PressKeyTool(BaseBrowserTool):
         if self.async_browser is None:
             raise ValueError(f"Asynchronous browser not provided to {self.name}")
         page = await aget_current_page(self.async_browser)
-        
+
         from playwright.async_api import TimeoutError as PlaywrightTimeoutError
-        
+
         try:
             if selector:
                 selector_effective = self._selector_effective(selector=selector)
@@ -116,10 +117,10 @@ class PressKeyTool(BaseBrowserTool):
                     )
                 except PlaywrightTimeoutError:
                     return f"Unable to focus element '{selector}'"
-                
+
                 # Press the key on the focused element
                 await page.press(
-                    selector_effective, 
+                    selector_effective,
                     key,
                     strict=self.playwright_strict,
                     timeout=self.playwright_timeout,
@@ -130,4 +131,4 @@ class PressKeyTool(BaseBrowserTool):
                 await page.keyboard.press(key)
                 return f"Pressed '{key}'"
         except Exception as e:
-            return f"Error pressing key '{key}': {str(e)}" 
+            return f"Error pressing key '{key}': {str(e)}"

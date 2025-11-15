@@ -3,60 +3,62 @@
 import argparse
 import asyncio
 import os
-
 import random
-from typing import Literal, TypedDict
 import uuid
+from typing import Literal, TypedDict
 
 import nest_asyncio
 from dotenv import load_dotenv
+from langchain.agents import AgentExecutor, create_tool_calling_agent
+from langchain_core.messages import SystemMessage
+from langchain_core.prompts import (
+    ChatPromptTemplate,
+    HumanMessagePromptTemplate,
+    MessagesPlaceholder,
+)
+from langchain_openai import ChatOpenAI
+from langgraph.checkpoint.memory import MemorySaver
+from langgraph.graph import END, StateGraph
 from playwright.async_api import async_playwright
 from pydantic import SecretStr
-
-from langchain_core.messages import SystemMessage
-from langchain_core.prompts import ChatPromptTemplate, HumanMessagePromptTemplate, MessagesPlaceholder
-
-from langchain_openai import ChatOpenAI
-from langgraph.graph import END, StateGraph
-from langgraph.checkpoint.memory import MemorySaver
-from langchain.agents import create_tool_calling_agent
-from langchain.agents import AgentExecutor
 
 # Playwright tools
 from langchain_community.tools.playwright.click import ClickTool
 from langchain_community.tools.playwright.current_page import CurrentWebPageTool
+from langchain_community.tools.playwright.download_file import DownloadFileTool
+from langchain_community.tools.playwright.drag_slider import DragSliderTool
+from langchain_community.tools.playwright.dragndrop import DragAndDropTool
 from langchain_community.tools.playwright.extract_dom_tree import ExtractDOMTreeTool
-from langchain_community.tools.playwright.extract_hyperlinks import ExtractHyperlinksTool
+from langchain_community.tools.playwright.extract_hyperlinks import (
+    ExtractHyperlinksTool,
+)
+from langchain_community.tools.playwright.extract_inputs import ExtractInputsTool
 from langchain_community.tools.playwright.extract_text import ExtractTextTool
 from langchain_community.tools.playwright.get_elements import GetElementsTool
+from langchain_community.tools.playwright.hover_element import HoverElementTool
+from langchain_community.tools.playwright.http_request import HttpRequestTool
 from langchain_community.tools.playwright.input_text import InputTextTool
 from langchain_community.tools.playwright.navigate import NavigateTool
 from langchain_community.tools.playwright.navigate_back import NavigateBackTool
+from langchain_community.tools.playwright.output_to_file import OutputToFileTool
 from langchain_community.tools.playwright.press_key import PressKeyTool
 from langchain_community.tools.playwright.screenshot import ScreenshotTool
 from langchain_community.tools.playwright.scroll import ScrollTool
-from langchain_community.tools.playwright.dragndrop import DragAndDropTool
-from langchain_community.tools.playwright.drag_slider import DragSliderTool
-from langchain_community.tools.playwright.hover_element import HoverElementTool
-from langchain_community.tools.playwright.extract_inputs import ExtractInputsTool
+from langchain_community.tools.playwright.select_dropdown import SelectDropdownTool
 from langchain_community.tools.playwright.switch_frame import SwitchFrameTool
 from langchain_community.tools.playwright.upload_file import UploadFileTool
-from langchain_community.tools.playwright.select_dropdown import SelectDropdownTool
-from langchain_community.tools.playwright.download_file import DownloadFileTool
-from langchain_community.tools.playwright.output_to_file import OutputToFileTool
-from langchain_community.tools.playwright.http_request import HttpRequestTool
-
 
 load_dotenv()
-api_key = os.getenv('OPENROUTER_API_KEY')
-base_url = os.getenv('OPENROUTER_BASE_URL')
-site_url = os.getenv('YOUR_SITE_URL')
-site_name = os.getenv('YOUR_SITE_NAME')
+api_key = os.getenv("OPENROUTER_API_KEY")
+base_url = os.getenv("OPENROUTER_BASE_URL")
+site_url = os.getenv("YOUR_SITE_URL")
+site_name = os.getenv("YOUR_SITE_NAME")
 
 if not all([api_key, base_url]):
-    raise ValueError('Required environment variables are not set')
+    raise ValueError("Required environment variables are not set")
 
 nest_asyncio.apply()
+
 
 # Define shared state
 class AgentState(TypedDict):
@@ -65,6 +67,7 @@ class AgentState(TypedDict):
     result: str
     steps: list[str]
     history: list[str]
+
 
 async def main():
     # Set up LLM
@@ -81,14 +84,14 @@ async def main():
     browser = await playwright.chromium.launch(
         # executable_path="/Applications/Google Chrome.app/Contents/MacOS/Google Chrome",
         args=[
-                "--disable-gpu",
-                "--disable-dev-shm-usage",
-                "--disable-web-security",
-                "--disable-blink-features=AutomationControlled",
-                "--no-sandbox",
-                "--disable-setuid-sandbox",
-            ],
-        headless=False  # Optional: set to True if you want headless mode
+            "--disable-gpu",
+            "--disable-dev-shm-usage",
+            "--disable-web-security",
+            "--disable-blink-features=AutomationControlled",
+            "--no-sandbox",
+            "--disable-setuid-sandbox",
+        ],
+        headless=False,  # Optional: set to True if you want headless mode
     )
     page = await browser.new_page(no_viewport=True)
 
@@ -122,8 +125,10 @@ async def main():
     llm_with_tools = llm.bind_tools(tools=tools, parallel_tool_calls=False)
 
     # Navigation prompt
-    navigator_prompt = ChatPromptTemplate.from_messages([
-        SystemMessage(content="""You are a web automation agent that can browse websites and perform tasks as requested.
+    navigator_prompt = ChatPromptTemplate.from_messages(
+        [
+            SystemMessage(
+                content="""You are a web automation agent that can browse websites and perform tasks as requested.
 
 AVAILABLE TOOLS:
 - navigate: Navigate to a URL
@@ -193,10 +198,12 @@ Example tool usage:
 1. navigate({"url": "https://example.com"})
 2. extract_dom_tree({})
 3. click({"selector": "button.submit"})
-"""),
-        HumanMessagePromptTemplate.from_template("{input}"),
-        MessagesPlaceholder(variable_name="agent_scratchpad")
-    ])
+"""
+            ),
+            HumanMessagePromptTemplate.from_template("{input}"),
+            MessagesPlaceholder(variable_name="agent_scratchpad"),
+        ]
+    )
 
     # Navigator agent (executes tool calls)
     navigator_agent = AgentExecutor(
@@ -215,19 +222,19 @@ Example tool usage:
             "input": state["input"],
             "step": "navigating",
             "result": "",
-            "steps": []
+            "steps": [],
         }
 
     async def navigator_node(state: AgentState) -> AgentState:
         dom_tree = await ExtractDOMTreeTool(page=page, async_browser=browser).arun({})
         input_with_dom = f"{state['input']}\n\n[DOM]:\n{dom_tree}"
-        
+
         steps = state.get("steps", [])
         history = state.get("history", [])
         current_input = input_with_dom
 
         while True:
-            await page.wait_for_timeout(random.randint(1,3))
+            await page.wait_for_timeout(random.randint(1, 3))
             output = await navigator_agent.ainvoke({"input": current_input})
 
             for tool_call, result in output.get("intermediate_steps", []):
@@ -239,7 +246,9 @@ Example tool usage:
                 break  # task complete
             else:
                 # Refresh DOM and continue
-                dom_tree = await ExtractDOMTreeTool(page=page, async_browser=browser).arun({})
+                dom_tree = await ExtractDOMTreeTool(
+                    page=page, async_browser=browser
+                ).arun({})
                 current_input = f"{state['input']}\n\n[DOM]:\n{dom_tree}"
 
         return {
@@ -247,9 +256,9 @@ Example tool usage:
             "step": "done",
             "result": output.get("output", ""),
             "steps": steps,
-            "history": history
+            "history": history,
         }
-        
+
     checkpointer = MemorySaver()
 
     workflow.add_node("planner", planner_node)
@@ -267,18 +276,22 @@ Example tool usage:
     # Run graph
     thread_id = str(uuid.uuid4())
 
-    await graph.ainvoke({
-        "input": args.prompt,
-        "step": "planning",
-        "result": "",
-        "steps": [],
-        "history": []
-    }, config={"configurable": {"thread_id": thread_id}})
-    
+    await graph.ainvoke(
+        {
+            "input": args.prompt,
+            "step": "planning",
+            "result": "",
+            "steps": [],
+            "history": [],
+        },
+        config={"configurable": {"thread_id": thread_id}},
+    )
+
     print(f"\n✅ Job finished")
-    
+
     await browser.close()
     await playwright.stop()
+
 
 if __name__ == "__main__":
     asyncio.run(main())

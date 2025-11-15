@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 import json
-from typing import Optional, Type, Dict, Any, List
+from typing import Optional, Type
 
 from langchain_core.callbacks import (
     AsyncCallbackManagerForToolRun,
@@ -18,13 +18,20 @@ from langchain_community.tools.playwright.utils import (
 
 class ExtractDOMTreeToolInput(BaseModel):
     """Input for ExtractDOMTreeTool."""
+
     selector: Optional[str] = Field(
         default=None,
-        description="Optional CSS selector to scope the DOM extraction, like 'main' or '#content'."
+        description=(
+            "Optional CSS selector to scope the DOM extraction, "
+            "like 'main' or '#content'."
+        ),
     )
     full_tree: Optional[bool] = Field(
         default=False,
-        description="If true, returns the full DOM tree; otherwise returns only key elements like metadata, forms, and interactive items."
+        description=(
+            "If true, returns the full DOM tree; otherwise returns only key elements "
+            "like metadata, forms, and interactive items."
+        ),
     )
 
 
@@ -44,7 +51,15 @@ class ExtractDOMTreeTool(BaseBrowserTool):
             const { selector, fullTree } = args;
             function isInteractive(el) {
                 const tag = el.tagName?.toLowerCase();
-                const roles = ['button','link','checkbox','radio','combobox','tab','menuitem'];
+                const roles = [
+                    "button",
+                    "link",
+                    "checkbox",
+                    "radio",
+                    "combobox",
+                    "tab",
+                    "menuitem",
+                ];
                 const interTags = ['a','button','input','select','textarea','summary'];
                 if (interTags.includes(tag)) return true;
                 if (roles.includes(el.getAttribute?.('role'))) return true;
@@ -56,9 +71,16 @@ class ExtractDOMTreeTool(BaseBrowserTool):
                 const tag = el.tagName.toLowerCase();
                 const s = [];
                 if (el.id) s.push(`#${el.id}`);
-                if (el.getAttribute('name')) s.push(`${tag}[name="${el.getAttribute('name')}"]`);
-                if (el.getAttribute('data-testid')) s.push(`[data-testid="${el.getAttribute('data-testid')}"]`);
-                if ((tag === 'button' || tag === 'a') && el.innerText?.trim().length < 20) {
+                if (el.getAttribute("name")) {
+                    s.push(`${tag}[name="${el.getAttribute('name')}"]`);
+                }
+                if (el.getAttribute("data-testid")) {
+                    s.push(`[data-testid="${el.getAttribute('data-testid')}"]`);
+                }
+                if (
+                    (tag === "button" || tag === "a") &&
+                    el.innerText?.trim().length < 20
+                ) {
                     s.push(`${tag}:has-text("${el.innerText.trim()}")`);
                 }
                 return s.slice(0, 2);
@@ -68,7 +90,9 @@ class ExtractDOMTreeTool(BaseBrowserTool):
                 metadata: {
                     url: document.location.href,
                     title: document.title,
-                    description: document.querySelector('meta[name="description"]')?.content || null,
+                    description:
+                        document.querySelector('meta[name="description"]')?.content ||
+                        null,
                     lang: document.documentElement.lang || null
                 },
                 forms: [],
@@ -90,11 +114,13 @@ class ExtractDOMTreeTool(BaseBrowserTool):
                     selectors: getSelectorSuggestions(el)
                 };
 
-                ['name','type','id','placeholder','value','href','role'].forEach(attr => {
-                    if (el.getAttribute(attr)) {
-                        data.attrs[attr] = el.getAttribute(attr).slice(0, 40);
+                ["name", "type", "id", "placeholder", "value", "href", "role"].forEach(
+                    (attr) => {
+                        if (el.getAttribute(attr)) {
+                            data.attrs[attr] = el.getAttribute(attr).slice(0, 40);
+                        }
                     }
-                });
+                );
 
                 summary.topInteractiveElements.push(data);
 
@@ -125,7 +151,9 @@ class ExtractDOMTreeTool(BaseBrowserTool):
                         tag: el.tagName.toLowerCase(),
                         children: []
                     };
-                    if (el.innerText?.trim()) node.text = el.innerText.trim().slice(0, 40);
+                    if (el.innerText?.trim()) {
+                        node.text = el.innerText.trim().slice(0, 40);
+                    }
                     for (let i = 0; i < Math.min(5, el.children.length); i++) {
                         const child = slim(el.children[i], depth + 1);
                         if (child) node.children.push(child);
@@ -149,7 +177,10 @@ class ExtractDOMTreeTool(BaseBrowserTool):
             raise ValueError(f"Synchronous browser not provided to {self.name}")
         page = get_current_page(self.sync_browser)
         try:
-            result = page.evaluate(self._dom_extract_script(), {"selector": selector, "fullTree": full_tree})
+            result = page.evaluate(
+                self._dom_extract_script(),
+                {"selector": selector, "fullTree": full_tree},
+            )
             return json.dumps(result, separators=(",", ":"))
         except Exception as e:
             return f"Error extracting DOM tree: {str(e)}"
@@ -164,7 +195,10 @@ class ExtractDOMTreeTool(BaseBrowserTool):
             raise ValueError(f"Asynchronous browser not provided to {self.name}")
         page = await aget_current_page(self.async_browser)
         try:
-            result = await page.evaluate(self._dom_extract_script(), {"selector": selector, "fullTree": full_tree})
+            result = await page.evaluate(
+                self._dom_extract_script(),
+                {"selector": selector, "fullTree": full_tree},
+            )
             return json.dumps(result, separators=(",", ":"))
         except Exception as e:
             return f"Error extracting DOM tree: {str(e)}"

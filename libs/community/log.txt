@@ -1,0 +1,25 @@
+./scripts/check_pydantic.sh .
+./scripts/lint_imports.sh .
+./scripts/check_pickle.sh .
+[ "langchain_community" = "" ] || uv run --group typing --group lint ruff check langchain_community
+E501 Line too long (90 > 88)
+   --> langchain_community/tools/playwright/switch_frame.py:112:89
+    |
+111 |         setattr(page, ACTIVE_FRAME_ATTR, resolved_frame)
+112 |         return f"Successfully switched to frame '{name_or_selector}' ({selector_detail})."
+    |                                                                                         ^^
+113 |
+114 |     async def _handle_switch_async(self, page: AsyncPage, name_or_selector: str) -> str:
+    |
+
+E501 Line too long (90 > 88)
+   --> langchain_community/tools/playwright/switch_frame.py:172:89
+    |
+171 |         setattr(page, ACTIVE_FRAME_ATTR, resolved_frame)
+172 |         return f"Successfully switched to frame '{name_or_selector}' ({selector_detail})."
+    |                                                                                         ^^
+173 |
+174 |     def _run(
+    |
+
+Found 2 errors.

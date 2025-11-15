@@ -1,20 +1,40 @@
 from __future__ import annotations
+
 from typing import Optional, Type
+
+from langchain_core.callbacks import (
+    AsyncCallbackManagerForToolRun,
+    CallbackManagerForToolRun,
+)
 from pydantic import BaseModel, Field
-from langchain_core.callbacks import AsyncCallbackManagerForToolRun, CallbackManagerForToolRun
+
 from langchain_community.tools.playwright.base import BaseBrowserTool
-from langchain_community.tools.playwright.utils import get_current_page, aget_current_page
+from langchain_community.tools.playwright.utils import (
+    aget_current_page,
+    get_current_page,
+)
+
 
 class DragAndDropToolInput(BaseModel):
-    source_selector: str = Field(..., description="CSS selector for the source element to drag")
-    target_selector: str = Field(..., description="CSS selector for the target element to drop onto")
-    source_nth: Optional[int] = Field(0, description="Index of source element when multiple matches")
-    target_nth: Optional[int] = Field(0, description="Index of target element when multiple matches")
+    source_selector: str = Field(
+        ..., description="CSS selector for the source element to drag"
+    )
+    target_selector: str = Field(
+        ..., description="CSS selector for the target element to drop onto"
+    )
+    source_nth: Optional[int] = Field(
+        0, description="Index of source element when multiple matches"
+    )
+    target_nth: Optional[int] = Field(
+        0, description="Index of target element when multiple matches"
+    )
+
 
 class DragAndDropTool(BaseBrowserTool):
     name: str = Field("drag_and_drop", description="Unique tool name.")
     description: str = Field(
-        "Drag an element matched by source_selector and drop it onto target_selector.", description="Tool description"
+        "Drag an element matched by source_selector and drop it onto target_selector.",
+        description="Tool description",
     )
     args_schema: Type[BaseModel] = DragAndDropToolInput
 
@@ -66,7 +86,10 @@ class DragAndDropTool(BaseBrowserTool):
             )
 
         except PlaywrightTimeoutError:
-            return f"Timeout waiting for element(s) '{source_selector}' or '{target_selector}'"
+            return (
+                f"Timeout waiting for element(s) '{source_selector}' or "
+                f"'{target_selector}'"
+            )
         except Exception as e:
             return f"DragAndDropTool error: {e}"
 
@@ -86,8 +109,12 @@ class DragAndDropTool(BaseBrowserTool):
         page = await aget_current_page(self.async_browser)
 
         try:
-            await page.wait_for_selector(source_selector, timeout=self.playwright_timeout)
-            await page.wait_for_selector(target_selector, timeout=self.playwright_timeout)
+            await page.wait_for_selector(
+                source_selector, timeout=self.playwright_timeout
+            )
+            await page.wait_for_selector(
+                target_selector, timeout=self.playwright_timeout
+            )
             src_locator = page.locator(source_selector)
             tgt_locator = page.locator(target_selector)
             count_src = await src_locator.count()
@@ -116,6 +143,9 @@ class DragAndDropTool(BaseBrowserTool):
             )
 
         except PlaywrightTimeoutError:
-            return f"Timeout waiting for element(s) '{source_selector}' or '{target_selector}'"
+            return (
+                f"Timeout waiting for element(s) '{source_selector}' or "
+                f"'{target_selector}'"
+            )
         except Exception as e:
             return f"DragAndDropTool async error: {e}"

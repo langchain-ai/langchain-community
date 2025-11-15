@@ -1,10 +1,13 @@
 from __future__ import annotations
-from typing import ClassVar, Optional, Type, Dict, Any, Union, List
-from pydantic import BaseModel, Field
-from langchain_core.callbacks import CallbackManagerForToolRun
-from langchain_core.tools.base import BaseTool
 
-from langchain_core.callbacks import AsyncCallbackManagerForToolRun, CallbackManagerForToolRun
+from typing import Any, Dict, List, Optional, Type, Union
+
+from langchain_core.callbacks import (
+    AsyncCallbackManagerForToolRun,
+    CallbackManagerForToolRun,
+)
+from langchain_core.tools.base import BaseTool
+from pydantic import BaseModel, Field
 
 
 class OutputToFileToolInput(BaseModel):
@@ -14,9 +17,10 @@ class OutputToFileToolInput(BaseModel):
     )
     format: str = Field(..., description="Format: 'csv', 'json', or 'txt'")
 
+
 class OutputToFileTool(BaseTool):
-    name: ClassVar[str] = "output_to_file"
-    description: ClassVar[str] = "Write data to a file in csv, json, or txt format."
+    name: str = "output_to_file"
+    description: str = "Write data to a file in csv, json, or txt format."
     args_schema: Type[BaseModel] = OutputToFileToolInput
 
     def _run(
@@ -31,7 +35,12 @@ class OutputToFileTool(BaseTool):
             # CSV
             if fmt == "csv":
                 import csv
-                if not isinstance(data, list) or not data or not all(isinstance(item, dict) for item in data):
+
+                if (
+                    not isinstance(data, list)
+                    or not data
+                    or not all(isinstance(item, dict) for item in data)
+                ):
                     return "CSV format requires a non-empty list of dictionaries."
                 with open(file_path, "w", newline="", encoding="utf-8") as f:
                     writer = csv.DictWriter(f, fieldnames=list(data[0].keys()))
@@ -41,6 +50,7 @@ class OutputToFileTool(BaseTool):
             # JSON
             elif fmt == "json":
                 import json
+
                 obj: Any = data
                 if isinstance(data, str):
                     try:

@@ -20,11 +20,11 @@ class SelectOptionToolInput(BaseModel):
 
     selector: str = Field(..., description="CSS selector for the select element")
     values: Union[List[str], str] = Field(
-        ..., 
+        ...,
         description=(
             "Value(s) to select. Can be a single string or a list of strings. "
             "These are the option values, not necessarily the display text."
-        )
+        ),
     )
 
 
@@ -57,17 +57,17 @@ class SelectOptionTool(BaseBrowserTool):
         if self.sync_browser is None:
             raise ValueError(f"Synchronous browser not provided to {self.name}")
         page = get_current_page(self.sync_browser)
-        
+
         # Standardize values to list format
         values_list = values if isinstance(values, list) else [values]
-        
+
         # Navigate to the desired webpage before using this tool
         selector_effective = self._selector_effective(selector=selector)
         from playwright.sync_api import TimeoutError as PlaywrightTimeoutError
 
         try:
             page.select_option(
-                selector_effective, 
+                selector_effective,
                 values_list,
                 strict=self.playwright_strict,
                 timeout=self.playwright_timeout,
@@ -76,8 +76,8 @@ class SelectOptionTool(BaseBrowserTool):
             return f"Unable to select option(s) from element '{selector}'"
         except Exception as e:
             return f"Error selecting option(s) from '{selector}': {str(e)}"
-            
-        values_display = ', '.join(f"'{v}'" for v in values_list)
+
+        values_display = ", ".join(f"'{v}'" for v in values_list)
         return f"Selected {values_display} from dropdown '{selector}'"
 
     async def _arun(
@@ -90,10 +90,10 @@ class SelectOptionTool(BaseBrowserTool):
         if self.async_browser is None:
             raise ValueError(f"Asynchronous browser not provided to {self.name}")
         page = await aget_current_page(self.async_browser)
-        
+
         # Standardize values to list format
         values_list = values if isinstance(values, list) else [values]
-        
+
         # Navigate to the desired webpage before using this tool
         selector_effective = self._selector_effective(selector=selector)
         from playwright.async_api import TimeoutError as PlaywrightTimeoutError
@@ -109,6 +109,6 @@ class SelectOptionTool(BaseBrowserTool):
             return f"Unable to select option(s) from element '{selector}'"
         except Exception as e:
             return f"Error selecting option(s) from '{selector}': {str(e)}"
-            
-        values_display = ', '.join(f"'{v}'" for v in values_list)
-        return f"Selected {values_display} from dropdown '{selector}'" 
+
+        values_display = ", ".join(f"'{v}'" for v in values_list)
+        return f"Selected {values_display} from dropdown '{selector}'"

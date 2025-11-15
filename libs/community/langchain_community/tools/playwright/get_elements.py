@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 import json
-from typing import TYPE_CHECKING, List, Optional, Sequence, Type, Any, Dict
+from typing import TYPE_CHECKING, Any, Dict, List, Optional, Sequence, Type
 
 from langchain_core.callbacks import (
     AsyncCallbackManagerForToolRun,
@@ -25,15 +25,21 @@ class GetElementsToolInput(BaseModel):
 
     selector: Optional[str] = Field(
         default="body",
-        description="CSS selector like 'div', 'p', 'a', '#id', '.classname'. If not provided, defaults to 'body' to get the entire page.",
+        description=(
+            "CSS selector like 'div', 'p', 'a', '#id', '.classname'. If not "
+            "provided, defaults to 'body' to get the entire page."
+        ),
     )
     attributes: Optional[List[str]] = Field(
         None,
-        description="Set of attributes to retrieve for each element. If None, will extract standard useful attributes.",
+        description=(
+            "Set of attributes to retrieve for each element. If None, will extract "
+            "standard useful attributes."
+        ),
     )
 
 
-def _build_script():
+def _build_script() -> str:
     return """
     ({ selector, requestedAttributes }) => {
         const elements = Array.from(document.querySelectorAll(selector));
@@ -83,7 +89,15 @@ def _build_script():
         }
 
         function isInteractiveElement(el) {
-            const tags = ['a', 'button', 'input', 'select', 'textarea', 'option', 'label'];
+            const tags = [
+                "a",
+                "button",
+                "input",
+                "select",
+                "textarea",
+                "option",
+                "label",
+            ];
             const roles = ['button', 'link', 'checkbox', 'menuitem', 'tab', 'radio'];
             const role = el.getAttribute('role');
             return tags.includes(el.tagName.toLowerCase()) ||
@@ -97,9 +111,15 @@ def _build_script():
             const type = el.getAttribute('type')?.toLowerCase();
 
             if (tag === 'a' || el.getAttribute('role') === 'link') return 'link';
-            if (tag === 'button' || el.getAttribute('role') === 'button') return 'button';
+            if (tag === "button" || el.getAttribute("role") === "button") {
+                return "button";
+            }
             if (tag === 'input') {
-                if (["text", "email", "number", "password", "search"].includes(type)) return 'input';
+                if (
+                    ["text", "email", "number", "password", "search"].includes(type)
+                ) {
+                    return "input";
+                }
                 if (["checkbox", "radio"].includes(type)) return type;
                 if (["submit", "button"].includes(type)) return 'button';
             }
@@ -114,13 +134,25 @@ def _build_script():
 async def _aget_elements(
     page: AsyncPage, selector: str, attributes: Optional[Sequence[str]] = None
 ) -> List[Dict[str, Any]]:
-    return await page.evaluate(_build_script(), {"selector": selector, "requestedAttributes": list(attributes) if attributes else None})
+    return await page.evaluate(
+        _build_script(),
+        {
+            "selector": selector,
+            "requestedAttributes": list(attributes) if attributes else None,
+        },
+    )
 
 
 def _get_elements(
     page: SyncPage, selector: str, attributes: Optional[Sequence[str]] = None
 ) -> List[Dict[str, Any]]:
-    return page.evaluate(_build_script(), {"selector": selector, "requestedAttributes": list(attributes) if attributes else None})
+    return page.evaluate(
+        _build_script(),
+        {
+            "selector": selector,
+            "requestedAttributes": list(attributes) if attributes else None,
+        },
+    )
 
 
 class GetElementsTool(BaseBrowserTool):
@@ -145,7 +177,9 @@ class GetElementsTool(BaseBrowserTool):
         page.wait_for_load_state("load")
         try:
             results = _get_elements(page, selector, attributes)
-            return json.dumps({"elements": results, "count": len(results)}, ensure_ascii=False)
+            return json.dumps(
+                {"elements": results, "count": len(results)}, ensure_ascii=False
+            )
         except Exception as e:
             return json.dumps({"error": str(e)}, ensure_ascii=False)
 
@@ -160,6 +194,8 @@ class GetElementsTool(BaseBrowserTool):
         page = await aget_current_page(self.async_browser)
         try:
             results = await _aget_elements(page, selector, attributes)
-            return json.dumps({"elements": results, "count": len(results)}, ensure_ascii=False)
+            return json.dumps(
+                {"elements": results, "count": len(results)}, ensure_ascii=False
+            )
         except Exception as e:
             return json.dumps({"error": str(e)}, ensure_ascii=False)

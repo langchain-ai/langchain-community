@@ -20,11 +20,11 @@ class ExtractTextToolInput(BaseModel):
 
     selector: Optional[str] = Field(
         default=None,
-        description="Optional CSS selector to extract text from a specific element."
+        description="Optional CSS selector to extract text from a specific element.",
     )
     full_html: Optional[bool] = Field(
         default=False,
-        description="If True, returns the outer HTML instead of plain text."
+        description="If True, returns the outer HTML instead of plain text.",
     )
 
     @model_validator(mode="before")
@@ -34,7 +34,8 @@ class ExtractTextToolInput(BaseModel):
             from bs4 import BeautifulSoup  # noqa
         except ImportError:
             raise ImportError(
-                "The 'beautifulsoup4' package is required. Please install it with 'pip install beautifulsoup4'."
+                "The 'beautifulsoup4' package is required. "
+                "Please install it with 'pip install beautifulsoup4'."
             )
         return values
 
@@ -43,7 +44,10 @@ class ExtractTextTool(BaseBrowserTool):
     """Tool for extracting text or HTML from the current webpage."""
 
     name: str = "extract_text"
-    description: str = "Extract text or HTML from the current webpage. Use optional 'selector' to narrow scope."
+    description: str = (
+        "Extract text or HTML from the current webpage. "
+        "Use optional 'selector' to narrow scope."
+    )
     args_schema: Type[BaseModel] = ExtractTextToolInput
 
     def _run(

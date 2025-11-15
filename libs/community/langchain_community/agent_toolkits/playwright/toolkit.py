@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import logging
 from typing import TYPE_CHECKING, Any, List, Optional, Type, cast
 
 from langchain_core.tools import BaseTool, BaseToolkit
@@ -25,8 +26,8 @@ from langchain_community.tools.playwright.navigate import NavigateTool
 from langchain_community.tools.playwright.navigate_back import NavigateBackTool
 from langchain_community.tools.playwright.press_key import PressKeyTool
 from langchain_community.tools.playwright.screenshot import ScreenshotTool
-from langchain_community.tools.playwright.select_option import SelectOptionTool
 from langchain_community.tools.playwright.scroll import ScrollTool
+from langchain_community.tools.playwright.select_option import SelectOptionTool
 
 if TYPE_CHECKING:
     from playwright.async_api import Browser as AsyncBrowser
@@ -38,6 +39,9 @@ else:
         from playwright.sync_api import Browser as SyncBrowser
     except ImportError:
         pass
+
+
+logger = logging.getLogger(__file__)
 
 
 class PlayWrightBrowserToolkit(BaseToolkit):
@@ -95,14 +99,12 @@ class PlayWrightBrowserToolkit(BaseToolkit):
             # Navigation tools
             NavigateTool,
             NavigateBackTool,
-            
             # Extraction tools
             ExtractTextTool,
             ExtractHyperlinksTool,
             GetElementsTool,
             ExtractDOMTreeTool,
             CurrentWebPageTool,
-            
             # Interaction tools
             ClickTool,
             InputTextTool,
@@ -110,7 +112,6 @@ class PlayWrightBrowserToolkit(BaseToolkit):
             SelectOptionTool,
             CheckTool,
             ScrollTool,
-            
             # Visual tools
             ScreenshotTool,
         ]
@@ -123,8 +124,8 @@ class PlayWrightBrowserToolkit(BaseToolkit):
                 )
                 tools.append(tool)
             except Exception as e:
-                print(f"Failed to create tool {tool_cls.__name__}: {str(e)}")
-        
+                logger.exception(f"Failed to create tool {tool_cls.__name__}: {str(e)}")
+
         return cast(List[BaseTool], tools)
 
     @classmethod

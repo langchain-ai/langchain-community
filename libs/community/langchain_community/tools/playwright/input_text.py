@@ -20,14 +20,22 @@ class InputTextToolInput(BaseModel):
 
     selector: str = Field(..., description="CSS selector for the input element")
     text: str = Field(..., description="Text to type into the input element")
-    nth: Optional[int] = Field(0, description="Index of the element to use when multiple are found (default is 0)")
+    nth: Optional[int] = Field(
+        0,
+        description=(
+            "Index of the element to use when multiple are found (default is 0)"
+        ),
+    )
 
 
 class InputTextTool(BaseBrowserTool):
     """Tool for typing text into an input element with the given CSS selector."""
 
     name: str = "input_text"
-    description: str = "Type text into an input element using a CSS selector. Use nth to pick among multiple matches."
+    description: str = (
+        "Type text into an input element using a CSS selector. "
+        "Use nth to pick among multiple matches."
+    )
     args_schema: Type[BaseModel] = InputTextToolInput
 
     visible_only: bool = True
@@ -59,7 +67,10 @@ class InputTextTool(BaseBrowserTool):
             element = locator.nth(nth or 0)
             element.scroll_into_view_if_needed(timeout=self.playwright_timeout)
 
-            if not element.is_visible(timeout=self.playwright_timeout / 2) and self.visible_only:
+            if (
+                not element.is_visible(timeout=self.playwright_timeout / 2)
+                and self.visible_only
+            ):
                 return "Element found but not visible. Try disabling visible_only."
 
             element.click()
@@ -96,7 +107,10 @@ class InputTextTool(BaseBrowserTool):
             element = locator.nth(nth or 0)
             await element.scroll_into_view_if_needed(timeout=self.playwright_timeout)
 
-            if not await element.is_visible(timeout=self.playwright_timeout / 2) and self.visible_only:
+            if (
+                not await element.is_visible(timeout=self.playwright_timeout / 2)
+                and self.visible_only
+            ):
                 return "Element found but not visible. Try disabling visible_only."
 
             await element.click()

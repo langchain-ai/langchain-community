@@ -1,9 +1,18 @@
 from __future__ import annotations
+
 from typing import Optional, Type
+
+from langchain_core.callbacks import (
+    AsyncCallbackManagerForToolRun,
+    CallbackManagerForToolRun,
+)
 from pydantic import BaseModel, Field
-from langchain_core.callbacks import AsyncCallbackManagerForToolRun, CallbackManagerForToolRun
+
 from langchain_community.tools.playwright.base import BaseBrowserTool
-from langchain_community.tools.playwright.utils import get_current_page, aget_current_page
+from langchain_community.tools.playwright.utils import (
+    aget_current_page,
+    get_current_page,
+)
 
 
 class UploadFileInput(BaseModel):
@@ -16,7 +25,12 @@ class UploadFileTool(BaseBrowserTool):
     description: str = "Upload a file to an <input type='file'> element"
     args_schema: Type[BaseModel] = UploadFileInput
 
-    def _run(self, selector: str, file_path: str, run_manager: Optional[CallbackManagerForToolRun] = None) -> str:
+    def _run(
+        self,
+        selector: str,
+        file_path: str,
+        run_manager: Optional[CallbackManagerForToolRun] = None,
+    ) -> str:
         page = get_current_page(self.sync_browser)
         try:
             page.set_input_files(selector, file_path)
@@ -24,7 +38,12 @@ class UploadFileTool(BaseBrowserTool):
         except Exception as e:
             return f"UploadFile error: {str(e)}"
 
-    async def _arun(self, selector: str, file_path: str, run_manager: Optional[AsyncCallbackManagerForToolRun] = None) -> str:
+    async def _arun(
+        self,
+        selector: str,
+        file_path: str,
+        run_manager: Optional[AsyncCallbackManagerForToolRun] = None,
+    ) -> str:
         page = await aget_current_page(self.async_browser)
         try:
             await page.set_input_files(selector, file_path)
