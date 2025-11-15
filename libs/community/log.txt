@@ -2,24 +2,38 @@
 ./scripts/lint_imports.sh .
 ./scripts/check_pickle.sh .
 [ "langchain_community" = "" ] || uv run --group typing --group lint ruff check langchain_community
-E501 Line too long (90 > 88)
-   --> langchain_community/tools/playwright/switch_frame.py:112:89
-    |
-111 |         setattr(page, ACTIVE_FRAME_ATTR, resolved_frame)
-112 |         return f"Successfully switched to frame '{name_or_selector}' ({selector_detail})."
-    |                                                                                         ^^
-113 |
-114 |     async def _handle_switch_async(self, page: AsyncPage, name_or_selector: str) -> str:
-    |
+All checks passed!
+[ "langchain_community" = "" ] || uv run --group typing --group lint ruff format langchain_community --diff
+--- langchain_community/tools/playwright/download_file.py
++++ langchain_community/tools/playwright/download_file.py
+@@ -23,9 +23,7 @@
+     """
+ 
+     name: str = "download_file"
+-    description: str = (
+-        "Download a file from the specified URL and save to dest_path."
+-    )
++    description: str = "Download a file from the specified URL and save to dest_path."
+     args_schema: Type[BaseModel] = DownloadFileToolInput
+ 
+     def _run(
 
-E501 Line too long (90 > 88)
-   --> langchain_community/tools/playwright/switch_frame.py:172:89
-    |
-171 |         setattr(page, ACTIVE_FRAME_ATTR, resolved_frame)
-172 |         return f"Successfully switched to frame '{name_or_selector}' ({selector_detail})."
-    |                                                                                         ^^
-173 |
-174 |     def _run(
-    |
+--- langchain_community/tools/playwright/switch_frame.py
++++ langchain_community/tools/playwright/switch_frame.py
+@@ -164,9 +164,7 @@
+                     return f"Error getting content frame ({selector_detail}): {e}"
+ 
+         if not resolved_frame:
+-            return (
+-                f"Could not find an iframe matching '{name_or_selector}'."
+-            )
++            return f"Could not find an iframe matching '{name_or_selector}'."
+ 
+         setattr(page, ACTIVE_FRAME_ATTR, resolved_frame)
+         return (
+@@ -192,4 +190,3 @@
+         if not page:
+             return "No active page found. Ensure a page is navigated to first."
+         return await self._handle_switch_async(page, name_or_selector)
+-
 
-Found 2 errors.

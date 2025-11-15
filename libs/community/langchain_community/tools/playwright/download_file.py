@@ -23,9 +23,7 @@ class DownloadFileTool(BaseTool):
     """
 
     name: str = "download_file"
-    description: str = (
-        "Download a file from the specified URL and save to dest_path."
-    )
+    description: str = "Download a file from the specified URL and save to dest_path."
     args_schema: Type[BaseModel] = DownloadFileToolInput
 
     def _run(

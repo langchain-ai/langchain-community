@@ -164,9 +164,7 @@ class SwitchFrameTool(BaseBrowserTool):
                     return f"Error getting content frame ({selector_detail}): {e}"
 
         if not resolved_frame:
-            return (
-                f"Could not find an iframe matching '{name_or_selector}'."
-            )
+            return f"Could not find an iframe matching '{name_or_selector}'."
 
         setattr(page, ACTIVE_FRAME_ATTR, resolved_frame)
         return (
@@ -192,4 +190,3 @@ class SwitchFrameTool(BaseBrowserTool):
         if not page:
             return "No active page found. Ensure a page is navigated to first."
         return await self._handle_switch_async(page, name_or_selector)
-
