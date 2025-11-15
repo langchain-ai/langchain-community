@@ -104,12 +104,12 @@ class SwitchFrameTool(BaseBrowserTool):
                     return f"Error getting content frame ({selector_detail}): {e}"
 
         if not resolved_frame:
-            return (
-                f"Could not find an iframe matching '{name_or_selector}'."
-            )
+            return f"Could not find an iframe matching '{name_or_selector}'."
 
         setattr(page, ACTIVE_FRAME_ATTR, resolved_frame)
-        return f"Successfully switched to frame '{name_or_selector}' ({selector_detail})."
+        return (
+            f"Successfully switched to frame '{name_or_selector}' ({selector_detail})."
+        )
 
     async def _handle_switch_async(self, page: AsyncPage, name_or_selector: str) -> str:
         """Async logic for switching frames."""
@@ -169,7 +169,9 @@ class SwitchFrameTool(BaseBrowserTool):
             )
 
         setattr(page, ACTIVE_FRAME_ATTR, resolved_frame)
-        return f"Successfully switched to frame '{name_or_selector}' ({selector_detail})."
+        return (
+            f"Successfully switched to frame '{name_or_selector}' ({selector_detail})."
+        )
 
     def _run(
         self,
