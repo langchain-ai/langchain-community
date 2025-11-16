@@ -4,8 +4,8 @@ from typing import Any, Dict, List, Tuple
 from langchain_community.graphs.graph_document import GraphDocument, Relationship
 
 
-class KuzuGraph:
-    """Kùzu wrapper for graph operations.
+class LadybugGraph:
+    """Ladybug wrapper for graph operations.
 
     *Security note*: Make sure that the database connection uses credentials
         that are narrowly-scoped to only include necessary permissions.
@@ -20,37 +20,37 @@ class KuzuGraph:
     """
 
     def __init__(
-        self, db: Any, database: str = "kuzu", allow_dangerous_requests: bool = False
+        self, db: Any, database: str = "ladybug", allow_dangerous_requests: bool = False
     ) -> None:
-        """Initializes the Kùzu graph database connection."""
+        """Initializes the Ladybug graph database connection."""
 
         if allow_dangerous_requests is not True:
             raise ValueError(
-                "The KuzuGraph class is a powerful tool that can be used to execute "
+                "The LadybugGraph class is a powerful tool that can be used to execute "
                 "arbitrary queries on the database. To enable this functionality, "
                 "set the `allow_dangerous_requests` parameter to `True` when "
-                "constructing the KuzuGraph object."
+                "constructing the LadybugGraph object."
             )
 
         try:
-            import kuzu
+            import real_ladybug as lb
         except ImportError:
             raise ImportError(
-                "Could not import Kùzu python package."
-                "Please install Kùzu with `pip install kuzu`."
+                "Could not import Ladybug python package."
+                "Please install Ladybug with `pip install real_ladybug`."
             )
         self.db = db
-        self.conn = kuzu.Connection(self.db)
+        self.conn = lb.Connection(self.db)
         self.database = database
         self.refresh_schema()
 
     @property
     def get_schema(self) -> str:
-        """Returns the schema of the Kùzu database"""
+        """Returns the schema of the Ladybug database"""
         return self.schema
 
     def query(self, query: str, params: dict = {}) -> List[Dict[str, Any]]:
-        """Query Kùzu database"""
+        """Query Ladybug database"""
         result = self.conn.execute(query, params)
         column_names = result.get_column_names()
         return_list = []
@@ -60,7 +60,7 @@ class KuzuGraph:
         return return_list
 
     def refresh_schema(self) -> None:
-        """Refreshes the Kùzu graph schema information"""
+        """Refreshes the Ladybug graph schema information"""
         node_properties = []
         node_table_names = self.conn._get_node_table_names()
         for table_name in node_table_names:
@@ -160,13 +160,11 @@ class KuzuGraph:
             `GraphDocument` should encapsulate the structure of part of the graph,
             including nodes, relationships, and the source document information.
 
-          - allowed_relationships (List[Tuple[str, str, str]]): A list of allowed
+            - allowed_relationships (List[Tuple[str, str, str]]): A list of allowed
             relationships that exist in the graph. Each tuple contains three elements:
             the source node type, the relationship type, and the target node type.
-            Required for Kùzu, as the names of the relationship tables that need to
-            pre-exist are derived from these tuples.
-
-          - include_source (bool): If True, stores the source document
+            Required for Ladybug, as the names of the relationship tables that need to
+            pre-exist are derived from these tuples.          - include_source (bool): If True, stores the source document
             and links it to nodes in the graph using the `MENTIONS` relationship.
             This is useful for tracing back the origin of data. Merges source
             documents based on the `id` property from the source document metadata

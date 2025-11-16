@@ -9,7 +9,7 @@ EXPECTED_ALL = [
     "NeptuneAnalyticsGraph",
     "NeptuneGraph",
     "NeptuneRdfGraph",
-    "KuzuGraph",
+    "LadybugGraph",
     "HugeGraph",
     "RdfGraph",
     "ArangoGraph",

@@ -16,8 +16,8 @@ if TYPE_CHECKING:
     from langchain_community.graphs.hugegraph import (
         HugeGraph,
     )
-    from langchain_community.graphs.kuzu_graph import (
-        KuzuGraph,
+    from langchain_community.graphs.ladybug_graph import (
+        LadybugGraph,
     )
     from langchain_community.graphs.memgraph_graph import (
         MemgraphGraph,
@@ -54,7 +54,7 @@ __all__ = [
     "FalkorDBGraph",
     "GremlinGraph",
     "HugeGraph",
-    "KuzuGraph",
+    "LadybugGraph",
     "BaseNeptuneGraph",
     "MemgraphGraph",
     "NebulaGraph",
@@ -73,7 +73,7 @@ _module_lookup = {
     "FalkorDBGraph": "langchain_community.graphs.falkordb_graph",
     "GremlinGraph": "langchain_community.graphs.gremlin_graph",
     "HugeGraph": "langchain_community.graphs.hugegraph",
-    "KuzuGraph": "langchain_community.graphs.kuzu_graph",
+    "LadybugGraph": "langchain_community.graphs.ladybug_graph",
     "MemgraphGraph": "langchain_community.graphs.memgraph_graph",
     "NebulaGraph": "langchain_community.graphs.nebula_graph",
     "Neo4jGraph": "langchain_community.graphs.neo4j_graph",

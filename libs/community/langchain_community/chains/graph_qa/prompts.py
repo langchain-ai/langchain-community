@@ -73,20 +73,20 @@ NGQL_GENERATION_PROMPT = PromptTemplate(
     input_variables=["schema", "question"], template=NGQL_GENERATION_TEMPLATE
 )
 
-KUZU_EXTRA_INSTRUCTIONS = """
+LADYBUG_EXTRA_INSTRUCTIONS = """
 Instructions:
-Generate the Kùzu dialect of Cypher with the following rules in mind:
+Generate the Ladybug dialect of Cypher with the following rules in mind:
 1. Do not omit the relationship pattern. Always use `()-[]->()` instead of `()->()`.
 2. Do not include triple backticks ``` in your response. Return only Cypher.
 3. Do not return any notes or comments in your response.
 \n"""
 
-KUZU_GENERATION_TEMPLATE = CYPHER_GENERATION_TEMPLATE.replace(
-    "Generate Cypher", "Generate Kùzu Cypher"
-).replace("Instructions:", KUZU_EXTRA_INSTRUCTIONS)
+LADYBUG_GENERATION_TEMPLATE = CYPHER_GENERATION_TEMPLATE.replace(
+    "Generate Cypher", "Generate Ladybug Cypher"
+).replace("Instructions:", LADYBUG_EXTRA_INSTRUCTIONS)
 
-KUZU_GENERATION_PROMPT = PromptTemplate(
-    input_variables=["schema", "question"], template=KUZU_GENERATION_TEMPLATE
+LADYBUG_GENERATION_PROMPT = PromptTemplate(
+    input_variables=["schema", "question"], template=LADYBUG_GENERATION_TEMPLATE
 )
 
 GREMLIN_GENERATION_TEMPLATE = CYPHER_GENERATION_TEMPLATE.replace("Cypher", "Gremlin")

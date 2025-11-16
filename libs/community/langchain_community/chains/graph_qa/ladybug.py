@@ -14,9 +14,9 @@ from pydantic import Field
 
 from langchain_community.chains.graph_qa.prompts import (
     CYPHER_QA_PROMPT,
-    KUZU_GENERATION_PROMPT,
+    LADYBUG_GENERATION_PROMPT,
 )
-from langchain_community.graphs.kuzu_graph import KuzuGraph
+from langchain_community.graphs.ladybug_graph import LadybugGraph
 
 
 def remove_prefix(text: str, prefix: str) -> str:
@@ -52,8 +52,8 @@ def extract_cypher(text: str) -> str:
     return matches[0] if matches else text
 
 
-class KuzuQAChain(Chain):
-    """Question-answering against a graph by generating Cypher statements for Kùzu.
+class LadybugQAChain(Chain):
+        """Question-answering against a graph by generating Cypher statements for Ladybug.
 
     *Security note*: Make sure that the database connection uses credentials
         that are narrowly-scoped to only include necessary permissions.
@@ -67,7 +67,7 @@ class KuzuQAChain(Chain):
         See https://python.langchain.com/docs/security for more information.
     """
 
-    graph: KuzuGraph = Field(exclude=True)
+    graph: LadybugGraph = Field(exclude=True)
     cypher_generation_chain: LLMChain
     qa_chain: LLMChain
     input_key: str = "query"
@@ -121,11 +121,11 @@ class KuzuQAChain(Chain):
         llm: Optional[BaseLanguageModel] = None,
         *,
         qa_prompt: BasePromptTemplate = CYPHER_QA_PROMPT,
-        cypher_prompt: BasePromptTemplate = KUZU_GENERATION_PROMPT,
+        cypher_prompt: BasePromptTemplate = LADYBUG_GENERATION_PROMPT,
         cypher_llm: Optional[BaseLanguageModel] = None,
         qa_llm: Optional[BaseLanguageModel] = None,
         **kwargs: Any,
-    ) -> KuzuQAChain:
+    ) -> LadybugQAChain:
         """Initialize from LLM."""
         if not cypher_llm and not llm:
             raise ValueError("Either `llm` or `cypher_llm` parameters must be provided")
