@@ -3,26 +3,24 @@
 import argparse
 import asyncio
 import os
-import random
 import uuid
-from typing import Literal, TypedDict
+import logging
+from typing import Annotated, TypedDict
 
+from langchain_google_genai import ChatGoogleGenerativeAI
 import nest_asyncio
 from dotenv import load_dotenv
-from langchain.agents import AgentExecutor, create_tool_calling_agent
-from langchain_core.messages import SystemMessage
-from langchain_core.prompts import (
-    ChatPromptTemplate,
-    HumanMessagePromptTemplate,
-    MessagesPlaceholder,
+from langchain_core.messages import (
+    SystemMessage,
+    HumanMessage,
+    BaseMessage,
 )
-from langchain_openai import ChatOpenAI
 from langgraph.checkpoint.memory import MemorySaver
 from langgraph.graph import END, StateGraph
+from langgraph.graph.message import add_messages
+from langgraph.prebuilt import ToolNode
 from playwright.async_api import async_playwright
-from pydantic import SecretStr
 
-# Playwright tools
 from langchain_community.tools.playwright.click import ClickTool
 from langchain_community.tools.playwright.current_page import CurrentWebPageTool
 from langchain_community.tools.playwright.download_file import DownloadFileTool
@@ -49,86 +47,87 @@ from langchain_community.tools.playwright.switch_frame import SwitchFrameTool
 from langchain_community.tools.playwright.upload_file import UploadFileTool
 
 load_dotenv()
-api_key = os.getenv("OPENROUTER_API_KEY")
-base_url = os.getenv("OPENROUTER_BASE_URL")
-site_url = os.getenv("YOUR_SITE_URL")
-site_name = os.getenv("YOUR_SITE_NAME")
 
-if not all([api_key, base_url]):
-    raise ValueError("Required environment variables are not set")
+
+api_key = os.getenv("GEMINI_API_KEY")
+
+if not api_key:
+    raise ValueError("GEMINI_API_KEY environment variable not set")
 
 nest_asyncio.apply()
 
 
-# Define shared state
 class AgentState(TypedDict):
-    input: str
-    step: Literal["planning", "navigating"]
-    result: str
-    steps: list[str]
-    history: list[str]
+    messages: Annotated[list[BaseMessage], add_messages]
 
 
 async def main():
-    # Set up LLM
-    llm = ChatOpenAI(
-        api_key=api_key,
-        base_url=base_url,
-        model_name="mistralai/devstral-small-2505:free",
-        temperature=0,
-        streaming=True,
+    logging.basicConfig(
+        level=logging.INFO,
+        format="%(asctime)s - %(name)s - %(levelname)s - %(message)s",
+        handlers=[
+            logging.FileHandler("agent_debug.log", mode="w"),
+            logging.StreamHandler()
+        ]
+    )
+    logger = logging.getLogger(__name__)
+
+    logger.info("Setting up LLM...")
+    llm = ChatGoogleGenerativeAI(
+        model="gemini-2.5-flash",
+        google_api_key=api_key,
     )
 
-    # Launch Playwright
-    playwright = await async_playwright().start()
-    browser = await playwright.chromium.launch(
-        # executable_path="/Applications/Google Chrome.app/Contents/MacOS/Google Chrome",
-        args=[
-            "--disable-gpu",
-            "--disable-dev-shm-usage",
-            "--disable-web-security",
-            "--disable-blink-features=AutomationControlled",
-            "--no-sandbox",
-            "--disable-setuid-sandbox",
-        ],
-        headless=False,  # Optional: set to True if you want headless mode
-    )
-    page = await browser.new_page(no_viewport=True)
+    logger.info("Launching Playwright...")
+    playwright = None
+    browser = None
+    try:
+        playwright = await async_playwright().start()
+        browser = await playwright.chromium.launch(
+            args=[
+                "--disable-gpu",
+                "--disable-dev-shm-usage",
+                "--disable-web-security",
+                "--disable-blink-features=AutomationControlled",
+                "--no-sandbox",
+                "--disable-setuid-sandbox",
+            ],
+            headless=False,
+        )
+        page = await browser.new_page(no_viewport=True)
 
-    # Create tools
-    tools = [
-        NavigateTool(page=page, async_browser=browser),
-        NavigateBackTool(page=page, async_browser=browser),
-        ExtractDOMTreeTool(page=page, async_browser=browser),
-        ClickTool(page=page, async_browser=browser),
-        InputTextTool(page=page, async_browser=browser),
-        PressKeyTool(page=page, async_browser=browser),
-        ScreenshotTool(page=page, async_browser=browser),
-        CurrentWebPageTool(page=page, async_browser=browser),
-        ExtractTextTool(page=page, async_browser=browser),
-        ExtractHyperlinksTool(page=page, async_browser=browser),
-        GetElementsTool(page=page, async_browser=browser),
-        ScrollTool(page=page, async_browser=browser),
-        DragAndDropTool(page=page, async_browser=browser),
-        HoverElementTool(page=page, async_browser=browser),
-        UploadFileTool(page=page, async_browser=browser),
-        SwitchFrameTool(page=page, async_browser=browser),
-        DragSliderTool(page=page, async_browser=browser),
-        ExtractInputsTool(page=page, async_browser=browser),
-        SelectDropdownTool(page=page, async_browser=browser),
-        DownloadFileTool(),
-        OutputToFileTool(),
-        HttpRequestTool(),
-    ]
+        logger.info("Creating tools...")
+        tools = [
+            NavigateTool(page=page, async_browser=browser),
+            NavigateBackTool(page=page, async_browser=browser),
+            ExtractDOMTreeTool(page=page, async_browser=browser),
+            ClickTool(page=page, async_browser=browser),
+            InputTextTool(page=page, async_browser=browser),
+            PressKeyTool(page=page, async_browser=browser),
+            ScreenshotTool(page=page, async_browser=browser),
+            CurrentWebPageTool(page=page, async_browser=browser),
+            ExtractTextTool(page=page, async_browser=browser),
+            ExtractHyperlinksTool(page=page, async_browser=browser),
+            GetElementsTool(page=page, async_browser=browser),
+            ScrollTool(page=page, async_browser=browser),
+            DragAndDropTool(page=page, async_browser=browser),
+            HoverElementTool(page=page, async_browser=browser),
+            UploadFileTool(page=page, async_browser=browser),
+            SwitchFrameTool(page=page, async_browser=browser),
+            DragSliderTool(page=page, async_browser=browser),
+            ExtractInputsTool(page=page, async_browser=browser),
+            SelectDropdownTool(page=page, async_browser=browser),
+            DownloadFileTool(),
+            OutputToFileTool(),
+            HttpRequestTool(),
+        ]
+        logger.info(f"Initialized {len(tools)} tools.")
 
-    # Bind tools to LLM
-    llm_with_tools = llm.bind_tools(tools=tools, parallel_tool_calls=False)
+        # Bind tools to LLM
+        logger.info("Binding tools to LLM...")
+        llm_with_tools = llm.bind_tools(tools=tools, parallel_tool_calls=False)
 
-    # Navigation prompt
-    navigator_prompt = ChatPromptTemplate.from_messages(
-        [
-            SystemMessage(
-                content="""You are a web automation agent that can browse websites and perform tasks as requested.
+        system_prompt_content = """You are a web automation agent that can browse websites and perform tasks as requested.
 
 AVAILABLE TOOLS:
 - navigate: Navigate to a URL
@@ -155,21 +154,18 @@ AVAILABLE TOOLS:
 - http_request: Make an HTTP request
 
 EFFICIENT WORKFLOW - follow this exactly:
-1. Navigate to requested URL. The URLS must start with 'https://'
-2. Aways accept cookies when asked
-3. Call extract_dom_tree ONCE to analyze the page structure
-4. Examine the DOM to identify relevant elements (forms, buttons, inputs, etc.)
-5. Perform ONE action based on the task requirements
-6. ONLY call extract_dom_tree again if the page state has changed
-7. Continue with the next action until the task is complete
-8. Make sure ALL requirements are satisfied
+1. Navigate to the requested URL. The URLS must start with 'https://'.
+2. **After navigation, call `extract_dom_tree` (with no arguments)** to get the simplified page structure.
+3. Examine this simplified DOM to find cookie banners, navigation links, and other elements.
+4. **Always accept cookies** if a banner is present (e.g., click "Accept All").
+5. Perform the next action based on the task (e.g., click "Characters").
+6. Call `extract_dom_tree` (no arguments) again **only if** the page state has significantly changed after an action (like navigation).
+7. Continue step-by-step until the task is complete.
 
 GENERAL GUIDELINES:
-- Extract the DOM tree ONCE after navigation to understand page structure
-- Extract the DOM again ONLY after actions that change the page
-- Use selectors found in the DOM extraction (don't hardcode selectors)
-- Complete all requested actions in the proper sequence
-- Take screenshots when explicitly requested or to show final results
+- **IMPORTANT: Never use the 'full_tree=True' argument** for `extract_dom_tree`. The default simplified tree is much more effective and reliable for analysis and fits within the context window.
+- Use selectors found in the DOM extraction.
+- Complete all requested actions in the proper sequence.
 
 COMMON WEB TASKS:
 - For search tasks: Input text and press Enter to submit the query
@@ -177,120 +173,122 @@ COMMON WEB TASKS:
 - For navigation: Identify and click on relevant links or buttons
 - For extraction: Extract text or data from relevant elements
 
-IMPORTANT NOTES:
-- For screenshots, use take_screenshot with simple parameters:
-  take_screenshot with {"filename": "results"}
-- Avoid using selector parameters for screenshots to prevent errors
-- Use press_key to submit forms or trigger actions (e.g., Enter key)
-- After inputting text in forms, always take the appropriate action to submit
-- For any page, analyze the DOM first to discover the correct selectors
-- When exporting to JSON, first try to capture and organize any inherent data structure (e.g. lists, tables, key–value pairs). 
-  If the source offers no clear schema, fall back to extracting text and then wrap it in a sensible JSON format.
-
 TOOL USAGE FORMAT:
 When using tools, always use this format:
-1. First, use navigate to go to the URL
-2. Then use extract_dom_tree to understand the page structure
-3. Use other tools as needed based on the task
-4. Always check the results of each tool call
+1. First, use `Maps` to go to the URL.
+2. Then, use `extract_dom_tree({})` (no arguments) to understand the page.
+3. Use other tools as needed.
 
 Example tool usage:
 1. navigate({"url": "https://example.com"})
 2. extract_dom_tree({})
-3. click({"selector": "button.submit"})
+3. click({"selector": "button#accept-cookies"})
+4. click({"selector": "a[href='/characters']"})
 """
-            ),
-            HumanMessagePromptTemplate.from_template("{input}"),
-            MessagesPlaceholder(variable_name="agent_scratchpad"),
-        ]
-    )
 
-    # Navigator agent (executes tool calls)
-    navigator_agent = AgentExecutor(
-        agent=create_tool_calling_agent(llm_with_tools, tools, navigator_prompt),
-        tools=tools,
-        max_iterations=120,
-        max_execution_time=360,
-        verbose=True,  # <-- enable logging
-    )
 
-    # Build the LangGraph
-    workflow = StateGraph(AgentState)
+        async def agent_node(state: AgentState):
+            logger.info("--- Calling Agent Node ---")
+            try:
+                if state["messages"]:
+                    logger.debug(f"Current state: {state['messages'][-1].pretty_repr()}")
+                else:
+                    logger.debug("Current state is empty.")
 
-    async def planner_node(state: AgentState) -> AgentState:
-        return {
-            "input": state["input"],
-            "step": "navigating",
-            "result": "",
-            "steps": [],
-        }
+                response = await llm_with_tools.ainvoke(state["messages"])
 
-    async def navigator_node(state: AgentState) -> AgentState:
-        dom_tree = await ExtractDOMTreeTool(page=page, async_browser=browser).arun({})
-        input_with_dom = f"{state['input']}\n\n[DOM]:\n{dom_tree}"
+                logger.info(f"LLM Response: {response.pretty_repr()}")
+                return {"messages": [response]}
+            except Exception as e:
+                logger.error(f"Error in agent_node: {e}", exc_info=True)
+                error_message = f"Error in agent node: {e}. Check logs for details. Stopping."
+                return {"messages": [SystemMessage(content=error_message)]}
 
-        steps = state.get("steps", [])
-        history = state.get("history", [])
-        current_input = input_with_dom
+        tool_node = ToolNode(tools)
 
-        while True:
-            await page.wait_for_timeout(random.randint(1, 3))
-            output = await navigator_agent.ainvoke({"input": current_input})
+        def should_continue(state: AgentState):
+            logger.info("--- Checking 'should_continue' ---")
+            if not state["messages"]:
+                logger.warning("State has no messages. Ending.")
+                return END
 
-            for tool_call, result in output.get("intermediate_steps", []):
-                step_text = f"Tool: {tool_call.tool}, Args: {tool_call.tool_input}, Result: {result}"
-                steps.append(step_text)
-                history.append(step_text)
+            last_message = state["messages"][-1]
+            logger.info(f"Last message type: {type(last_message).__name__}")
 
-            if "output" in output and output["output"]:
-                break  # task complete
+            if isinstance(last_message, SystemMessage):
+                logger.warning("Last message was a SystemMessage, likely an error. Ending.")
+                return END
+
+            if last_message.tool_calls:
+                logger.info(f"Decision: Agent wants to use {len(last_message.tool_calls)} tool(s). -> 'tools'")
+                return "tools"
             else:
-                # Refresh DOM and continue
-                dom_tree = await ExtractDOMTreeTool(
-                    page=page, async_browser=browser
-                ).arun({})
-                current_input = f"{state['input']}\n\n[DOM]:\n{dom_tree}"
+                logger.info("Decision: Agent has no tool calls. -> END")
+                return END
 
-        return {
-            "input": state["input"],
-            "step": "done",
-            "result": output.get("output", ""),
-            "steps": steps,
-            "history": history,
-        }
+        workflow = StateGraph(AgentState)
 
-    checkpointer = MemorySaver()
+        workflow.add_node("agent", agent_node)
+        workflow.add_node("tools", tool_node)
 
-    workflow.add_node("planner", planner_node)
-    workflow.add_node("navigator", navigator_node)
-    workflow.set_entry_point("planner")
-    workflow.add_edge("planner", "navigator")
-    workflow.add_edge("navigator", END)
+        workflow.set_entry_point("agent")
 
-    graph = workflow.compile(checkpointer=checkpointer)
+        workflow.add_conditional_edges(
+            "agent",
+            should_continue,
+            {
+                "tools": "tools",
+                END: END,
+            },
+        )
 
-    parser = argparse.ArgumentParser()
-    parser.add_argument("prompt", help="Prompt for the agent")
-    args = parser.parse_args()
+        workflow.add_edge("tools", "agent")
 
-    # Run graph
-    thread_id = str(uuid.uuid4())
+        logger.info("Compiling graph...")
+        checkpointer = MemorySaver()
+        graph = workflow.compile(checkpointer=checkpointer)
 
-    await graph.ainvoke(
-        {
-            "input": args.prompt,
-            "step": "planning",
-            "result": "",
-            "steps": [],
-            "history": [],
-        },
-        config={"configurable": {"thread_id": thread_id}},
-    )
+        parser = argparse.ArgumentParser()
+        parser.add_argument("prompt", help="Prompt for the agent")
+        args = parser.parse_args()
 
-    print(f"\n✅ Job finished")
+        thread_id = str(uuid.uuid4())
+        logger.info(f"Using Thread ID: {thread_id}")
 
-    await browser.close()
-    await playwright.stop()
+        initial_messages = [
+            SystemMessage(content=system_prompt_content),
+            HumanMessage(content=args.prompt),
+        ]
+
+        logger.info(f"🚀 Starting agent with prompt: {args.prompt}")
+
+        final_state = await graph.ainvoke(
+            {"messages": initial_messages},
+            config={
+                "configurable": {"thread_id": thread_id},
+                "recursion_limit": 100
+            },
+        )
+
+        final_message = final_state["messages"][-1]
+        logger.info(f"\n✅ Job finished. Final Answer:")
+        logger.info(final_message)
+
+    except Exception as e:
+        logger.critical(f"Unhandled exception during agent execution: {e}", exc_info=True)
+
+    finally:
+        logger.info("Cleaning up resources (browser and playwright)...")
+        try:
+            if browser:
+                await browser.close()
+                logger.info("Browser closed.")
+            if playwright:
+                await playwright.stop()
+                logger.info("Playwright stopped.")
+            logger.info("Cleanup successful.")
+        except Exception as e:
+            logger.error(f"Error during resource cleanup: {e}", exc_info=True)
 
 
 if __name__ == "__main__":
