@@ -243,9 +243,7 @@ class SupabaseVectorStore(VectorStore):
         query_builder = self._client.rpc(self.query_name, match_documents_params)
 
         if postgrest_filter:
-            query_builder.params = query_builder.params.set(
-                "and", f"({postgrest_filter})"
-            )
+            query_builder = query_builder.filter("and", f"({postgrest_filter})")
 
         query_builder = query_builder.limit(k)
 
@@ -288,9 +286,7 @@ class SupabaseVectorStore(VectorStore):
         query_builder = self._client.rpc(self.query_name, match_documents_params)
 
         if postgrest_filter:
-            query_builder.params = query_builder.params.set(
-                "and", f"({postgrest_filter})"
-            )
+            query_builder = query_builder.filter("and", f"({postgrest_filter})")
 
         query_builder = query_builder.limit(k)
 
