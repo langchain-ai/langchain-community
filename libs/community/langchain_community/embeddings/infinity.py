@@ -40,7 +40,7 @@ class InfinityEmbeddings(BaseModel, Embeddings):
     infinity_api_url: str = "http://localhost:7997"
     """Endpoint URL to use."""
 
-    client: Any = None  #: :meta private:
+    client: Any = None
     """Infinity client."""
 
     # LLM call kwargs
@@ -116,7 +116,7 @@ class InfinityEmbeddings(BaseModel, Embeddings):
         return embeddings[0]
 
 
-class TinyAsyncOpenAIInfinityEmbeddingClient:  #: :meta private:
+class TinyAsyncOpenAIInfinityEmbeddingClient:
     """Helper tool to embed Infinity.
 
     It is not a part of Langchain's stable API,

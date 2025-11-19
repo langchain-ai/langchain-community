@@ -1,6 +1,6 @@
 import tempfile
 from enum import Enum
-from typing import Any, Dict, Optional, Union
+from typing import Any, Dict, Iterator, Optional, Union
 
 from langchain_core.callbacks import CallbackManagerForToolRun
 from langchain_core.tools import BaseTool
@@ -65,6 +65,8 @@ class ElevenLabsText2SpeechTool(BaseTool):
                 voice_id=self.voice,
                 output_format="mp3_44100_128",
             )
+            if isinstance(speech, Iterator):
+                speech = b"".join(speech)
             with tempfile.NamedTemporaryFile(
                 mode="bx", suffix=".mp3", delete=False
             ) as f:
@@ -86,7 +88,7 @@ class ElevenLabsText2SpeechTool(BaseTool):
         Play the text in your speakers."""
         elevenlabs = _import_elevenlabs()
         client = elevenlabs.client.ElevenLabs()
-        speech_stream = client.text_to_speech.convert_as_stream(
+        speech_stream = client.text_to_speech.stream(
             text=query, model_id=self.model, voice_id=self.voice
         )
         elevenlabs.stream(speech_stream)

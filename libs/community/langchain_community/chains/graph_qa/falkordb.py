@@ -57,8 +57,8 @@ class FalkorDBQAChain(Chain):
     graph: FalkorDBGraph = Field(exclude=True)
     cypher_generation_chain: LLMChain
     qa_chain: LLMChain
-    input_key: str = "query"  #: :meta private:
-    output_key: str = "result"  #: :meta private:
+    input_key: str = "query"
+    output_key: str = "result"
     top_k: int = 10
     """Number of results to return from the query"""
     return_intermediate_steps: bool = False
@@ -99,18 +99,12 @@ class FalkorDBQAChain(Chain):
 
     @property
     def input_keys(self) -> List[str]:
-        """Return the input keys.
-
-        :meta private:
-        """
+        """Return the input keys."""
         return [self.input_key]
 
     @property
     def output_keys(self) -> List[str]:
-        """Return the output keys.
-
-        :meta private:
-        """
+        """Return the output keys."""
         _output_keys = [self.output_key]
         return _output_keys
 

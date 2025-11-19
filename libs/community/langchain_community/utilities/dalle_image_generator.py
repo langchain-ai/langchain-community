@@ -27,8 +27,8 @@ class DallEAPIWrapper(BaseModel):
     2. save your OPENAI_API_KEY in an environment variable
     """
 
-    client: Any = None  #: :meta private:
-    async_client: Any = Field(default=None, exclude=True)  #: :meta private:
+    client: Any = None
+    async_client: Any = Field(default=None, exclude=True)
     model_name: str = Field(default="dall-e-2", alias="model")
     model_kwargs: Dict[str, Any] = Field(default_factory=dict)
     openai_api_key: Optional[SecretStr] = Field(
@@ -42,7 +42,7 @@ class DallEAPIWrapper(BaseModel):
     openai_api_base: Optional[str] = Field(
         alias="base_url", default_factory=from_env("OPENAI_API_BASE", default=None)
     )
-    """Base URL path for API requests, leave blank if not using a proxy or service 
+    """Base URL path for API requests, leave blank if not using a proxy or service
         emulator."""
     openai_organization: Optional[str] = Field(
         alias="organization",

@@ -1,10 +1,23 @@
 from typing import Any, Dict, List, Optional, Union
 
+from langchain_core._api import deprecated
 from langchain_core.documents import Document
 
 from langchain_community.document_loaders.base import BaseLoader
 
 
+@deprecated(
+    since="0.3.30",
+    removal="1.0",
+    message=(
+        "This class is deprecated and will be removed in a future release. "
+        "Instead, please use `OracleAutonomousDatabaseLoader` from the "
+        "`langchain-oracledb` package. "
+        "For more information, refer to <https://github.com/oracle/langchain-oracle/tree/main/libs/oracledb>."
+    ),
+    alternative="from langchain_oracledb.document_loaders import OracleAutonomousDatabaseLoader;",  # noqa: E501
+    pending=False,
+)
 class OracleAutonomousDatabaseLoader(BaseLoader):
     """
     Load from oracle adb

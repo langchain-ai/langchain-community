@@ -38,9 +38,9 @@ class MLXPipeline(LLM):
 
     model_id: str = DEFAULT_MODEL_ID
     """Model name to use."""
-    model: Any = None  #: :meta private:
+    model: Any = None
     """Model."""
-    tokenizer: Any = None  #: :meta private:
+    tokenizer: Any = None
     """Tokenizer."""
     tokenizer_config: Optional[dict] = None
     """

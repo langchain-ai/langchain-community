@@ -43,13 +43,13 @@ class HuggingFaceHub(LLM):
             hf = HuggingFaceHub(repo_id="gpt2", huggingfacehub_api_token="my-api-key")
     """
 
-    client: Any = None  #: :meta private:
+    client: Any = None
     repo_id: Optional[str] = None
-    """Model name to use. 
+    """Model name to use.
     If not provided, the default model for the chosen task will be used."""
     task: Optional[str] = None
     """Task to call the model with.
-    Should be a task that returns `generated_text`, `summary_text`, 
+    Should be a task that returns `generated_text`, `summary_text`,
     or `translation_text`."""
     model_kwargs: Optional[dict] = None
     """Keyword arguments to pass to the model."""
