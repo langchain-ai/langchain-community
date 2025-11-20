@@ -66,8 +66,8 @@ class ChatWriter(BaseChatModel):
             )
     """
 
-    client: Any = Field(default=None, exclude=True)  #: :meta private:
-    async_client: Any = Field(default=None, exclude=True)  #: :meta private:
+    client: Any = Field(default=None, exclude=True)
+    async_client: Any = Field(default=None, exclude=True)
 
     api_key: Optional[SecretStr] = Field(default=None)
     """Writer API key."""

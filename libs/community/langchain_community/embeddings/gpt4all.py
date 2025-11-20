@@ -26,7 +26,7 @@ class GPT4AllEmbeddings(BaseModel, Embeddings):
     n_threads: Optional[int] = None
     device: Optional[str] = "cpu"
     gpt4all_kwargs: Optional[dict] = {}
-    client: Any  #: :meta private:
+    client: Any
 
     model_config = ConfigDict(protected_namespaces=())
 

@@ -67,7 +67,7 @@ class GooglePalm(BaseLLM, BaseModel):
     Google PaLM models.
     """
 
-    client: Any  #: :meta private:
+    client: Any
     google_api_key: Optional[SecretStr]
     model_name: str = "models/text-bison-001"
     """Model name to use."""

@@ -13,7 +13,7 @@ class AwaEmbeddings(BaseModel, Embeddings):
          Default is "all-mpnet-base-v2".
     """
 
-    client: Any  #: :meta private:
+    client: Any
     model: str = "all-mpnet-base-v2"
 
     @model_validator(mode="before")

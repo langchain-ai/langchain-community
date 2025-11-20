@@ -35,24 +35,18 @@ class OpenAPIEndpointChain(Chain, BaseModel):
     requests: Requests = Field(exclude=True, default_factory=Requests)
     param_mapping: _ParamMapping = Field(alias="param_mapping")
     return_intermediate_steps: bool = False
-    instructions_key: str = "instructions"  #: :meta private:
-    output_key: str = "output"  #: :meta private:
-    max_text_length: Optional[int] = Field(ge=0)  #: :meta private:
+    instructions_key: str = "instructions"
+    output_key: str = "output"
+    max_text_length: Optional[int] = Field(ge=0)
 
     @property
     def input_keys(self) -> List[str]:
-        """Expect input key.
-
-        :meta private:
-        """
+        """Expect input key."""
         return [self.instructions_key]
 
     @property
     def output_keys(self) -> List[str]:
-        """Expect output key.
-
-        :meta private:
-        """
+        """Expect output key."""
         if not self.return_intermediate_steps:
             return [self.output_key]
         else:

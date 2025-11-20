@@ -57,8 +57,8 @@ class GremlinQAChain(Chain):
     qa_chain: LLMChain
     gremlin_fix_chain: LLMChain
     max_fix_retries: int = 3
-    input_key: str = "query"  #: :meta private:
-    output_key: str = "result"  #: :meta private:
+    input_key: str = "query"
+    output_key: str = "result"
     top_k: int = 100
     return_direct: bool = False
     return_intermediate_steps: bool = False
@@ -96,18 +96,12 @@ class GremlinQAChain(Chain):
 
     @property
     def input_keys(self) -> List[str]:
-        """Input keys.
-
-        :meta private:
-        """
+        """Input keys."""
         return [self.input_key]
 
     @property
     def output_keys(self) -> List[str]:
-        """Output keys.
-
-        :meta private:
-        """
+        """Output keys."""
         _output_keys = [self.output_key]
         return _output_keys
 
