@@ -36,7 +36,7 @@ class ReadFileTool(BaseFileToolMixin, BaseTool):
         if not read_path.exists():
             return f"Error: no such file or directory: {file_path}"
         try:
-            with read_path.open("r", encoding="utf-8") as f:
+            with read_path.open("r", errors="ignore") as f:
                 content = f.read()
             return content
         except Exception as e:
