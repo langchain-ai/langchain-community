@@ -205,6 +205,9 @@ if TYPE_CHECKING:
     from langchain_community.document_loaders.gcs_file import (
         GCSFileLoader,
     )
+    from langchain_community.document_loaders.genius import (
+        GeniusLoader,
+    )
     from langchain_community.document_loaders.geodataframe import (
         GeoDataFrameLoader,
     )
@@ -814,6 +817,7 @@ __all__ = [
     "GlueCatalogLoader",
     "GCSFileLoader",
     "GeoDataFrameLoader",
+    "GeniusLoader",
     "GitHubIssuesLoader",
     "GitLoader",
     "GitbookLoader",
