@@ -297,7 +297,7 @@ class BedrockBase(BaseModel, ABC):
 
     model_config = ConfigDict(protected_namespaces=())
 
-    client: Any = Field(exclude=True)  #: :meta private:
+    client: Any = Field(exclude=True)
 
     region_name: Optional[str] = None
     """The aws region e.g., `us-west-2`. Fallsback to AWS_DEFAULT_REGION env variable
@@ -317,7 +317,7 @@ class BedrockBase(BaseModel, ABC):
 
     provider: Optional[str] = None
     """The model provider, e.g., amazon, cohere, ai21, etc. When not supplied, provider
-    is extracted from the first part of the model_id e.g. 'amazon' in 
+    is extracted from the first part of the model_id e.g. 'amazon' in
     'amazon.titan-text-express-v1'. This value should be provided for model ids that do
     not have the provider in them, e.g., custom and provisioned models that have an ARN
     associated with them."""

@@ -43,9 +43,9 @@ class GraphSparqlQAChain(Chain):
     sparql_intent_chain: LLMChain
     qa_chain: LLMChain
     return_sparql_query: bool = False
-    input_key: str = "query"  #: :meta private:
-    output_key: str = "result"  #: :meta private:
-    sparql_query_key: str = "sparql_query"  #: :meta private:
+    input_key: str = "query"
+    output_key: str = "result"
+    sparql_query_key: str = "sparql_query"
 
     allow_dangerous_requests: bool = False
     """Forced user opt-in to acknowledge that the chain can make dangerous requests.
@@ -80,18 +80,12 @@ class GraphSparqlQAChain(Chain):
 
     @property
     def input_keys(self) -> List[str]:
-        """Return the input keys.
-
-        :meta private:
-        """
+        """Return the input keys."""
         return [self.input_key]
 
     @property
     def output_keys(self) -> List[str]:
-        """Return the output keys.
-
-        :meta private:
-        """
+        """Return the output keys."""
         _output_keys = [self.output_key]
         return _output_keys
 

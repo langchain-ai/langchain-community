@@ -22,9 +22,9 @@ class AzureAiServicesDocumentIntelligenceTool(BaseTool):
     https://learn.microsoft.com/en-us/azure/ai-services/document-intelligence/quickstarts/get-started-sdks-rest-api?view=doc-intel-4.0.0&pivots=programming-language-python
     """
 
-    azure_ai_services_key: str = ""  #: :meta private:
-    azure_ai_services_endpoint: str = ""  #: :meta private:
-    doc_analysis_client: Any  #: :meta private:
+    azure_ai_services_key: str = ""
+    azure_ai_services_endpoint: str = ""
+    doc_analysis_client: Any
 
     name: str = "azure_ai_services_document_intelligence"
     description: str = (

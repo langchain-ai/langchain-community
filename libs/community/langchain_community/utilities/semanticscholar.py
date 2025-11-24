@@ -34,11 +34,16 @@ class SemanticScholarAPIWrapper(BaseModel):
     ss.run("biases in large language models")
     """
 
-    semanticscholar_search: Any  #: :meta private:
+    semanticscholar_search: Any
+
     top_k_results: int = 5
+
     S2_MAX_QUERY_LENGTH: int = 300
+
     load_max_docs: int = 100
+
     doc_content_chars_max: Optional[int] = 4000
+
     returned_fields: List[str] = [
         "title",
         "abstract",

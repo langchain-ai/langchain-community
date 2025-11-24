@@ -171,13 +171,13 @@ class JinaChat(BaseChatModel):
         """Return whether this model can be serialized by Langchain."""
         return False
 
-    client: Any = None  #: :meta private:
+    client: Any = None
     temperature: float = 0.7
     """What sampling temperature to use."""
     model_kwargs: Dict[str, Any] = Field(default_factory=dict)
     """Holds any model parameters valid for `create` call not explicitly specified."""
     jinachat_api_key: Optional[SecretStr] = None
-    """Base URL path for API requests, 
+    """Base URL path for API requests,
     leave blank if not using a proxy or service emulator."""
     request_timeout: Optional[Union[float, Tuple[float, float]]] = None
     """Timeout for requests to JinaChat completion API. Default is 600 seconds."""

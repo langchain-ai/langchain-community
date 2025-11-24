@@ -237,7 +237,7 @@ class ChatGooglePalm(BaseChatModel, BaseModel):
 
     """
 
-    client: Any  #: :meta private:
+    client: Any
     model_name: str = "models/chat-bison-001"
     """Model name to use."""
     google_api_key: Optional[SecretStr] = None

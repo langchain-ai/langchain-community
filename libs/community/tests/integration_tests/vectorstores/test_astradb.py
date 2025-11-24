@@ -316,7 +316,7 @@ class TestAstraDB:
             await v_store_2.adelete_collection()
 
     def test_astradb_vectorstore_crud(self, store_someemb: AstraDB) -> None:
-        """Basic add/delete/update behaviour."""
+        """Basic add/delete/update behavior."""
         res0 = store_someemb.similarity_search("Abc", k=2)
         assert res0 == []
         # write and check again
@@ -374,7 +374,7 @@ class TestAstraDB:
         assert res4[0].metadata["ord"] == 205
 
     async def test_astradb_vectorstore_crud_async(self, store_someemb: AstraDB) -> None:
-        """Basic add/delete/update behaviour."""
+        """Basic add/delete/update behavior."""
         res0 = await store_someemb.asimilarity_search("Abc", k=2)
         assert res0 == []
         # write and check again
@@ -597,7 +597,7 @@ class TestAstraDB:
         assert store_someemb.similarity_search("x", k=2 * M) == []
 
     def test_astradb_vectorstore_drop(self) -> None:
-        """behaviour of 'delete_collection'."""
+        """Behavior of `delete_collection`."""
         collection_name = "lc_test_d"
         emb = SomeEmbeddings(dimension=2)
         v_store = AstraDB(

@@ -204,7 +204,7 @@ def _convert_message_to_dict(message: BaseMessage) -> dict:
 class ChatDeepInfra(BaseChatModel):
     """A chat model that uses the DeepInfra API."""
 
-    # client: Any  #: :meta private:
+    # client: Any
     model_name: str = Field(default="meta-llama/Llama-2-70b-chat-hf", alias="model")
     """Model name to use."""
 

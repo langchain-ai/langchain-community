@@ -42,7 +42,7 @@ def get_bytes_str(file_path: str) -> str:
 class JinaEmbeddings(BaseModel, Embeddings):
     """Jina embedding models."""
 
-    session: Any  #: :meta private:
+    session: Any
     model_name: str = "jina-embeddings-v2-base-en"
     jina_api_key: Optional[SecretStr] = None
 

@@ -28,8 +28,8 @@ def _import_tiktoken() -> Any:
 class GitHubAPIWrapper(BaseModel):
     """Wrapper for GitHub API."""
 
-    github: Any = None  #: :meta private:
-    github_repo_instance: Any = None  #: :meta private:
+    github: Any = None
+    github_repo_instance: Any = None
     github_repository: Optional[str] = None
     github_app_id: Optional[str] = None
     github_app_private_key: Optional[str] = None

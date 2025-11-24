@@ -44,11 +44,11 @@ class HuggingFaceEmbeddings(BaseModel, Embeddings):
             )
     """
 
-    client: Any = None  #: :meta private:
+    client: Any = None
     model_name: str = DEFAULT_MODEL_NAME
     """Model name to use."""
     cache_folder: Optional[str] = None
-    """Path to store models. 
+    """Path to store models.
     Can be also set by SENTENCE_TRANSFORMERS_HOME environment variable."""
     model_kwargs: Dict[str, Any] = Field(default_factory=dict)
     """Keyword arguments to pass to the Sentence Transformer model, such as `device`,
@@ -156,11 +156,11 @@ class HuggingFaceInstructEmbeddings(BaseModel, Embeddings):
             )
     """
 
-    client: Any = None  #: :meta private:
+    client: Any = None
     model_name: str = DEFAULT_INSTRUCT_MODEL
     """Model name to use."""
     cache_folder: Optional[str] = None
-    """Path to store models. 
+    """Path to store models.
     Can be also set by SENTENCE_TRANSFORMERS_HOME environment variable."""
     model_kwargs: Dict[str, Any] = Field(default_factory=dict)
     """Keyword arguments to pass to the model."""
@@ -293,7 +293,7 @@ class HuggingFaceBgeEmbeddings(BaseModel, Embeddings):
             )
     """
 
-    client: Any = None  #: :meta private:
+    client: Any = None
     model_name: str = DEFAULT_BGE_MODEL
     """Model name to use."""
     cache_folder: Optional[str] = None
