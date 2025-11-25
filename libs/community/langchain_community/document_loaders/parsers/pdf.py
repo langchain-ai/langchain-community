@@ -1542,6 +1542,7 @@ class AmazonTextractPDFParser(BaseBlobParser):
         client: Optional[Any] = None,
         *,
         linearization_config: Optional[TextLinearizationConfig] = None,
+        mime_type: Optional[str] = None,
     ) -> None:
         """Initializes the parser.
 
@@ -1553,6 +1554,7 @@ class AmazonTextractPDFParser(BaseBlobParser):
             linearization_config: Config to be used for linearization of the output
                                   should be an instance of TextLinearizationConfig from
                                   the `textractor` pkg
+            mime_type: Mime type of the document to be parsed.
         """
 
         try:
@@ -1561,6 +1563,7 @@ class AmazonTextractPDFParser(BaseBlobParser):
 
             self.tc = tc
             self.textractor = textractor
+            self.mime_type = mime_type
 
             if textract_features is not None:
                 self.textract_features = [
@@ -1617,6 +1620,7 @@ class AmazonTextractPDFParser(BaseBlobParser):
                 input_document=str(blob.path),
                 features=self.textract_features,
                 boto3_textract_client=self.boto3_textract_client,
+                mime_type=self.mime_type,
             )
         else:
             textract_response_json = self.tc.call_textract(
@@ -1624,6 +1628,7 @@ class AmazonTextractPDFParser(BaseBlobParser):
                 features=self.textract_features,
                 call_mode=self.tc.Textract_Call_Mode.FORCE_SYNC,
                 boto3_textract_client=self.boto3_textract_client,
+                mime_type=self.mime_type,
             )
 
         document = self.textractor.Document.open(textract_response_json)

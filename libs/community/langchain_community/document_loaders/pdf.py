@@ -1079,6 +1079,7 @@ class AmazonTextractPDFLoader(BasePDFLoader):
         headers: Optional[dict] = None,
         *,
         linearization_config: Optional["TextLinearizationConfig"] = None,
+        mime_type: Optional[str] = None,
     ) -> None:
         """Initialize the loader.
 
@@ -1142,6 +1143,7 @@ class AmazonTextractPDFLoader(BasePDFLoader):
             textract_features=features,
             client=client,
             linearization_config=linearization_config,
+            mime_type=mime_type,
         )
 
     def load(self) -> list[Document]:
@@ -1380,7 +1382,7 @@ class ZeroxPDFLoader(BasePDFLoader):
                 Hosted models are passed in format "<provider>/<model>"
                 Examples: "azure/gpt-4o-mini", "vertex_ai/gemini-1.5-flash-001"
                           See more details in zerox documentation.
-            **zerox_kwargs: 
+            **zerox_kwargs:
                 Arguments specific to the zerox function.
                 see datailed list of arguments here in zerox repository:
                 https://github.com/getomni-ai/zerox/blob/main/py_zerox/pyzerox/core/zerox.py#L25
