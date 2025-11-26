@@ -2,6 +2,8 @@ from __future__ import annotations
 
 from typing import Any, Dict, Iterator, List, Optional
 
+from openai import OpenAI
+from langchian_openai import ChatOpenAI
 from langchain_core.callbacks import CallbackManagerForLLMRun
 from langchain_core.language_models.llms import LLM
 from langchain_core.outputs import GenerationChunk
@@ -16,24 +18,16 @@ class VolcEngineMaasBase(BaseModel):
 
     client: Any = None
 
-    volc_engine_maas_ak: Optional[SecretStr] = None
-    """access key for volc engine"""
-    volc_engine_maas_sk: Optional[SecretStr] = None
-    """secret key for volc engine"""
+    volc_engine_api_key: Optional[SecretStr] = None
+    """api key for volc engine"""
 
-    endpoint: Optional[str] = "maas-api.ml-platform-cn-beijing.volces.com"
+    endpoint: Optional[str] = "https://ark.cn-beijing.volces.com/api/v3"
     """Endpoint of the VolcEngineMaas LLM."""
 
-    region: Optional[str] = "Region"
-    """Region of the VolcEngineMaas LLM."""
-
     model: str = "skylark-lite-public"
-    """Model name. you could check this model details here 
+    """Model name or Endpoint ID. you could check this model details here
     https://www.volcengine.com/docs/82379/1133187
     and you could choose other models by change this field"""
-    model_version: Optional[str] = None
-    """Model version. Only used in moonshot large language model. 
-    you could check details here https://www.volcengine.com/docs/82379/1158281"""
 
     top_p: Optional[float] = 0.8
     """Total probability mass of tokens to consider at each step."""
@@ -51,16 +45,13 @@ class VolcEngineMaasBase(BaseModel):
     """Timeout for connect to volc engine maas endpoint. Default is 60 seconds."""
 
     read_timeout: Optional[int] = 60
-    """Timeout for read response from volc engine maas endpoint. 
+    """Timeout for read response from volc engine maas endpoint.
     Default is 60 seconds."""
 
     @pre_init
     def validate_environment(cls, values: Dict) -> Dict:
-        volc_engine_maas_ak = convert_to_secret_str(
-            get_from_dict_or_env(values, "volc_engine_maas_ak", "VOLC_ACCESSKEY")
-        )
-        volc_engine_maas_sk = convert_to_secret_str(
-            get_from_dict_or_env(values, "volc_engine_maas_sk", "VOLC_SECRETKEY")
+        volc_engine_api_key = convert_to_secret_str(
+            get_from_dict_or_env(values, "volc_engine_api_key", "VOLC_ACCESSKEY")
         )
         endpoint = values["endpoint"]
         if values["endpoint"] is not None and values["endpoint"] != "":
