@@ -18,7 +18,8 @@ class WolframAlphaAPIWrapper(BaseModel):
 
     """
 
-    wolfram_client: Any = None  #: :meta private:
+    wolfram_client: Any = None
+
     wolfram_alpha_appid: Optional[str] = None
 
     model_config = ConfigDict(

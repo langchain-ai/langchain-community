@@ -7,15 +7,19 @@ from pydantic import BaseModel, Field, model_validator
 class StackExchangeAPIWrapper(BaseModel):
     """Wrapper for Stack Exchange API."""
 
-    client: Any = None  #: :meta private:
+    client: Any = None
+
     max_results: int = 3
     """Max number of results to include in output."""
+
     query_type: Literal["all", "title", "body"] = "all"
-    """Which part of StackOverflows items to match against. One of 'all', 'title', 
-        'body'. Defaults to 'all'.
+    """Which part of StackOverflows items to match against. One of 'all', 'title',
+    'body'. Defaults to 'all'.
     """
+
     fetch_params: Dict[str, Any] = Field(default_factory=dict)
     """Additional params to pass to StackApi.fetch."""
+
     result_separator: str = "\n\n"
     """Separator between question,answer pairs."""
 

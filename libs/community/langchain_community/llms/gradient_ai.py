@@ -70,7 +70,7 @@ class GradientLLM(BaseLLM):
     gradient_api_url: str = "https://api.gradient.ai/api"
     """Endpoint URL to use."""
 
-    aiosession: Optional[aiohttp.ClientSession] = None  #: :meta private:
+    aiosession: Optional[aiohttp.ClientSession] = None
     """ClientSession, private, subject to change in upcoming releases."""
 
     # LLM call kwargs

@@ -163,10 +163,7 @@ class SearxResults(dict):
 
     @property
     def results(self) -> Any:
-        """Silence mypy for accessing this field.
-
-        :meta private:
-        """
+        """Silence mypy for accessing this field."""
         return self.get("results")
 
     @property

@@ -59,7 +59,7 @@ class BaichuanTextEmbeddings(BaseModel, Embeddings):
             vectors = embeddings.embed_query(text)
     """  # noqa: E501
 
-    session: Any = None  #: :meta private:
+    session: Any = None
     model_name: str = Field(default="Baichuan-Text-Embedding", alias="model")
     """The model used to embed the documents."""
     baichuan_api_key: SecretStr = Field(

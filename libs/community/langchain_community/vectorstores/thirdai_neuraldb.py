@@ -32,7 +32,7 @@ class NeuralDBVectorStore(VectorStore):
     def __init__(self, db: "ndb.NeuralDB") -> None:
         self.db = db
 
-    db: "ndb.NeuralDB" = None  #: :meta private:
+    db: "ndb.NeuralDB" = None
     """NeuralDB instance"""
 
     model_config = ConfigDict(
@@ -334,7 +334,7 @@ class NeuralDBClientVectorStore(VectorStore):
     def __init__(self, db: "ndb.NeuralDBClient") -> None:
         self.db = db
 
-    db: "ndb.NeuralDBClient" = None  #: :meta private:
+    db: "ndb.NeuralDBClient" = None
     """NeuralDB Client instance"""
 
     model_config = ConfigDict(
