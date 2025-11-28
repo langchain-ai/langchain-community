@@ -98,6 +98,7 @@ EXPECTED_ALL = [
     "LLMSherpaFileLoader",
     "LarkSuiteDocLoader",
     "LakeFSLoader",
+    "LandingAIADEDocumentLoader",
     "MHTMLLoader",
     "MWDumpLoader",
     "MastodonTootsLoader",

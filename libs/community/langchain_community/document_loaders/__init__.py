@@ -270,6 +270,9 @@ if TYPE_CHECKING:
     from langchain_community.document_loaders.lakefs import (
         LakeFSLoader,
     )
+    from langchain_community.document_loaders.landing_ai_ade import (
+        LandingAIADEDocumentLoader,
+    )
     from langchain_community.document_loaders.larksuite import (
         LarkSuiteDocLoader,
     )
@@ -626,6 +629,7 @@ _module_lookup = {
     "JoplinLoader": "langchain_community.document_loaders.joplin",
     "KineticaLoader": "langchain_community.document_loaders.kinetica_loader",
     "LakeFSLoader": "langchain_community.document_loaders.lakefs",
+    "LandingAIADEDocumentLoader": "langchain_community.document_loaders.landing_ai_ade",
     "LarkSuiteDocLoader": "langchain_community.document_loaders.larksuite",
     "LLMSherpaFileLoader": "langchain_community.document_loaders.llmsherpa",
     "MHTMLLoader": "langchain_community.document_loaders.mhtml",
@@ -834,6 +838,7 @@ __all__ = [
     "JSONLoader",
     "KineticaLoader",
     "LakeFSLoader",
+    "LandingAIADEDocumentLoader",
     "LarkSuiteDocLoader",
     "LLMSherpaFileLoader",
     "MastodonTootsLoader",
