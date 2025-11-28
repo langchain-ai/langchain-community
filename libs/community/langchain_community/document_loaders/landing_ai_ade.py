@@ -1,7 +1,7 @@
 """Load documents using Landing AI's ADE (Agentic Document Extraction)."""
 
 from pathlib import Path
-from typing import Iterator, Optional, Union
+from typing import Iterator, Literal, Optional, Union
 from urllib.parse import urlparse
 
 from langchain_core.documents import Document
@@ -60,7 +60,7 @@ class LandingAIADEDocumentLoader(BaseLoader):
         file_path: Union[str, Path],
         api_key: Optional[str] = None,
         model: str = "dpt-2-latest",
-        environment: str = "production",
+        environment: Literal["production", "eu"] = "production",
         **kwargs: dict,
     ) -> None:
         """Initialize the loader.
