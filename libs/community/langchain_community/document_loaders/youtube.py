@@ -420,7 +420,7 @@ class GoogleApiYoutubeLoader(BaseLoader):
         return values.kwargs
 
     def _get_transcript_for_video_id(self, video_id: str) -> str:
-        from youtube_transcript_api import NoTranscriptFound, YouTubeTranscriptApi
+        from youtube_transcript_api import NoTranscriptFound, YouTubeTranscriptApi, FetchedTranscript
 
         if getattr(self, "proxy_config", None) is not None:
         api = YouTubeTranscriptApi(proxy_config=self.proxy_config)
