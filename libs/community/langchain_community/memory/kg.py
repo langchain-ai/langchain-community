@@ -13,13 +13,13 @@ from langchain_community.graphs.networkx_graph import (
 )
 
 try:
-    from langchain.chains.llm import LLMChain
-    from langchain.memory.chat_memory import BaseChatMemory
-    from langchain.memory.prompt import (
+    from langchain_classic.chains.llm import LLMChain
+    from langchain_classic.memory.chat_memory import BaseChatMemory
+    from langchain_classic.memory.prompt import (
         ENTITY_EXTRACTION_PROMPT,
         KNOWLEDGE_TRIPLE_EXTRACTION_PROMPT,
     )
-    from langchain.memory.utils import get_prompt_input_key
+    from langchain_classic.memory.utils import get_prompt_input_key
 
     class ConversationKGMemory(BaseChatMemory):
         """Knowledge graph conversation memory.
@@ -39,7 +39,7 @@ try:
         llm: BaseLanguageModel
         summary_message_cls: Type[BaseMessage] = SystemMessage
         """Number of previous utterances to include in the context."""
-        memory_key: str = "history"  #: :meta private:
+        memory_key: str = "history"
 
         def load_memory_variables(self, inputs: Dict[str, Any]) -> Dict[str, Any]:
             """Return history buffer."""
@@ -65,10 +65,7 @@ try:
 
         @property
         def memory_variables(self) -> List[str]:
-            """Will always return list of memory variables.
-
-            :meta private:
-            """
+            """Will always return list of memory variables."""
             return [self.memory_key]
 
         def _get_prompt_input_key(self, inputs: Dict[str, Any]) -> str:

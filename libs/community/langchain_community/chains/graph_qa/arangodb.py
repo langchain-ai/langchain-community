@@ -5,8 +5,8 @@ from __future__ import annotations
 import re
 from typing import Any, Dict, List, Optional
 
-from langchain.chains.base import Chain
-from langchain.chains.llm import LLMChain
+from langchain_classic.chains.base import Chain
+from langchain_classic.chains.llm import LLMChain
 from langchain_core.callbacks import CallbackManagerForChainRun
 from langchain_core.language_models import BaseLanguageModel
 from langchain_core.prompts import BasePromptTemplate
@@ -39,8 +39,8 @@ class ArangoGraphQAChain(Chain):
     aql_generation_chain: LLMChain
     aql_fix_chain: LLMChain
     qa_chain: LLMChain
-    input_key: str = "query"  #: :meta private:
-    output_key: str = "result"  #: :meta private:
+    input_key: str = "query"
+    output_key: str = "result"
 
     # Specifies the maximum number of AQL Query Results to return
     top_k: int = 10

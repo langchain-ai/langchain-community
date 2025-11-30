@@ -343,13 +343,13 @@ class QianfanChatEndpoint(BaseChatModel):
     """  # noqa: E501
 
     init_kwargs: Dict[str, Any] = Field(default_factory=dict)
-    """init kwargs for qianfan client init, such as `query_per_second` which is 
+    """init kwargs for qianfan client init, such as `query_per_second` which is
         associated with qianfan resource object to limit QPS"""
 
     model_kwargs: Dict[str, Any] = Field(default_factory=dict)
     """extra params for model invoke using with `do`."""
 
-    client: Any = None  #: :meta private:
+    client: Any = None
 
     # It could be empty due to the use of Console API
     # And they're not list here
@@ -375,7 +375,7 @@ class QianfanChatEndpoint(BaseChatModel):
     model: Optional[str] = Field(default=None)
     """Model name.
     you could get from https://cloud.baidu.com/doc/WENXINWORKSHOP/s/Nlks5zkzu
-    
+
     preset models are mapping to an endpoint.
     `model` will be ignored if `endpoint` is set.
     Default is set by `qianfan` SDK, not here
@@ -475,8 +475,7 @@ class QianfanChatEndpoint(BaseChatModel):
             resulting dictionary.
 
         Returns:
-            Dict[str, Any]: A dictionary containing the message content and default
-            parameters.
+            `dict` containing the message content and default parameters.
 
         """
         messages_dict: Dict[str, Any] = {
@@ -693,7 +692,7 @@ class QianfanChatEndpoint(BaseChatModel):
         self,
         tools: Sequence[Union[Dict[str, Any], Type[BaseModel], Callable, BaseTool]],
         **kwargs: Any,
-    ) -> Runnable[LanguageModelInput, BaseMessage]:
+    ) -> Runnable[LanguageModelInput, AIMessage]:
         """Bind tool-like objects to this chat model.
 
         Assumes model is compatible with OpenAI tool-calling API.
@@ -720,18 +719,25 @@ class QianfanChatEndpoint(BaseChatModel):
         """Model wrapper that returns outputs formatted to match the given schema.
 
         Args:
-            schema: The output schema as a dict or a Pydantic class. If a Pydantic class
+            schema: The output schema as a dict or a Pydantic class.If a Pydantic class
                 then the model output will be an object of that class. If a dict then
                 the model output will be a dict. With a Pydantic class the returned
                 attributes will be validated, whereas with a dict they will not be. If
                 `method` is "function_calling" and `schema` is a dict, then the dict
                 must match the OpenAI function-calling spec.
-            include_raw: If False then only the parsed structured output is returned. If
-                an error occurs during model output parsing it will be raised. If True
-                then both the raw model response (a BaseMessage) and the parsed model
-                response will be returned. If an error occurs during output parsing it
-                will be caught and returned as well. The final output is always a dict
-                with keys "raw", "parsed", and "parsing_error".
+            include_raw:
+                If `False` then only the parsed structured output is returned.
+
+                If an error occurs during model output parsing it will be raised.
+
+                If `True` then both the raw model response (a `BaseMessage`) and the
+                parsed model response will be returned.
+
+                If an error occurs during output parsing it will be caught and returned
+                as well.
+
+                The final output is always a `dict` with keys `'raw'`, `'parsed'`, and
+                `'parsing_error'`.
 
         Returns:
             A Runnable that takes any ChatModel input and returns as output:

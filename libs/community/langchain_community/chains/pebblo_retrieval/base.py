@@ -9,8 +9,8 @@ import logging
 from importlib.metadata import version
 from typing import Any, Dict, List, Optional
 
-from langchain.chains.base import Chain
-from langchain.chains.combine_documents.base import BaseCombineDocumentsChain
+from langchain_classic.chains.base import Chain
+from langchain_classic.chains.combine_documents.base import BaseCombineDocumentsChain
 from langchain_core.callbacks import (
     AsyncCallbackManagerForChainRun,
     CallbackManagerForChainRun,
@@ -50,32 +50,32 @@ class PebbloRetrievalQA(Chain):
 
     combine_documents_chain: BaseCombineDocumentsChain
     """Chain to use to combine the documents."""
-    input_key: str = "query"  #: :meta private:
-    output_key: str = "result"  #: :meta private:
+    input_key: str = "query"
+    output_key: str = "result"
     return_source_documents: bool = False
     """Return the source documents or not."""
 
     retriever: VectorStoreRetriever = Field(exclude=True)
     """VectorStore to use for retrieval."""
-    auth_context_key: str = "auth_context"  #: :meta private:
+    auth_context_key: str = "auth_context"
     """Authentication context for identity enforcement."""
-    semantic_context_key: str = "semantic_context"  #: :meta private:
+    semantic_context_key: str = "semantic_context"
     """Semantic context for semantic enforcement."""
-    app_name: str  #: :meta private:
+    app_name: str
     """App name."""
-    owner: str  #: :meta private:
+    owner: str
     """Owner of app."""
-    description: str  #: :meta private:
+    description: str
     """Description of app."""
-    api_key: Optional[str] = None  #: :meta private:
+    api_key: Optional[str] = None
     """Pebblo cloud API key for app."""
-    classifier_url: Optional[str] = None  #: :meta private:
+    classifier_url: Optional[str] = None
     """Classifier endpoint."""
-    classifier_location: str = "local"  #: :meta private:
+    classifier_location: str = "local"
     """Classifier location. It could be either of 'local' or 'pebblo-cloud'."""
-    _discover_sent: bool = False  #: :meta private:
+    _discover_sent: bool = False
     """Flag to check if discover payload has been sent."""
-    enable_prompt_gov: bool = True  #: :meta private:
+    enable_prompt_gov: bool = True
     """Flag to check if prompt governance is enabled or not"""
     pb_client: PebbloRetrievalAPIWrapper = Field(
         default_factory=PebbloRetrievalAPIWrapper
@@ -197,18 +197,12 @@ class PebbloRetrievalQA(Chain):
 
     @property
     def input_keys(self) -> List[str]:
-        """Input keys.
-
-        :meta private:
-        """
+        """Input keys."""
         return [self.input_key, self.auth_context_key, self.semantic_context_key]
 
     @property
     def output_keys(self) -> List[str]:
-        """Output keys.
-
-        :meta private:
-        """
+        """Output keys."""
         _output_keys = [self.output_key]
         if self.return_source_documents:
             _output_keys += ["source_documents"]
@@ -234,7 +228,7 @@ class PebbloRetrievalQA(Chain):
         **kwargs: Any,
     ) -> "PebbloRetrievalQA":
         """Load chain from chain type."""
-        from langchain.chains.question_answering import load_qa_chain
+        from langchain_classic.chains.question_answering import load_qa_chain
 
         _chain_type_kwargs = chain_type_kwargs or {}
         combine_documents_chain = load_qa_chain(
@@ -294,8 +288,8 @@ class PebbloRetrievalQA(Chain):
     ) -> List[Document]:
         """Get docs."""
         set_enforcement_filters(self.retriever, auth_context, semantic_context)
-        return self.retriever.get_relevant_documents(
-            question, callbacks=run_manager.get_child()
+        return self.retriever.invoke(
+            question, config={"callbacks": run_manager.get_child()}
         )
 
     async def _aget_docs(
@@ -308,8 +302,8 @@ class PebbloRetrievalQA(Chain):
     ) -> List[Document]:
         """Get docs."""
         set_enforcement_filters(self.retriever, auth_context, semantic_context)
-        return await self.retriever.aget_relevant_documents(
-            question, callbacks=run_manager.get_child()
+        return await self.retriever.ainvoke(
+            question, config={"callbacks": run_manager.get_child()}
         )
 
     @staticmethod

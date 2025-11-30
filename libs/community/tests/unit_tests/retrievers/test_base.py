@@ -16,62 +16,32 @@ from tests.unit_tests.callbacks.fake_callback_handler import FakeCallbackHandler
 
 @pytest.fixture
 def fake_retriever_v1() -> BaseRetriever:
-    with pytest.warns(
-        DeprecationWarning,
-        match="Retrievers must implement abstract "
-        "`_get_relevant_documents` method instead of `get_relevant_documents`",
-    ):
+    class FakeRetrieverV1(BaseRetriever):
+        def _get_relevant_documents(
+            self,
+            query: str,
+            *,
+            run_manager: CallbackManagerForRetrieverRun,
+        ) -> List[Document]:
+            assert isinstance(self, FakeRetrieverV1)
+            return [
+                Document(page_content=query, metadata={"uuid": "1234"}),
+            ]
 
-        class FakeRetrieverV1(BaseRetriever):
-            def get_relevant_documents(  # type: ignore[override]
-                self,
-                query: str,
-            ) -> List[Document]:
-                assert isinstance(self, FakeRetrieverV1)
-                return [
-                    Document(page_content=query, metadata={"uuid": "1234"}),
-                ]
+        async def _aget_relevant_documents(
+            self,
+            query: str,
+            *,
+            run_manager: AsyncCallbackManagerForRetrieverRun,
+        ) -> List[Document]:
+            assert isinstance(self, FakeRetrieverV1)
+            return [
+                Document(
+                    page_content=f"Async query {query}", metadata={"uuid": "1234"}
+                ),
+            ]
 
-            async def aget_relevant_documents(  # type: ignore[override]
-                self,
-                query: str,
-            ) -> List[Document]:
-                assert isinstance(self, FakeRetrieverV1)
-                return [
-                    Document(
-                        page_content=f"Async query {query}", metadata={"uuid": "1234"}
-                    ),
-                ]
-
-        return FakeRetrieverV1()  # type: ignore[abstract]
-
-
-def test_fake_retriever_v1_upgrade(fake_retriever_v1: BaseRetriever) -> None:
-    callbacks = FakeCallbackHandler()
-    assert fake_retriever_v1._new_arg_supported is False
-    assert fake_retriever_v1._expects_other_args is False
-    results: List[Document] = fake_retriever_v1.invoke(
-        "Foo", config={"callbacks": [callbacks]}
-    )
-    assert results[0].page_content == "Foo"
-    assert callbacks.retriever_starts == 1
-    assert callbacks.retriever_ends == 1
-    assert callbacks.retriever_errors == 0
-
-
-async def test_fake_retriever_v1_upgrade_async(
-    fake_retriever_v1: BaseRetriever,
-) -> None:
-    callbacks = FakeCallbackHandler()
-    assert fake_retriever_v1._new_arg_supported is False
-    assert fake_retriever_v1._expects_other_args is False
-    results: List[Document] = await fake_retriever_v1.ainvoke(
-        "Foo", config={"callbacks": [callbacks]}
-    )
-    assert results[0].page_content == "Async query Foo"
-    assert callbacks.retriever_starts == 1
-    assert callbacks.retriever_ends == 1
-    assert callbacks.retriever_errors == 0
+    return FakeRetrieverV1()
 
 
 def test_fake_retriever_v1_standard_params(fake_retriever_v1: BaseRetriever) -> None:
@@ -82,64 +52,34 @@ def test_fake_retriever_v1_standard_params(fake_retriever_v1: BaseRetriever) -> 
 @pytest.fixture
 def fake_retriever_v1_with_kwargs() -> BaseRetriever:
     # Test for things like the Weaviate V1 Retriever.
-    with pytest.warns(
-        DeprecationWarning,
-        match="Retrievers must implement abstract "
-        "`_get_relevant_documents` method instead of `get_relevant_documents`",
-    ):
+    class FakeRetrieverV1(BaseRetriever):
+        def _get_relevant_documents(
+            self,
+            query: str,
+            *,
+            run_manager: CallbackManagerForRetrieverRun,
+            where_filter: Optional[Dict[str, object]] = None,
+        ) -> List[Document]:
+            assert isinstance(self, FakeRetrieverV1)
+            return [
+                Document(page_content=query, metadata=where_filter or {}),
+            ]
 
-        class FakeRetrieverV1(BaseRetriever):
-            def get_relevant_documents(  # type: ignore[override]
-                self, query: str, where_filter: Optional[Dict[str, object]] = None
-            ) -> List[Document]:
-                assert isinstance(self, FakeRetrieverV1)
-                return [
-                    Document(page_content=query, metadata=where_filter or {}),
-                ]
+        async def _aget_relevant_documents(
+            self,
+            query: str,
+            *,
+            run_manager: AsyncCallbackManagerForRetrieverRun,
+            where_filter: Optional[Dict[str, object]] = None,
+        ) -> List[Document]:
+            assert isinstance(self, FakeRetrieverV1)
+            return [
+                Document(
+                    page_content=f"Async query {query}", metadata=where_filter or {}
+                ),
+            ]
 
-            async def aget_relevant_documents(  # type: ignore[override]
-                self, query: str, where_filter: Optional[Dict[str, object]] = None
-            ) -> List[Document]:
-                assert isinstance(self, FakeRetrieverV1)
-                return [
-                    Document(
-                        page_content=f"Async query {query}", metadata=where_filter or {}
-                    ),
-                ]
-
-        return FakeRetrieverV1()  # type: ignore[abstract]
-
-
-def test_fake_retriever_v1_with_kwargs_upgrade(
-    fake_retriever_v1_with_kwargs: BaseRetriever,
-) -> None:
-    callbacks = FakeCallbackHandler()
-    assert fake_retriever_v1_with_kwargs._new_arg_supported is False
-    assert fake_retriever_v1_with_kwargs._expects_other_args is True
-    results: List[Document] = fake_retriever_v1_with_kwargs.invoke(
-        "Foo", config={"callbacks": [callbacks]}, where_filter={"foo": "bar"}
-    )
-    assert results[0].page_content == "Foo"
-    assert results[0].metadata == {"foo": "bar"}
-    assert callbacks.retriever_starts == 1
-    assert callbacks.retriever_ends == 1
-    assert callbacks.retriever_errors == 0
-
-
-async def test_fake_retriever_v1_with_kwargs_upgrade_async(
-    fake_retriever_v1_with_kwargs: BaseRetriever,
-) -> None:
-    callbacks = FakeCallbackHandler()
-    assert fake_retriever_v1_with_kwargs._new_arg_supported is False
-    assert fake_retriever_v1_with_kwargs._expects_other_args is True
-    results: List[Document] = await fake_retriever_v1_with_kwargs.ainvoke(
-        "Foo", config={"callbacks": [callbacks]}, where_filter={"foo": "bar"}
-    )
-    assert results[0].page_content == "Async query Foo"
-    assert results[0].metadata == {"foo": "bar"}
-    assert callbacks.retriever_starts == 1
-    assert callbacks.retriever_ends == 1
-    assert callbacks.retriever_errors == 0
+    return FakeRetrieverV1()
 
 
 class FakeRetrieverV2(BaseRetriever):

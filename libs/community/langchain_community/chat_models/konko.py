@@ -13,6 +13,7 @@ from typing import (
     Optional,
     Set,
     Tuple,
+    Type,
     Union,
     cast,
 )
@@ -21,7 +22,7 @@ import requests
 from langchain_core.callbacks import (
     CallbackManagerForLLMRun,
 )
-from langchain_core.messages import AIMessageChunk, BaseMessage
+from langchain_core.messages import AIMessageChunk, BaseMessage, BaseMessageChunk
 from langchain_core.outputs import ChatGenerationChunk, ChatResult
 from langchain_core.utils import convert_to_secret_str, get_from_dict_or_env, pre_init
 from pydantic import Field, SecretStr
@@ -67,7 +68,7 @@ class ChatKonko(ChatOpenAI):
         """Return whether this model can be serialized by Langchain."""
         return False
 
-    client: Any = None  #: :meta private:
+    client: Any = None
     model: str = Field(default=DEFAULT_MODEL, alias="model")
     """Model name to use."""
     temperature: float = 0.7
@@ -202,7 +203,7 @@ class ChatKonko(ChatOpenAI):
         message_dicts, params = self._create_message_dicts(messages, stop)
         params = {**params, **kwargs, "stream": True}
 
-        default_chunk_class = AIMessageChunk
+        default_chunk_class: Type[BaseMessageChunk] = AIMessageChunk
         for chunk in self.completion_with_retry(
             messages=message_dicts, run_manager=run_manager, **params
         ):

@@ -28,7 +28,7 @@ class LlamaCpp(LLM):
             llm = LlamaCpp(model_path="/path/to/llama/model")
     """
 
-    client: Any = None  #: :meta private:
+    client: Any = None
     model_path: str
     """The path to the Llama model file."""
 
@@ -125,8 +125,8 @@ class LlamaCpp(LLM):
     """
     grammar: Optional[Union[str, Any]] = None
     """
-    grammar: formal grammar for constraining model outputs. For instance, the grammar 
-    can be used to force the model to generate valid JSON or to speak exclusively in 
+    grammar: formal grammar for constraining model outputs. For instance, the grammar
+    can be used to force the model to generate valid JSON or to speak exclusively in
     emojis. At most one of grammar_path and grammar should be passed in.
     """
 

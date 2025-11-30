@@ -262,11 +262,14 @@ class YoutubeLoader(BaseLoader):
             self._metadata.update(video_info)
 
         try:
-            if hasattr(self, "proxy_config") and self.proxy_config:
-                yta = YouTubeTranscriptApi(proxy_config=self.proxy_config)
-                transcript_list = yta.list_transcripts(self.video_id)
+            # Create a YouTubeTranscriptApi client, optionally with proxy_config
+            if self.proxy_config is not None:
+                api = YouTubeTranscriptApi(proxy_config=self.proxy_config)
             else:
-                transcript_list = YouTubeTranscriptApi.list_transcripts(self.video_id)
+                api = YouTubeTranscriptApi()
+
+            # New-style instance API: returns a TranscriptList
+            transcript_list = api.list(self.video_id)
         except TranscriptsDisabled:
             return []
 
@@ -416,23 +419,32 @@ class GoogleApiYoutubeLoader(BaseLoader):
             raise ValueError("Must specify either channel_name or video_ids")
         return values.kwargs
 
-    def _get_transcripe_for_video_id(self, video_id: str) -> str:
+    def _get_transcript_for_video_id(self, video_id: str) -> str:
         from youtube_transcript_api import NoTranscriptFound, YouTubeTranscriptApi
 
-        if hasattr(self, "proxy_config") and self.proxy_config:
-            yta = YouTubeTranscriptApi(proxy_config=self.proxy_config)
-            transcript_list = yta.list_transcripts(video_id)
+        if getattr(self, "proxy_config", None) is not None:
+        api = YouTubeTranscriptApi(proxy_config=self.proxy_config)
         else:
-            transcript_list = YouTubeTranscriptApi.list_transcripts(video_id)
+            api = YouTubeTranscriptApi()
+
+        transcript_list = api.list(video_id)
+        
         try:
             transcript = transcript_list.find_transcript([self.captions_language])
         except NoTranscriptFound:
             for available_transcript in transcript_list:
                 transcript = available_transcript.translate(self.captions_language)
                 continue
-
-        transcript_pieces = transcript.fetch()
-        return " ".join([t["text"].strip(" ") for t in transcript_pieces])
+        
+        # new version returns iterable FetchedTranscript
+        fetched = transcript.fetch()
+        if isinstance(fetched, FetchedTranscript):
+          return " ".join([t["text"].strip(" ") for t in transcript_pieces])
+        
+        # backwards compatible, list of dicts
+        else:
+          return " ".join(t["text"].strip(" ") for t in transcript_pieces)
+        
 
     def _get_document_for_video_id(self, video_id: str, **kwargs: Any) -> Document:
         captions = self._get_transcripe_for_video_id(video_id)

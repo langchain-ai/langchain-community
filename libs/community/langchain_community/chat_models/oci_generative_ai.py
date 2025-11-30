@@ -649,7 +649,7 @@ class ChatOCIGenAI(BaseChatModel, OCIGenAIBase):
         self,
         tools: Sequence[Union[Dict[str, Any], Type[BaseModel], Callable, BaseTool]],
         **kwargs: Any,
-    ) -> Runnable[LanguageModelInput, BaseMessage]:
+    ) -> Runnable[LanguageModelInput, AIMessage]:
         formatted_tools = [self._provider.convert_to_oci_tool(tool) for tool in tools]
         return super().bind(tools=formatted_tools, **kwargs)
 
@@ -678,12 +678,18 @@ class ChatOCIGenAI(BaseChatModel, OCIGenAIBase):
                 used. Note that if using "json_mode" then you must include instructions
                 for formatting the output into the desired schema into the model call.
             include_raw:
-                If False then only the parsed structured output is returned. If
-                an error occurs during model output parsing it will be raised. If True
-                then both the raw model response (a BaseMessage) and the parsed model
-                response will be returned. If an error occurs during output parsing it
-                will be caught and returned as well. The final output is always a dict
-                with keys "raw", "parsed", and "parsing_error".
+                If `False` then only the parsed structured output is returned.
+
+                If an error occurs during model output parsing it will be raised.
+
+                If `True` then both the raw model response (a `BaseMessage`) and the
+                parsed model response will be returned.
+
+                If an error occurs during output parsing it will be caught and returned
+                as well.
+
+                The final output is always a `dict` with keys `'raw'`, `'parsed'`, and
+                `'parsing_error'`.
 
         Returns:
             A Runnable that takes any ChatModel input and returns as output:

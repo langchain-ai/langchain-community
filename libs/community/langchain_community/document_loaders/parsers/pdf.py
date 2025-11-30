@@ -73,22 +73,21 @@ def extract_from_images_with_rapidocr(
         Text extracted from images.
 
     Raises:
-        ImportError: If `rapidocr-onnxruntime` package is not installed.
+        ImportError: If `rapidocr` package is not installed.
     """
     try:
-        from rapidocr_onnxruntime import RapidOCR
+        from rapidocr import RapidOCR
     except ImportError:
         raise ImportError(
-            "`rapidocr-onnxruntime` package not found, please install it with "
-            "`pip install rapidocr-onnxruntime`"
+            "`rapidocr` package not found, please install it with "
+            "`pip install rapidocr`"
         )
     ocr = RapidOCR()
     text = ""
     for img in images:
-        result, _ = ocr(img)
-        if result:
-            result = [text[1] for text in result]
-            text += "\n".join(result)
+        result = ocr(img)
+        if result and result.txts:
+            text += "\n".join(result.txts)
     return text
 
 
@@ -458,10 +457,10 @@ class PyPDFParser(BaseBlobParser):
                 if np_image is not None:
                     image_bytes = io.BytesIO()
 
+                    Image.fromarray(np_image).save(image_bytes, format="PNG")
                     if image_bytes.getbuffer().nbytes == 0:
                         continue
 
-                    Image.fromarray(np_image).save(image_bytes, format="PNG")
                     blob = Blob.from_data(image_bytes.getvalue(), mime_type="image/png")
                     image_text = next(self.images_parser.lazy_parse(blob)).page_content
                     images.append(
@@ -1112,10 +1111,10 @@ class PyMuPDFParser(BaseBlobParser):
                     pix.height, pix.width, -1
                 )
                 image_bytes = io.BytesIO()
+                numpy.save(image_bytes, image)
                 if image_bytes.getbuffer().nbytes == 0:
                     continue
 
-                numpy.save(image_bytes, image)
                 blob = Blob.from_data(
                     image_bytes.getvalue(), mime_type="application/x-npy"
                 )

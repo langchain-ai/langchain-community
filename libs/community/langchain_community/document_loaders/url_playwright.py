@@ -116,6 +116,16 @@ class PlaywrightURLLoader(BaseLoader):
             through the specified proxy.
         browser_session (Optional[Union[str, os.PathLike[str]]]): Path to a file with
             browser session data that can be used to restore the browser session.
+        timeout (Optional[int]): Timeout in milliseconds for page navigation.
+        wait_until (Optional[str]): When to consider navigation succeeded.
+
+            Can be one of:
+
+            - "load": wait for the "load" event to fire
+            - "domcontentloaded": wait for the "DOMContentLoaded" event to fire
+            - "networkidle": wait until there are no network connections for at least
+                500ms
+            - "commit": wait for the first network request to be sent
 
     Example:
         .. code-block:: python
@@ -128,7 +138,12 @@ class PlaywrightURLLoader(BaseLoader):
                 "username": "username",
                 "password": "password"
             }
-            loader = PlaywrightURLLoader(urls, proxy=proxy)
+            loader = PlaywrightURLLoader(
+                urls=urls,
+                proxy=proxy,
+                timeout=60000,  # 60 second timeout
+                wait_until="domcontentloaded"  # Wait for DOM content to load
+            )
             data = loader.load()
     """
 
@@ -141,6 +156,8 @@ class PlaywrightURLLoader(BaseLoader):
         evaluator: Optional[PlaywrightEvaluator] = None,
         proxy: Optional[Dict[str, str]] = None,
         browser_session: Optional[Union[str, os.PathLike[str]]] = None,
+        timeout: Optional[int] = 30000,
+        wait_until: Optional[str] = "load",
     ):
         """Load a list of URLs using Playwright."""
         try:
@@ -156,6 +173,8 @@ class PlaywrightURLLoader(BaseLoader):
         self.headless = headless
         self.proxy = proxy
         self.browser_session = browser_session
+        self.timeout = timeout
+        self.wait_until = wait_until
 
         if remove_selectors and evaluator:
             raise ValueError(
@@ -189,11 +208,13 @@ class PlaywrightURLLoader(BaseLoader):
             for url in self.urls:
                 try:
                     page = context.new_page()
-                    response = page.goto(url)
+                    response = page.goto(
+                        url, timeout=self.timeout, wait_until=self.wait_until
+                    )
                     if response is None:
                         raise ValueError(f"page.goto() returned None for url {url}")
 
-                    page.wait_for_load_state("load")
+                    page.wait_for_load_state(self.wait_until, timeout=self.timeout)
 
                     text = self.evaluator.evaluate(page, browser, response)
                     page.close()
@@ -244,11 +265,15 @@ class PlaywrightURLLoader(BaseLoader):
             for url in self.urls:
                 try:
                     page = await context.new_page()
-                    response = await page.goto(url)
+                    response = await page.goto(
+                        url, timeout=self.timeout, wait_until=self.wait_until
+                    )
                     if response is None:
                         raise ValueError(f"page.goto() returned None for url {url}")
 
-                    await page.wait_for_load_state("load")
+                    await page.wait_for_load_state(
+                        self.wait_until, timeout=self.timeout
+                    )
 
                     text = await self.evaluator.evaluate_async(page, browser, response)
                     await page.close()

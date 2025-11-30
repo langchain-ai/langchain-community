@@ -35,7 +35,7 @@ class BedrockEmbeddings(BaseModel, Embeddings):
         .. code-block:: python
 
             from langchain_community.bedrock_embeddings import BedrockEmbeddings
-            
+
             region_name ="us-east-1"
             credentials_profile_name = "default"
             model_id = "amazon.titan-embed-text-v1"
@@ -47,7 +47,7 @@ class BedrockEmbeddings(BaseModel, Embeddings):
             )
     """
 
-    client: Any = None  #: :meta private:
+    client: Any = None
     """Bedrock client."""
     region_name: Optional[str] = None
     """The aws region e.g., `us-west-2`. Fallsback to AWS_DEFAULT_REGION env variable
