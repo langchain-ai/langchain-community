@@ -423,7 +423,7 @@ class GoogleApiYoutubeLoader(BaseLoader):
         from youtube_transcript_api import NoTranscriptFound, YouTubeTranscriptApi, FetchedTranscript
 
         if getattr(self, "proxy_config", None) is not None:
-        api = YouTubeTranscriptApi(proxy_config=self.proxy_config)
+            api = YouTubeTranscriptApi(proxy_config=self.proxy_config)
         else:
             api = YouTubeTranscriptApi()
 
