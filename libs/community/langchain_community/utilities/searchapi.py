@@ -1,4 +1,4 @@
-from typing import Any, Dict, Optional
+from typing import Any, Dict, Optional, List
 
 import aiohttp
 import requests
@@ -103,36 +103,97 @@ class SearchApiAPIWrapper(BaseModel):
         return results
 
     @staticmethod
-    def _result_as_string(result: dict) -> str:
-        toret = "No good search result found"
-        if "answer_box" in result.keys() and "answer" in result["answer_box"].keys():
-            toret = result["answer_box"]["answer"]
-        elif "answer_box" in result.keys() and "snippet" in result["answer_box"].keys():
-            toret = result["answer_box"]["snippet"]
-        elif "knowledge_graph" in result.keys():
-            toret = result["knowledge_graph"]["description"]
-        elif "organic_results" in result.keys():
-            snippets = [
-                r["snippet"] for r in result["organic_results"] if "snippet" in r.keys()
-            ]
-            toret = "\n".join(snippets)
-        elif "jobs" in result.keys():
-            jobs = [
-                r["description"] for r in result["jobs"] if "description" in r.keys()
-            ]
-            toret = "\n".join(jobs)
-        elif "videos" in result.keys():
-            videos = [
-                f"""Title: "{r["title"]}" Link: {r["link"]}"""
-                for r in result["videos"]
-                if "title" in r.keys()
-            ]
-            toret = "\n".join(videos)
-        elif "images" in result.keys():
-            images = [
-                f"""Title: "{r["title"]}" Link: {r["original"]["link"]}"""
-                for r in result["images"]
-                if "original" in r.keys()
-            ]
-            toret = "\n".join(images)
-        return toret
+    def _result_as_string(result: Dict[str, Any]) -> str:
+        """
+        Convert a SearchApi API response into a human-readable string.
+
+        This implementation is intentionally defensive:
+        - Tolerates missing keys and unexpected types.
+        - Skips malformed items instead of raising exceptions.
+        - Falls back to a default message when nothing useful is found.
+        """
+        default_message = "No good search result found"
+
+        # Guard against completely invalid input
+        if not isinstance(result, dict) or not result:
+            return default_message
+
+        # 1) Answer box: prefer explicit answer, then snippet
+        answer_box = result.get("answer_box")
+        if isinstance(answer_box, dict):
+            answer = answer_box.get("answer")
+            if isinstance(answer, str) and answer.strip():
+                return answer
+
+            snippet = answer_box.get("snippet")
+            if isinstance(snippet, str) and snippet.strip():
+                return snippet
+
+        # 2) Knowledge graph description
+        knowledge_graph = result.get("knowledge_graph")
+        if isinstance(knowledge_graph, dict):
+            description = knowledge_graph.get("description")
+            if isinstance(description, str) and description.strip():
+                return description
+
+        # 3) Organic results snippets
+        organic_results = result.get("organic_results")
+        snippets: List[str] = []
+        if isinstance(organic_results, list):
+            for item in organic_results:
+                if not isinstance(item, dict):
+                    continue
+                snippet = item.get("snippet")
+                if isinstance(snippet, str) and snippet.strip():
+                    snippets.append(snippet.strip())
+        if snippets:
+            return "\n".join(snippets)
+
+        # 4) Jobs descriptions
+        jobs_results = result.get("jobs")
+        job_descriptions: List[str] = []
+        if isinstance(jobs_results, list):
+            for item in jobs_results:
+                if not isinstance(item, dict):
+                    continue
+                description = item.get("description")
+                if isinstance(description, str) and description.strip():
+                    job_descriptions.append(description.strip())
+        if job_descriptions:
+            return "\n".join(job_descriptions)
+
+        # 5) Videos (Title + Link)
+        video_results = result.get("videos")
+        video_lines: List[str] = []
+        if isinstance(video_results, list):
+            for item in video_results:
+                if not isinstance(item, dict):
+                    continue
+                title = item.get("title")
+                link = item.get("link")
+                if isinstance(title, str) and isinstance(link, str):
+                    video_lines.append(f'Title: "{title}" Link: {link}')
+        if video_lines:
+            return "\n".join(video_lines)
+
+        # 6) Images (Title + original.link)
+        image_results = result.get("images")
+        image_lines: List[str] = []
+        if isinstance(image_results, list):
+            for item in image_results:
+                if not isinstance(item, dict):
+                    continue
+                title = item.get("title")
+                original = item.get("original")
+                link: Optional[str] = None
+                if isinstance(original, dict):
+                    raw_link = original.get("link")
+                    if isinstance(raw_link, str) and raw_link.strip():
+                        link = raw_link.strip()
+                if isinstance(title, str) and title.strip() and link:
+                    image_lines.append(f'Title: "{title.strip()}" Link: {link}')
+        if image_lines:
+            return "\n".join(image_lines)
+
+        # Fallback when nothing meaningful found
+        return default_message
