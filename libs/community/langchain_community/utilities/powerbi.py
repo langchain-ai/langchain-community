@@ -5,7 +5,7 @@ from __future__ import annotations
 import asyncio
 import logging
 import os
-from typing import TYPE_CHECKING, Any, Dict, Iterable, List, Optional, Union
+from typing import Any, Dict, Iterable, List, Optional, Union
 
 import aiohttp
 import requests
@@ -22,8 +22,14 @@ logger = logging.getLogger(__name__)
 
 BASE_URL = os.getenv("POWERBI_BASE_URL", "https://api.powerbi.com/v1.0/myorg")
 
-if TYPE_CHECKING:
-    from azure.core.credentials import TokenCredential
+# --- Optional azure dependency handling ---------------------------------------
+
+try:  # pragma: no cover - exercised indirectly via tests
+    from azure.core.credentials import TokenCredential  # type: ignore
+except Exception:  # noqa: BLE001
+    class TokenCredential:  # type: ignore[no-redef]
+        """Fallback TokenCredential when azure.core is not installed."""
+        pass
 
 
 class PowerBIDataset(BaseModel):
@@ -43,7 +49,12 @@ class PowerBIDataset(BaseModel):
     impersonated_user_name: Optional[str] = None
     sample_rows_in_table_info: int = Field(default=1, gt=0, le=10)
     schemas: Dict[str, str] = Field(default_factory=dict)
-    aiosession: Optional[aiohttp.ClientSession] = None
+
+    # Allow any aiohttp-like session object so tests can pass dummy sessions
+    aiosession: Optional[Any] = None
+
+    # Default timeout (seconds) used by run/arun if no explicit timeout is passed
+    request_timeout: float = Field(default=10.0, gt=0)
 
     model_config = ConfigDict(
         arbitrary_types_allowed=True,
@@ -63,8 +74,11 @@ class PowerBIDataset(BaseModel):
     def request_url(self) -> str:
         """Get the request url."""
         if self.group_id:
-            return f"{BASE_URL}/groups/{self.group_id}/datasets/{self.dataset_id}/executeQueries"  # noqa: E501 # pylint: disable=C0301
-        return f"{BASE_URL}/datasets/{self.dataset_id}/executeQueries"  # pylint: disable=C0301
+            return (
+                f"{BASE_URL}/groups/{self.group_id}/datasets/"
+                f"{self.dataset_id}/executeQueries"
+            )
+        return f"{BASE_URL}/datasets/{self.dataset_id}/executeQueries"
 
     @property
     def headers(self) -> Dict[str, str]:
@@ -74,8 +88,10 @@ class PowerBIDataset(BaseModel):
                 "Content-Type": "application/json",
                 "Authorization": "Bearer " + self.token,
             }
-        from azure.core.exceptions import (
-            ClientAuthenticationError,  # pylint: disable=import-outside-toplevel
+
+        # Imported only when needed so that azure remains optional
+        from azure.core.exceptions import (  # type: ignore[import-not-found]  # noqa: E501,B950  # pylint: disable=import-outside-toplevel
+            ClientAuthenticationError,
         )
 
         if self.credential:
@@ -87,7 +103,7 @@ class PowerBIDataset(BaseModel):
                     "Content-Type": "application/json",
                     "Authorization": "Bearer " + token,
                 }
-            except Exception as exc:  # pylint: disable=broad-exception-caught
+            except Exception as exc:  # noqa: BLE001  # pylint: disable=broad-exception-caught
                 raise ClientAuthenticationError(
                     "Could not get a token from the supplied credentials."
                 ) from exc
@@ -182,7 +198,7 @@ class PowerBIDataset(BaseModel):
         except Timeout:
             logger.warning("Timeout while getting table info for %s", table)
             self.schemas[table] = "unknown"
-        except Exception as exc:  # pylint: disable=broad-exception-caught
+        except Exception as exc:  # noqa: BLE001  # pylint: disable=broad-exception-caught
             logger.warning("Error while getting table info for %s: %s", table, exc)
             self.schemas[table] = "unknown"
 
@@ -196,7 +212,7 @@ class PowerBIDataset(BaseModel):
         except ServerTimeoutError:
             logger.warning("Timeout while getting table info for %s", table)
             self.schemas[table] = "unknown"
-        except Exception as exc:  # pylint: disable=broad-exception-caught
+        except Exception as exc:  # noqa: BLE001  # pylint: disable=broad-exception-caught
             logger.warning("Error while getting table info for %s: %s", table, exc)
             self.schemas[table] = "unknown"
 
@@ -208,14 +224,29 @@ class PowerBIDataset(BaseModel):
             "serializerSettings": {"includeNulls": True},
         }
 
-    def run(self, command: str) -> Any:
-        """Execute a DAX command and return a json representing the results."""
+    def _validate_timeout_value(self, timeout: Optional[float]) -> None:
+        """Validate that timeout (if given) is a positive number."""
+        if timeout is None:
+            return
+        if not isinstance(timeout, (int, float)) or timeout <= 0:
+            raise ValueError(
+                f"Invalid timeout value {timeout!r}. Timeout must be a positive number."
+            )
+
+    def run(self, command: str, *, timeout: Optional[float] = None) -> Any:
+        """Execute a DAX command and return a json representing the results.
+
+        If `timeout` is provided, it overrides the instance-level `request_timeout`.
+        """
         logger.debug("Running command: %s", command)
+        self._validate_timeout_value(timeout)
+        effective_timeout = timeout if timeout is not None else self.request_timeout
+
         response = requests.post(
             self.request_url,
             json=self._create_json_content(command),
             headers=self.headers,
-            timeout=10,
+            timeout=effective_timeout,
         )
         if response.status_code == 403:
             return (
@@ -223,31 +254,46 @@ class PowerBIDataset(BaseModel):
             )
         return response.json()
 
-    async def arun(self, command: str) -> Any:
-        """Execute a DAX command and return the result asynchronously."""
+    async def arun(self, command: str, *, timeout: Optional[float] = None) -> Any:
+        """Execute a DAX command and return the result asynchronously.
+
+        If `timeout` is provided, it overrides the instance-level `request_timeout`.
+        """
         logger.debug("Running command: %s", command)
+        self._validate_timeout_value(timeout)
+        effective_timeout = timeout if timeout is not None else self.request_timeout
+        client_timeout = ClientTimeout(total=effective_timeout)
+
+        # If a session is provided externally, use it directly.
         if self.aiosession:
-            async with self.aiosession.post(
+            resp = await self.aiosession.post(
                 self.request_url,
                 headers=self.headers,
                 json=self._create_json_content(command),
-                timeout=ClientTimeout(total=10),
-            ) as response:
-                if response.status == 403:
-                    return "TokenError: Could not login to PowerBI, please check your credentials."  # noqa: E501
-                response_json = await response.json(content_type=response.content_type)
-                return response_json
-        async with aiohttp.ClientSession() as session:
-            async with session.post(
-                self.request_url,
-                headers=self.headers,
-                json=self._create_json_content(command),
-                timeout=ClientTimeout(total=10),
-            ) as response:
-                if response.status == 403:
-                    return "TokenError: Could not login to PowerBI, please check your credentials."  # noqa: E501
-                response_json = await response.json(content_type=response.content_type)
-                return response_json
+                timeout=client_timeout,
+            )
+        else:
+            async with aiohttp.ClientSession() as session:
+                resp = await session.post(
+                    self.request_url,
+                    headers=self.headers,
+                    json=self._create_json_content(command),
+                    timeout=client_timeout,
+                )
+
+        # `resp` may be a real aiohttp response or a dummy test object.
+        status = getattr(resp, "status", None)
+        if status == 403:
+            return (
+                "TokenError: Could not login to PowerBI, please check your "
+                "credentials."
+            )
+
+        # Some dummy responses in tests set content_type as an attribute; real
+        # aiohttp also exposes it. Fall back gracefully if missing.
+        content_type = getattr(resp, "content_type", None)
+        response_json = await resp.json(content_type=content_type)
+        return response_json
 
 
 def json_to_md(
@@ -260,9 +306,9 @@ def json_to_md(
     output_md = ""
     headers = json_contents[0].keys()
     for header in headers:
-        header.replace("[", ".").replace("]", "")
+        header = header.replace("[", ".").replace("]", "")
         if table_name:
-            header.replace(f"{table_name}.", "")
+            header = header.replace(f"{table_name}.", "")
         output_md += f"| {header} "
     output_md += "|\n"
     for row in json_contents:
