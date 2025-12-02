@@ -61,6 +61,8 @@ class BM25Retriever(BaseRetriever):
 
         texts_processed = [preprocess_func(t) for t in texts]
         bm25_params = bm25_params or {}
+        vectorizer = BM25(**bm25_params)
+        vectorizer.index(texts_processed)
         metadatas = metadatas or ({} for _ in texts)
         if ids:
             docs = [
@@ -71,10 +73,8 @@ class BM25Retriever(BaseRetriever):
             docs = [
                 Document(page_content=t, metadata=m) for t, m in zip(texts, metadatas)
             ]
-        bm25 = BM25(corpus=docs, **bm25_params)
-        bm25.index(texts_processed)
         return cls(
-            vectorizer=bm25, docs=docs, preprocess_func=preprocess_func, **kwargs
+            vectorizer=vectorizer, docs=docs, preprocess_func=preprocess_func, **kwargs
         )
 
     @classmethod
