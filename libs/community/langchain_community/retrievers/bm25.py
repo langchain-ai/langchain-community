@@ -52,16 +52,15 @@ class BM25Retriever(BaseRetriever):
             A BM25Retriever instance.
         """
         try:
-            from rank_bm25 import BM25Okapi
+            from bm25s import BM25
         except ImportError:
             raise ImportError(
-                "Could not import rank_bm25, please install with `pip install "
-                "rank_bm25`."
+                "Could not import bm25s, please install with `pip install "
+                "bm25s`."
             )
 
         texts_processed = [preprocess_func(t) for t in texts]
         bm25_params = bm25_params or {}
-        vectorizer = BM25Okapi(texts_processed, **bm25_params)
         metadatas = metadatas or ({} for _ in texts)
         if ids:
             docs = [
@@ -72,8 +71,10 @@ class BM25Retriever(BaseRetriever):
             docs = [
                 Document(page_content=t, metadata=m) for t, m in zip(texts, metadatas)
             ]
+        bm25 = BM25(corpus=docs, **bm25_params)
+        bm25.index(texts_processed)
         return cls(
-            vectorizer=vectorizer, docs=docs, preprocess_func=preprocess_func, **kwargs
+            vectorizer=bm25, docs=docs, preprocess_func=preprocess_func, **kwargs
         )
 
     @classmethod
@@ -109,8 +110,23 @@ class BM25Retriever(BaseRetriever):
         )
 
     def _get_relevant_documents(
-        self, query: str, *, run_manager: CallbackManagerForRetrieverRun
+        self, query: str, *, run_manager: CallbackManagerForRetrieverRun, **kwargs: Any
     ) -> List[Document]:
+        # Cache self.vectorizer.retrieve() parameters
+        if not hasattr(self, "_retrieve_params"):
+            import inspect
+            self._retrieve_params = inspect.signature(self.vectorizer.retrieve).parameters
+        retrieve_params = self._retrieve_params
+        retrieve_kwargs = {
+            k: v for k, v in kwargs.items() if k in retrieve_params
+        }
+
         processed_query = self.preprocess_func(query)
-        return_docs = self.vectorizer.get_top_n(processed_query, self.docs, n=self.k)
-        return return_docs
+        results = self.vectorizer.retrieve(
+            query_tokens=[processed_query],
+            corpus=self.docs,
+            k=self.k,
+            return_as="documents",
+            **retrieve_kwargs   # for params like 'backend_selection', 'n_threads' ...
+        ) # np.ndarray of shape (num_queries, k), dtype=object; each entry is a Document
+        return list(results[0])
