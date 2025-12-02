@@ -61,7 +61,9 @@ class BM25Retriever(BaseRetriever):
 
         texts_processed = [preprocess_func(t) for t in texts]
         bm25_params = bm25_params or {}
-        vectorizer = BM25(**bm25_params)
+        method = bm25_params.pop("method", "atire")
+        idf_method = bm25_params.pop("idf_method", "lucene")
+        vectorizer = BM25(method=method, idf_method=idf_method, **bm25_params)
         vectorizer.index(texts_processed)
         metadatas = metadatas or ({} for _ in texts)
         if ids:
