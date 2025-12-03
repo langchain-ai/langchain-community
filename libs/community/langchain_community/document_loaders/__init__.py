@@ -218,6 +218,10 @@ if TYPE_CHECKING:
         GithubFileLoader,
         GitHubIssuesLoader,
     )
+    from langchain_community.document_loaders.gitlab import (
+        GitLabFileLoader,
+        GitLabIssuesLoader,
+    )
     from langchain_community.document_loaders.glue_catalog import (
         GlueCatalogLoader,
     )
@@ -606,6 +610,8 @@ _module_lookup = {
     "GCSFileLoader": "langchain_community.document_loaders.gcs_file",
     "GeoDataFrameLoader": "langchain_community.document_loaders.geodataframe",
     "GitHubIssuesLoader": "langchain_community.document_loaders.github",
+    "GitLabFileLoader": "langchain_community.document_loaders.gitlab",
+    "GitLabIssuesLoader": "langchain_community.document_loaders.gitlab",
     "GitLoader": "langchain_community.document_loaders.git",
     "GitbookLoader": "langchain_community.document_loaders.gitbook",
     "GithubFileLoader": "langchain_community.document_loaders.github",
@@ -815,6 +821,8 @@ __all__ = [
     "GCSFileLoader",
     "GeoDataFrameLoader",
     "GitHubIssuesLoader",
+    "GitLabFileLoader",
+    "GitLabIssuesLoader",
     "GitLoader",
     "GitbookLoader",
     "GithubFileLoader",
