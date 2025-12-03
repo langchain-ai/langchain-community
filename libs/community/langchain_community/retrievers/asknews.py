@@ -17,7 +17,7 @@ class AskNewsRetriever(BaseRetriever):
     offset: int = 0
     start_timestamp: Optional[int] = None
     end_timestamp: Optional[int] = None
-    method: Literal["nl", "kw"] = "nl"
+    method: Literal["nl", "kw"] = "kw"
     categories: List[
         Literal[
             "All",
@@ -42,6 +42,7 @@ class AskNewsRetriever(BaseRetriever):
     kwargs: Optional[Dict[str, Any]] = {}
     client_id: Optional[str] = None
     client_secret: Optional[str] = None
+    api_key: Optional[str] = None
 
     def _get_relevant_documents(
         self, query: str, *, run_manager: CallbackManagerForRetrieverRun
@@ -60,11 +61,37 @@ class AskNewsRetriever(BaseRetriever):
                 "AskNews python package not found. "
                 "Please install it with `pip install asknews`."
             )
-        an_client = AskNewsSDK(
-            client_id=self.client_id or os.environ["ASKNEWS_CLIENT_ID"],
-            client_secret=self.client_secret or os.environ["ASKNEWS_CLIENT_SECRET"],
-            scopes=["news"],
+
+        # Determine which authentication method to use
+        has_client_credentials = bool(
+            self.client_id or os.environ.get("ASKNEWS_CLIENT_ID")
         )
+        has_api_key = bool(self.api_key or os.environ.get("ASKNEWS_API_KEY"))
+
+        if has_client_credentials and has_api_key:
+            raise ValueError(
+                "Both client credentials and api_key provided. Please provide "
+                "either client credentials or API key, not both."
+            )
+
+        if not has_client_credentials and not has_api_key:
+            raise ValueError(
+                "No authentication credentials provided. Please provide either "
+                "client_id/client_secret or api_key."
+            )
+
+        # Initialize SDK with appropriate authentication method
+        if has_api_key:
+            an_client = AskNewsSDK(
+                api_key=self.api_key or os.environ["ASKNEWS_API_KEY"],
+                scopes=["news"],
+            )
+        else:
+            an_client = AskNewsSDK(
+                client_id=self.client_id or os.environ["ASKNEWS_CLIENT_ID"],
+                client_secret=self.client_secret or os.environ["ASKNEWS_CLIENT_SECRET"],
+                scopes=["news"],
+            )
         response = an_client.news.search_news(
             query=query,
             n_articles=self.k,
@@ -100,11 +127,37 @@ class AskNewsRetriever(BaseRetriever):
                 "AskNews python package not found. "
                 "Please install it with `pip install asknews`."
             )
-        an_client = AsyncAskNewsSDK(
-            client_id=self.client_id or os.environ["ASKNEWS_CLIENT_ID"],
-            client_secret=self.client_secret or os.environ["ASKNEWS_CLIENT_SECRET"],
-            scopes=["news"],
+
+        # Determine which authentication method to use
+        has_client_credentials = bool(
+            self.client_id or os.environ.get("ASKNEWS_CLIENT_ID")
         )
+        has_api_key = bool(self.api_key or os.environ.get("ASKNEWS_API_KEY"))
+
+        if has_client_credentials and has_api_key:
+            raise ValueError(
+                "Both client credentials and api_key provided. Please provide "
+                "either client credentials or API key, not both."
+            )
+
+        if not has_client_credentials and not has_api_key:
+            raise ValueError(
+                "No authentication credentials provided. Please provide either "
+                "client_id/client_secret or api_key."
+            )
+
+        # Initialize SDK with appropriate authentication method
+        if has_api_key:
+            an_client = AsyncAskNewsSDK(
+                api_key=self.api_key or os.environ["ASKNEWS_API_KEY"],
+                scopes=["news"],
+            )
+        else:
+            an_client = AsyncAskNewsSDK(
+                client_id=self.client_id or os.environ["ASKNEWS_CLIENT_ID"],
+                client_secret=self.client_secret or os.environ["ASKNEWS_CLIENT_SECRET"],
+                scopes=["news"],
+            )
         response = await an_client.news.search_news(
             query=query,
             n_articles=self.k,

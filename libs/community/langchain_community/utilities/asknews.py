@@ -18,6 +18,8 @@ class AskNewsAPIWrapper(BaseModel):
     """Client ID for the AskNews API."""
     asknews_client_secret: Optional[str] = None
     """Client Secret for the AskNews API."""
+    asknews_api_key: Optional[str] = None
+    """API Key for the AskNews API."""
 
     model_config = ConfigDict(
         extra="forbid",
@@ -28,13 +30,6 @@ class AskNewsAPIWrapper(BaseModel):
     def validate_environment(cls, values: Dict) -> Any:
         """Validate that api credentials and python package exists in environment."""
 
-        asknews_client_id = get_from_dict_or_env(
-            values, "asknews_client_id", "ASKNEWS_CLIENT_ID"
-        )
-        asknews_client_secret = get_from_dict_or_env(
-            values, "asknews_client_secret", "ASKNEWS_CLIENT_SECRET"
-        )
-
         try:
             import asknews_sdk
 
@@ -44,21 +39,60 @@ class AskNewsAPIWrapper(BaseModel):
                 "Please install it with `pip install asknews`."
             )
 
-        an_sync = asknews_sdk.AskNewsSDK(
-            client_id=asknews_client_id,
-            client_secret=asknews_client_secret,
-            scopes=["news"],
+        # Try to get credentials, but don't require them yet
+        asknews_client_id = get_from_dict_or_env(
+            values, "asknews_client_id", "ASKNEWS_CLIENT_ID", default=None
         )
-        an_async = asknews_sdk.AsyncAskNewsSDK(
-            client_id=asknews_client_id,
-            client_secret=asknews_client_secret,
-            scopes=["news"],
+        asknews_client_secret = get_from_dict_or_env(
+            values, "asknews_client_secret", "ASKNEWS_CLIENT_SECRET", default=None
         )
+        asknews_api_key = get_from_dict_or_env(
+            values, "asknews_api_key", "ASKNEWS_API_KEY", default=None
+        )
+
+        # Determine which authentication method to use
+        has_client_credentials = bool(asknews_client_id and asknews_client_secret)
+        has_api_key = bool(asknews_api_key)
+
+        if has_client_credentials and has_api_key:
+            raise ValueError(
+                "Both client credentials and api_key provided. Please provide "
+                "either client credentials or API key, not both."
+            )
+
+        if not has_client_credentials and not has_api_key:
+            raise ValueError(
+                "No authentication credentials provided. Please provide either "
+                "asknews_client_id/asknews_client_secret or asknews_api_key."
+            )
+
+        # Initialize SDK with appropriate authentication method
+        if has_api_key:
+            an_sync = asknews_sdk.AskNewsSDK(
+                api_key=asknews_api_key,
+                scopes=["news"],
+            )
+            an_async = asknews_sdk.AsyncAskNewsSDK(
+                api_key=asknews_api_key,
+                scopes=["news"],
+            )
+        else:
+            an_sync = asknews_sdk.AskNewsSDK(
+                client_id=asknews_client_id,
+                client_secret=asknews_client_secret,
+                scopes=["news"],
+            )
+            an_async = asknews_sdk.AsyncAskNewsSDK(
+                client_id=asknews_client_id,
+                client_secret=asknews_client_secret,
+                scopes=["news"],
+            )
 
         values["asknews_sync"] = an_sync
         values["asknews_async"] = an_async
         values["asknews_client_id"] = asknews_client_id
         values["asknews_client_secret"] = asknews_client_secret
+        values["asknews_api_key"] = asknews_api_key
 
         return values
 
@@ -66,24 +100,12 @@ class AskNewsAPIWrapper(BaseModel):
         self, query: str, max_results: int = 10, hours_back: int = 0
     ) -> str:
         """Search news in AskNews API synchronously."""
-        if hours_back > 48:
-            method = "kw"
-            historical = True
-            start = int((datetime.now() - timedelta(hours=hours_back)).timestamp())
-            stop = int(datetime.now().timestamp())
-        else:
-            historical = False
-            method = "nl"
-            start = None
-            stop = None
 
         response = self.asknews_sync.news.search_news(
             query=query,
             n_articles=max_results,
-            method=method,
-            historical=historical,
-            start_timestamp=start,
-            end_timestamp=stop,
+            method="kw",
+            hours_back=hours_back,
             return_type="string",
         )
         return response.as_string
@@ -92,24 +114,11 @@ class AskNewsAPIWrapper(BaseModel):
         self, query: str, max_results: int = 10, hours_back: int = 0
     ) -> str:
         """Search news in AskNews API asynchronously."""
-        if hours_back > 48:
-            method = "kw"
-            historical = True
-            start = int((datetime.now() - timedelta(hours=hours_back)).timestamp())
-            stop = int(datetime.now().timestamp())
-        else:
-            historical = False
-            method = "nl"
-            start = None
-            stop = None
-
         response = await self.asknews_async.news.search_news(
             query=query,
             n_articles=max_results,
-            method=method,
-            historical=historical,
-            start_timestamp=start,
-            end_timestamp=stop,
+            method="kw",
+            hours_back=hours_back,
             return_type="string",
         )
         return response.as_string
