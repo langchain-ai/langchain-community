@@ -111,11 +111,3 @@ filterwarnings = [
     "ignore::langchain_core._api.deprecation.LangChainDeprecationWarning:test",
     "ignore::langchain_core._api.deprecation.LangChainPendingDeprecationWarning:test",
 ]
-
-
-# [project.optional-dependencies]
-# bigquery = [
-#     "google-cloud-bigquery",
-#     "google-cloud-bigquery-storage",
-#     "pyarrow",
-# ]
