@@ -25,9 +25,9 @@ class IpexLLM(LLM):
     """Model name or model path to use."""
     model_kwargs: Optional[dict] = None
     """Keyword arguments passed to the model."""
-    model: Any = None  #: :meta private:
+    model: Any = None
     """IpexLLM model."""
-    tokenizer: Any = None  #: :meta private:
+    tokenizer: Any = None
     """Huggingface tokenizer model."""
     streaming: bool = True
     """Whether to stream the results, token by token."""

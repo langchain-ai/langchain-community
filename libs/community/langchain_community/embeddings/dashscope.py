@@ -111,7 +111,7 @@ class DashScopeEmbeddings(BaseModel, Embeddings):
 
     """
 
-    client: Any = None  #: :meta private:
+    client: Any = None
     """The DashScope client."""
     model: str = "text-embedding-v1"
     dashscope_api_key: Optional[str] = None
