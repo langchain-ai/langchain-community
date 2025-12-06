@@ -317,6 +317,9 @@ if TYPE_CHECKING:
         TavilyAnswer,
         TavilySearchResults,
     )
+    from langchain_community.tools.typecast.text2speech import (
+        TypecastText2SpeechTool,
+    )
     from langchain_community.tools.vectorstore.tool import (
         VectorStoreQATool,
         VectorStoreQAWithSourcesTool,
@@ -402,6 +405,7 @@ __all__ = [
     "EdenAiTextToSpeechTool",
     "EdenaiTool",
     "ElevenLabsText2SpeechTool",
+    "TypecastText2SpeechTool",
     "ExtractHyperlinksTool",
     "ExtractTextTool",
     "FileSearchTool",
@@ -556,6 +560,7 @@ _module_lookup = {
     "EdenAiTextToSpeechTool": "langchain_community.tools.edenai",
     "EdenaiTool": "langchain_community.tools.edenai",
     "ElevenLabsText2SpeechTool": "langchain_community.tools.eleven_labs.text2speech",
+    "TypecastText2SpeechTool": "langchain_community.tools.typecast.text2speech",
     "ExtractHyperlinksTool": "langchain_community.tools.playwright",
     "ExtractTextTool": "langchain_community.tools.playwright",
     "FileSearchTool": "langchain_community.tools.file_management",

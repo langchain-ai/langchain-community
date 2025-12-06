@@ -133,6 +133,7 @@ EXPECTED_ALL = [
     "TavilyAnswer",
     "TavilySearchResults",
     "Tool",
+    "TypecastText2SpeechTool",
     "VectorStoreQATool",
     "VectorStoreQAWithSourcesTool",
     "WikipediaQueryRun",
