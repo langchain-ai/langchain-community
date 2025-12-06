@@ -142,14 +142,11 @@ class QuerySQLCheckerTool(BaseSQLDatabaseTool, BaseTool):
     @classmethod
     def initialize_llm_chain(cls, values: Dict[str, Any]) -> Any:
         if "llm_chain" not in values:
-            from langchain_classic.chains.llm import LLMChain
-
-            values["llm_chain"] = LLMChain(
-                llm=values.get("llm"),  # type: ignore[arg-type]
-                prompt=PromptTemplate(
+            llm=values.get("llm")  # type: ignore[arg-type]
+            prompt=PromptTemplate(
                     template=QUERY_CHECKER, input_variables=["dialect", "query"]
-                ),
-            )
+                )
+            values["llm_chain"] = prompt | llm
 
         if values["llm_chain"].prompt.input_variables != ["dialect", "query"]:
             raise ValueError(
