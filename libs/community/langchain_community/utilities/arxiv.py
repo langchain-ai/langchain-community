@@ -1,9 +1,11 @@
 """Util that calls Arxiv."""
 
 import logging
+import tempfile
 import os
 import re
 from typing import Any, Dict, Iterator, List, Optional
+from urllib.request import urlretrieve
 
 from langchain_core.documents import Document
 from pydantic import BaseModel, model_validator
@@ -53,6 +55,7 @@ class ArxivAPIWrapper(BaseModel):
     """
 
     arxiv_search: Any
+    arxiv_client: Any
     arxiv_exceptions: Any
     top_k_results: int = 3
     ARXIV_MAX_QUERY_LENGTH: int = 300
@@ -81,6 +84,7 @@ class ArxivAPIWrapper(BaseModel):
             import arxiv
 
             values["arxiv_search"] = arxiv.Search
+            values["arxiv_client"] = arxiv.Client()
             values["arxiv_exceptions"] = (
                 arxiv.ArxivError,
                 arxiv.UnexpectedEmptyPageError,
@@ -96,13 +100,16 @@ class ArxivAPIWrapper(BaseModel):
 
     def _fetch_results(self, query: str) -> Any:
         """Helper function to fetch arxiv results based on query."""
+        max_results = min(self.load_max_docs, self.top_k_results)
         if self.is_arxiv_identifier(query):
-            return self.arxiv_search(
-                id_list=query.split(), max_results=self.top_k_results
-            ).results()
-        return self.arxiv_search(
-            query[: self.ARXIV_MAX_QUERY_LENGTH], max_results=self.top_k_results
-        ).results()
+            search = self.arxiv_search(
+                id_list=query.split(), max_results=max_results
+            )
+        else:
+            search = self.arxiv_search(
+                query[: self.ARXIV_MAX_QUERY_LENGTH], max_results=max_results
+            )
+        return self.arxiv_client.results(search)
 
     def get_summaries_as_docs(self, query: str) -> List[Document]:
         """
@@ -216,19 +223,22 @@ class ArxivAPIWrapper(BaseModel):
             return
 
         for result in results:
-            try:
-                doc_file_name: str = result.download_pdf()
-                with fitz.open(doc_file_name) as doc_file:
-                    text: str = "".join(page.get_text() for page in doc_file)
-            except (FileNotFoundError, fitz.fitz.FileDataError) as f_ex:
-                logger.debug(f_ex)
-                continue
-            except Exception as e:
-                if self.continue_on_failure:
-                    logger.error(e)
+            result_pdf = result.pdf_url
+            with tempfile.TemporaryDirectory() as tmpdir:
+                try:
+                    doc_file_name = os.path.join(tmpdir, "tmp.pdf")
+                    urlretrieve(result_pdf, doc_file_name)
+                    with fitz.open(doc_file_name) as doc_file:
+                        text: str = "".join(page.get_text() for page in doc_file)
+                except (FileNotFoundError, fitz.FileDataError) as f_ex:
+                    logger.debug(f_ex)
                     continue
-                else:
-                    raise e
+                except Exception as e:
+                    if self.continue_on_failure:
+                        logger.error(e)
+                        continue
+                    else:
+                        raise e
             if self.load_all_available_meta:
                 extra_metadata = {
                     "entry_id": result.entry_id,
@@ -252,4 +262,3 @@ class ArxivAPIWrapper(BaseModel):
             yield Document(
                 page_content=text[: self.doc_content_chars_max], metadata=metadata
             )
-            os.remove(doc_file_name)
