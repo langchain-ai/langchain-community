@@ -40,8 +40,9 @@ def test_load_success_all_meta(retriever: ArxivRetriever) -> None:
 
 
 def test_load_success_init_args() -> None:
-    retriever = ArxivRetriever(load_max_docs=1, load_all_available_meta=True,
-                               get_full_documents=True)  # type: ignore[call-arg]
+    retriever = ArxivRetriever(
+        load_max_docs=1, load_all_available_meta=True, get_full_documents=True
+    )  # type: ignore[call-arg]
     docs = retriever.invoke("ChatGPT")
     assert len(docs) == 1
     assert_docs(docs, all_meta=True)

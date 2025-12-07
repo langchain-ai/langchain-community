@@ -1,4 +1,4 @@
-from typing import List
+from typing import Any, List
 
 from langchain_core.callbacks import CallbackManagerForRetrieverRun
 from langchain_core.documents import Document
@@ -84,10 +84,8 @@ class ArxivRetriever(BaseRetriever, ArxivAPIWrapper):
     get_full_documents: bool = False
 
     def _get_relevant_documents(
-        self, query: str, *, run_manager: CallbackManagerForRetrieverRun,
-        **kwargs
+        self, query: str, *, run_manager: CallbackManagerForRetrieverRun, **kwargs: Any
     ) -> List[Document]:
-
         arxiv_api_prefixes = [
             ("ti", "title"),
             ("au", "author"),

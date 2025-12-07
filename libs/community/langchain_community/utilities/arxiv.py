@@ -1,9 +1,9 @@
 """Util that calls Arxiv."""
 
 import logging
-import tempfile
 import os
 import re
+import tempfile
 from typing import Any, Dict, Iterator, List, Optional
 from urllib.request import urlretrieve
 
@@ -102,9 +102,7 @@ class ArxivAPIWrapper(BaseModel):
         """Helper function to fetch arxiv results based on query."""
         max_results = min(self.load_max_docs, self.top_k_results)
         if self.is_arxiv_identifier(query):
-            search = self.arxiv_search(
-                id_list=query.split(), max_results=max_results
-            )
+            search = self.arxiv_search(id_list=query.split(), max_results=max_results)
         else:
             search = self.arxiv_search(
                 query[: self.ARXIV_MAX_QUERY_LENGTH], max_results=max_results
