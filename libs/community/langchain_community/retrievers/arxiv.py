@@ -20,7 +20,7 @@ class ArxivRetriever(BaseRetriever, ArxivAPIWrapper):
     Key init args:
         load_max_docs: int
             maximum number of documents to load
-        get_ful_documents: bool
+        get_full_documents: bool
             whether to return full document text or snippets
 
     Instantiate:
@@ -30,7 +30,7 @@ class ArxivRetriever(BaseRetriever, ArxivAPIWrapper):
 
             retriever = ArxivRetriever(
                 load_max_docs=2,
-                get_ful_documents=True,
+                get_full_documents=True,
             )
 
     Usage:
@@ -84,8 +84,25 @@ class ArxivRetriever(BaseRetriever, ArxivAPIWrapper):
     get_full_documents: bool = False
 
     def _get_relevant_documents(
-        self, query: str, *, run_manager: CallbackManagerForRetrieverRun
+        self, query: str, *, run_manager: CallbackManagerForRetrieverRun,
+        **kwargs
     ) -> List[Document]:
+
+        arxiv_api_prefixes = [
+            ("ti", "title"),
+            ("au", "author"),
+            ("abs", "abstract"),
+            ("co", "comment"),
+            ("jr", "journal_reference"),
+            ("cat", "category"),
+            ("rn", "report_number"),
+        ]
+
+        for key, full_name in arxiv_api_prefixes:
+            if value := (kwargs.get(full_name) or kwargs.get(key)):
+                if f"{key}:" not in query:
+                    query = f"{query} AND {key}:{value.replace(' ', '+')}"
+
         if self.get_full_documents:
             return self.load(query=query)
         else:
