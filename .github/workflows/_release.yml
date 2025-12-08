@@ -307,4 +307,5 @@ jobs:
           draft: false
           generateReleaseNotes: true
           tag: ${{ inputs.working-directory }}/v${{ needs.build.outputs.version }}
+          name: ${{ needs.build.outputs.pkg-name }}==${{ needs.build.outputs.version }}
           commit: ${{ github.sha }}
