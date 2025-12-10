@@ -10,6 +10,14 @@ from langchain_core.messages import AIMessage
 from langchain_core.outputs import ChatGeneration, LLMResult
 
 MODEL_COST_PER_1K_TOKENS = {
+    # GPT-5.1 input
+    "gpt-5.1": 0.00125,
+    "gpt-5.1-cached": 0.000125,
+    "gpt-5.1-2025-11-13": 0.00125,
+    "gpt-5.1-2025-11-13-cached": 0.000125,
+    # GPT-5.1 output
+    "gpt-5.1-completion": 0.01,
+    "gpt-5.1-2025-11-13-completion": 0.01,
     # GPT-5 input
     "gpt-5": 0.00125,
     "gpt-5-cached": 0.000125,
