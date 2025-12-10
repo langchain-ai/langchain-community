@@ -31,7 +31,7 @@ def concatenate_rows(message: dict, title: str) -> str:
 class ChatGPTLoader(BaseLoader):
     """Load conversations from exported `ChatGPT` data."""
 
-    def __init__(self, log_file: str, num_logs: int = -1):
+    def __init__(self, log_file: str, num_logs: int = 0):
         """Initialize a class object.
 
         Args:
