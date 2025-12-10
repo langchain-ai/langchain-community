@@ -1,5 +1,6 @@
 """Callback Handler that prints to std out."""
 
+from ast import mod
 import threading
 from enum import Enum, auto
 from typing import Any, Dict, List
@@ -10,6 +11,14 @@ from langchain_core.messages import AIMessage
 from langchain_core.outputs import ChatGeneration, LLMResult
 
 MODEL_COST_PER_1K_TOKENS = {
+    # GPT-5.1 input
+    "gpt-5.1": 0.00125,
+    "gpt-5.1-cached": 0.000125,
+    "gpt-5.1-2025-11-13": 0.00125,
+    "gpt-5.1-2025-11-13-cached": 0.000125,
+    # GPT-5.1 output
+    "gpt-5.1-completion": 0.01,
+    "gpt-5.1-2025-11-13-completion": 0.01,
     # GPT-5 input
     "gpt-5": 0.00125,
     "gpt-5-cached": 0.000125,
@@ -351,7 +360,8 @@ def standardize_model_name(
     if "ft:" in model_name:
         model_name = model_name.split(":")[1] + "-finetuned"
     if token_type == TokenType.COMPLETION and (
-        model_name.startswith("gpt-5")
+        model_name.startswith("gpt-5-1")
+        or model_name.startswith("gpt-5")
         or model_name.startswith("gpt-4")
         or model_name.startswith("gpt-3.5")
         or model_name.startswith("gpt-35")
@@ -364,7 +374,8 @@ def standardize_model_name(
     if (
         token_type == TokenType.PROMPT_CACHED
         and (
-            model_name.startswith("gpt-5")
+            model_name.startswith("gpt-5.1")
+            or model_name.startswith("gpt-5")
             or model_name.startswith("gpt-4o")
             or model_name.startswith("gpt-4.1")
             or model_name.startswith("o1")
