@@ -181,6 +181,9 @@ if TYPE_CHECKING:
     from langchain_community.vectorstores.mongodb_atlas import (
         MongoDBAtlasVectorSearch,
     )
+    from langchain_community.vectorstores.mongodb_local import (
+        MongoDBLocalVectorSearch,
+    )
     from langchain_community.vectorstores.myscale import (
         MyScale,
         MyScaleSettings,
@@ -370,6 +373,7 @@ __all__ = [
     "Milvus",
     "MomentoVectorIndex",
     "MongoDBAtlasVectorSearch",
+    "MongoDBLocalVectorSearch",
     "MyScale",
     "MyScaleSettings",
     "Neo4jVector",
@@ -475,6 +479,7 @@ _module_lookup = {
     "Milvus": "langchain_community.vectorstores.milvus",
     "MomentoVectorIndex": "langchain_community.vectorstores.momento_vector_index",
     "MongoDBAtlasVectorSearch": "langchain_community.vectorstores.mongodb_atlas",
+    "MongoDBLocalVectorSearch": "langchain_community.vectorstores.mongodb_local",
     "MyScale": "langchain_community.vectorstores.myscale",
     "MyScaleSettings": "langchain_community.vectorstores.myscale",
     "Neo4jVector": "langchain_community.vectorstores.neo4j_vector",

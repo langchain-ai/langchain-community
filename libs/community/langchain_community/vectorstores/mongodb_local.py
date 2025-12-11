@@ -1,13 +1,11 @@
 #--------VERSION 1--------
 #This version will only have the 'flat' and 'hnsw' index_types with all 3 metrics (euclidean,dot,cosine)
 #This is just like what Atlas gives
-
-
-#Docs for me to remember cause i forgot what ive done:
 """
 FAISS Index types:
     Flat
     HNSW
+
 by now ive made a class that holds this info:
     collection: Collection[MongoDBDocumentType],
     embedder_model: Embeddings,
@@ -64,6 +62,9 @@ so i have these functions:
     ,
 
 """
+
+from __future__ import annotations
+
 import logging
 from typing import (
     TYPE_CHECKING,
@@ -82,7 +83,7 @@ from typing import (
 import numpy as np
 import faiss
 import os
-import pickle
+from bson import ObjectId
 from pymongo import UpdateOne
 
 from langchain_core.documents import Document
@@ -101,7 +102,9 @@ DEFAULT_INSERT_BATCH_SIZE = 100
 #FAISS index creation helper functions
 def euclid_flat_faiss(dimensions:int):
     """Returns a FAISS Flat Euclidean index (exact search)."""
-    return faiss.IndexFlatL2(dimensions)
+    index = faiss.IndexFlatL2(dimensions)
+    index = faiss.IndexIDMap(index)
+    return index
 
 def euclid_hnsw_faiss(
         dimensions:int,
@@ -113,6 +116,7 @@ def euclid_hnsw_faiss(
     index = faiss.IndexHNSWFlat(dimensions, neighbours, faiss.METRIC_L2)
     index.hnsw.efSearch = efSearch
     index.hnsw.efConstruction = efConstruction
+    index = faiss.IndexIDMap(index)
     return index
 
 # def euclid_ivf(dimensions, clusters=100):
@@ -140,7 +144,9 @@ def euclid_hnsw_faiss(
 
 def dot_flat_faiss(dimensions):
     """Returns a FAISS Flat index with Dot Product (exact search)."""
-    return faiss.IndexFlat(dimensions, faiss.METRIC_INNER_PRODUCT)
+    index=faiss.IndexFlat(dimensions, faiss.METRIC_INNER_PRODUCT)
+    index = faiss.IndexIDMap(index)
+    return index
 
 def dot_hnsw_faiss(
         dimensions:int, 
@@ -152,6 +158,7 @@ def dot_hnsw_faiss(
     index = faiss.IndexHNSWFlat(dimensions, neighbours, faiss.METRIC_INNER_PRODUCT)
     index.hnsw.efSearch = efSearch
     index.hnsw.efConstruction = efConstruction
+    index = faiss.IndexIDMap(index)
     return index
 
 # def dot_ivf(dimensions, clusters=100):
@@ -171,7 +178,9 @@ def dot_hnsw_faiss(
 
 def cosine_flat_faiss(dimensions):
     """Returns a FAISS Flat index with Cosine similarity (via inner product)."""
-    return faiss.IndexFlat(dimensions, faiss.METRIC_INNER_PRODUCT)
+    index=faiss.IndexFlat(dimensions, faiss.METRIC_INNER_PRODUCT)
+    index = faiss.IndexIDMap(index)
+    return index
 
 def cosine_hnsw_faiss(
         dimensions:int, 
@@ -183,6 +192,7 @@ def cosine_hnsw_faiss(
     index = faiss.IndexHNSWFlat(dimensions, neighbours, faiss.METRIC_INNER_PRODUCT)
     index.hnsw.efSearch = efSearch
     index.hnsw.efConstruction = efConstruction
+    index = faiss.IndexIDMap(index)
     return index
 
 # def cosine_ivf(dimensions, clusters=100):
@@ -318,10 +328,15 @@ class MongoDBLocalVectorSearch(VectorStore):
             raise ValueError(f"Unsupported Faiss metric:{metric} or index_type: {index_type}")
         
         index_params=self._faiss_config.get('index_params',{})
-        for param in index_params:
+
+        #removing duplicate dimensions
+        params_copy=dict(index_params)
+        params_copy.pop('dimensions',None)
+
+        for param in params_copy:
             if not is_param_valid(param):
                 raise ValueError(f"Invalid FAISS parameter: {param}. Valid parameters are: {valid_params}")
-        self._faiss_index=faiss_creator[metric][index_type](dimensions,**index_params)
+        self._faiss_index=faiss_creator[metric][index_type](dimensions,**params_copy)
         # self._requires_training = 'ivf' in index_type
 
     def load_faiss(
@@ -336,7 +351,7 @@ class MongoDBLocalVectorSearch(VectorStore):
             # self._faiss_index=faiss.read(index_path)
             self._faiss_index=faiss.read_index(index_path)
             with open(id_map_path,'rb') as f:
-                self._faiss_to_mongo_id=pickle.load(f)
+                self._faiss_to_mongo_id = bson.decode(f.read())
             logger.info(f"Loaded FAISS index from {index_path} and id_mapping from {id_map_path}")
         except Exception as e:
             logger.exception(f"Failed to load FAISS index error:{e}")
@@ -353,7 +368,7 @@ class MongoDBLocalVectorSearch(VectorStore):
             # faiss.write(self._faiss_index,index_path)
             faiss.write_index(self._faiss_index,index_path)
             with open(id_map_path,'wb') as f:
-                pickle.dump(self._faiss_to_mongo_id,f)
+                f.write(bson.encode(self._faiss_to_mongo_id))
             logger.info(f"Saved FAISS index to {index_path} and id mapping to {id_map_path}")
         except Exception as e:
             logger.exception(f"Unable to save FAISS index at {index_path} and id mapping at {id_map_path} with error: {e}")
@@ -433,7 +448,7 @@ class MongoDBLocalVectorSearch(VectorStore):
             metadata_batch.append(metadata)
             if (i+1) % batch_size==0:
                 # self._requires_training= 'ivf' in self._faiss_config.get('index_type','flat')
-                result_ids.extend(self.insert_texts(text_batch,metadata_batch))
+                result_ids.extend(self.insert_texts(texts=text_batch,metadatas=metadata_batch))
                 text_batch=[]
                 metadata_batch=[]
         #for any remaining text in text_batch
@@ -506,18 +521,10 @@ class MongoDBLocalVectorSearch(VectorStore):
         result_ids=[]
         for i,inserted_id in enumerate(insertion_result.inserted_ids):
             faiss_id=int(faiss_ids[i])
-            self._faiss_to_mongo_id[faiss_id]=str(inserted_id)
+            self._faiss_to_mongo_id[faiss_id]=inserted_id
             result_ids.append(inserted_id)
         
         return result_ids
-    
-    def _get_all_embeddings(self)->np.ndarray:
-        """
-        Gets all the embeddings from MongoDB for training.
-        """
-        docs= self._collection.find({},{self._embedding_key:1})
-        embeddings=np.array( [doc[self._embedding_key] for doc in docs] ).astype('float32')
-        return embeddings if embeddings else np.empty( (0,0) )
     
     def queryfilter(
             self,
@@ -683,7 +690,7 @@ class MongoDBLocalVectorSearch(VectorStore):
         query_embedding = np.array(
             query_embedding or self._embedder_model.embed_query(query),
             dtype='float32'
-        ).reshape(1, -1)
+        ).reshape(1,-1)
 
         if self._faiss_config.get('metric') == 'cosine':
             faiss.normalize_L2(query_embedding)
@@ -727,6 +734,7 @@ class MongoDBLocalVectorSearch(VectorStore):
                 k: v for k, v in doc.items()
                 if k not in [self._text_key, self._embedding_key, "_id", "faiss_id"]
             }
+            # [Document,Distance]
             results.append((Document(page_content=text, metadata=metadata), float(dist)))
             if len(results) >= k:
                 break
@@ -741,9 +749,75 @@ class MongoDBLocalVectorSearch(VectorStore):
             post_filter_query: Optional[List[Dict[str,Any]]]=None,
         )->List[Tuple[Document,float]]:
 
-            result=self._similarity_search_with_score(query,query_embedding,k,post_filter_query)
-            return result            
-            
+            result=self._similarity_search_with_score(
+                query=query,
+                query_embedding=query_embedding,
+                k=k,
+                post_filter_query=post_filter_query
+            )
+            return result       
+
+    def similarity_search(
+            self,
+            query:str,
+            query_embedding:List['float']=None,
+            k:int=5,
+            post_filter_query:Optional[List[Dict[str,Any]]]=None,
+        )->List[Document]:
+        result=self._similarity_search_with_score(
+            query=query,
+            query_embedding=query_embedding,
+            k=k,
+            post_filter_query=post_filter_query
+        )
+        return result
+        # return result[0][0]
+    
+    @classmethod
+    def from_texts(
+        cls,
+        texts: List[str],
+        embedding: Embeddings,
+        metadatas: Optional[List[Dict]] = None,
+        collection: Optional[Collection[MongoDBDocumentType]] = None,
+        **kwargs: Any,
+    ) -> MongoDBLocalVectorSearch:
+        """
+        Constructs a `MongoDB Local Vector Store` vector store using raw documents.
+
+        This is a user friendly interface that:
+            1. Embeds the documents.
+            2. Adds the documents to the provided MongoDB collection while keeping FAISS updated.
+        
+        This is intended to be a quick way to get started.
+
+        Args:
+            - texts: List of strings to add to the vectorstore.
+            - metadatas: Optional list of metadatas associated with the texts.
+
+        Example:
+            .. code-block:: python
+                from pymongo import MongoClient
+                from langchain_community.vectorstores import MongoDBLocalVectorSearch
+                from langchain_community.embeddings import OpenAIEmbeddings
+
+                mongo_client = MongoClient("<CONNECTION STRING>")
+                collection = mongo_client["<DATABASE_NAME>"]["<COLLECTION_NAME>"]
+                embeddings = OpenAIEmbeddings()
+                vectorstore = MongoDBLocalVectorSearch.from_texts(
+                    texts,
+                    embeddings,
+                    metadatas=metadatas,
+                    collection=collection
+                )
+            ..
+
+        """
+        if collection is None:
+            raise ValueError("MongoDB `collection` can not be NULL/None, provide a valid `collection` parameter")
+        vectorstore=cls(collection,embedding,**kwargs)
+        vectorstore.add_texts(texts,metadatas=metadatas)
+        return vectorstore
 
     # def retrain_index(self):
     #     """
