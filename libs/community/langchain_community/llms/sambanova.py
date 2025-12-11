@@ -195,8 +195,10 @@ class SambaStudio(LLM):
         Get the tuning parameters to use when calling the LLM.
 
         Args:
-            stop: Stop words to use when generating. Model output is cut off at the
-                first occurrence of any of the stop substrings.
+            stop: Stop words to use when generating.
+
+                Model output is cut off at the first occurrence of any of these
+                substrings.
 
         Returns:
             The tuning parameters in the format required by api to use

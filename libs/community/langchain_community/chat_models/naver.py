@@ -196,8 +196,8 @@ class ChatClovaX(BaseChatModel):
             model.invoke([HumanMessage(content="Come up with 10 names for a song about parrots.")])
     """  # noqa: E501
 
-    client: Optional[httpx.Client] = Field(default=None)  #: :meta private:
-    async_client: Optional[httpx.AsyncClient] = Field(default=None)  #: :meta private:
+    client: Optional[httpx.Client] = Field(default=None)
+    async_client: Optional[httpx.AsyncClient] = Field(default=None)
 
     model_name: str = Field(
         default="HCX-003",

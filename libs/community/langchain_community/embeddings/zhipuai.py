@@ -65,7 +65,7 @@ class ZhipuAIEmbeddings(BaseModel, Embeddings):
             ]
     """  # noqa: E501
 
-    client: Any = Field(default=None, exclude=True)  #: :meta private:
+    client: Any = Field(default=None, exclude=True)
     model: str = Field(default="embedding-2")
     """Model name"""
     api_key: str

@@ -18,9 +18,9 @@ class AzureAiServicesTextAnalyticsForHealthTool(BaseTool):
     https://learn.microsoft.com/en-us/azure/ai-services/language-service/text-analytics-for-health/quickstart?pivots=programming-language-python
     """
 
-    azure_ai_services_key: str = ""  #: :meta private:
-    azure_ai_services_endpoint: str = ""  #: :meta private:
-    text_analytics_client: Any  #: :meta private:
+    azure_ai_services_key: str = ""
+    azure_ai_services_endpoint: str = ""
+    text_analytics_client: Any
 
     name: str = "azure_ai_services_text_analytics_for_health"
     description: str = (

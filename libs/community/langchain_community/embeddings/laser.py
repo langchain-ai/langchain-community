@@ -35,7 +35,7 @@ class LaserEmbeddings(BaseModel, Embeddings):
     https://github.com/facebookresearch/flores/blob/main/flores200/README.md#languages-in-flores-200
     """
 
-    _encoder_pipeline: Any = None  # : :meta private:
+    _encoder_pipeline: Any = None
 
     model_config = ConfigDict(
         extra="forbid",

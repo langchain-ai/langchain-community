@@ -27,7 +27,7 @@ class Arcee(LLM):
             response = arcee("AI-driven music therapy")
     """
 
-    _client: Optional[ArceeWrapper] = None  #: :meta private:
+    _client: Optional[ArceeWrapper] = None
     """Arcee _client."""
 
     arcee_api_key: Union[SecretStr, str, None] = None
