@@ -204,7 +204,7 @@ def _convert_message_to_dict(message: BaseMessage) -> dict:
 class ChatDeepInfra(BaseChatModel):
     """A chat model that uses the DeepInfra API."""
 
-    # client: Any  #: :meta private:
+    # client: Any
     model_name: str = Field(default="meta-llama/Llama-2-70b-chat-hf", alias="model")
     """Model name to use."""
 
@@ -488,7 +488,7 @@ class ChatDeepInfra(BaseChatModel):
         self,
         tools: Sequence[Union[Dict[str, Any], Type[BaseModel], Callable, BaseTool]],
         **kwargs: Any,
-    ) -> Runnable[LanguageModelInput, BaseMessage]:
+    ) -> Runnable[LanguageModelInput, AIMessage]:
         """Bind tool-like objects to this chat model.
 
         Assumes model is compatible with OpenAI tool-calling API.

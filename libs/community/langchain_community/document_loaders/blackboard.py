@@ -192,9 +192,9 @@ class BlackboardLoader(WebBaseLoader):
             for link in attachment.find_all("a"):
                 href = link.get("href")
                 # Only add if href is not None and does not start with #
-                if href is not None and not href.startswith("#"):
+                if href is not None and not href.startswith("#"):  # type: ignore[union-attr]
                     attachments.append(href)
-        return attachments
+        return attachments  # type: ignore[return-value]
 
     def _download_attachments(self, attachments: List[str]) -> None:
         """Download all attachments.

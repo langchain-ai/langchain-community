@@ -31,8 +31,8 @@ from pydantic import ConfigDict, Field, SecretStr, model_validator
 
 
 class _AnthropicCommon(BaseLanguageModel):
-    client: Any = None  #: :meta private:
-    async_client: Any = None  #: :meta private:
+    client: Any = None
+    async_client: Any = None
     model: str = Field(default="claude-2", alias="model_name")
     """Model name to use."""
 

@@ -1171,6 +1171,7 @@ class FAISS(VectorStore):
         index_name: str = "index",
         *,
         allow_dangerous_deserialization: bool = False,
+        io_flags: int = 0,
         **kwargs: Any,
     ) -> FAISS:
         """Load FAISS index, docstore, and index_to_docstore_id from disk.
@@ -1185,6 +1186,7 @@ class FAISS(VectorStore):
                 Pickle files can be modified by malicious actors to deliver a
                 malicious payload that results in execution of
                 arbitrary code on your machine.
+            io_flags: Flags to use when opening the pickle file.
         """
         if not allow_dangerous_deserialization:
             raise ValueError(
@@ -1202,7 +1204,7 @@ class FAISS(VectorStore):
         path = Path(folder_path)
         # load index separately since it is not picklable
         faiss = dependable_faiss_import()
-        index = faiss.read_index(str(path / f"{index_name}.faiss"))
+        index = faiss.read_index(str(path / f"{index_name}.faiss"), io_flags)
 
         # load docstore and index_to_docstore_id
         with open(path / f"{index_name}.pkl", "rb") as f:
@@ -1447,11 +1449,11 @@ class FAISS(VectorStore):
             supports logical operators ($and, $or, $not) and field-level filtering.
 
             Args:
-                filter (Dict[str, Any]): A dictionary containing filter conditions.
-                Can include:
-                    - Logical operators ($and, $or, $not) with lists of sub-filters
-                    - Field-level conditions with comparison or sequence operators
-                    - Direct field-value mappings for equality comparison
+                `dict` containing filter conditions.
+                    Can include:
+                        - Logical operators ($and, $or, $not) with lists of sub-filters
+                        - Field-level conditions with comparison or sequence operators
+                        - Direct field-value mappings for equality comparison
 
             Returns:
                 Callable[[Dict[str, Any]], bool]: A function that takes a document

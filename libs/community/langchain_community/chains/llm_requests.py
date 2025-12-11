@@ -4,8 +4,8 @@ from __future__ import annotations
 
 from typing import Any, Dict, List, Optional
 
-from langchain.chains import LLMChain
-from langchain.chains.base import Chain
+from langchain_classic.chains import LLMChain
+from langchain_classic.chains.base import Chain
 from langchain_core.callbacks import CallbackManagerForChainRun
 from pydantic import ConfigDict, Field, model_validator
 
@@ -34,9 +34,9 @@ class LLMRequestsChain(Chain):
         exclude=True,
     )
     text_length: int = 8000
-    requests_key: str = "requests_result"  #: :meta private:
-    input_key: str = "url"  #: :meta private:
-    output_key: str = "output"  #: :meta private:
+    requests_key: str = "requests_result"
+    input_key: str = "url"
+    output_key: str = "output"
 
     model_config = ConfigDict(
         arbitrary_types_allowed=True,
@@ -45,18 +45,12 @@ class LLMRequestsChain(Chain):
 
     @property
     def input_keys(self) -> List[str]:
-        """Will be whatever keys the prompt expects.
-
-        :meta private:
-        """
+        """Will be whatever keys the prompt expects."""
         return [self.input_key]
 
     @property
     def output_keys(self) -> List[str]:
-        """Will always return text key.
-
-        :meta private:
-        """
+        """Will always return text key."""
         return [self.output_key]
 
     @model_validator(mode="before")
@@ -86,7 +80,7 @@ class LLMRequestsChain(Chain):
         url = inputs[self.input_key]
         res = self.requests_wrapper.get(url)
         # extract the text from the html
-        soup = BeautifulSoup(res, "html.parser")
+        soup = BeautifulSoup(res, "html.parser")  # type: ignore[arg-type]
         other_keys[self.requests_key] = soup.get_text()[: self.text_length]
         result = self.llm_chain.predict(
             callbacks=_run_manager.get_child(), **other_keys

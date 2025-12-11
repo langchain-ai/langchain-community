@@ -150,7 +150,7 @@ class GPTRouter(BaseChatModel):
     For more information, see https://gpt-router.writesonic.com/docs
     """
 
-    client: Any = Field(default=None, exclude=True)  #: :meta private:
+    client: Any = Field(default=None, exclude=True)
     models_priority_list: List[GPTRouterModel] = Field(min_length=1)
     gpt_router_api_base: str = Field(default="")
     """WriteSonic GPTRouter custom endpoint"""
@@ -334,7 +334,7 @@ class GPTRouter(BaseChatModel):
 
             if run_manager:
                 run_manager.on_llm_new_token(
-                    token=chunk.message.content, chunk=chunk.message
+                    token=str(chunk.message.content), chunk=chunk
                 )
 
             yield chunk
@@ -367,7 +367,7 @@ class GPTRouter(BaseChatModel):
 
             if run_manager:
                 await run_manager.on_llm_new_token(
-                    token=chunk.message.content, chunk=chunk.message
+                    token=str(chunk.message.content), chunk=chunk
                 )
 
             yield chunk

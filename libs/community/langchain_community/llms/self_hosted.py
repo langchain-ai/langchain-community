@@ -126,9 +126,9 @@ class SelfHostedPipeline(LLM):
             )
     """
 
-    pipeline_ref: Any = None  #: :meta private:
-    client: Any = None  #: :meta private:
-    inference_fn: Callable = _generate_text  #: :meta private:
+    pipeline_ref: Any = None
+    client: Any = None
+    inference_fn: Callable = _generate_text
     """Inference function to send to the remote hardware."""
     hardware: Any = None
     """Remote hardware to send the inference function to."""
@@ -140,7 +140,7 @@ class SelfHostedPipeline(LLM):
     """Requirements to install on hardware to inference the model."""
 
     allow_dangerous_deserialization: bool = False
-    """Allow deserialization using pickle which can be dangerous if 
+    """Allow deserialization using pickle which can be dangerous if
     loading compromised data.
     """
 

@@ -45,7 +45,7 @@ class SagemakerEndpointCrossEncoder(BaseModel, BaseCrossEncoder):
        .. code-block:: python
 
 
-           from langchain.embeddings import SagemakerEndpointCrossEncoder
+           from langchain_classic.embeddings import SagemakerEndpointCrossEncoder
            endpoint_name = (
                "my-endpoint-name"
            )
@@ -61,7 +61,7 @@ class SagemakerEndpointCrossEncoder(BaseModel, BaseCrossEncoder):
                credentials_profile_name=credentials_profile_name
            )
    """
-    client: Any = None  #: :meta private:
+    client: Any = None
 
     endpoint_name: str = ""
     """The name of the endpoint from the deployed Sagemaker model.

@@ -55,10 +55,14 @@ class TensorflowDatasets(BaseModel):
     """
 
     dataset_name: str = ""
+
     split_name: str = "train"
+
     load_max_docs: int = 100
+
     sample_to_document_function: Optional[Callable[[Dict], Document]] = None
-    dataset: Any  #: :meta private:
+
+    dataset: Any
 
     @model_validator(mode="before")
     @classmethod

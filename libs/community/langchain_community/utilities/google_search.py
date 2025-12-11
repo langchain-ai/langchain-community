@@ -47,14 +47,18 @@ class GoogleSearchAPIWrapper(BaseModel):
     - Create a custom search engine here: https://programmablesearchengine.google.com/.
     - In `What to search` to search, pick the `Search the entire Web` option.
     After search engine is created, you can click on it and find `Search engine ID`
-      on the Overview page.
+        on the Overview page.
 
     """
 
-    search_engine: Any = None  #: :meta private:
+    search_engine: Any = None
+
     google_api_key: Optional[str] = None
+
     google_cse_id: Optional[str] = None
+
     k: int = 10
+
     siterestrict: bool = False
 
     model_config = ConfigDict(

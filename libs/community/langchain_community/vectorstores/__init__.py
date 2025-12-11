@@ -264,9 +264,6 @@ if TYPE_CHECKING:
     from langchain_community.vectorstores.tidb_vector import (
         TiDBVectorStore,
     )
-    from langchain_community.vectorstores.tigris import (
-        Tigris,
-    )
     from langchain_community.vectorstores.tiledb import (
         TileDB,
     )
@@ -402,7 +399,6 @@ __all__ = [
     "Tair",
     "TencentVectorDB",
     "TiDBVectorStore",
-    "Tigris",
     "TileDB",
     "TimescaleVector",
     "Typesense",
@@ -508,7 +504,6 @@ _module_lookup = {
     "Tair": "langchain_community.vectorstores.tair",
     "TencentVectorDB": "langchain_community.vectorstores.tencentvectordb",
     "TiDBVectorStore": "langchain_community.vectorstores.tidb_vector",
-    "Tigris": "langchain_community.vectorstores.tigris",
     "TileDB": "langchain_community.vectorstores.tiledb",
     "TimescaleVector": "langchain_community.vectorstores.timescalevector",
     "Typesense": "langchain_community.vectorstores.typesense",
