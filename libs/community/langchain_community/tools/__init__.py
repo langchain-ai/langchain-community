@@ -74,6 +74,12 @@ if TYPE_CHECKING:
         BingSearchResults,
         BingSearchRun,
     )
+    from langchain_community.tools.boxlite import (
+        BrowserTool as BoxliteBrowserTool,
+        CodeInterpreterTool as BoxliteCodeInterpreterTool,
+        ComputerUseTool as BoxliteComputerUseTool,
+        SandboxTool as BoxliteSandboxTool,
+    )
     from langchain_community.tools.brave_search.tool import (
         BraveSearch,
     )
@@ -378,6 +384,10 @@ __all__ = [
     "BearlyInterpreterTool",
     "BingSearchResults",
     "BingSearchRun",
+    "BoxliteBrowserTool",
+    "BoxliteCodeInterpreterTool",
+    "BoxliteComputerUseTool",
+    "BoxliteSandboxTool",
     "BraveSearch",
     "CashFlowStatements",
     "ClickTool",
@@ -531,6 +541,10 @@ _module_lookup = {
     "BearlyInterpreterTool": "langchain_community.tools.bearly.tool",
     "BingSearchResults": "langchain_community.tools.bing_search.tool",
     "BingSearchRun": "langchain_community.tools.bing_search.tool",
+    "BoxliteBrowserTool": "langchain_community.tools.boxlite",
+    "BoxliteCodeInterpreterTool": "langchain_community.tools.boxlite",
+    "BoxliteComputerUseTool": "langchain_community.tools.boxlite",
+    "BoxliteSandboxTool": "langchain_community.tools.boxlite",
     "BraveSearch": "langchain_community.tools.brave_search.tool",
     "CashFlowStatements": "langchain_community.tools.financial_datasets.cash_flow_statements",  # noqa: E501
     "ClickTool": "langchain_community.tools.playwright",
