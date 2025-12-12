@@ -9,7 +9,8 @@ from pydantic import ConfigDict, Field
 
 
 def default_preprocessing_func(text: str) -> List[str]:
-    return text.split()
+    import re
+    return re.sub(r"[^a-zA-Z0-9\s]", " ", text.lower()).split()
 
 
 class BM25Retriever(BaseRetriever):
