@@ -57,7 +57,7 @@ def _check_correct_or_not_defined__all__(code: str) -> bool:
                     # Check if the value assigned is a list
                     if isinstance(node.value, ast.List):
                         # Verify all elements in the list are string literals
-                        if all(isinstance(el, ast.Str) for el in node.value.elts):
+                        if all(isinstance(el, ast.Constant) and isinstance(el.value, str) for el in node.value.elts):
                             pass
                         else:
                             all_good = False
