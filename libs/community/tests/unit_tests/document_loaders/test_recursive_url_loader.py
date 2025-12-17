@@ -28,9 +28,9 @@ URL_TO_HTML = {
 
 
 class MockGet:
-    def __init__(self, url: str, ssl=None, **kwargs) -> None:
+    def __init__(self, url: str, ssl: bool | None = None, **kwargs: object) -> None:
         self._text = URL_TO_HTML[url]
-        self.headers: dict = {}
+        self.headers: dict[str, str] = {}
 
     async def text(self) -> str:
         return self._text
