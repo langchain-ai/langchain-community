@@ -1,30 +1,35 @@
 """
 Deprecated LiteLLM Router wrapper.
 
-⭐  Use `pip install -U langchain-litellm` and import
-    `from langchain_litellm import ChatLiteLLMRouter` instead.
+⭐ Use `pip install -U langchain-litellm` and import
+   `from langchain_litellm import ChatLiteLLMRouter` instead.
 """
+
 from __future__ import annotations
 
 import warnings
+from typing import TYPE_CHECKING
 
 warnings.warn(
-    "ChatLiteLLMRouter in `langchain-community` is deprecated and will be removed "
-    "in a future release.\n"
-    "Please install `langchain-litellm` and import ChatLiteLLMRouter from there:\n\n"
+    "ChatLiteLLMRouter in `langchain-community` is deprecated and will be removed.\n"
+    "Install and import from `langchain-litellm` instead:\n\n"
     "  pip install -U langchain-litellm\n"
     "  from langchain_litellm import ChatLiteLLMRouter\n",
     DeprecationWarning,
     stacklevel=2,
 )
 
-try:
+if TYPE_CHECKING:
     from langchain_litellm import ChatLiteLLMRouter
-except ImportError as e:
-    raise ImportError(
-        "ChatLiteLLMRouter has been moved to the `langchain-litellm` package.\n"
-        "Install it with:\n"
-        "  pip install -U langchain-litellm"
-    ) from e
+else:
+
+    class ChatLiteLLMRouter:
+        def __init__(self, *_, **__):
+            raise ImportError(
+                "ChatLiteLLMRouter has moved to `langchain-litellm`.\n"
+                "Install it with:\n"
+                "  pip install -U langchain-litellm"
+            )
+
 
 __all__ = ["ChatLiteLLMRouter"]
