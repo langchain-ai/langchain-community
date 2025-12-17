@@ -28,7 +28,7 @@ URL_TO_HTML = {
 
 
 class MockGet:
-    def __init__(self, url: str) -> None:
+    def __init__(self, url: str, ssl=None, **kwargs) -> None:
         self._text = URL_TO_HTML[url]
         self.headers: dict = {}
 
