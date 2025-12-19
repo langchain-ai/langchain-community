@@ -104,6 +104,9 @@ if TYPE_CHECKING:
         RivaASR,
         RivaTTS,
     )
+    from langchain_community.utilities.olostep import (
+        OlostepAPIWrapper,
+    )
     from langchain_community.utilities.openweathermap import (
         OpenWeatherMapAPIWrapper,
     )
@@ -210,6 +213,7 @@ __all__ = [
     "NVIDIARivaTTS",
     "NasaAPIWrapper",
     "NutritionAIAPI",
+    "OlostepAPIWrapper",
     "OpenWeatherMapAPIWrapper",
     "OracleSummary",
     "OutlineAPIWrapper",
@@ -274,6 +278,7 @@ _module_lookup = {
     "NVIDIARivaTTS": "langchain_community.utilities.nvidia_riva",
     "NasaAPIWrapper": "langchain_community.utilities.nasa",
     "NutritionAIAPI": "langchain_community.utilities.passio_nutrition_ai",
+    "OlostepAPIWrapper": "langchain_community.utilities.olostep",
     "OpenWeatherMapAPIWrapper": "langchain_community.utilities.openweathermap",
     "OracleSummary": "langchain_community.utilities.oracleai",
     "OutlineAPIWrapper": "langchain_community.utilities.outline",

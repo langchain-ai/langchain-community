@@ -207,6 +207,12 @@ if TYPE_CHECKING:
     from langchain_community.tools.office365.utils import (
         authenticate,
     )
+    from langchain_community.tools.olostep import (
+        OlostepAnswers,
+        OlostepCrawl,
+        OlostepMap,
+        OlostepScrape,
+    )
     from langchain_community.tools.openapi.utils.api_models import (
         APIOperation,
     )
@@ -444,6 +450,10 @@ __all__ = [
     "O365SearchEvents",
     "O365SendEvent",
     "O365SendMessage",
+    "OlostepAnswers",
+    "OlostepCrawl",
+    "OlostepMap",
+    "OlostepScrape",
     "OpenAPISpec",
     "OpenWeatherMapQueryRun",
     "PolygonAggregates",
@@ -598,6 +608,10 @@ _module_lookup = {
     "O365SearchEvents": "langchain_community.tools.office365.events_search",
     "O365SendEvent": "langchain_community.tools.office365.send_event",
     "O365SendMessage": "langchain_community.tools.office365.send_message",
+    "OlostepAnswers": "langchain_community.tools.olostep",
+    "OlostepCrawl": "langchain_community.tools.olostep",
+    "OlostepMap": "langchain_community.tools.olostep",
+    "OlostepScrape": "langchain_community.tools.olostep",
     "OpenAPISpec": "langchain_community.tools.openapi.utils.openapi_utils",
     "OpenWeatherMapQueryRun": "langchain_community.tools.openweathermap.tool",
     "PolygonAggregates": "langchain_community.tools.polygon.aggregates",

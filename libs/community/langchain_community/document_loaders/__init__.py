@@ -333,6 +333,9 @@ if TYPE_CHECKING:
     from langchain_community.document_loaders.onedrive_file import (
         OneDriveFileLoader,
     )
+    from langchain_community.document_loaders.olostep import (
+        OlostepLoader,
+    )
     from langchain_community.document_loaders.open_city_data import (
         OpenCityDataLoader,
     )
@@ -646,6 +649,7 @@ _module_lookup = {
     "ObsidianLoader": "langchain_community.document_loaders.obsidian",
     "OneDriveFileLoader": "langchain_community.document_loaders.onedrive_file",
     "OneDriveLoader": "langchain_community.document_loaders.onedrive",
+    "OlostepLoader": "langchain_community.document_loaders.olostep",
     "OnlinePDFLoader": "langchain_community.document_loaders.pdf",
     "OpenCityDataLoader": "langchain_community.document_loaders.open_city_data",
     "OracleAutonomousDatabaseLoader": "langchain_community.document_loaders.oracleadb_loader",  # noqa: E501
@@ -854,6 +858,7 @@ __all__ = [
     "ObsidianLoader",
     "OneDriveFileLoader",
     "OneDriveLoader",
+    "OlostepLoader",
     "OnlinePDFLoader",
     "OpenCityDataLoader",
     "OracleAutonomousDatabaseLoader",
