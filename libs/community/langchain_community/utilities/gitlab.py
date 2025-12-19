@@ -15,21 +15,27 @@ if TYPE_CHECKING:
 class GitLabAPIWrapper(BaseModel):
     """Wrapper for GitLab API."""
 
-    gitlab: Any = None  #: :meta private:
-    gitlab_repo_instance: Any = None  #: :meta private:
+    gitlab: Any = None
+
+    gitlab_repo_instance: Any = None
+
     gitlab_url: Optional[str] = None
     """The url of the GitLab instance."""
+
     gitlab_repository: Optional[str] = None
     """The name of the GitLab repository, in the form {username}/{repo-name}."""
+
     gitlab_personal_access_token: Optional[str] = None
     """Personal access token for the GitLab service, used for authentication."""
+
     gitlab_branch: Optional[str] = None
     """The specific branch in the GitLab repository where the bot will make
-        its commits. Defaults to 'main'.
+        its commits. Defaults to `'main'`.
     """
+
     gitlab_base_branch: Optional[str] = None
     """The base branch in the GitLab repository, used for comparisons.
-        Usually 'main' or 'master'. Defaults to 'main'.
+        Usually `'main'` or `'master'`. Defaults to `'main'`.
     """
 
     model_config = ConfigDict(
@@ -166,8 +172,7 @@ class GitLabAPIWrapper(BaseModel):
             commits are already in the master branch"""
         else:
             try:
-                title = pr_query.split("\n")[0]
-                body = pr_query[len(title) + 2 :]
+                title, body = pr_query.split("\n", 1)
                 pr = self.gitlab_repo_instance.mergerequests.create(
                     {
                         "source_branch": self.gitlab_branch,
@@ -218,8 +223,7 @@ class GitLabAPIWrapper(BaseModel):
                 f"to the {self.gitlab_base_branch} branch, which is protected. "
                 "Please create a new branch and try again."
             )
-        file_path = file_query.split("\n")[0]
-        file_contents = file_query[len(file_path) + 2 :]
+        file_path, file_contents = file_query.split("\n", 1)
         try:
             self.gitlab_repo_instance.files.get(file_path, self.gitlab_branch)
             return f"File already exists at {file_path}. Use update_file instead"

@@ -34,10 +34,10 @@ class AzureAiServicesImageAnalysisTool(BaseTool):
         including its purpose and expected input.
     """
 
-    azure_ai_services_key: Optional[str] = None  #: :meta private:
-    azure_ai_services_endpoint: Optional[str] = None  #: :meta private:
+    azure_ai_services_key: Optional[str] = None
+    azure_ai_services_endpoint: Optional[str] = None
     visual_features: Any = None
-    image_analysis_client: Any = None  #: :meta private:
+    image_analysis_client: Any = None
 
     name: str = "azure_ai_services_image_analysis"
     description: str = (

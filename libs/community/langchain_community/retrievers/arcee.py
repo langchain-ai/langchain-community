@@ -28,7 +28,7 @@ class ArceeRetriever(BaseRetriever):
             documents = retriever.invoke("AI-driven music therapy")
     """
 
-    _client: Optional[ArceeWrapper] = None  #: :meta private:
+    _client: Optional[ArceeWrapper] = None
     """Arcee client."""
 
     arcee_api_key: SecretStr

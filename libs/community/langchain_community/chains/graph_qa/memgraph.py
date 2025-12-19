@@ -32,9 +32,9 @@ from langchain_community.graphs.memgraph_graph import MemgraphGraph
 
 INTERMEDIATE_STEPS_KEY = "intermediate_steps"
 
-FUNCTION_RESPONSE_SYSTEM = """You are an assistant that helps to form nice and human 
+FUNCTION_RESPONSE_SYSTEM = """You are an assistant that helps to form nice and human
 understandable answers based on the provided information from tools.
-Do not add any other information that wasn't present in the tools, and use 
+Do not add any other information that wasn't present in the tools, and use
 very concise style in interpreting results!
 """
 
@@ -101,8 +101,8 @@ class MemgraphQAChain(Chain):
     cypher_generation_chain: Runnable
     qa_chain: Runnable
     graph_schema: str
-    input_key: str = "query"  #: :meta private:
-    output_key: str = "result"  #: :meta private:
+    input_key: str = "query"
+    output_key: str = "result"
     top_k: int = 10
     """Number of results to return from the query"""
     return_intermediate_steps: bool = False
@@ -113,7 +113,7 @@ class MemgraphQAChain(Chain):
     """Whether to wrap the database context as tool/function response"""
     allow_dangerous_requests: bool = False
     """Forced user opt-in to acknowledge that the chain can make dangerous requests.
-    
+
     *Security note*: Make sure that the database connection uses credentials
         that are narrowly-scoped to only include necessary permissions.
         Failure to do so may result in data corruption or loss, since the calling
@@ -144,18 +144,12 @@ class MemgraphQAChain(Chain):
 
     @property
     def input_keys(self) -> List[str]:
-        """Return the input keys.
-
-        :meta private:
-        """
+        """Return the input keys."""
         return [self.input_key]
 
     @property
     def output_keys(self) -> List[str]:
-        """Return the output keys.
-
-        :meta private:
-        """
+        """Return the output keys."""
         _output_keys = [self.output_key]
         return _output_keys
 
