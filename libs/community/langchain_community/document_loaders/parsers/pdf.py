@@ -455,13 +455,13 @@ class PyPDFParser(BaseBlobParser):
                 else:
                     logger.warning("Unknown PDF Filter!")
                 if np_image is not None:
-                    image_bytes = io.BytesIO()
+                    img_bytes = io.BytesIO()
 
-                    Image.fromarray(np_image).save(image_bytes, format="PNG")
-                    if image_bytes.getbuffer().nbytes == 0:
+                    Image.fromarray(np_image).save(img_bytes, format="PNG")
+                    if img_bytes.getbuffer().nbytes == 0:
                         continue
 
-                    blob = Blob.from_data(image_bytes.getvalue(), mime_type="image/png")
+                    blob = Blob.from_data(img_bytes.getvalue(), mime_type="image/png")
                     image_text = next(self.images_parser.lazy_parse(blob)).page_content
                     images.append(
                         _format_inner_image(blob, image_text, self.images_inner_format)
@@ -1110,13 +1110,13 @@ class PyMuPDFParser(BaseBlobParser):
                 image = np.frombuffer(pix.samples, dtype=np.uint8).reshape(
                     pix.height, pix.width, -1
                 )
-                image_bytes = io.BytesIO()
-                numpy.save(image_bytes, image)
-                if image_bytes.getbuffer().nbytes == 0:
+                img_bytes = io.BytesIO()
+                numpy.save(img_bytes, image)
+                if img_bytes.getbuffer().nbytes == 0:
                     continue
 
                 blob = Blob.from_data(
-                    image_bytes.getvalue(), mime_type="application/x-npy"
+                    img_bytes.getvalue(), mime_type="application/x-npy"
                 )
                 image_text = next(self.images_parser.lazy_parse(blob)).page_content
 
@@ -1377,12 +1377,12 @@ class PyPDFium2Parser(BaseBlobParser):
             return ""
         str_images = []
         for image in images:
-            image_bytes = io.BytesIO()
+            img_bytes = io.BytesIO()
             np_image = image.get_bitmap().to_numpy()
             if np_image.size < 3:
                 continue
-            numpy.save(image_bytes, image.get_bitmap().to_numpy())
-            blob = Blob.from_data(image_bytes.getvalue(), mime_type="application/x-npy")
+            numpy.save(img_bytes, image.get_bitmap().to_numpy())
+            blob = Blob.from_data(img_bytes.getvalue(), mime_type="application/x-npy")
             text_from_image = next(self.images_parser.lazy_parse(blob)).page_content
             str_images.append(
                 _format_inner_image(blob, text_from_image, self.images_inner_format)
