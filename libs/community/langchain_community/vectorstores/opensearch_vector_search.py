@@ -978,6 +978,27 @@ class OpenSearchVectorSearch(VectorStore):
         """
         return self._identity_fn
 
+    def _hits_to_documents(
+        self, hits: List[dict], text_field: str, metadata_field: str
+    ) -> List[Tuple[Document, float]]:
+        """Parse OpenSearch hits into a list of Documents with scores."""
+        documents_with_scores = [
+            (
+                Document(
+                    page_content=hit["_source"][text_field],
+                    metadata=(
+                        hit["_source"]
+                        if metadata_field == "*" or metadata_field not in hit["_source"]
+                        else hit["_source"][metadata_field]
+                    ),
+                    id=hit["_id"],
+                ),
+                hit["_score"],
+            )
+            for hit in hits
+        ]
+        return documents_with_scores
+
     def similarity_search(
         self,
         query: str,
@@ -1123,22 +1144,7 @@ class OpenSearchVectorSearch(VectorStore):
             embedding=embedding, k=k, score_threshold=score_threshold, **kwargs
         )
 
-        documents_with_scores = [
-            (
-                Document(
-                    page_content=hit["_source"][text_field],
-                    metadata=(
-                        hit["_source"]
-                        if metadata_field == "*" or metadata_field not in hit["_source"]
-                        else hit["_source"][metadata_field]
-                    ),
-                    id=hit["_id"],
-                ),
-                hit["_score"],
-            )
-            for hit in hits
-        ]
-        return documents_with_scores
+        return self._hits_to_documents(hits, text_field, metadata_field)
 
     def _raw_similarity_search_with_score_by_vector(
         self,
@@ -1814,3 +1820,244 @@ class OpenSearchVectorSearch(VectorStore):
         kwargs["engine"] = engine
         kwargs["routing"] = routing
         return cls(opensearch_url, index_name, embedding, **kwargs)
+
+    async def asimilarity_search_with_score(
+        self,
+        query: str,
+        k: int = 4,
+        score_threshold: Optional[float] = 0.0,
+        **kwargs: Any,
+    ) -> List[Tuple[Document, float]]:
+        """Asynchronously return docs and their scores most similar to query.
+
+        Args:
+            query: Text to look up documents similar to.
+            k: Number of Documents to return. Defaults to 4.
+            score_threshold: Specify a score threshold to return only documents
+            above the threshold. Defaults to 0.0.
+
+        Returns:
+            List of Documents along with its scores most similar to the query.
+        """
+        # Added query_text to kwargs for Hybrid Search
+        kwargs["query_text"] = query
+
+        # IMPORTANT: Use async embedding
+        embedding = await self.embedding_function.aembed_query(query)
+
+        return await self.asimilarity_search_with_score_by_vector(
+            embedding, k, score_threshold, **kwargs
+        )
+
+    async def asimilarity_search_with_score_by_vector(
+        self,
+        embedding: List[float],
+        k: int = 4,
+        score_threshold: Optional[float] = 0.0,
+        **kwargs: Any,
+    ) -> List[Tuple[Document, float]]:
+        """Asynchronously return docs and their scores most similar to the
+        embedding vector.
+        """
+        text_field = kwargs.get("text_field", "text")
+        metadata_field = kwargs.get("metadata_field", "metadata")
+
+        hits = await self._araw_similarity_search_with_score_by_vector(
+            embedding=embedding, k=k, score_threshold=score_threshold, **kwargs
+        )
+
+        return self._hits_to_documents(hits, text_field, metadata_field)
+
+    async def asimilarity_search(
+        self,
+        query: str,
+        k: int = 4,
+        score_threshold: Optional[float] = 0.0,
+        **kwargs: Any,
+    ) -> List[Document]:
+        """Asynchronously return docs most similar to query."""
+        docs_with_scores = await self.asimilarity_search_with_score(
+            query, k, score_threshold, **kwargs
+        )
+        return [doc[0] for doc in docs_with_scores]
+
+    async def _araw_similarity_search_with_score_by_vector(
+        self,
+        embedding: List[float],
+        k: int = 4,
+        score_threshold: Optional[float] = 0.0,
+        **kwargs: Any,
+    ) -> List[dict]:
+        """Asynchronously return raw opensearch documents (dict) including vectors,
+        scores most similar to the embedding vector.
+
+        By default, supports Approximate Search.
+        Also supports Script Scoring and Painless Scripting.
+
+        Args:
+            embedding: Embedding vector to look up documents similar to.
+            k: Number of Documents to return. Defaults to 4.
+            score_threshold: Specify a score threshold to return only documents
+            above the threshold. Defaults to 0.0.
+
+        Returns:
+            List of dict with its scores most similar to the embedding.
+
+        Optional Args:
+            same as `similarity_search`
+        """
+        search_type = kwargs.get("search_type", "approximate_search")
+        vector_field = kwargs.get("vector_field", "vector_field")
+        index_name = kwargs.get("index_name", self.index_name)
+        if self.index_name is None:
+            raise ValueError("index_name must be provided.")
+        filter = kwargs.get("filter", {})
+
+        if (
+            self.is_aoss
+            and search_type != "approximate_search"
+            and search_type != SCRIPT_SCORING_SEARCH
+        ):
+            raise ValueError(
+                "Amazon OpenSearch Service Serverless only "
+                "supports `approximate_search` and `script_scoring`"
+            )
+
+        if search_type == "approximate_search":
+            boolean_filter = kwargs.get("boolean_filter", {})
+            subquery_clause = kwargs.get("subquery_clause", "must")
+            efficient_filter = kwargs.get("efficient_filter", {})
+            # `lucene_filter` is deprecated, added for Backwards Compatibility
+            lucene_filter = kwargs.get("lucene_filter", {})
+
+            if boolean_filter != {} and efficient_filter != {}:
+                raise ValueError(
+                    "Both `boolean_filter` and `efficient_filter` are provided which "
+                    "is invalid"
+                )
+
+            if lucene_filter != {} and efficient_filter != {}:
+                raise ValueError(
+                    "Both `lucene_filter` and `efficient_filter` are provided which "
+                    "is invalid. `lucene_filter` is deprecated"
+                )
+
+            if lucene_filter != {} and boolean_filter != {}:
+                raise ValueError(
+                    "Both `lucene_filter` and `boolean_filter` are provided which "
+                    "is invalid. `lucene_filter` is deprecated"
+                )
+
+            if (
+                efficient_filter == {}
+                and boolean_filter == {}
+                and lucene_filter == {}
+                and filter != {}
+            ):
+                if self.engine in ["faiss", "lucene"]:
+                    efficient_filter = filter
+                else:
+                    boolean_filter = filter
+
+            if boolean_filter != {}:
+                search_query = _approximate_search_query_with_boolean_filter(
+                    embedding,
+                    boolean_filter,
+                    k=k,
+                    vector_field=vector_field,
+                    subquery_clause=subquery_clause,
+                    score_threshold=score_threshold,
+                )
+            elif efficient_filter != {}:
+                search_query = _approximate_search_query_with_efficient_filter(
+                    embedding,
+                    efficient_filter,
+                    k=k,
+                    vector_field=vector_field,
+                    score_threshold=score_threshold,
+                )
+            elif lucene_filter != {}:
+                warnings.warn(
+                    "`lucene_filter` is deprecated. Please use the keyword argument"
+                    " `efficient_filter`"
+                )
+                search_query = _approximate_search_query_with_efficient_filter(
+                    embedding,
+                    lucene_filter,
+                    k=k,
+                    vector_field=vector_field,
+                    score_threshold=score_threshold,
+                )
+            else:
+                search_query = _default_approximate_search_query(
+                    embedding,
+                    k=k,
+                    vector_field=vector_field,
+                    score_threshold=score_threshold,
+                )
+        elif search_type == SCRIPT_SCORING_SEARCH:
+            space_type = kwargs.get("space_type", "l2")
+            pre_filter = kwargs.get("pre_filter", MATCH_ALL_QUERY)
+            search_query = _default_script_query(
+                embedding,
+                k,
+                space_type,
+                pre_filter,
+                vector_field,
+                score_threshold=score_threshold,
+            )
+        elif search_type == PAINLESS_SCRIPTING_SEARCH:
+            space_type = kwargs.get("space_type", "l2Squared")
+            pre_filter = kwargs.get("pre_filter", MATCH_ALL_QUERY)
+            search_query = _default_painless_scripting_query(
+                embedding,
+                k,
+                space_type,
+                pre_filter,
+                vector_field,
+                score_threshold=score_threshold,
+            )
+
+        elif search_type == HYBRID_SEARCH:
+            search_pipeline = kwargs.get("search_pipeline")
+            post_filter = kwargs.get("post_filter", {})
+            query_text = kwargs.get("query_text")
+            path = f"/{index_name}/_search?search_pipeline={search_pipeline}"
+
+            if query_text is None:
+                raise ValueError("query_text must be provided for hybrid search")
+
+            if search_pipeline is None:
+                raise ValueError("search_pipeline must be provided for hybrid search")
+
+            # Async embedding of the query_text
+            embeded_query = await self.embedding_function.aembed_query(query_text)
+
+            # if post filter is provided
+            if post_filter != {}:
+                # hybrid search with post filter
+                payload = _hybrid_search_query_with_post_filter(
+                    query_text, embeded_query, k, post_filter
+                )
+            else:
+                # hybrid search without post filter
+                payload = _default_hybrid_search_query(query_text, embeded_query, k)
+
+            # Async transport request
+            response = await self.async_client.transport.perform_request(
+                method="GET", url=path, body=payload
+            )
+
+            return [hit for hit in response["hits"]["hits"]]
+
+        else:
+            raise ValueError("Invalid `search_type` provided as an argument")
+
+        search_params = {"index": index_name, "body": search_query}
+        if self.routing:
+            search_params["routing"] = self.routing
+
+        # Async search call
+        response = await self.async_client.search(**search_params)
+
+        return [hit for hit in response["hits"]["hits"]]
