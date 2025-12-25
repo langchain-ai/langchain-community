@@ -360,7 +360,7 @@ def standardize_model_name(
     if "ft:" in model_name:
         model_name = model_name.split(":")[1] + "-finetuned"
     if token_type == TokenType.COMPLETION and (
-        model_name.startswith("gpt-5-1")
+        model_name.startswith("gpt-5.1")
         or model_name.startswith("gpt-5")
         or model_name.startswith("gpt-4")
         or model_name.startswith("gpt-3.5")
