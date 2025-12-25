@@ -18,7 +18,7 @@ This repository contains community-maintained LangChain integrations in the [`la
 **Documentation**:
 
 - [docs.langchain.com](https://docs.langchain.com/oss/python/langchain/overview) – Comprehensive documentation, including conceptual overviews and guides
-- [reference.langchain.com/python](https://reference.langchain.com/python/langchain_community/) – API reference docs for community integrations
+- [reference.langchain.com/python](https://reference.langchain.com/python/integrations/langchain_community/) – API reference docs for community integrations
 
 **Discussions**: Visit the [LangChain Forum](https://forum.langchain.com) to connect with the community and share all of your technical questions, ideas, and feedback.
 
