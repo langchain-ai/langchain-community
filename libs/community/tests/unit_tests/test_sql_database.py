@@ -18,6 +18,8 @@ from sqlalchemy.engine import Engine, Result
 
 from langchain_community.utilities.sql_database import (
     SQLDatabase,
+    _add_duckdb_user_agent,
+    _inject_langchain_user_agent,
     sanitize_schema,
     truncate_word,
 )
@@ -288,3 +290,61 @@ def test_sanitize_schema() -> None:
         with pytest.raises(ValueError) as ex:
             sanitize_schema(schema)
         assert f"Schema name '{schema}' contains invalid characters" in str(ex.value)
+
+
+def test_inject_langchain_user_agent() -> None:
+    """Test that _inject_langchain_user_agent adds langchain to config."""
+    # None config should return dict with user agent
+    result = _inject_langchain_user_agent(None)
+    assert result == {"custom_user_agent": "langchain"}
+
+    # Empty config should get user agent added
+    result = _inject_langchain_user_agent({})
+    assert result == {"custom_user_agent": "langchain"}
+
+    # Existing config should be preserved
+    result = _inject_langchain_user_agent({"threads": 4})
+    assert result == {"threads": 4, "custom_user_agent": "langchain"}
+
+    # User-provided custom_user_agent should have langchain prepended
+    result = _inject_langchain_user_agent({"custom_user_agent": "my-app"})
+    assert result == {"custom_user_agent": "langchain my-app"}
+
+    # Original dict should not be mutated
+    original = {"threads": 4}
+    _inject_langchain_user_agent(original)
+    assert original == {"threads": 4}
+
+
+def test_add_duckdb_user_agent() -> None:
+    """Test that _add_duckdb_user_agent adds langchain user agent."""
+    # Empty engine_args should get user agent added
+    result = _add_duckdb_user_agent({})
+    assert result == {"connect_args": {"config": {"custom_user_agent": "langchain"}}}
+
+    # Existing connect_args should be preserved
+    result = _add_duckdb_user_agent({"connect_args": {"timeout": 30}})
+    assert result == {
+        "connect_args": {"timeout": 30, "config": {"custom_user_agent": "langchain"}}
+    }
+
+    # Existing config should be preserved
+    result = _add_duckdb_user_agent(
+        {"connect_args": {"config": {"threads": 4}}}
+    )
+    assert result == {
+        "connect_args": {"config": {"threads": 4, "custom_user_agent": "langchain"}}
+    }
+
+    # User-provided custom_user_agent should have langchain prepended
+    result = _add_duckdb_user_agent(
+        {"connect_args": {"config": {"custom_user_agent": "my-app"}}}
+    )
+    assert result == {
+        "connect_args": {"config": {"custom_user_agent": "langchain my-app"}}
+    }
+
+    # Original dict should not be mutated
+    original = {"connect_args": {"config": {"threads": 4}}}
+    _add_duckdb_user_agent(original)
+    assert original == {"connect_args": {"config": {"threads": 4}}}

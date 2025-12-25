@@ -48,6 +48,25 @@ def _patch_duckdb_types() -> None:
 _patch_duckdb_types()
 
 
+def _inject_langchain_user_agent(config: Optional[Dict[str, Any]]) -> Dict[str, Any]:
+    """Add 'langchain' to DuckDB custom_user_agent config."""
+    config = dict(config or {})
+    existing = config.get("custom_user_agent", "")
+    config["custom_user_agent"] = f"langchain {existing}" if existing else "langchain"
+
+    return config
+
+
+def _add_duckdb_user_agent(engine_args: dict) -> dict:
+    """Add langchain user agent to SQLAlchemy engine_args for DuckDB."""
+    engine_args = dict(engine_args or {})
+    connect_args = engine_args.get("connect_args", {})
+    connect_args = connect_args.copy()
+    connect_args["config"] = _inject_langchain_user_agent(connect_args.get("config"))
+    engine_args["connect_args"] = connect_args
+    return engine_args
+
+
 def _format_index(index: sqlalchemy.engine.interfaces.ReflectedIndex) -> str:
     return (
         f"Name: {index['name']}, Unique: {index['unique']},"
@@ -177,6 +196,12 @@ class SQLDatabase:
     ) -> SQLDatabase:
         """Construct a SQLAlchemy engine from URI."""
         _engine_args = engine_args or {}
+
+        # Add LangChain user agent for DuckDB/MotherDuck connections
+        uri_str = str(database_uri)
+        if uri_str.startswith("duckdb://"):
+            _engine_args = _add_duckdb_user_agent(_engine_args)
+
         return cls(create_engine(database_uri, **_engine_args), **kwargs)
 
     @classmethod

@@ -3,6 +3,7 @@ from typing import Dict, List, Optional, cast
 from langchain_core.documents import Document
 
 from langchain_community.document_loaders.base import BaseLoader
+from langchain_community.utilities.sql_database import _inject_langchain_user_agent
 
 
 class DuckDBLoader(BaseLoader):
@@ -54,8 +55,9 @@ class DuckDBLoader(BaseLoader):
             )
 
         docs = []
+        config = _inject_langchain_user_agent(self.config)
         with duckdb.connect(
-            database=self.database, read_only=self.read_only, config=self.config
+            database=self.database, read_only=self.read_only, config=config
         ) as con:
             query_result = con.execute(self.query)
             results = query_result.fetchall()
