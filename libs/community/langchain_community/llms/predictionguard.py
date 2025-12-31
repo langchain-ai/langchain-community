@@ -33,7 +33,7 @@ class PredictionGuard(LLM):
             )
     """
 
-    client: Any = None  #: :meta private:
+    client: Any = None
 
     model: Optional[str] = "Hermes-3-Llama-3.1-8B"
     """Model name to use."""

@@ -112,18 +112,18 @@ class SparkLLM(LLM):
 
     """  # noqa: E501
 
-    client: Any = None  #: :meta private:
+    client: Any = None
     spark_app_id: Optional[str] = Field(default=None, alias="app_id")
-    """Automatically inferred from env var `IFLYTEK_SPARK_APP_ID` 
+    """Automatically inferred from env var `IFLYTEK_SPARK_APP_ID`
         if not provided."""
     spark_api_key: Optional[str] = Field(default=None, alias="api_key")
-    """IFLYTEK SPARK API KEY. If not passed in will be read from 
+    """IFLYTEK SPARK API KEY. If not passed in will be read from
         env var IFLYTEK_SPARK_API_KEY."""
     spark_api_secret: Optional[str] = Field(default=None, alias="api_secret")
-    """IFLYTEK SPARK API SECRET. If not passed in will be read from 
+    """IFLYTEK SPARK API SECRET. If not passed in will be read from
         env var IFLYTEK_SPARK_API_SECRET."""
     spark_api_url: Optional[str] = Field(default=None, alias="api_url")
-    """Base URL path for API requests, leave blank if not using a proxy or service 
+    """Base URL path for API requests, leave blank if not using a proxy or service
         emulator."""
     spark_llm_domain: Optional[str] = Field(default=None, alias="model")
     """Model name to use."""

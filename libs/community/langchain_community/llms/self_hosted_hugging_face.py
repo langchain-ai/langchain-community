@@ -165,7 +165,7 @@ class SelfHostedHuggingFaceLLM(SelfHostedPipeline):
     """Requirements to install on hardware to inference the model."""
     model_load_fn: Callable = _load_transformer
     """Function to load the model remotely on the server."""
-    inference_fn: Callable = _generate_text  #: :meta private:
+    inference_fn: Callable = _generate_text
     """Inference function to send to the remote hardware."""
 
     model_config = ConfigDict(
