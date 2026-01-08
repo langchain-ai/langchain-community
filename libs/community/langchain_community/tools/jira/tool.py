@@ -20,13 +20,25 @@ toolkit = JiraToolkit.from_jira_api_wrapper(jira)
 ```
 """
 
-from typing import Optional
+from typing import Optional, Type
 
 from langchain_core.callbacks import CallbackManagerForToolRun
 from langchain_core.tools import BaseTool
-from pydantic import Field
+from pydantic import BaseModel, Field
 
 from langchain_community.utilities.jira import JiraAPIWrapper
+
+
+class JiraActionInput(BaseModel):
+    """Input schema for Jira actions."""
+
+    instructions: str = Field(
+        ...,
+        description=(
+            "Instructions for the Jira action. Provide a JQL query, issue fields "
+            "JSON, or other Jira API input based on the tool description."
+        ),
+    )
 
 
 class JiraAction(BaseTool):
@@ -36,6 +48,7 @@ class JiraAction(BaseTool):
     mode: str
     name: str = ""
     description: str = ""
+    args_schema: Type[BaseModel] = JiraActionInput
 
     def _run(
         self,
