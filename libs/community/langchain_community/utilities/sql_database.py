@@ -461,9 +461,9 @@ class SQLDatabase:
             # save the sample rows in string format
             sample_rows_str = "\n".join(["\t".join(row) for row in sample_rows])
 
-        # in some dialects when there are no rows in the table a
-        # 'ProgrammingError' is returned
-        except ProgrammingError:
+        # Catching ProgrammingError to handle specific dialect errors (original behavior)
+        # Catching ValueError to handle Python-level type conversion errors (e.g. invalid dates in DB)
+        except (ProgrammingError, ValueError):
             sample_rows_str = ""
 
         return (
