@@ -47,6 +47,9 @@ if TYPE_CHECKING:
     from langchain_community.tools.ainetwork.value import (
         AINValueOps,
     )
+    from langchain_community.tools.api_governor.tool import (
+        APIGovernorTool,
+    )
     from langchain_community.tools.arxiv.tool import (
         ArxivQueryRun,
     )
@@ -289,6 +292,9 @@ if TYPE_CHECKING:
     from langchain_community.tools.sleep.tool import (
         SleepTool,
     )
+    from langchain_community.tools.spec_test_generator.tool import (
+        SpecTestGeneratorTool,
+    )
     from langchain_community.tools.spark_sql.tool import (
         BaseSparkSQLTool,
         InfoSparkSQLTool,
@@ -357,6 +363,7 @@ __all__ = [
     "AINTransfer",
     "AINValueOps",
     "AIPluginTool",
+    "APIGovernorTool",
     "APIOperation",
     "ArxivQueryRun",
     "AskNewsSearch",
@@ -476,6 +483,7 @@ __all__ = [
     "SlackScheduleMessage",
     "SlackSendMessage",
     "SleepTool",
+    "SpecTestGeneratorTool",
     "StackExchangeTool",
     "StdInInquireTool",
     "SteamWebAPIQueryRun",
@@ -509,6 +517,7 @@ _module_lookup = {
     "AINTransfer": "langchain_community.tools.ainetwork.transfer",
     "AINValueOps": "langchain_community.tools.ainetwork.value",
     "AIPluginTool": "langchain_community.tools.plugin",
+    "APIGovernorTool": "langchain_community.tools.api_governor.tool",
     "APIOperation": "langchain_community.tools.openapi.utils.api_models",
     "ArxivQueryRun": "langchain_community.tools.arxiv.tool",
     "AskNewsSearch": "langchain_community.tools.asknews.tool",
@@ -631,6 +640,7 @@ _module_lookup = {
     "SlackScheduleMessage": "langchain_community.tools.slack.schedule_message",
     "SlackSendMessage": "langchain_community.tools.slack.send_message",
     "SleepTool": "langchain_community.tools.sleep.tool",
+    "SpecTestGeneratorTool": "langchain_community.tools.spec_test_generator.tool",
     "StackExchangeTool": "langchain_community.tools.stackexchange.tool",
     "StdInInquireTool": "langchain_community.tools.interaction.tool",
     "SteamWebAPIQueryRun": "langchain_community.tools.steam.tool",
