@@ -31,7 +31,8 @@ class HNLoader(WebBaseLoader):
     def load_comments(self, soup_info: Any) -> List[Document]:
         """Load comments from a HN post."""
         comments = soup_info.select("tr[class='athing comtr']")
-        title = soup_info.select_one("tr[id='pagespace']").get("title")
+        pagespace = soup_info.select_one("tr[id='pagespace']")
+        title = pagespace.get("title") if pagespace else None
         return [
             Document(
                 page_content=comment.text.strip(),
@@ -45,9 +46,16 @@ class HNLoader(WebBaseLoader):
         items = soup.select("tr[class='athing']")
         documents = []
         for lineItem in items:
-            ranking = lineItem.select_one("span[class='rank']").text
-            link = lineItem.find("span", {"class": "titleline"}).find("a").get("href")
-            title = lineItem.find("span", {"class": "titleline"}).text.strip()
+            rank_elem = lineItem.select_one("span[class='rank']")
+            ranking = rank_elem.text if rank_elem else None
+            titleline = lineItem.find("span", {"class": "titleline"})
+            if titleline:
+                link_elem = titleline.find("a")
+                link = link_elem.get("href") if link_elem else None
+                title = titleline.text.strip()
+            else:
+                link = None
+                title = None
             metadata = {
                 "source": self.web_path,
                 "title": title,
@@ -56,7 +64,10 @@ class HNLoader(WebBaseLoader):
             }
             documents.append(
                 Document(
-                    page_content=title, link=link, ranking=ranking, metadata=metadata
+                    page_content=title or "",
+                    link=link,
+                    ranking=ranking,
+                    metadata=metadata,
                 )
             )
         return documents
