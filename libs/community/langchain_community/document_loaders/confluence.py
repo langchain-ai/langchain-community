@@ -849,7 +849,6 @@ class ConfluenceLoader(BaseLoader):
         return text
 
     def process_xlsx(self, link: str) -> str:
-        """Process .xlsx files using openpyxl."""
         try:
             import openpyxl
         except ImportError:
@@ -859,7 +858,11 @@ class ConfluenceLoader(BaseLoader):
 
         response = self.confluence.request(path=link, absolute=True)
 
-        if response.status_code != 200 or not response.content:
+        if (
+            response.status_code != 200
+            or response.content == b""
+            or response.content is None
+        ):
             logger.warning(f"Failed to download .xlsx from {link}")
             return ""
 
@@ -881,7 +884,10 @@ class ConfluenceLoader(BaseLoader):
 
             return text
 
-        except Exception as e:
+        except (
+            openpyxl.utils.exceptions.InvalidFileException,
+            openpyxl.utils.exceptions.SheetTitleException,
+        ) as e:
             logger.error(f"Error processing .xlsx: {e}")
             return ""
 
