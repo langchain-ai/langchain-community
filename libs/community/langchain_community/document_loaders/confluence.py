@@ -690,6 +690,11 @@ class ConfluenceLoader(BaseLoader):
                     text = title + self.process_doc(absolute_url)
                 elif media_type == "application/vnd.ms-excel":
                     text = title + self.process_xls(absolute_url)
+                elif (
+                    media_type == "application/vnd.openxmlformats-officedocument"
+                    ".spreadsheetml.sheet"
+                ):
+                    text = title + self.process_xlsx(absolute_url)
                 elif media_type == "image/svg+xml":
                     text = title + self.process_svg(absolute_url, ocr_languages)
                 else:
@@ -842,6 +847,43 @@ class ConfluenceLoader(BaseLoader):
                 text += "\n"
 
         return text
+
+    def process_xlsx(self, link: str) -> str:
+        """Process .xlsx files using openpyxl."""
+        try:
+            import openpyxl
+        except ImportError:
+            raise ImportError(
+                "openpyxl package not found, please run pip install openpyxl"
+            )
+
+        response = self.confluence.request(path=link, absolute=True)
+
+        if response.status_code != 200 or not response.content:
+            logger.warning(f"Failed to download .xlsx from {link}")
+            return ""
+
+        try:
+            excel_file = BytesIO(response.content)
+            workbook = openpyxl.load_workbook(excel_file, data_only=True)
+
+            text = ""
+            for sheet_name in workbook.sheetnames:
+                sheet = workbook[sheet_name]
+                text += f"\n{sheet_name}:\n"
+
+                for row in sheet.iter_rows(values_only=True):
+                    row_text = "\t".join(
+                        str(cell) if cell is not None else "" for cell in row
+                    )
+                    text += f"{row_text}\n"
+                text += "\n"
+
+            return text
+
+        except Exception as e:
+            logger.error(f"Error processing .xlsx: {e}")
+            return ""
 
     def process_svg(
         self,
