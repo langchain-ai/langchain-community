@@ -854,7 +854,7 @@ class ConfluenceLoader(BaseLoader):
             import openpyxl
         except ImportError:
             raise ImportError(
-                "openpyxl package not found, please run pip install openpyxl"
+                "`openpyxl` package not found, please run `pip install openpyxl`"
             )
 
         response = self.confluence.request(path=link, absolute=True)
