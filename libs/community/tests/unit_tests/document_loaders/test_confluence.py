@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-import unittest
+from io import BytesIO
 from typing import TYPE_CHECKING, Any, Dict
 from unittest.mock import MagicMock, patch
 
@@ -86,7 +86,7 @@ class TestConfluenceLoader:
     def test_confluence_loader_initialization_from_env(
         self, mock_confluence: MagicMock
     ) -> None:
-        with unittest.mock.patch.dict(
+        with patch.dict(
             "os.environ",
             {
                 "CONFLUENCE_USERNAME": self.MOCK_USERNAME,
@@ -240,6 +240,73 @@ class TestConfluenceLoader:
         assert documents[0].metadata["labels"] == ["l1", "l2"]
         assert documents[1].metadata["labels"] == []
 
+    @pytest.mark.requires("openpyxl")
+    def test_confluence_loader_with_xlsx_attachment(
+        self, mock_confluence: MagicMock
+    ) -> None:
+        mock_confluence.get_page_by_id.side_effect = [self._get_mock_page("123")]
+        mock_confluence.get_all_restrictions_for_content.side_effect = [
+            self._get_mock_page_restrictions("123")
+        ]
+        mock_confluence.get_attachments_from_content.return_value = {
+            "results": [
+                {
+                    "metadata": {
+                        "mediaType": "application/vnd.openxmlformats-officedocument"
+                        ".spreadsheetml.sheet"
+                    },
+                    "_links": {"download": "/download/attachments/123/file.xlsx"},
+                    "title": "file.xlsx",
+                }
+            ]
+        }
+
+        mock_confluence.request.return_value.status_code = 200
+        mock_confluence.request.return_value.content = self._create_xlsx_bytes()
+
+        confluence_loader = self._get_mock_confluence_loader(
+            mock_confluence, page_ids=["123"], include_attachments=True
+        )
+        documents = confluence_loader.load()
+
+        assert len(documents) == 1
+        assert "Sheet1:" in documents[0].page_content
+        assert "a\tb" in documents[0].page_content
+
+    @pytest.mark.requires("openpyxl")
+    def test_confluence_loader_with_xlsx_attachment_failed_download(
+        self, mock_confluence: MagicMock
+    ) -> None:
+        mock_confluence.get_page_by_id.side_effect = [self._get_mock_page("123")]
+        mock_confluence.get_all_restrictions_for_content.side_effect = [
+            self._get_mock_page_restrictions("123")
+        ]
+        mock_confluence.get_attachments_from_content.return_value = {
+            "results": [
+                {
+                    "metadata": {
+                        "mediaType": "application/vnd.openxmlformats-officedocument"
+                        ".spreadsheetml.sheet"
+                    },
+                    "_links": {"download": "/download/attachments/123/file.xlsx"},
+                    "title": "file.xlsx",
+                }
+            ]
+        }
+
+        mock_confluence.request.return_value.status_code = 404
+        mock_confluence.request.return_value.content = b""
+
+        confluence_loader = self._get_mock_confluence_loader(
+            mock_confluence, page_ids=["123"], include_attachments=True
+        )
+        documents = confluence_loader.load()
+
+        assert len(documents) == 1
+        assert "file.xlsx" in documents[0].page_content
+        assert "Sheet1:" not in documents[0].page_content
+        assert "a\tb" not in documents[0].page_content
+
     def _get_mock_confluence_loader(
         self, mock_confluence: MagicMock, **kwargs: Any
     ) -> ConfluenceLoader:
@@ -318,3 +385,16 @@ class TestConfluenceLoader:
                 "context": "/wiki",
             },
         }
+
+    def _create_xlsx_bytes(self) -> bytes:
+        import openpyxl
+
+        workbook = openpyxl.Workbook()
+        sheet = workbook.active
+        if sheet is not None:
+            sheet.title = "Sheet1"
+            sheet.append(["a", "b"])
+
+        buffer = BytesIO()
+        workbook.save(buffer)
+        return buffer.getvalue()
