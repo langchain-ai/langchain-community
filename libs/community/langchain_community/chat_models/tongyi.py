@@ -100,28 +100,33 @@ def convert_dict_to_message(
         if "tool_calls" in _dict:
             additional_kwargs = {"tool_calls": _dict["tool_calls"]}
 
-            for index, value in enumerate(_dict["tool_calls"]):
+            for enum_index, tool_call_data in enumerate(_dict["tool_calls"]):
                 if is_chunk:
                     try:
+                        # For incremental streaming: newer Qwen models provide proper
+                        # index to prevent parallel tool calls from being merged
+                        # incorrectly. Fall back to enumeration index if not provided.
+                        api_index = tool_call_data.get("index", enum_index)
+
                         tool_calls.append(
                             {
-                                "name": value["function"].get("name"),
-                                "args": value["function"].get("arguments"),
-                                "id": value.get("id"),
-                                # Tongyi does not respond with index,
-                                # use index in the list instead
-                                "index": index,
+                                "name": tool_call_data["function"].get("name"),
+                                "args": tool_call_data["function"].get("arguments"),
+                                "id": tool_call_data.get("id"),
+                                "index": api_index,
                             }
                         )
                     except KeyError:
                         pass
                 else:
                     try:
-                        parsed_tool = parse_tool_call(value, return_id=True)
+                        parsed_tool = parse_tool_call(tool_call_data, return_id=True)
                         if parsed_tool:
                             tool_calls.append(parsed_tool)
                     except Exception as e:
-                        invalid_tool_calls.append(make_invalid_tool_call(value, str(e)))
+                        invalid_tool_calls.append(
+                            make_invalid_tool_call(tool_call_data, str(e))
+                        )
         elif "reasoning_content" in _dict:
             additional_kwargs = {"reasoning_content": _dict["reasoning_content"]}
         elif "partial" in _dict and isinstance(_dict["partial"], bool):
@@ -440,7 +445,7 @@ class ChatTongyi(BaseChatModel):
     def lc_secrets(self) -> Dict[str, str]:
         return {"dashscope_api_key": "DASHSCOPE_API_KEY"}
 
-    client: Any = None  #: :meta private:
+    client: Any = None
     model_name: str = Field(default="qwen-turbo", alias="model")
     """Model name to use.
     callable multimodal model:
@@ -865,12 +870,19 @@ class ChatTongyi(BaseChatModel):
                 attributes will be validated, whereas with a dict they will not be. If
                 `method` is "function_calling" and `schema` is a dict, then the dict
                 must match the OpenAI function-calling spec.
-            include_raw: If False then only the parsed structured output is returned. If
-                an error occurs during model output parsing it will be raised. If True
-                then both the raw model response (a BaseMessage) and the parsed model
-                response will be returned. If an error occurs during output parsing it
-                will be caught and returned as well. The final output is always a dict
-                with keys "raw", "parsed", and "parsing_error".
+            include_raw:
+                If `False` then only the parsed structured output is returned.
+
+                If an error occurs during model output parsing it will be raised.
+
+                If `True` then both the raw model response (a `BaseMessage`) and the
+                parsed model response will be returned.
+
+                If an error occurs during output parsing it will be caught and returned
+                as well.
+
+                The final output is always a `dict` with keys `'raw'`, `'parsed'`, and
+                `'parsing_error'`.
 
         Returns:
             A Runnable that takes any ChatModel input and returns as output:

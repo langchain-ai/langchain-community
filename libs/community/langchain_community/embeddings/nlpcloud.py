@@ -20,7 +20,7 @@ class NLPCloudEmbeddings(BaseModel, Embeddings):
 
     model_name: str  # Define model_name as a class attribute
     gpu: bool  # Define gpu as a class attribute
-    client: Any  #: :meta private:
+    client: Any
 
     model_config = ConfigDict(protected_namespaces=())
 
