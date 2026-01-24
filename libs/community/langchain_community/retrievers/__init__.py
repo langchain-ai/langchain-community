@@ -44,6 +44,9 @@ if TYPE_CHECKING:
     from langchain_community.retrievers.breebs import (
         BreebsRetriever,
     )
+    from langchain_community.retrievers.causal import (
+        CausalRetriever,
+    )
     from langchain_community.retrievers.chaindesk import (
         ChaindeskRetriever,
     )
@@ -156,6 +159,7 @@ _module_lookup = {
     "AzureCognitiveSearchRetriever": "langchain_community.retrievers.azure_ai_search",
     "BM25Retriever": "langchain_community.retrievers.bm25",
     "BreebsRetriever": "langchain_community.retrievers.breebs",
+    "CausalRetriever": "langchain_community.retrievers.causal",
     "ChaindeskRetriever": "langchain_community.retrievers.chaindesk",
     "ChatGPTPluginRetriever": "langchain_community.retrievers.chatgpt_plugin_retriever",
     "CohereRagRetriever": "langchain_community.retrievers.cohere_rag_retriever",
@@ -213,6 +217,7 @@ __all__ = [
     "AzureCognitiveSearchRetriever",
     "BM25Retriever",
     "BreebsRetriever",
+    "CausalRetriever",
     "ChaindeskRetriever",
     "ChatGPTPluginRetriever",
     "CohereRagRetriever",
