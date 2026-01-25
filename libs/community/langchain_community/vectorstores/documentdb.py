@@ -226,25 +226,56 @@ class DocumentDBVectorSearch(VectorStore):
         self,
         texts: Iterable[str],
         metadatas: Optional[List[Dict[str, Any]]] = None,
+        # FIX for issue #507: Accept ids parameter to support Indexing API
+        ids: Optional[List[str]] = None,
         **kwargs: Any,
     ) -> List:
         batch_size = kwargs.get("batch_size", DEFAULT_INSERT_BATCH_SIZE)
         _metadatas: Union[List, Generator] = metadatas or ({} for _ in texts)
         texts_batch = []
         metadatas_batch = []
+        # FIX for issue #507: Track ids for batching
+        ids_batch = []
         result_ids = []
-        for i, (text, metadata) in enumerate(zip(texts, _metadatas)):
+
+        # FIX for issue #507: Convert texts to list to enable indexing with ids
+        texts_list = list(texts)
+        _metadatas_list = list(_metadatas)
+
+        for i, (text, metadata) in enumerate(zip(texts_list, _metadatas_list)):
             texts_batch.append(text)
             metadatas_batch.append(metadata)
+            # FIX for issue #507: Add corresponding id to batch if ids provided
+            if ids:
+                ids_batch.append(ids[i])
+
             if (i + 1) % batch_size == 0:
-                result_ids.extend(self._insert_texts(texts_batch, metadatas_batch))
+                # FIX for issue #507: Pass ids_batch to _insert_texts
+                result_ids.extend(
+                    self._insert_texts(
+                        texts_batch, metadatas_batch, ids_batch if ids else None
+                    )
+                )
                 texts_batch = []
                 metadatas_batch = []
+                ids_batch = []
+
         if texts_batch:
-            result_ids.extend(self._insert_texts(texts_batch, metadatas_batch))
+            # FIX for issue #507: Pass ids_batch to _insert_texts for remaining items
+            result_ids.extend(
+                self._insert_texts(
+                    texts_batch, metadatas_batch, ids_batch if ids else None
+                )
+            )
         return result_ids
 
-    def _insert_texts(self, texts: List[str], metadatas: List[Dict[str, Any]]) -> List:
+    # FIX for issue #507: Updated signature to accept ids parameter
+    def _insert_texts(
+        self,
+        texts: List[str],
+        metadatas: List[Dict[str, Any]],
+        ids: Optional[List[str]] = None,
+    ) -> List:
         """Used to Load Documents into the collection
 
         Args:
@@ -264,9 +295,21 @@ class DocumentDBVectorSearch(VectorStore):
             {self._text_key: t, self._embedding_key: embedding, **m}
             for t, m, embedding in zip(texts, metadatas, embeddings)
         ]
+
+        # FIX for issue #507: Set custom _id if ids are provided
+        if ids:
+            for i, doc in enumerate(to_insert):
+                doc["_id"] = ids[i]
+
         # insert the documents in DocumentDB
         insert_result = self._collection.insert_many(to_insert)
-        return insert_result.inserted_ids
+
+        # FIX for issue #507: Return provided ids if available,
+        # else return generated ids
+        if ids:
+            return ids
+        else:
+            return insert_result.inserted_ids
 
     @classmethod
     def from_texts(
@@ -291,6 +334,7 @@ class DocumentDBVectorSearch(VectorStore):
             self.delete_document_by_id(document_id)
         return True
 
+    # FIX for issue #507: Updated to handle both custom string IDs and ObjectId strings
     def delete_document_by_id(self, document_id: Optional[str] = None) -> None:
         """Removes a Specific Document by Id
 
@@ -306,7 +350,19 @@ class DocumentDBVectorSearch(VectorStore):
         if document_id is None:
             raise ValueError("No document id provided to delete.")
 
-        self._collection.delete_one({"_id": ObjectId(document_id)})
+        # FIX for issue #507: Handle both ObjectId strings & custom IDs (e.g., SHA256)
+        # Try to use ObjectId for 24-character hex strings (backward compatibility)
+        # Otherwise use the ID as-is for custom IDs from Indexing API
+        try:
+            if len(document_id) == 24:
+                # Attempt to convert to ObjectId for backward compatibility
+                self._collection.delete_one({"_id": ObjectId(document_id)})
+            else:
+                # Use custom ID directly (e.g., SHA256 hash from Indexing API)
+                self._collection.delete_one({"_id": document_id})
+        except Exception:
+            # If ObjectId conversion fails, try using the ID as-is
+            self._collection.delete_one({"_id": document_id})
 
     def _similarity_search_without_score(
         self,
