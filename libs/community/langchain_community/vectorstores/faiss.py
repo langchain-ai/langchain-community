@@ -1251,6 +1251,12 @@ class FAISS(VectorStore):
         ) = pickle.loads(  # ignore[pickle]: explicit-opt-in
             serialized
         )
+        if index.d != len(embeddings.embed_query("dim_check")):
+            raise ValueError(
+                "The provided embeddings dimension does not match the "
+                "dimension of the deserialized FAISS index."
+                "Use the same embeddings instance that was used"
+            )
         return cls(embeddings, index, docstore, index_to_docstore_id, **kwargs)
 
     def _select_relevance_score_fn(self) -> Callable[[float], float]:
