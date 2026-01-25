@@ -1251,6 +1251,8 @@ class FAISS(VectorStore):
         ) = pickle.loads(  # ignore[pickle]: explicit-opt-in
             serialized
         )
+
+        # Check if the embeddings dimension matches the index dimension
         if index.d != len(embeddings.embed_query("dim_check")):
             raise ValueError(
                 "The provided embeddings dimension does not match the "
