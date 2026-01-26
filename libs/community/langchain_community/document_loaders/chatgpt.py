@@ -31,19 +31,21 @@ def concatenate_rows(message: dict, title: str) -> str:
 class ChatGPTLoader(BaseLoader):
     """Load conversations from exported `ChatGPT` data."""
 
-    def __init__(self, log_file: str, num_logs: int = -1):
+    def __init__(self, log_file: str, num_logs: int = 0):
         """Initialize a class object.
 
         Args:
             log_file: Path to the log file
-            num_logs: Number of logs to load. If 0, load all logs.
+            num_logs: Number of logs to load. If 0 (default), load all logs.
         """
         self.log_file = log_file
         self.num_logs = num_logs
 
     def load(self) -> List[Document]:
         with open(self.log_file, encoding="utf8") as f:
-            data = json.load(f)[: self.num_logs] if self.num_logs else json.load(f)
+            data = json.load(f)
+            if self.num_logs > 0:
+                data = data[: self.num_logs]
 
         documents = []
         for d in data:
