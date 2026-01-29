@@ -25,7 +25,7 @@ def mock_soups() -> Tuple[BeautifulSoup, BeautifulSoup]:
     page_content = """
     <html>
         <body>
-            <main>
+            <main id="body">
                 <h1>Test Page</h1>
                 <p>This is test content.</p>
             </main>
@@ -312,3 +312,17 @@ def test_ssrf_protection_validation() -> None:
         GitbookLoader(
             web_page="https://attacker.com/page", allowed_domains={"example.com"}
         )
+def test_content_selector_css_selector(
+    mock_soups: Tuple[BeautifulSoup, BeautifulSoup],
+) -> None:
+    """Test that content_selector supports CSS selectors (e.g. #id)."""
+    _, mock_page_soup = mock_soups
+    loader = GitbookLoader(
+        web_page="https://example.com",
+        load_all_paths=False,
+        content_selector="#body",
+    )
+    doc = loader._get_document(mock_page_soup, "https://example.com/page")
+    assert doc is not None
+    assert doc.metadata["title"] == "Test Page"
+    assert "This is test content." in doc.page_content

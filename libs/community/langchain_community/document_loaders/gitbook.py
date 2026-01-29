@@ -366,7 +366,7 @@ class GitbookLoader(BaseLoader):
         self, soup: Any, custom_url: Optional[str] = None
     ) -> Optional[Document]:
         """Fetch content from page and return Document."""
-        page_content_raw = soup.find(self.content_selector)
+        page_content_raw = soup.select_one(self.content_selector)
         if not page_content_raw:
             return None
         content = page_content_raw.get_text(separator="\n").strip()
