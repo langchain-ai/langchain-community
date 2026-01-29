@@ -93,6 +93,7 @@ EXPECTED_ALL = [
     "ZepVectorStore",
     "ZepCloudVectorStore",
     "Zilliz",
+    "Zvec",
 ]
 
 

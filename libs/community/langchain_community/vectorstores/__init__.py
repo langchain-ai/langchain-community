@@ -259,6 +259,9 @@ if TYPE_CHECKING:
     from langchain_community.vectorstores.zilliz import (
         Zilliz,
     )
+    from langchain_community.vectorstores.zvec import (
+        Zvec,
+    )
 
 __all__ = [
     "Aerospike",
@@ -350,6 +353,7 @@ __all__ = [
     "ZepVectorStore",
     "ZepCloudVectorStore",
     "Zilliz",
+    "Zvec",
 ]
 
 _module_lookup = {
@@ -442,6 +446,7 @@ _module_lookup = {
     "ZepVectorStore": "langchain_community.vectorstores.zep",
     "ZepCloudVectorStore": "langchain_community.vectorstores.zep_cloud",
     "Zilliz": "langchain_community.vectorstores.zilliz",
+    "Zvec": "langchain_community.vectorstores.zvec",
 }
 
 

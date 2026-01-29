@@ -98,5 +98,6 @@ def test_compatible_vectorstore_documentation() -> None:
         "Zilliz",
         "Lantern",
         "OpenSearchVectorSearch",
+        "Zvec",
     }
     assert compatible == documented
