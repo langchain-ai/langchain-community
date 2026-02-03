@@ -23,6 +23,8 @@ def test_mermaid_trace_integration() -> None:
     result = chain.invoke({"input": "hello"}, config={"callbacks": [handler]})
     
     assert result == {"result": "hello world"}
+    # Verify stack is empty after successful run
+    assert all(len(stack) == 0 for stack in handler._root_to_stack.values())
     # If we reached here without exception, the integration is working
     # (at least it doesn't crash on real library calls)
 
@@ -44,4 +46,4 @@ def test_mermaid_trace_error_integration() -> None:
         chain.invoke({"input": "hello"}, config={"callbacks": [handler]})
     
     # Verify stack is empty after error
-    assert len(handler._participant_stack) == 0
+    assert all(len(stack) == 0 for stack in handler._root_to_stack.values())
