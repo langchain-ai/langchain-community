@@ -360,16 +360,20 @@ class DocumentDBVectorSearch(VectorStore):
         # FIX for issue #507: Handle both ObjectId strings & custom IDs (e.g., SHA256)
         # Try to use ObjectId for 24-character hex strings (backward compatibility)
         # Otherwise use the ID as-is for custom IDs from Indexing API
+
         try:
             if len(document_id) == 24:
-                # Attempt to convert to ObjectId for backward compatibility
-                self._collection.delete_one({"_id": ObjectId(document_id)})
+                try:
+                    obj_id = ObjectId(document_id)
+                    self._collection.delete_one({"_id": obj_id})
+                except (InvalidId, ValueError):
+                    # Not a valid ObjectId, use as-is
+                    self._collection.delete_one({"_id": document_id})
             else:
-                # Use custom ID directly (e.g., SHA256 hash from Indexing API)
                 self._collection.delete_one({"_id": document_id})
         except Exception:
-            # If ObjectId conversion fails, try using the ID as-is
-            self._collection.delete_one({"_id": document_id})
+            # Let other exceptions propagate
+            raise
 
     def _similarity_search_without_score(
         self,
