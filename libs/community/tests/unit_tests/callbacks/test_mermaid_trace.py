@@ -75,3 +75,62 @@ def test_on_llm_end(mock_mt_components: Any) -> None:
 
     # Verify logger.info was called at least twice (once for start, once for end)
     assert mock_logger.info.call_count >= 2
+
+
+def test_on_tool_lifecycle(mock_mt_components: Any) -> None:
+    mock_mt, mock_logger = mock_mt_components
+    handler = MermaidTraceCallbackHandler(host_name="TestHost")
+
+    run_id = uuid.uuid4()
+    handler.on_tool_start({"name": "TestTool"}, "input", run_id=run_id)
+    handler.on_tool_end("output", run_id=run_id)
+
+    assert mock_logger.info.call_count == 2
+    mock_events.FlowEvent.assert_called()
+
+
+def test_on_chain_error(mock_mt_components: Any) -> None:
+    mock_mt, mock_logger = mock_mt_components
+    handler = MermaidTraceCallbackHandler(host_name="TestHost")
+
+    run_id = uuid.uuid4()
+    handler.on_chain_start({"name": "TestChain"}, {}, run_id=run_id)
+
+    error = ValueError("test error")
+    handler.on_chain_error(error, run_id=run_id)
+
+    # Verify stack is empty
+    assert len(handler._participant_stack) == 0
+    assert mock_logger.info.call_count == 2
+    mock_events.FlowEvent.assert_called()
+
+
+def test_on_retriever_lifecycle(mock_mt_components: Any) -> None:
+    mock_mt, mock_logger = mock_mt_components
+    handler = MermaidTraceCallbackHandler(host_name="TestHost")
+
+    run_id = uuid.uuid4()
+    handler.on_retriever_start({"name": "TestRetriever"}, "query", run_id=run_id)
+    handler.on_retriever_end([], run_id=run_id)
+
+    assert mock_logger.info.call_count == 2
+    mock_events.FlowEvent.assert_called()
+
+
+def test_on_agent_lifecycle(mock_mt_components: Any) -> None:
+    mock_mt, mock_logger = mock_mt_components
+    handler = MermaidTraceCallbackHandler(host_name="TestHost")
+
+    mock_action = MagicMock()
+    mock_action.tool = "search"
+    mock_action.tool_input = "query"
+
+    mock_finish = MagicMock()
+    mock_finish.return_values = {"output": "result"}
+
+    run_id = uuid.uuid4()
+    handler.on_agent_action(mock_action, run_id=run_id)
+    handler.on_agent_finish(mock_finish, run_id=run_id)
+
+    assert mock_logger.info.call_count == 2
+    mock_events.FlowEvent.assert_called()

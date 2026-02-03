@@ -9,11 +9,15 @@ from langchain_core.utils import guard_import
 if TYPE_CHECKING:
     from langchain_core.agents import AgentAction, AgentFinish
     from langchain_core.documents import Document
+    from langchain_core.messages import BaseMessage
     from langchain_core.outputs import LLMResult
 
 
 def import_mermaid_trace() -> Any:
     """Import the mermaid-trace python package.
+
+    Returns:
+        The mermaid-trace module.
 
     Raises:
         ImportError: If the mermaid-trace package is not installed.
@@ -28,7 +32,7 @@ class MermaidTraceCallbackHandler(BaseCallbackHandler):
     FlowEvents, which are then processed by MermaidTrace to generate diagrams.
     """
 
-    def __init__(self, host_name: str = "LangChain"):
+    def __init__(self, host_name: str = "LangChain") -> None:
         """Initialize the callback handler.
 
         Args:
@@ -41,7 +45,11 @@ class MermaidTraceCallbackHandler(BaseCallbackHandler):
         self._participant_stack: List[str] = []
 
     def _get_current_source(self) -> str:
-        """Get the current source participant from stack or context."""
+        """Get the current source participant from stack or context.
+
+        Returns:
+            The name of the current source participant.
+        """
         mt = import_mermaid_trace()
         if self._participant_stack:
             return self._participant_stack[-1]
@@ -59,7 +67,17 @@ class MermaidTraceCallbackHandler(BaseCallbackHandler):
         metadata: Optional[Dict[str, Any]] = None,
         **kwargs: Any,
     ) -> None:
-        """Run when chain starts running."""
+        """Run when chain starts running.
+
+        Args:
+            serialized: The serialized chain.
+            inputs: The inputs to the chain.
+            run_id: The run ID.
+            parent_run_id: The parent run ID.
+            tags: The tags.
+            metadata: The metadata.
+            **kwargs: Additional keyword arguments.
+        """
         mt = import_mermaid_trace()
         target = (
             (serialized.get("name") if serialized else None)
@@ -89,7 +107,14 @@ class MermaidTraceCallbackHandler(BaseCallbackHandler):
         parent_run_id: Optional[uuid.UUID] = None,
         **kwargs: Any,
     ) -> None:
-        """Run when chain ends running."""
+        """Run when chain ends running.
+
+        Args:
+            outputs: The outputs from the chain.
+            run_id: The run ID.
+            parent_run_id: The parent run ID.
+            **kwargs: Additional keyword arguments.
+        """
         mt = import_mermaid_trace()
         if not self._participant_stack:
             return
@@ -109,6 +134,84 @@ class MermaidTraceCallbackHandler(BaseCallbackHandler):
             f"{target} -> {source}: {event.action}", extra={"flow_event": event}
         )
 
+    def on_chain_error(
+        self,
+        error: BaseException,
+        *,
+        run_id: uuid.UUID,
+        parent_run_id: Optional[uuid.UUID] = None,
+        **kwargs: Any,
+    ) -> None:
+        """Run when chain errors.
+
+        Args:
+            error: The error that occurred.
+            run_id: The run ID.
+            parent_run_id: The parent run ID.
+            **kwargs: Additional keyword arguments.
+        """
+        mt = import_mermaid_trace()
+        if not self._participant_stack:
+            return
+
+        target = self._participant_stack.pop()
+        source = self._get_current_source()
+
+        event = mt.core.events.FlowEvent(
+            source=target,
+            target=source,
+            action="Error",
+            message=f"Chain Error: {type(error).__name__}",
+            trace_id=mt.core.context.LogContext.get("trace_id", str(uuid.uuid4())),
+            params=str(error),
+        )
+        self.logger.info(
+            f"{target} -> {source}: {event.action}", extra={"flow_event": event}
+        )
+
+    def on_chat_model_start(
+        self,
+        serialized: Optional[Dict[str, Any]],
+        messages: List[List["BaseMessage"]],
+        *,
+        run_id: uuid.UUID,
+        parent_run_id: Optional[uuid.UUID] = None,
+        tags: Optional[List[str]] = None,
+        metadata: Optional[Dict[str, Any]] = None,
+        **kwargs: Any,
+    ) -> None:
+        """Run when Chat Model starts running.
+
+        Args:
+            serialized: The serialized Chat Model.
+            messages: The messages.
+            run_id: The run ID.
+            parent_run_id: The parent run ID.
+            tags: The tags.
+            metadata: The metadata.
+            **kwargs: Additional keyword arguments.
+        """
+        mt = import_mermaid_trace()
+        target = (
+            (serialized.get("name") if serialized else None)
+            or kwargs.get("name")
+            or "ChatModel"
+        )
+        source = self._get_current_source()
+
+        event = mt.core.events.FlowEvent(
+            source=source,
+            target=target,
+            action="Query ChatModel",
+            message=f"Start ChatModel: {target}",
+            trace_id=mt.core.context.LogContext.get("trace_id", str(uuid.uuid4())),
+            params=str(messages),
+        )
+        self.logger.info(
+            f"{source} -> {target}: {event.action}", extra={"flow_event": event}
+        )
+        self._participant_stack.append(target)
+
     def on_llm_start(
         self,
         serialized: Optional[Dict[str, Any]],
@@ -120,7 +223,17 @@ class MermaidTraceCallbackHandler(BaseCallbackHandler):
         metadata: Optional[Dict[str, Any]] = None,
         **kwargs: Any,
     ) -> None:
-        """Run when LLM starts running."""
+        """Run when LLM starts running.
+
+        Args:
+            serialized: The serialized LLM.
+            prompts: The prompts.
+            run_id: The run ID.
+            parent_run_id: The parent run ID.
+            tags: The tags.
+            metadata: The metadata.
+            **kwargs: Additional keyword arguments.
+        """
         mt = import_mermaid_trace()
         target = (
             (serialized.get("name") if serialized else None)
@@ -150,7 +263,14 @@ class MermaidTraceCallbackHandler(BaseCallbackHandler):
         parent_run_id: Optional[uuid.UUID] = None,
         **kwargs: Any,
     ) -> None:
-        """Run when LLM ends running."""
+        """Run when LLM ends running.
+
+        Args:
+            response: The LLM result.
+            run_id: The run ID.
+            parent_run_id: The parent run ID.
+            **kwargs: Additional keyword arguments.
+        """
         mt = import_mermaid_trace()
         if not self._participant_stack:
             return
@@ -170,6 +290,41 @@ class MermaidTraceCallbackHandler(BaseCallbackHandler):
             f"{target} -> {source}: {event.action}", extra={"flow_event": event}
         )
 
+    def on_llm_error(
+        self,
+        error: BaseException,
+        *,
+        run_id: uuid.UUID,
+        parent_run_id: Optional[uuid.UUID] = None,
+        **kwargs: Any,
+    ) -> None:
+        """Run when LLM errors.
+
+        Args:
+            error: The error that occurred.
+            run_id: The run ID.
+            parent_run_id: The parent run ID.
+            **kwargs: Additional keyword arguments.
+        """
+        mt = import_mermaid_trace()
+        if not self._participant_stack:
+            return
+
+        target = self._participant_stack.pop()
+        source = self._get_current_source()
+
+        event = mt.core.events.FlowEvent(
+            source=target,
+            target=source,
+            action="Error",
+            message=f"LLM Error: {type(error).__name__}",
+            trace_id=mt.core.context.LogContext.get("trace_id", str(uuid.uuid4())),
+            params=str(error),
+        )
+        self.logger.info(
+            f"{target} -> {source}: {event.action}", extra={"flow_event": event}
+        )
+
     def on_tool_start(
         self,
         serialized: Optional[Dict[str, Any]],
@@ -182,7 +337,18 @@ class MermaidTraceCallbackHandler(BaseCallbackHandler):
         inputs: Optional[Dict[str, Any]] = None,
         **kwargs: Any,
     ) -> None:
-        """Run when tool starts running."""
+        """Run when tool starts running.
+
+        Args:
+            serialized: The serialized tool.
+            input_str: The input string.
+            run_id: The run ID.
+            parent_run_id: The parent run ID.
+            tags: The tags.
+            metadata: The metadata.
+            inputs: The inputs.
+            **kwargs: Additional keyword arguments.
+        """
         mt = import_mermaid_trace()
         target = (
             (serialized.get("name") if serialized else None)
@@ -212,7 +378,14 @@ class MermaidTraceCallbackHandler(BaseCallbackHandler):
         parent_run_id: Optional[uuid.UUID] = None,
         **kwargs: Any,
     ) -> None:
-        """Run when tool ends running."""
+        """Run when tool ends running.
+
+        Args:
+            output: The tool output.
+            run_id: The run ID.
+            parent_run_id: The parent run ID.
+            **kwargs: Additional keyword arguments.
+        """
         mt = import_mermaid_trace()
         if not self._participant_stack:
             return
@@ -232,6 +405,41 @@ class MermaidTraceCallbackHandler(BaseCallbackHandler):
             f"{target} -> {source}: {event.action}", extra={"flow_event": event}
         )
 
+    def on_tool_error(
+        self,
+        error: BaseException,
+        *,
+        run_id: uuid.UUID,
+        parent_run_id: Optional[uuid.UUID] = None,
+        **kwargs: Any,
+    ) -> None:
+        """Run when tool errors.
+
+        Args:
+            error: The error that occurred.
+            run_id: The run ID.
+            parent_run_id: The parent run ID.
+            **kwargs: Additional keyword arguments.
+        """
+        mt = import_mermaid_trace()
+        if not self._participant_stack:
+            return
+
+        target = self._participant_stack.pop()
+        source = self._get_current_source()
+
+        event = mt.core.events.FlowEvent(
+            source=target,
+            target=source,
+            action="Error",
+            message=f"Tool Error: {type(error).__name__}",
+            trace_id=mt.core.context.LogContext.get("trace_id", str(uuid.uuid4())),
+            params=str(error),
+        )
+        self.logger.info(
+            f"{target} -> {source}: {event.action}", extra={"flow_event": event}
+        )
+
     def on_retriever_start(
         self,
         serialized: Optional[Dict[str, Any]],
@@ -243,7 +451,17 @@ class MermaidTraceCallbackHandler(BaseCallbackHandler):
         metadata: Optional[Dict[str, Any]] = None,
         **kwargs: Any,
     ) -> None:
-        """Run when retriever starts running."""
+        """Run when retriever starts running.
+
+        Args:
+            serialized: The serialized retriever.
+            query: The query.
+            run_id: The run ID.
+            parent_run_id: The parent run ID.
+            tags: The tags.
+            metadata: The metadata.
+            **kwargs: Additional keyword arguments.
+        """
         mt = import_mermaid_trace()
         target = (
             (serialized.get("name") if serialized else None)
@@ -271,10 +489,16 @@ class MermaidTraceCallbackHandler(BaseCallbackHandler):
         *,
         run_id: uuid.UUID,
         parent_run_id: Optional[uuid.UUID] = None,
-        tags: Optional[List[str]] = None,
         **kwargs: Any,
     ) -> None:
-        """Run when retriever ends running."""
+        """Run when retriever ends running.
+
+        Args:
+            documents: The retrieved documents.
+            run_id: The run ID.
+            parent_run_id: The parent run ID.
+            **kwargs: Additional keyword arguments.
+        """
         mt = import_mermaid_trace()
         if not self._participant_stack:
             return
@@ -294,6 +518,41 @@ class MermaidTraceCallbackHandler(BaseCallbackHandler):
             f"{target} -> {source}: {event.action}", extra={"flow_event": event}
         )
 
+    def on_retriever_error(
+        self,
+        error: BaseException,
+        *,
+        run_id: uuid.UUID,
+        parent_run_id: Optional[uuid.UUID] = None,
+        **kwargs: Any,
+    ) -> None:
+        """Run when retriever errors.
+
+        Args:
+            error: The error that occurred.
+            run_id: The run ID.
+            parent_run_id: The parent run ID.
+            **kwargs: Additional keyword arguments.
+        """
+        mt = import_mermaid_trace()
+        if not self._participant_stack:
+            return
+
+        target = self._participant_stack.pop()
+        source = self._get_current_source()
+
+        event = mt.core.events.FlowEvent(
+            source=target,
+            target=source,
+            action="Error",
+            message=f"Retriever Error: {type(error).__name__}",
+            trace_id=mt.core.context.LogContext.get("trace_id", str(uuid.uuid4())),
+            params=str(error),
+        )
+        self.logger.info(
+            f"{target} -> {source}: {event.action}", extra={"flow_event": event}
+        )
+
     def on_agent_action(
         self,
         action: "AgentAction",
@@ -302,7 +561,14 @@ class MermaidTraceCallbackHandler(BaseCallbackHandler):
         parent_run_id: Optional[uuid.UUID] = None,
         **kwargs: Any,
     ) -> None:
-        """Run on agent action."""
+        """Run on agent action.
+
+        Args:
+            action: The agent action.
+            run_id: The run ID.
+            parent_run_id: The parent run ID.
+            **kwargs: Additional keyword arguments.
+        """
         mt = import_mermaid_trace()
         target = f"Agent:{action.tool}"
         source = self._get_current_source()
@@ -327,10 +593,17 @@ class MermaidTraceCallbackHandler(BaseCallbackHandler):
         parent_run_id: Optional[uuid.UUID] = None,
         **kwargs: Any,
     ) -> None:
-        """Run on agent finish."""
+        """Run on agent finish.
+
+        Args:
+            finish: The agent finish.
+            run_id: The run ID.
+            parent_run_id: The parent run ID.
+            **kwargs: Additional keyword arguments.
+        """
         mt = import_mermaid_trace()
         target = "Agent"
-        source = self.host_name
+        source = self._get_current_source()
 
         event = mt.core.events.FlowEvent(
             source=target,
