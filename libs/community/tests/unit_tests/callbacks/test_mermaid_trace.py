@@ -74,6 +74,35 @@ def test_on_tool_lifecycle(mock_mt_components: Any) -> None:
     mock_mt.core.events.FlowEvent.assert_called()
 
 
+def test_source_participant_on_end(mock_mt_components: Any) -> None:
+    """Test that the source participant is correct when a run ends."""
+    mock_mt, _ = mock_mt_components
+    handler = MermaidTraceCallbackHandler(host_name="TestHost")
+
+    root_run_id = uuid.uuid4()
+    child_run_id = uuid.uuid4()
+
+    # Start root chain
+    handler.on_chain_start({"name": "RootChain"}, {}, run_id=root_run_id)
+    # Start child chain
+    handler.on_chain_start(
+        {"name": "ChildChain"}, {}, run_id=child_run_id, parent_run_id=root_run_id
+    )
+
+    # Reset mock to capture only the next call
+    mock_mt.core.events.FlowEvent.reset_mock()
+
+    # End child chain
+    handler.on_chain_end({}, run_id=child_run_id)
+
+    # The child chain (target "ChildChain") is ending.
+    # Its source (parent) should be "RootChain".
+    # FlowEvent(source="ChildChain", target="RootChain", ...)
+    call_args = mock_mt.core.events.FlowEvent.call_args[1]
+    assert call_args["source"] == "ChildChain"
+    assert call_args["target"] == "RootChain"
+
+
 def test_on_chain_error(mock_mt_components: Any) -> None:
     mock_mt, mock_logger = mock_mt_components
     handler = MermaidTraceCallbackHandler(host_name="TestHost")

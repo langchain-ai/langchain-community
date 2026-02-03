@@ -87,14 +87,14 @@ class MermaidTraceCallbackHandler(BaseCallbackHandler):
             self._run_to_root[run_id] = root_id
             self._root_to_stack[root_id].append(name)
 
-    def _end_run(self, run_id: uuid.UUID) -> Optional[str]:
+    def _end_run(self, run_id: uuid.UUID) -> Optional[Dict[str, str]]:
         """Pop the current run name from its stack and clean up if needed.
 
         Args:
             run_id: The run ID.
 
         Returns:
-            The name of the run that was popped, or None if not found.
+            A dictionary containing 'name' and 'parent', or None if not found.
         """
         with self._lock:
             root_id = self._run_to_root.get(run_id)
@@ -106,6 +106,7 @@ class MermaidTraceCallbackHandler(BaseCallbackHandler):
                 return None
 
             name = stack.pop()
+            parent = stack[-1] if stack else self.host_name
 
             # Clean up run_id mapping
             if run_id in self._run_to_root:
@@ -116,7 +117,7 @@ class MermaidTraceCallbackHandler(BaseCallbackHandler):
                 if root_id in self._root_to_stack:
                     del self._root_to_stack[root_id]
 
-            return name
+            return {"name": name, "parent": parent}
 
     def _get_trace_id(self, run_id: uuid.UUID) -> str:
         """Get the trace ID from context or generate a new one.
@@ -207,11 +208,12 @@ class MermaidTraceCallbackHandler(BaseCallbackHandler):
             parent_run_id: The parent run ID.
             **kwargs: Additional keyword arguments.
         """
-        target = self._end_run(run_id)
-        if not target:
+        run_info = self._end_run(run_id)
+        if not run_info:
             return
 
-        source = self._get_current_source(run_id)
+        target = run_info["name"]
+        source = run_info["parent"]
 
         event = self._mt.core.events.FlowEvent(
             source=target,
@@ -241,11 +243,12 @@ class MermaidTraceCallbackHandler(BaseCallbackHandler):
             parent_run_id: The parent run ID.
             **kwargs: Additional keyword arguments.
         """
-        target = self._end_run(run_id)
-        if not target:
+        run_info = self._end_run(run_id)
+        if not run_info:
             return
 
-        source = self._get_current_source(run_id)
+        target = run_info["name"]
+        source = run_info["parent"]
 
         event = self._mt.core.events.FlowEvent(
             source=target,
@@ -359,11 +362,12 @@ class MermaidTraceCallbackHandler(BaseCallbackHandler):
             parent_run_id: The parent run ID.
             **kwargs: Additional keyword arguments.
         """
-        target = self._end_run(run_id)
-        if not target:
+        run_info = self._end_run(run_id)
+        if not run_info:
             return
 
-        source = self._get_current_source(run_id)
+        target = run_info["name"]
+        source = run_info["parent"]
 
         event = self._mt.core.events.FlowEvent(
             source=target,
@@ -393,11 +397,12 @@ class MermaidTraceCallbackHandler(BaseCallbackHandler):
             parent_run_id: The parent run ID.
             **kwargs: Additional keyword arguments.
         """
-        target = self._end_run(run_id)
-        if not target:
+        run_info = self._end_run(run_id)
+        if not run_info:
             return
 
-        source = self._get_current_source(run_id)
+        target = run_info["name"]
+        source = run_info["parent"]
 
         event = self._mt.core.events.FlowEvent(
             source=target,
@@ -471,11 +476,12 @@ class MermaidTraceCallbackHandler(BaseCallbackHandler):
             parent_run_id: The parent run ID.
             **kwargs: Additional keyword arguments.
         """
-        target = self._end_run(run_id)
-        if not target:
+        run_info = self._end_run(run_id)
+        if not run_info:
             return
 
-        source = self._get_current_source(run_id)
+        target = run_info["name"]
+        source = run_info["parent"]
 
         event = self._mt.core.events.FlowEvent(
             source=target,
@@ -505,11 +511,12 @@ class MermaidTraceCallbackHandler(BaseCallbackHandler):
             parent_run_id: The parent run ID.
             **kwargs: Additional keyword arguments.
         """
-        target = self._end_run(run_id)
-        if not target:
+        run_info = self._end_run(run_id)
+        if not run_info:
             return
 
-        source = self._get_current_source(run_id)
+        target = run_info["name"]
+        source = run_info["parent"]
 
         event = self._mt.core.events.FlowEvent(
             source=target,
@@ -581,11 +588,12 @@ class MermaidTraceCallbackHandler(BaseCallbackHandler):
             parent_run_id: The parent run ID.
             **kwargs: Additional keyword arguments.
         """
-        target = self._end_run(run_id)
-        if not target:
+        run_info = self._end_run(run_id)
+        if not run_info:
             return
 
-        source = self._get_current_source(run_id)
+        target = run_info["name"]
+        source = run_info["parent"]
 
         event = self._mt.core.events.FlowEvent(
             source=target,
@@ -615,11 +623,12 @@ class MermaidTraceCallbackHandler(BaseCallbackHandler):
             parent_run_id: The parent run ID.
             **kwargs: Additional keyword arguments.
         """
-        target = self._end_run(run_id)
-        if not target:
+        run_info = self._end_run(run_id)
+        if not run_info:
             return
 
-        source = self._get_current_source(run_id)
+        target = run_info["name"]
+        source = run_info["parent"]
 
         event = self._mt.core.events.FlowEvent(
             source=target,
