@@ -54,6 +54,9 @@ if TYPE_CHECKING:
         get_openai_callback,
         wandb_tracing_enabled,
     )
+    from langchain_community.callbacks.mermaid_trace import (
+        MermaidTraceCallbackHandler,
+    )
     from langchain_community.callbacks.mlflow_callback import (
         MlflowCallbackHandler,
     )
@@ -103,6 +106,7 @@ _module_lookup = {
     "LLMThoughtLabeler": "langchain_community.callbacks.streamlit",
     "LLMonitorCallbackHandler": "langchain_community.callbacks.llmonitor_callback",
     "LabelStudioCallbackHandler": "langchain_community.callbacks.labelstudio_callback",
+    "MermaidTraceCallbackHandler": "langchain_community.callbacks.mermaid_trace",
     "MlflowCallbackHandler": "langchain_community.callbacks.mlflow_callback",
     "OpenAICallbackHandler": "langchain_community.callbacks.openai_info",
     "PromptLayerCallbackHandler": "langchain_community.callbacks.promptlayer_callback",
@@ -141,6 +145,7 @@ __all__ = [
     "LLMThoughtLabeler",
     "LLMonitorCallbackHandler",
     "LabelStudioCallbackHandler",
+    "MermaidTraceCallbackHandler",
     "MlflowCallbackHandler",
     "OpenAICallbackHandler",
     "PromptLayerCallbackHandler",
