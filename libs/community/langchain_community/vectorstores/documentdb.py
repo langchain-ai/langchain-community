@@ -242,6 +242,13 @@ class DocumentDBVectorSearch(VectorStore):
         texts_list = list(texts)
         _metadatas_list = list(_metadatas)
 
+        # Validate ids length before iteration to prevent IndexError
+        if ids and len(ids) != len(texts_list):
+            raise ValueError(
+                f"Number of ids ({len(ids)}) must match "
+                f"number of texts ({len(texts_list)})"
+            )
+
         for i, (text, metadata) in enumerate(zip(texts_list, _metadatas_list)):
             texts_batch.append(text)
             metadatas_batch.append(metadata)

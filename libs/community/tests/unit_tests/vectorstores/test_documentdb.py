@@ -263,6 +263,23 @@ class TestDocumentDBFixedBehavior:
         result = mock_collection.delete_one({"_id": objectid_string})
         assert result.deleted_count == 1
 
+    def test_add_texts_raises_on_ids_length_mismatch(
+        self, mock_collection: Mock, mock_embeddings: Mock
+    ) -> None:
+        """Verify ValueError is raised when ids count does not match texts count."""
+        from langchain_community.vectorstores.documentdb import DocumentDBVectorSearch
+
+        vector_store = DocumentDBVectorSearch(
+            collection=mock_collection,
+            embedding=mock_embeddings,
+        )
+
+        with pytest.raises(ValueError, match="must match"):
+            vector_store.add_texts(
+                texts=["doc1", "doc2", "doc3"],
+                ids=["id1", "id2"],  # 2 ids for 3 texts
+            )
+
 
 if __name__ == "__main__":
     pytest.main([__file__, "-v", "-s"])
