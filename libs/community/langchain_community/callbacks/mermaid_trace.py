@@ -65,7 +65,7 @@ class MermaidTraceCallbackHandler(BaseCallbackHandler):
             root_id = self._run_to_root.get(run_id)
             if root_id is None:
                 return []
-            return self._root_to_stack.get(root_id, [])
+            return list(self._root_to_stack.get(root_id, []))  # Return a copy
 
     def _start_run(
         self, run_id: uuid.UUID, parent_run_id: Optional[uuid.UUID], name: str
