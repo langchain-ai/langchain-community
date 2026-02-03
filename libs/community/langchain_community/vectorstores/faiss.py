@@ -1256,8 +1256,8 @@ class FAISS(VectorStore):
         if index.d != len(embeddings.embed_query("dim_check")):
             raise ValueError(
                 "The provided embeddings dimension does not match the "
-                "dimension of the deserialized FAISS index."
-                "Use the same embeddings instance that was used"
+                "dimension of the deserialized FAISS index. "
+                "Use the same embeddings instance that was used to create the index."
             )
         return cls(embeddings, index, docstore, index_to_docstore_id, **kwargs)
 
