@@ -103,6 +103,12 @@ def test_on_llm_end_custom_model(handler: OpenAICallbackHandler) -> None:
         ("babbage-002.ft-0123456789abcdefghijklmnopqrstuv", 0.0008),
         ("davinci-002.ft-0123456789abcdefghijklmnopqrstuv", 0.004),
         ("gpt-35-turbo-0613.ft-0123456789abcdefghijklmnopqrstuv", 0.0035),
+        ("gpt-4o-mini-2024-07-18-finetuned-completion": 0.0015),
+        ("gpt-4o-2024-08-06-finetuned-completion": 0.01875),
+        ("gpt-4.1-nano-2025-04-14-finetuned-completion": 0.001),
+        ("gpt-4.1-mini-2025-04-14-finetuned-completion": 0.004),
+        ("gpt-4.1-2025-04-14-finetuned-completion": 0.015),
+        ("o4-mini-2025-04-16-finetuned-completion": 0.02),
     ],
 )
 def test_on_llm_end_finetuned_model(
