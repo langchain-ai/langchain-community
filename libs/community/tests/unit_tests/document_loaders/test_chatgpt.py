@@ -80,6 +80,7 @@ def sample_chatgpt_export() -> dict:
     ]
 
 
+
 @pytest.fixture
 def chatgpt_export_file(sample_chatgpt_export: dict) -> str:
     """Create a temporary file with sample ChatGPT export data."""
@@ -87,7 +88,11 @@ def chatgpt_export_file(sample_chatgpt_export: dict) -> str:
         mode="w", suffix=".json", delete=False, encoding="utf-8"
     ) as f:
         json.dump(sample_chatgpt_export, f)
-        return f.name
+        temp_file = f.name
+    
+    yield temp_file
+    
+    Path(temp_file).unlink(missing_ok=True)
 
 
 def test_load_all_conversations_default(chatgpt_export_file: str) -> None:
