@@ -1,0 +1,692 @@
+interactions:
+- request:
+    body: !!binary |
+      hAFHRU5FUkFURSBQUk9NUFQgV0lUSCBPUFRJT05TIChDT05URVhUX05BTUVTID0gJ2RlbW8udGVz
+      dF9sbG1fY3R4JykAAgxiaW5hcnkAAAA=
+    headers:
+      Accept:
+      - application/octet-stream
+      Accept-Encoding:
+      - gzip, deflate
+      Connection:
+      - keep-alive
+      Content-Length:
+      - '80'
+      Content-type:
+      - application/octet-stream
+      User-Agent:
+      - python-requests/2.32.5
+      authorization:
+      - DUMMY
+    method: POST
+    uri: http://localhost:19191/execute/sql
+  response:
+    body:
+      string: !!binary |
+        BE9LAChleGVjdXRlX3NxbF9yZXNwb25zZfIMAPYDeyJuYW1lIjoiZ2VuZXJpY19yZXNwb25zZSIs
+        InR5cGUiOiJyZWNvcmQiLCJmaWVsZHMiOlt7Im5hbWUiOiJjb2x1bW5fMSIsInR5cGUiOnsidHlw
+        ZSI6ImFycmF5IiwiaXRlbXMiOiJzdHJpbmcifX0seyJuYW1lIjoiY29sdW1uX2hlYWRlcnMiLCJ0
+        eXBlIjp7InR5cGUiOiJhcnJheSIsIml0ZW1zIjoic3RyaW5nIn19LHsibmFtZSI6ImNvbHVtbl9k
+        YXRhdHlwZXMiLCJ0eXBlIjp7InR5cGUiOiJhcnJheSIsIml0ZW1zIjoic3RyaW5nIn19XX2qBwL+
+        BnsicGF5bG9hZCI6eyJjb250ZXh0IjpbeyJ0YWJsZSI6ImRlbW8udGVzdF9wcm9maWxlcyIsImNv
+        bHVtbnMiOlsidXNlcm5hbWUgVkFSQ0hBUiAoMzIpIE5PVCBOVUxMIiwibmFtZSBWQVJDSEFSICgz
+        MikgTk9UIE5VTEwiLCJzZXggVkFSQ0hBUiAoMikgTk9UIE5VTEwiLCJhZGRyZXNzIFZBUkNIQVIg
+        KDY0KSBOT1QgTlVMTCIsIm1haWwgVkFSQ0hBUiAoMzIpIE5PVCBOVUxMIiwiYmlydGhkYXRlIFRJ
+        TUVTVEFNUCBOT1QgTlVMTCJdLCJkZXNjcmlwdGlvbiI6IkNvbnRhaW5zIHVzZXIgcHJvZmlsZXMu
+        IiwicnVsZXMiOltdfSx7InNhbXBsZXMiOnsiSG93IG1hbnkgbWFsZSB1c2VycyBhcmUgdGhlcmU/
+        Ijoic2VsZWN0IGNvdW50KDEpIGFzIG51bV91c2Vyc1xuICAgICAgICAgICAgZnJvbSBkZW1vLnRl
+        c3RfcHJvZmlsZXNcbiAgICAgICAgICAgIHdoZXJlIHNleCA9ICcnTScnOyJ9fV19fQACDFByb21w
+        dAACDHN0cmluZwAAAgAACCBYLUtpbmV0aWNhLUdyb3VwClFVRVJZCmNvdW50AjAabGFzdF9lbmRw
+        b2ludCwvZ2VuZXJhdGUvc3FsL2ludGVybmFsLnRvdGFsX251bWJlcl9vZl9yZWNvcmRzAjAAAA==
+    headers:
+      Access-Control-Allow-Origin:
+      - '*'
+      Access-Control-Expose-Headers:
+      - x-request-time-secs
+      Content-Length:
+      - '853'
+      Content-Type:
+      - application/octet-stream
+      Strict-Transport-Security:
+      - max-age=31536000; includeSubDomains
+      X-Content-Type-Options:
+      - nosniff
+      X-Frame-Options:
+      - SAMEORIGIN
+      X-Kinetica-Group:
+      - QUERY
+      X-XSS-Protection:
+      - 1; mode=block
+      x-request-time-secs:
+      - '0.01920'
+    status:
+      code: 200
+      message: OK
+- request:
+    body: '{"messages": [{"role": "system", "content": "CREATE TABLE demo.test_profiles
+      AS\n(\n   username VARCHAR (32) NOT NULL,\n   name VARCHAR (32) NOT NULL,\n   sex
+      VARCHAR (2) NOT NULL,\n   address VARCHAR (64) NOT NULL,\n   mail VARCHAR (32)
+      NOT NULL,\n   birthdate TIMESTAMP NOT NULL\n);\nCOMMENT ON TABLE demo.test_profiles
+      IS ''Contains user profiles.'';"}, {"role": "user", "content": "How many male
+      users are there?"}, {"role": "assistant", "content": "select count(1) as num_users\n            from
+      demo.test_profiles\n            where sex = ''M'';"}, {"role": "user", "content":
+      "What are the female users ordered by username?"}]}'
+    headers:
+      Accept:
+      - text/plain
+      Accept-Encoding:
+      - gzip, deflate
+      Connection:
+      - keep-alive
+      Content-Length:
+      - '630'
+      Content-type:
+      - application/json
+      User-Agent:
+      - python-requests/2.32.5
+      authorization:
+      - DUMMY
+    method: POST
+    uri: http://localhost:19191/chat/completions
+  response:
+    body:
+      string: '{"status":"OK","data":{"status":"OK","data":{"id":"chatcmpl-D5gsTV69z2BvCB3jNaXt8yZvoBRrh","object":"chat.completion","created":1770248833,"model":"gpt-3.5-turbo-0125","choices":[{"index":0,"message":{"role":"assistant","content":"SELECT
+        *\nFROM demo.test_profiles\nWHERE sex = ''F''\nORDER BY username;","refusal":null,"annotations":[]},"logprobs":null,"finish_reason":"stop"}],"usage":{"prompt_tokens":232,"completion_tokens":17,"total_tokens":249,"prompt_tokens_details":{"cached_tokens":0,"audio_tokens":0},"completion_tokens_details":{"reasoning_tokens":0,"audio_tokens":0,"accepted_prediction_tokens":0,"rejected_prediction_tokens":0}},"service_tier":"default","system_fingerprint":null}}}'
+    headers:
+      Access-Control-Allow-Origin:
+      - '*'
+      Access-Control-Expose-Headers:
+      - x-request-time-secs
+      Content-Length:
+      - '693'
+      Content-Type:
+      - application/json
+      Strict-Transport-Security:
+      - max-age=31536000; includeSubDomains
+      X-Content-Type-Options:
+      - nosniff
+      X-Frame-Options:
+      - SAMEORIGIN
+      X-XSS-Protection:
+      - 1; mode=block
+      x-request-time-secs:
+      - '1.83378'
+    status:
+      code: 200
+      message: OK
+- request:
+    body: !!binary |
+      hAFHRU5FUkFURSBQUk9NUFQgV0lUSCBPUFRJT05TIChDT05URVhUX05BTUVTID0gJ2RlbW8udGVz
+      dF9sbG1fY3R4JykAAgxiaW5hcnkAAAA=
+    headers:
+      Accept:
+      - application/octet-stream
+      Accept-Encoding:
+      - gzip, deflate
+      Connection:
+      - keep-alive
+      Content-Length:
+      - '80'
+      Content-type:
+      - application/octet-stream
+      User-Agent:
+      - python-requests/2.32.5
+      authorization:
+      - DUMMY
+    method: POST
+    uri: http://localhost:19191/execute/sql
+  response:
+    body:
+      string: !!binary |
+        BE9LAChleGVjdXRlX3NxbF9yZXNwb25zZfIMAPYDeyJuYW1lIjoiZ2VuZXJpY19yZXNwb25zZSIs
+        InR5cGUiOiJyZWNvcmQiLCJmaWVsZHMiOlt7Im5hbWUiOiJjb2x1bW5fMSIsInR5cGUiOnsidHlw
+        ZSI6ImFycmF5IiwiaXRlbXMiOiJzdHJpbmcifX0seyJuYW1lIjoiY29sdW1uX2hlYWRlcnMiLCJ0
+        eXBlIjp7InR5cGUiOiJhcnJheSIsIml0ZW1zIjoic3RyaW5nIn19LHsibmFtZSI6ImNvbHVtbl9k
+        YXRhdHlwZXMiLCJ0eXBlIjp7InR5cGUiOiJhcnJheSIsIml0ZW1zIjoic3RyaW5nIn19XX2qBwL+
+        BnsicGF5bG9hZCI6eyJjb250ZXh0IjpbeyJ0YWJsZSI6ImRlbW8udGVzdF9wcm9maWxlcyIsImNv
+        bHVtbnMiOlsidXNlcm5hbWUgVkFSQ0hBUiAoMzIpIE5PVCBOVUxMIiwibmFtZSBWQVJDSEFSICgz
+        MikgTk9UIE5VTEwiLCJzZXggVkFSQ0hBUiAoMikgTk9UIE5VTEwiLCJhZGRyZXNzIFZBUkNIQVIg
+        KDY0KSBOT1QgTlVMTCIsIm1haWwgVkFSQ0hBUiAoMzIpIE5PVCBOVUxMIiwiYmlydGhkYXRlIFRJ
+        TUVTVEFNUCBOT1QgTlVMTCJdLCJkZXNjcmlwdGlvbiI6IkNvbnRhaW5zIHVzZXIgcHJvZmlsZXMu
+        IiwicnVsZXMiOltdfSx7InNhbXBsZXMiOnsiSG93IG1hbnkgbWFsZSB1c2VycyBhcmUgdGhlcmU/
+        Ijoic2VsZWN0IGNvdW50KDEpIGFzIG51bV91c2Vyc1xuICAgICAgICAgICAgZnJvbSBkZW1vLnRl
+        c3RfcHJvZmlsZXNcbiAgICAgICAgICAgIHdoZXJlIHNleCA9ICcnTScnOyJ9fV19fQACDFByb21w
+        dAACDHN0cmluZwAAAgAACCBYLUtpbmV0aWNhLUdyb3VwClFVRVJZCmNvdW50AjAabGFzdF9lbmRw
+        b2ludCwvZ2VuZXJhdGUvc3FsL2ludGVybmFsLnRvdGFsX251bWJlcl9vZl9yZWNvcmRzAjAAAA==
+    headers:
+      Access-Control-Allow-Origin:
+      - '*'
+      Access-Control-Expose-Headers:
+      - x-request-time-secs
+      Content-Length:
+      - '853'
+      Content-Type:
+      - application/octet-stream
+      Strict-Transport-Security:
+      - max-age=31536000; includeSubDomains
+      X-Content-Type-Options:
+      - nosniff
+      X-Frame-Options:
+      - SAMEORIGIN
+      X-Kinetica-Group:
+      - QUERY
+      X-XSS-Protection:
+      - 1; mode=block
+      x-request-time-secs:
+      - '0.00454'
+    status:
+      code: 200
+      message: OK
+- request:
+    body: '{"messages": [{"role": "system", "content": "CREATE TABLE demo.test_profiles
+      AS\n(\n   username VARCHAR (32) NOT NULL,\n   name VARCHAR (32) NOT NULL,\n   sex
+      VARCHAR (2) NOT NULL,\n   address VARCHAR (64) NOT NULL,\n   mail VARCHAR (32)
+      NOT NULL,\n   birthdate TIMESTAMP NOT NULL\n);\nCOMMENT ON TABLE demo.test_profiles
+      IS ''Contains user profiles.'';"}, {"role": "user", "content": "How many male
+      users are there?"}, {"role": "assistant", "content": "select count(1) as num_users\n            from
+      demo.test_profiles\n            where sex = ''M'';"}, {"role": "user", "content":
+      "What are the female users ordered by username?"}]}'
+    headers:
+      Accept:
+      - text/plain
+      Accept-Encoding:
+      - gzip, deflate
+      Connection:
+      - keep-alive
+      Content-Length:
+      - '630'
+      Content-type:
+      - application/json
+      User-Agent:
+      - python-requests/2.32.5
+      authorization:
+      - DUMMY
+    method: POST
+    uri: http://localhost:19191/chat/completions
+  response:
+    body:
+      string: '{"status":"OK","data":{"status":"OK","data":{"id":"chatcmpl-D5vLOCXQH6DzAW1h2DAYMl9SJeJFC","object":"chat.completion","created":1770304442,"model":"gpt-3.5-turbo-0125","choices":[{"index":0,"message":{"role":"assistant","content":"SELECT
+        *\nFROM demo.test_profiles\nWHERE sex = ''F''\nORDER BY username;","refusal":null,"annotations":[]},"logprobs":null,"finish_reason":"stop"}],"usage":{"prompt_tokens":232,"completion_tokens":17,"total_tokens":249,"prompt_tokens_details":{"cached_tokens":0,"audio_tokens":0},"completion_tokens_details":{"reasoning_tokens":0,"audio_tokens":0,"accepted_prediction_tokens":0,"rejected_prediction_tokens":0}},"service_tier":"default","system_fingerprint":null}}}'
+    headers:
+      Access-Control-Allow-Origin:
+      - '*'
+      Access-Control-Expose-Headers:
+      - x-request-time-secs
+      Content-Length:
+      - '693'
+      Content-Type:
+      - application/json
+      Strict-Transport-Security:
+      - max-age=31536000; includeSubDomains
+      X-Content-Type-Options:
+      - nosniff
+      X-Frame-Options:
+      - SAMEORIGIN
+      X-XSS-Protection:
+      - 1; mode=block
+      x-request-time-secs:
+      - '2.49033'
+    status:
+      code: 200
+      message: OK
+- request:
+    body: !!binary |
+      hAFHRU5FUkFURSBQUk9NUFQgV0lUSCBPUFRJT05TIChDT05URVhUX05BTUVTID0gJ2RlbW8udGVz
+      dF9sbG1fY3R4JykAAgxiaW5hcnkAAAA=
+    headers:
+      Accept:
+      - application/octet-stream
+      Accept-Encoding:
+      - gzip, deflate
+      Connection:
+      - keep-alive
+      Content-Length:
+      - '80'
+      Content-type:
+      - application/octet-stream
+      User-Agent:
+      - python-requests/2.32.5
+      authorization:
+      - DUMMY
+    method: POST
+    uri: http://localhost:19191/execute/sql
+  response:
+    body:
+      string: !!binary |
+        BE9LAChleGVjdXRlX3NxbF9yZXNwb25zZfIMAPYDeyJuYW1lIjoiZ2VuZXJpY19yZXNwb25zZSIs
+        InR5cGUiOiJyZWNvcmQiLCJmaWVsZHMiOlt7Im5hbWUiOiJjb2x1bW5fMSIsInR5cGUiOnsidHlw
+        ZSI6ImFycmF5IiwiaXRlbXMiOiJzdHJpbmcifX0seyJuYW1lIjoiY29sdW1uX2hlYWRlcnMiLCJ0
+        eXBlIjp7InR5cGUiOiJhcnJheSIsIml0ZW1zIjoic3RyaW5nIn19LHsibmFtZSI6ImNvbHVtbl9k
+        YXRhdHlwZXMiLCJ0eXBlIjp7InR5cGUiOiJhcnJheSIsIml0ZW1zIjoic3RyaW5nIn19XX2qBwL+
+        BnsicGF5bG9hZCI6eyJjb250ZXh0IjpbeyJ0YWJsZSI6ImRlbW8udGVzdF9wcm9maWxlcyIsImNv
+        bHVtbnMiOlsidXNlcm5hbWUgVkFSQ0hBUiAoMzIpIE5PVCBOVUxMIiwibmFtZSBWQVJDSEFSICgz
+        MikgTk9UIE5VTEwiLCJzZXggVkFSQ0hBUiAoMikgTk9UIE5VTEwiLCJhZGRyZXNzIFZBUkNIQVIg
+        KDY0KSBOT1QgTlVMTCIsIm1haWwgVkFSQ0hBUiAoMzIpIE5PVCBOVUxMIiwiYmlydGhkYXRlIFRJ
+        TUVTVEFNUCBOT1QgTlVMTCJdLCJkZXNjcmlwdGlvbiI6IkNvbnRhaW5zIHVzZXIgcHJvZmlsZXMu
+        IiwicnVsZXMiOltdfSx7InNhbXBsZXMiOnsiSG93IG1hbnkgbWFsZSB1c2VycyBhcmUgdGhlcmU/
+        Ijoic2VsZWN0IGNvdW50KDEpIGFzIG51bV91c2Vyc1xuICAgICAgICAgICAgZnJvbSBkZW1vLnRl
+        c3RfcHJvZmlsZXNcbiAgICAgICAgICAgIHdoZXJlIHNleCA9ICcnTScnOyJ9fV19fQACDFByb21w
+        dAACDHN0cmluZwAAAgAACCBYLUtpbmV0aWNhLUdyb3VwClFVRVJZCmNvdW50AjAabGFzdF9lbmRw
+        b2ludCwvZ2VuZXJhdGUvc3FsL2ludGVybmFsLnRvdGFsX251bWJlcl9vZl9yZWNvcmRzAjAAAA==
+    headers:
+      Access-Control-Allow-Origin:
+      - '*'
+      Access-Control-Expose-Headers:
+      - x-request-time-secs
+      Content-Length:
+      - '853'
+      Content-Type:
+      - application/octet-stream
+      Strict-Transport-Security:
+      - max-age=31536000; includeSubDomains
+      X-Content-Type-Options:
+      - nosniff
+      X-Frame-Options:
+      - SAMEORIGIN
+      X-Kinetica-Group:
+      - QUERY
+      X-XSS-Protection:
+      - 1; mode=block
+      x-request-time-secs:
+      - '0.00416'
+    status:
+      code: 200
+      message: OK
+- request:
+    body: '{"messages": [{"role": "system", "content": "CREATE TABLE demo.test_profiles
+      AS\n(\n   username VARCHAR (32) NOT NULL,\n   name VARCHAR (32) NOT NULL,\n   sex
+      VARCHAR (2) NOT NULL,\n   address VARCHAR (64) NOT NULL,\n   mail VARCHAR (32)
+      NOT NULL,\n   birthdate TIMESTAMP NOT NULL\n);\nCOMMENT ON TABLE demo.test_profiles
+      IS ''Contains user profiles.'';"}, {"role": "user", "content": "How many male
+      users are there?"}, {"role": "assistant", "content": "select count(1) as num_users\n            from
+      demo.test_profiles\n            where sex = ''M'';"}, {"role": "user", "content":
+      "What are the female users ordered by username?"}]}'
+    headers:
+      Accept:
+      - text/plain
+      Accept-Encoding:
+      - gzip, deflate
+      Connection:
+      - keep-alive
+      Content-Length:
+      - '630'
+      Content-type:
+      - application/json
+      User-Agent:
+      - python-requests/2.32.5
+      authorization:
+      - DUMMY
+    method: POST
+    uri: http://localhost:19191/chat/completions
+  response:
+    body:
+      string: '{"status":"OK","data":{"status":"OK","data":{"id":"chatcmpl-D5vLWxRxMx7gyonvgWsRMy1K6ux5X","object":"chat.completion","created":1770304450,"model":"gpt-3.5-turbo-0125","choices":[{"index":0,"message":{"role":"assistant","content":"SELECT
+        *\nFROM demo.test_profiles\nWHERE sex = ''F''\nORDER BY username;","refusal":null,"annotations":[]},"logprobs":null,"finish_reason":"stop"}],"usage":{"prompt_tokens":232,"completion_tokens":17,"total_tokens":249,"prompt_tokens_details":{"cached_tokens":0,"audio_tokens":0},"completion_tokens_details":{"reasoning_tokens":0,"audio_tokens":0,"accepted_prediction_tokens":0,"rejected_prediction_tokens":0}},"service_tier":"default","system_fingerprint":null}}}'
+    headers:
+      Access-Control-Allow-Origin:
+      - '*'
+      Access-Control-Expose-Headers:
+      - x-request-time-secs
+      Content-Length:
+      - '693'
+      Content-Type:
+      - application/json
+      Strict-Transport-Security:
+      - max-age=31536000; includeSubDomains
+      X-Content-Type-Options:
+      - nosniff
+      X-Frame-Options:
+      - SAMEORIGIN
+      X-XSS-Protection:
+      - 1; mode=block
+      x-request-time-secs:
+      - '1.56945'
+    status:
+      code: 200
+      message: OK
+- request:
+    body: !!binary |
+      hAFHRU5FUkFURSBQUk9NUFQgV0lUSCBPUFRJT05TIChDT05URVhUX05BTUVTID0gJ2RlbW8udGVz
+      dF9sbG1fY3R4JykAAgxiaW5hcnkAAAA=
+    headers:
+      Accept:
+      - application/octet-stream
+      Accept-Encoding:
+      - gzip, deflate
+      Connection:
+      - keep-alive
+      Content-Length:
+      - '80'
+      Content-type:
+      - application/octet-stream
+      User-Agent:
+      - python-requests/2.32.5
+      authorization:
+      - DUMMY
+    method: POST
+    uri: http://localhost:19191/execute/sql
+  response:
+    body:
+      string: !!binary |
+        BE9LAChleGVjdXRlX3NxbF9yZXNwb25zZfIMAPYDeyJuYW1lIjoiZ2VuZXJpY19yZXNwb25zZSIs
+        InR5cGUiOiJyZWNvcmQiLCJmaWVsZHMiOlt7Im5hbWUiOiJjb2x1bW5fMSIsInR5cGUiOnsidHlw
+        ZSI6ImFycmF5IiwiaXRlbXMiOiJzdHJpbmcifX0seyJuYW1lIjoiY29sdW1uX2hlYWRlcnMiLCJ0
+        eXBlIjp7InR5cGUiOiJhcnJheSIsIml0ZW1zIjoic3RyaW5nIn19LHsibmFtZSI6ImNvbHVtbl9k
+        YXRhdHlwZXMiLCJ0eXBlIjp7InR5cGUiOiJhcnJheSIsIml0ZW1zIjoic3RyaW5nIn19XX2qBwL+
+        BnsicGF5bG9hZCI6eyJjb250ZXh0IjpbeyJ0YWJsZSI6ImRlbW8udGVzdF9wcm9maWxlcyIsImNv
+        bHVtbnMiOlsidXNlcm5hbWUgVkFSQ0hBUiAoMzIpIE5PVCBOVUxMIiwibmFtZSBWQVJDSEFSICgz
+        MikgTk9UIE5VTEwiLCJzZXggVkFSQ0hBUiAoMikgTk9UIE5VTEwiLCJhZGRyZXNzIFZBUkNIQVIg
+        KDY0KSBOT1QgTlVMTCIsIm1haWwgVkFSQ0hBUiAoMzIpIE5PVCBOVUxMIiwiYmlydGhkYXRlIFRJ
+        TUVTVEFNUCBOT1QgTlVMTCJdLCJkZXNjcmlwdGlvbiI6IkNvbnRhaW5zIHVzZXIgcHJvZmlsZXMu
+        IiwicnVsZXMiOltdfSx7InNhbXBsZXMiOnsiSG93IG1hbnkgbWFsZSB1c2VycyBhcmUgdGhlcmU/
+        Ijoic2VsZWN0IGNvdW50KDEpIGFzIG51bV91c2Vyc1xuICAgICAgICAgICAgZnJvbSBkZW1vLnRl
+        c3RfcHJvZmlsZXNcbiAgICAgICAgICAgIHdoZXJlIHNleCA9ICcnTScnOyJ9fV19fQACDFByb21w
+        dAACDHN0cmluZwAAAgAACCBYLUtpbmV0aWNhLUdyb3VwClFVRVJZCmNvdW50AjAabGFzdF9lbmRw
+        b2ludCwvZ2VuZXJhdGUvc3FsL2ludGVybmFsLnRvdGFsX251bWJlcl9vZl9yZWNvcmRzAjAAAA==
+    headers:
+      Access-Control-Allow-Origin:
+      - '*'
+      Access-Control-Expose-Headers:
+      - x-request-time-secs
+      Content-Length:
+      - '853'
+      Content-Type:
+      - application/octet-stream
+      Strict-Transport-Security:
+      - max-age=31536000; includeSubDomains
+      X-Content-Type-Options:
+      - nosniff
+      X-Frame-Options:
+      - SAMEORIGIN
+      X-Kinetica-Group:
+      - QUERY
+      X-XSS-Protection:
+      - 1; mode=block
+      x-request-time-secs:
+      - '0.00381'
+    status:
+      code: 200
+      message: OK
+- request:
+    body: '{"messages": [{"role": "system", "content": "CREATE TABLE demo.test_profiles
+      AS\n(\n   username VARCHAR (32) NOT NULL,\n   name VARCHAR (32) NOT NULL,\n   sex
+      VARCHAR (2) NOT NULL,\n   address VARCHAR (64) NOT NULL,\n   mail VARCHAR (32)
+      NOT NULL,\n   birthdate TIMESTAMP NOT NULL\n);\nCOMMENT ON TABLE demo.test_profiles
+      IS ''Contains user profiles.'';"}, {"role": "user", "content": "How many male
+      users are there?"}, {"role": "assistant", "content": "select count(1) as num_users\n            from
+      demo.test_profiles\n            where sex = ''M'';"}, {"role": "user", "content":
+      "What are the female users ordered by username?"}]}'
+    headers:
+      Accept:
+      - text/plain
+      Accept-Encoding:
+      - gzip, deflate
+      Connection:
+      - keep-alive
+      Content-Length:
+      - '630'
+      Content-type:
+      - application/json
+      User-Agent:
+      - python-requests/2.32.5
+      authorization:
+      - DUMMY
+    method: POST
+    uri: http://localhost:19191/chat/completions
+  response:
+    body:
+      string: '{"status":"OK","data":{"status":"OK","data":{"id":"chatcmpl-D5vMKzNXjqRbiU1AqxIIpBuSHHe7o","object":"chat.completion","created":1770304500,"model":"gpt-3.5-turbo-0125","choices":[{"index":0,"message":{"role":"assistant","content":"SELECT
+        *\nFROM demo.test_profiles\nWHERE sex = ''F''\nORDER BY username;","refusal":null,"annotations":[]},"logprobs":null,"finish_reason":"stop"}],"usage":{"prompt_tokens":232,"completion_tokens":17,"total_tokens":249,"prompt_tokens_details":{"cached_tokens":0,"audio_tokens":0},"completion_tokens_details":{"reasoning_tokens":0,"audio_tokens":0,"accepted_prediction_tokens":0,"rejected_prediction_tokens":0}},"service_tier":"default","system_fingerprint":null}}}'
+    headers:
+      Access-Control-Allow-Origin:
+      - '*'
+      Access-Control-Expose-Headers:
+      - x-request-time-secs
+      Content-Length:
+      - '693'
+      Content-Type:
+      - application/json
+      Strict-Transport-Security:
+      - max-age=31536000; includeSubDomains
+      X-Content-Type-Options:
+      - nosniff
+      X-Frame-Options:
+      - SAMEORIGIN
+      X-XSS-Protection:
+      - 1; mode=block
+      x-request-time-secs:
+      - '0.72617'
+    status:
+      code: 200
+      message: OK
+- request:
+    body: !!binary |
+      hAFHRU5FUkFURSBQUk9NUFQgV0lUSCBPUFRJT05TIChDT05URVhUX05BTUVTID0gJ2RlbW8udGVz
+      dF9sbG1fY3R4JykAAgxiaW5hcnkAAAA=
+    headers:
+      Accept:
+      - application/octet-stream
+      Accept-Encoding:
+      - gzip, deflate
+      Connection:
+      - keep-alive
+      Content-Length:
+      - '80'
+      Content-type:
+      - application/octet-stream
+      User-Agent:
+      - python-requests/2.32.5
+      authorization:
+      - DUMMY
+    method: POST
+    uri: http://localhost:19191/execute/sql
+  response:
+    body:
+      string: !!binary |
+        BE9LAChleGVjdXRlX3NxbF9yZXNwb25zZfIMAPYDeyJuYW1lIjoiZ2VuZXJpY19yZXNwb25zZSIs
+        InR5cGUiOiJyZWNvcmQiLCJmaWVsZHMiOlt7Im5hbWUiOiJjb2x1bW5fMSIsInR5cGUiOnsidHlw
+        ZSI6ImFycmF5IiwiaXRlbXMiOiJzdHJpbmcifX0seyJuYW1lIjoiY29sdW1uX2hlYWRlcnMiLCJ0
+        eXBlIjp7InR5cGUiOiJhcnJheSIsIml0ZW1zIjoic3RyaW5nIn19LHsibmFtZSI6ImNvbHVtbl9k
+        YXRhdHlwZXMiLCJ0eXBlIjp7InR5cGUiOiJhcnJheSIsIml0ZW1zIjoic3RyaW5nIn19XX2qBwL+
+        BnsicGF5bG9hZCI6eyJjb250ZXh0IjpbeyJ0YWJsZSI6ImRlbW8udGVzdF9wcm9maWxlcyIsImNv
+        bHVtbnMiOlsidXNlcm5hbWUgVkFSQ0hBUiAoMzIpIE5PVCBOVUxMIiwibmFtZSBWQVJDSEFSICgz
+        MikgTk9UIE5VTEwiLCJzZXggVkFSQ0hBUiAoMikgTk9UIE5VTEwiLCJhZGRyZXNzIFZBUkNIQVIg
+        KDY0KSBOT1QgTlVMTCIsIm1haWwgVkFSQ0hBUiAoMzIpIE5PVCBOVUxMIiwiYmlydGhkYXRlIFRJ
+        TUVTVEFNUCBOT1QgTlVMTCJdLCJkZXNjcmlwdGlvbiI6IkNvbnRhaW5zIHVzZXIgcHJvZmlsZXMu
+        IiwicnVsZXMiOltdfSx7InNhbXBsZXMiOnsiSG93IG1hbnkgbWFsZSB1c2VycyBhcmUgdGhlcmU/
+        Ijoic2VsZWN0IGNvdW50KDEpIGFzIG51bV91c2Vyc1xuICAgICAgICAgICAgZnJvbSBkZW1vLnRl
+        c3RfcHJvZmlsZXNcbiAgICAgICAgICAgIHdoZXJlIHNleCA9ICcnTScnOyJ9fV19fQACDFByb21w
+        dAACDHN0cmluZwAAAgAACCBYLUtpbmV0aWNhLUdyb3VwClFVRVJZCmNvdW50AjAabGFzdF9lbmRw
+        b2ludCwvZ2VuZXJhdGUvc3FsL2ludGVybmFsLnRvdGFsX251bWJlcl9vZl9yZWNvcmRzAjAAAA==
+    headers:
+      Access-Control-Allow-Origin:
+      - '*'
+      Access-Control-Expose-Headers:
+      - x-request-time-secs
+      Content-Length:
+      - '853'
+      Content-Type:
+      - application/octet-stream
+      Strict-Transport-Security:
+      - max-age=31536000; includeSubDomains
+      X-Content-Type-Options:
+      - nosniff
+      X-Frame-Options:
+      - SAMEORIGIN
+      X-Kinetica-Group:
+      - QUERY
+      X-XSS-Protection:
+      - 1; mode=block
+      x-request-time-secs:
+      - '0.00315'
+    status:
+      code: 200
+      message: OK
+- request:
+    body: '{"messages": [{"role": "system", "content": "CREATE TABLE demo.test_profiles
+      AS\n(\n   username VARCHAR (32) NOT NULL,\n   name VARCHAR (32) NOT NULL,\n   sex
+      VARCHAR (2) NOT NULL,\n   address VARCHAR (64) NOT NULL,\n   mail VARCHAR (32)
+      NOT NULL,\n   birthdate TIMESTAMP NOT NULL\n);\nCOMMENT ON TABLE demo.test_profiles
+      IS ''Contains user profiles.'';"}, {"role": "user", "content": "How many male
+      users are there?"}, {"role": "assistant", "content": "select count(1) as num_users\n            from
+      demo.test_profiles\n            where sex = ''M'';"}, {"role": "user", "content":
+      "What are the female users ordered by username?"}]}'
+    headers:
+      Accept:
+      - text/plain
+      Accept-Encoding:
+      - gzip, deflate
+      Connection:
+      - keep-alive
+      Content-Length:
+      - '630'
+      Content-type:
+      - application/json
+      User-Agent:
+      - python-requests/2.32.5
+      authorization:
+      - DUMMY
+    method: POST
+    uri: http://localhost:19191/chat/completions
+  response:
+    body:
+      string: '{"status":"OK","data":{"status":"OK","data":{"id":"chatcmpl-D5vqDzl9GYtRSLNdwdm60vCfy5yeY","object":"chat.completion","created":1770306353,"model":"gpt-3.5-turbo-0125","choices":[{"index":0,"message":{"role":"assistant","content":"SELECT
+        *\nFROM demo.test_profiles\nWHERE sex = ''F''\nORDER BY username;","refusal":null,"annotations":[]},"logprobs":null,"finish_reason":"stop"}],"usage":{"prompt_tokens":232,"completion_tokens":17,"total_tokens":249,"prompt_tokens_details":{"cached_tokens":0,"audio_tokens":0},"completion_tokens_details":{"reasoning_tokens":0,"audio_tokens":0,"accepted_prediction_tokens":0,"rejected_prediction_tokens":0}},"service_tier":"default","system_fingerprint":null}}}'
+    headers:
+      Access-Control-Allow-Origin:
+      - '*'
+      Access-Control-Expose-Headers:
+      - x-request-time-secs
+      Content-Length:
+      - '693'
+      Content-Type:
+      - application/json
+      Strict-Transport-Security:
+      - max-age=31536000; includeSubDomains
+      X-Content-Type-Options:
+      - nosniff
+      X-Frame-Options:
+      - SAMEORIGIN
+      X-XSS-Protection:
+      - 1; mode=block
+      x-request-time-secs:
+      - '1.35041'
+    status:
+      code: 200
+      message: OK
+- request:
+    body: !!binary |
+      hAFHRU5FUkFURSBQUk9NUFQgV0lUSCBPUFRJT05TIChDT05URVhUX05BTUVTID0gJ2RlbW8udGVz
+      dF9sbG1fY3R4JykAAgxiaW5hcnkAAAA=
+    headers:
+      Accept:
+      - application/octet-stream
+      Accept-Encoding:
+      - gzip, deflate
+      Connection:
+      - keep-alive
+      Content-Length:
+      - '80'
+      Content-type:
+      - application/octet-stream
+      User-Agent:
+      - python-requests/2.32.5
+      authorization:
+      - DUMMY
+    method: POST
+    uri: http://localhost:19191/execute/sql
+  response:
+    body:
+      string: !!binary |
+        BE9LAChleGVjdXRlX3NxbF9yZXNwb25zZfIMAPYDeyJuYW1lIjoiZ2VuZXJpY19yZXNwb25zZSIs
+        InR5cGUiOiJyZWNvcmQiLCJmaWVsZHMiOlt7Im5hbWUiOiJjb2x1bW5fMSIsInR5cGUiOnsidHlw
+        ZSI6ImFycmF5IiwiaXRlbXMiOiJzdHJpbmcifX0seyJuYW1lIjoiY29sdW1uX2hlYWRlcnMiLCJ0
+        eXBlIjp7InR5cGUiOiJhcnJheSIsIml0ZW1zIjoic3RyaW5nIn19LHsibmFtZSI6ImNvbHVtbl9k
+        YXRhdHlwZXMiLCJ0eXBlIjp7InR5cGUiOiJhcnJheSIsIml0ZW1zIjoic3RyaW5nIn19XX2qBwL+
+        BnsicGF5bG9hZCI6eyJjb250ZXh0IjpbeyJ0YWJsZSI6ImRlbW8udGVzdF9wcm9maWxlcyIsImNv
+        bHVtbnMiOlsidXNlcm5hbWUgVkFSQ0hBUiAoMzIpIE5PVCBOVUxMIiwibmFtZSBWQVJDSEFSICgz
+        MikgTk9UIE5VTEwiLCJzZXggVkFSQ0hBUiAoMikgTk9UIE5VTEwiLCJhZGRyZXNzIFZBUkNIQVIg
+        KDY0KSBOT1QgTlVMTCIsIm1haWwgVkFSQ0hBUiAoMzIpIE5PVCBOVUxMIiwiYmlydGhkYXRlIFRJ
+        TUVTVEFNUCBOT1QgTlVMTCJdLCJkZXNjcmlwdGlvbiI6IkNvbnRhaW5zIHVzZXIgcHJvZmlsZXMu
+        IiwicnVsZXMiOltdfSx7InNhbXBsZXMiOnsiSG93IG1hbnkgbWFsZSB1c2VycyBhcmUgdGhlcmU/
+        Ijoic2VsZWN0IGNvdW50KDEpIGFzIG51bV91c2Vyc1xuICAgICAgICAgICAgZnJvbSBkZW1vLnRl
+        c3RfcHJvZmlsZXNcbiAgICAgICAgICAgIHdoZXJlIHNleCA9ICcnTScnOyJ9fV19fQACDFByb21w
+        dAACDHN0cmluZwAAAgAACCBYLUtpbmV0aWNhLUdyb3VwClFVRVJZCmNvdW50AjAabGFzdF9lbmRw
+        b2ludCwvZ2VuZXJhdGUvc3FsL2ludGVybmFsLnRvdGFsX251bWJlcl9vZl9yZWNvcmRzAjAAAA==
+    headers:
+      Access-Control-Allow-Origin:
+      - '*'
+      Access-Control-Expose-Headers:
+      - x-request-time-secs
+      Content-Length:
+      - '853'
+      Content-Type:
+      - application/octet-stream
+      Strict-Transport-Security:
+      - max-age=31536000; includeSubDomains
+      X-Content-Type-Options:
+      - nosniff
+      X-Frame-Options:
+      - SAMEORIGIN
+      X-Kinetica-Group:
+      - QUERY
+      X-XSS-Protection:
+      - 1; mode=block
+      x-request-time-secs:
+      - '0.00472'
+    status:
+      code: 200
+      message: OK
+- request:
+    body: '{"messages": [{"role": "system", "content": "CREATE TABLE demo.test_profiles
+      AS\n(\n   username VARCHAR (32) NOT NULL,\n   name VARCHAR (32) NOT NULL,\n   sex
+      VARCHAR (2) NOT NULL,\n   address VARCHAR (64) NOT NULL,\n   mail VARCHAR (32)
+      NOT NULL,\n   birthdate TIMESTAMP NOT NULL\n);\nCOMMENT ON TABLE demo.test_profiles
+      IS ''Contains user profiles.'';"}, {"role": "user", "content": "How many male
+      users are there?"}, {"role": "assistant", "content": "select count(1) as num_users\n            from
+      demo.test_profiles\n            where sex = ''M'';"}, {"role": "user", "content":
+      "What are the female users ordered by username?"}]}'
+    headers:
+      Accept:
+      - text/plain
+      Accept-Encoding:
+      - gzip, deflate
+      Connection:
+      - keep-alive
+      Content-Length:
+      - '630'
+      Content-type:
+      - application/json
+      User-Agent:
+      - python-requests/2.32.5
+      authorization:
+      - DUMMY
+    method: POST
+    uri: http://localhost:19191/chat/completions
+  response:
+    body:
+      string: '{"status":"OK","data":{"status":"OK","data":{"id":"chatcmpl-D5xxttDbdx3fih9fZxEWPrn2q8Vcb","object":"chat.completion","created":1770314517,"model":"gpt-3.5-turbo-0125","choices":[{"index":0,"message":{"role":"assistant","content":"SELECT
+        *\nFROM demo.test_profiles\nWHERE sex = ''F''\nORDER BY username;","refusal":null,"annotations":[]},"logprobs":null,"finish_reason":"stop"}],"usage":{"prompt_tokens":232,"completion_tokens":17,"total_tokens":249,"prompt_tokens_details":{"cached_tokens":0,"audio_tokens":0},"completion_tokens_details":{"reasoning_tokens":0,"audio_tokens":0,"accepted_prediction_tokens":0,"rejected_prediction_tokens":0}},"service_tier":"default","system_fingerprint":null}}}'
+    headers:
+      Access-Control-Allow-Origin:
+      - '*'
+      Access-Control-Expose-Headers:
+      - x-request-time-secs
+      Content-Length:
+      - '693'
+      Content-Type:
+      - application/json
+      Strict-Transport-Security:
+      - max-age=31536000; includeSubDomains
+      X-Content-Type-Options:
+      - nosniff
+      X-Frame-Options:
+      - SAMEORIGIN
+      X-XSS-Protection:
+      - 1; mode=block
+      x-request-time-secs:
+      - '1.90390'
+    status:
+      code: 200
+      message: OK
+version: 1

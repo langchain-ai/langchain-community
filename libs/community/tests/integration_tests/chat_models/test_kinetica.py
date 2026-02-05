@@ -16,7 +16,6 @@ from langchain_community.chat_models.kinetica import (
     ChatKinetica,
     KineticaSqlOutputParser,
     KineticaSqlResponse,
-    KineticaUtil,
 )
 
 if TYPE_CHECKING:
@@ -31,7 +30,16 @@ def vcr_config() -> dict:
     return {
         # Replace the Authorization request header with "DUMMY" in cassettes
         "filter_headers": [("authorization", "DUMMY")],
+
+        # as an alternative you can pass --record-mode=new_episodes to pytest
+        #"record_mode": "new_episodes",
     }
+
+@pytest.fixture(scope="module")
+def chat_kinetica() -> ChatKinetica:
+    import gpudb
+    kdbc = gpudb.GPUdb.get_connection()
+    return ChatKinetica(kdbc=kdbc)  # type: ignore[call-arg]
 
 
 class TestChatKinetica:
@@ -53,38 +61,43 @@ class TestChatKinetica:
     3. A chain is constructed from the chat prompt template.
 
     4. The chain is executed to generate the SQL and execute the query.
+
+    Run this independently with:
+
+    ```
+    uv run --group test --group test_integration \
+        pytest --record-mode=all \
+        tests/integration_tests/chat_models/test_kinetica.py::TestChatKinetica
+    ```
     """
 
     table_name = "demo.test_profiles"
     context_name = "demo.test_llm_ctx"
     num_records = 100
 
-    @classmethod
     @pytest.mark.vcr()
-    def test_setup(cls) -> "gpudb.GPUdb":
+    def test_setup(self, chat_kinetica: ChatKinetica) -> None:
         """Create the connection, test table, and LLM context."""
-
-        kdbc = KineticaUtil.create_kdbc()
-        cls._create_test_table(kdbc, cls.table_name, cls.num_records)
-        cls._create_llm_context(kdbc, cls.context_name)
-        return kdbc
+        self._create_test_table(kinetica_dbc=chat_kinetica.kdbc, 
+                               table_name=self.table_name,
+                               num_records=self.num_records)
+        
+        self._create_llm_context(kinetica_dbc=chat_kinetica.kdbc,
+                                context_name=self.context_name)
 
     @pytest.mark.vcr()
-    def test_create_llm(self) -> None:
+    def test_create_llm(self, chat_kinetica: ChatKinetica) -> None:
         """Create an LLM instance."""
+        LOG.info(chat_kinetica._identifying_params)
+
         import gpudb
-
-        kinetica_llm = ChatKinetica()  # type: ignore[call-arg]
-        LOG.info(kinetica_llm._identifying_params)
-
-        assert isinstance(kinetica_llm.kdbc, gpudb.GPUdb)
-        assert kinetica_llm._llm_type == "kinetica-sqlassist"
+        assert isinstance(chat_kinetica.kdbc, gpudb.GPUdb)
+        assert chat_kinetica._llm_type == "kinetica-sqlassist"
 
     @pytest.mark.vcr()
-    def test_load_context(self) -> None:
+    def test_load_context(self, chat_kinetica: ChatKinetica) -> None:
         """Load the LLM context from the DB."""
-        kinetica_llm = ChatKinetica()  # type: ignore[call-arg]
-        ctx_messages = kinetica_llm.load_messages_from_context(self.context_name)
+        ctx_messages = chat_kinetica.load_messages_from_context(self.context_name)
 
         system_message = ctx_messages[0]
         assert isinstance(system_message, SystemMessage)
@@ -94,15 +107,14 @@ class TestChatKinetica:
         assert last_question.content == "How many male users are there?"
 
     @pytest.mark.vcr()
-    def test_generate(self) -> None:
+    def test_generate(self, chat_kinetica: ChatKinetica) -> None:
         """Generate SQL from a chain."""
-        kinetica_llm = ChatKinetica()  # type: ignore[call-arg]
 
         # create chain
-        ctx_messages = kinetica_llm.load_messages_from_context(self.context_name)
+        ctx_messages = chat_kinetica.load_messages_from_context(self.context_name)
         ctx_messages.append(("human", "{input}"))
         prompt_template = ChatPromptTemplate.from_messages(ctx_messages)
-        chain = prompt_template | kinetica_llm
+        chain = prompt_template | chat_kinetica
 
         resp_message = chain.invoke(
             {"input": "What are the female users ordered by username?"}
@@ -111,18 +123,17 @@ class TestChatKinetica:
         assert isinstance(resp_message, AIMessage)
 
     @pytest.mark.vcr()
-    def test_full_chain(self) -> None:
+    def test_full_chain(self, chat_kinetica: ChatKinetica) -> None:
         """Generate SQL from a chain and execute the query."""
-        kinetica_llm = ChatKinetica()  # type: ignore[call-arg]
 
         # create chain
-        ctx_messages = kinetica_llm.load_messages_from_context(self.context_name)
+        ctx_messages = chat_kinetica.load_messages_from_context(self.context_name)
         ctx_messages.append(("human", "{input}"))
         prompt_template = ChatPromptTemplate.from_messages(ctx_messages)
         chain = (
             prompt_template
-            | kinetica_llm
-            | KineticaSqlOutputParser(kdbc=kinetica_llm.kdbc)
+            | chat_kinetica
+            | KineticaSqlOutputParser(kdbc=chat_kinetica.kdbc)
         )
         sql_response: KineticaSqlResponse = chain.invoke(
             {"input": "What are the female users ordered by username?"}
