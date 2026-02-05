@@ -6,6 +6,7 @@ import json
 import logging
 import struct
 import uuid
+import warnings
 from collections import OrderedDict
 from enum import Enum
 from functools import partial
@@ -18,6 +19,14 @@ from langchain_core.vectorstores import VectorStore
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
 from langchain_community.vectorstores.utils import maximal_marginal_relevance
+
+warnings.warn(
+    "The 'langchain_community.vectorstores.kinetica' module "
+    "is deprecated and has been moved to a provider package. "
+    "Use the 'langchain-kinetica' package instead.",
+    DeprecationWarning,
+    stacklevel=2,
+)
 
 
 class DistanceStrategy(str, enum.Enum):

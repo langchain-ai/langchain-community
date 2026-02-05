@@ -1,10 +1,19 @@
 from __future__ import annotations
 
+import warnings
 from typing import Any, Dict, Iterator, List, Optional, Tuple
 
 from langchain_core.documents import Document
 
 from langchain_community.document_loaders.base import BaseLoader
+
+warnings.warn(
+    "The 'langchain_community.document_loaders.kinetica_loader' module"
+    " is deprecated and has been moved to a provider package. "
+    "Use the 'langchain-kinetica' package instead.",
+    DeprecationWarning,
+    stacklevel=2,
+)
 
 
 class KineticaLoader(BaseLoader):

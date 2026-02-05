@@ -30,16 +30,17 @@ def vcr_config() -> dict:
     return {
         # Replace the Authorization request header with "DUMMY" in cassettes
         "filter_headers": [("authorization", "DUMMY")],
-
         # as an alternative you can pass --record-mode=new_episodes to pytest
-        #"record_mode": "new_episodes",
+        # "record_mode": "new_episodes",
     }
+
 
 @pytest.fixture(scope="module")
 def chat_kinetica() -> ChatKinetica:
     import gpudb
+
     kdbc = gpudb.GPUdb.get_connection()
-    return ChatKinetica(kdbc=kdbc)  # type: ignore[call-arg]
+    return ChatKinetica(kdbc=kdbc)
 
 
 class TestChatKinetica:
@@ -78,12 +79,15 @@ class TestChatKinetica:
     @pytest.mark.vcr()
     def test_setup(self, chat_kinetica: ChatKinetica) -> None:
         """Create the connection, test table, and LLM context."""
-        self._create_test_table(kinetica_dbc=chat_kinetica.kdbc, 
-                               table_name=self.table_name,
-                               num_records=self.num_records)
-        
-        self._create_llm_context(kinetica_dbc=chat_kinetica.kdbc,
-                                context_name=self.context_name)
+        self._create_test_table(
+            kinetica_dbc=chat_kinetica.kdbc,
+            table_name=self.table_name,
+            num_records=self.num_records,
+        )
+
+        self._create_llm_context(
+            kinetica_dbc=chat_kinetica.kdbc, context_name=self.context_name
+        )
 
     @pytest.mark.vcr()
     def test_create_llm(self, chat_kinetica: ChatKinetica) -> None:
@@ -91,6 +95,7 @@ class TestChatKinetica:
         LOG.info(chat_kinetica._identifying_params)
 
         import gpudb
+
         assert isinstance(chat_kinetica.kdbc, gpudb.GPUdb)
         assert chat_kinetica._llm_type == "kinetica-sqlassist"
 

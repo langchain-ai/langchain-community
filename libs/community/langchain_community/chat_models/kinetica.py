@@ -7,6 +7,7 @@ import json
 import logging
 import os
 import re
+import warnings
 from importlib.metadata import version
 from pathlib import Path
 from typing import TYPE_CHECKING, Any, Dict, List, Optional, Pattern, cast
@@ -27,6 +28,14 @@ from langchain_core.messages import (
 from langchain_core.output_parsers.transform import BaseOutputParser
 from langchain_core.outputs import ChatGeneration, ChatResult, Generation
 from pydantic import BaseModel, ConfigDict, Field
+
+warnings.warn(
+    "The 'langchain_community.chat_models.kinetica' module "
+    "is deprecated and has been moved to a provider package. "
+    "Use the 'langchain-kinetica' package instead.",
+    DeprecationWarning,
+    stacklevel=2,
+)
 
 LOG = logging.getLogger(__name__)
 
