@@ -135,7 +135,7 @@ class FinancialDatasetsAPIWrapper(BaseModel):
         ticker: str,
         period: str,
         limit: Optional[int],
-    ) -> dict:
+    ) -> List[dict]:
         """
         Get the financial metrics for a stock `ticker` over a `period` of time.
 
