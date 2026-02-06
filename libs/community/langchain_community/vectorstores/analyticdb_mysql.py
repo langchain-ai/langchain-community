@@ -69,8 +69,18 @@ class AnalyticDBMySQLSettings(BaseSettings):
 
         Args:
             item: The configuration key.
+
+    def __getitem__(self, item: str) -> Any:
+        """Get configuration value by key.
+
+        Args:
+            item: The configuration key to retrieve.
+
+        Returns:
+            Any: The value associated with the key.
         """
         return getattr(self, item)
+
 
     @staticmethod
     def get_env_config() -> AnalyticDBMySQLSettings:
