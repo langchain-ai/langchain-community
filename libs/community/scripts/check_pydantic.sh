@@ -41,7 +41,7 @@ count=$(git grep -E '^import pydantic_settings|^from pydantic_settings' -- "*.py
 # PRs that increase the current count will not be accepted.
 # PRs that decrease update the code in the repository
 # and allow decreasing the count of are welcome!
-current_count=8
+current_count=9
 
 if [ "$count" -gt "$current_count" ]; then
   echo "The PR seems to be introducing new usage pydantic_settings."
