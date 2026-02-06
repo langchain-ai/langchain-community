@@ -280,7 +280,6 @@ class AnalyticDBMySQL(VectorStore):
 
         datas = []
         try:
-            t = None
             for tid, document, embedding, metadata in zip(
                 ids, texts, embeddings, metas
             ):
@@ -292,15 +291,11 @@ class AnalyticDBMySQL(VectorStore):
                 }
                 datas.append(v)
                 if len(datas) == batch_size:
-                    if t:
-                        t.join()
-                    t = Thread(target=self._insert, args=[datas])
-                    t.start()
+                    self._insert(datas)
                     datas = []
             if len(datas) > 0:
-                if t:
-                    t.join()
                 self._insert(datas)
+            return [i for i in ids]
             return [i for i in ids]
         except Exception as e:
             logger.error(f"add_texts error, {e}")
