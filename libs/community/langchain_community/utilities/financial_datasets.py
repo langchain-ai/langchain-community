@@ -130,6 +130,62 @@ class FinancialDatasetsAPIWrapper(BaseModel):
 
         return data.get("cash_flow_statements", None)
 
+    def get_financial_metrics(
+        self,
+        ticker: str,
+        period: str,
+        limit: Optional[int],
+    ) -> dict:
+        """
+        Get the financial metrics for a stock `ticker` over a `period` of time.
+
+        :param ticker: the stock ticker
+        :param period: the period of time to get the balance sheets for.
+            Possible values are: annual, quarterly, ttm.
+        :param limit: the number of results to return, default is 10
+        :return: a list of financial metrics
+        """
+
+        url = (
+            f"{FINANCIAL_DATASETS_BASE_URL}/financial-metrics"
+            f"?ticker={ticker}"
+            f"&period={period}"
+            f"&limit={limit if limit else 10}"
+        )
+
+        # Add the api key to the headers
+        headers = {"X-API-KEY": self._api_key}
+
+        # Execute the request
+        response = requests.get(url, headers=headers)
+        data = response.json()
+
+        return data.get("financial_metrics", None)
+
+    def get_financial_snapshots(
+        self,
+        ticker: str,
+    ) -> dict:
+        """
+        Get the financial snapshots for a stock `ticker`.
+
+        :param ticker: the stock ticker
+        """
+
+        url = (
+            f"{FINANCIAL_DATASETS_BASE_URL}/financial-metrics/snapshot"
+            f"?ticker={ticker}"
+        )
+
+        # Add the api key to the headers
+        headers = {"X-API-KEY": self._api_key}
+
+        # Execute the request
+        response = requests.get(url, headers=headers)
+        data = response.json()
+
+        return data.get("snapshot", None)
+
     def run(self, mode: str, ticker: str, **kwargs: Any) -> str:
         if mode == "get_income_statements":
             period = kwargs.get("period", "annual")
@@ -143,5 +199,11 @@ class FinancialDatasetsAPIWrapper(BaseModel):
             period = kwargs.get("period", "annual")
             limit = kwargs.get("limit", 10)
             return json.dumps(self.get_cash_flow_statements(ticker, period, limit))
+        elif mode == "get_financial_metrics":
+            period = kwargs.get("period", "annual")
+            limit = kwargs.get("limit", 10)
+            return json.dumps(self.get_financial_metrics(ticker, period, limit))
+        elif mode == "get_financial_snapshots":
+            return json.dumps(self.get_financial_snapshots(ticker))
         else:
             raise ValueError(f"Invalid mode {mode} for financial datasets API.")
