@@ -69,14 +69,16 @@ class SerpAPIWrapper(BaseModel):
         )
         values["serpapi_api_key"] = serpapi_api_key
         try:
-            from serpapi import GoogleSearch
-
-            values["search_engine"] = GoogleSearch
+            from serpapi.google_search import GoogleSearch
         except ImportError:
-            raise ImportError(
-                "Could not import serpapi python package. "
-                "Please install it with `pip install google-search-results`."
-            )
+            try:
+                from serpapi import GoogleSearch
+            except ImportError:
+                raise ImportError(
+                    "Could not import serpapi python package. "
+                    "Please install it with `pip install google-search-results`."
+                )
+        values["search_engine"] = GoogleSearch
         return values
 
     async def arun(self, query: str, **kwargs: Any) -> str:
