@@ -153,7 +153,7 @@ def _update_token_usage(
 ) -> Union[int, dict]:
     # Token usage is either ints or dictionaries
     # `reasoning_tokens` is nested inside `completion_tokens_details`
-    if isinstance(new_usage, int):
+    if isinstance(new_usage, int):mm                    
         if not isinstance(overall_token_usage, int):
             raise ValueError(
                 f"Got different types for token usage: "
@@ -276,6 +276,17 @@ class ChatOpenAI(BaseChatModel):
     model_config = ConfigDict(
         populate_by_name=True,
     )
+
+        def __repr__(self) -> str:
+        """Safe string representation that avoids leaking API keys."""
+        masked_key = "***" if self.openai_api_key else None
+        return (
+            f"ChatOpenAI("
+            f"model_name={self.model_name!r}, "
+            f"openai_api_key={masked_key}, "
+            f"openai_proxy={self.openai_proxy!r})"
+        )
+
 
     @model_validator(mode="before")
     @classmethod
