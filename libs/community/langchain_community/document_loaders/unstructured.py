@@ -230,6 +230,48 @@ class UnstructuredFileLoader(UnstructuredBaseLoader):
     def _get_metadata(self) -> dict[str, Any]:
         return {"source": self.file_path}
 
+    def _apply_post_processors_to_text(self, text: str) -> str:
+        """Apply post processors to text fallback content."""
+        for post_processor in self.post_processors:
+            text = post_processor(text)
+        return text
+
+    def lazy_load(self) -> Iterator[Document]:
+        """Load file with Unstructured, falling back to TextLoader when unsupported."""
+        if isinstance(self.file_path, list):
+            for file_path in self.file_path:
+                loader = UnstructuredFileLoader(
+                    file_path=file_path,
+                    mode=self.mode,
+                    **dict(self.unstructured_kwargs),
+                )
+                loader.post_processors = self.post_processors
+                yield from loader.lazy_load()
+            return
+
+        try:
+            yield from super().lazy_load()
+        except Exception as exc:
+            from unstructured.partition.common import UnsupportedFileFormatError
+
+            if not isinstance(exc, UnsupportedFileFormatError):
+                raise
+
+            logger.warning(
+                "Unstructured could not infer file type for %s; "
+                "falling back to TextLoader.",
+                self.file_path,
+            )
+            try:
+                from langchain_community.document_loaders.text import TextLoader
+
+                text_loader = TextLoader(self.file_path, autodetect_encoding=True)
+                for doc in text_loader.lazy_load():
+                    page_content = self._apply_post_processors_to_text(doc.page_content)
+                    yield Document(page_content=page_content, metadata=doc.metadata)
+            except Exception:
+                raise exc from None
+
 
 def get_elements_from_api(
     file_path: Union[str, List[str], Path, List[Path], None] = None,
