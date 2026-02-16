@@ -259,7 +259,7 @@ class UnstructuredFileLoader(UnstructuredBaseLoader):
 
             logger.warning(
                 "Unstructured could not infer file type for %s; "
-                "falling back to TextLoader.",
+                "falling back to TextLoader to load the file.",
                 self.file_path,
             )
             try:
