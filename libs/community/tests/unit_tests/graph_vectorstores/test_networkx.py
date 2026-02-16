@@ -9,6 +9,13 @@ from langchain_community.graph_vectorstores.networkx import documents_to_network
 def test_documents_to_networkx() -> None:
     import networkx as nx
 
+    def get_links(payload: dict) -> list:
+        if "links" in payload:
+            return payload["links"]
+        if "edges" in payload:
+            return payload["edges"]
+        raise KeyError("links")
+
     doc1 = Document(
         id="a",
         page_content="some content",
@@ -46,8 +53,9 @@ def test_documents_to_networkx() -> None:
         {"id": "tag_2", "label": "href:b"},
         {"id": "tag_3", "label": "kw:bar"},
     ]
-    link_data["links"].sort(key=lambda n: (n["source"], n["target"]))
-    assert link_data["links"] == [
+    links = get_links(link_data)
+    links.sort(key=lambda n: (n["source"], n["target"]))
+    assert links == [
         {"source": "a", "target": "tag_1"},
         {"source": "b", "target": "tag_0"},
         {"source": "b", "target": "tag_1"},
@@ -70,8 +78,9 @@ def test_documents_to_networkx() -> None:
         {"id": "b", "text": "<some\n more content>"},
     ]
 
-    link_data["links"].sort(key=lambda n: (n["source"], n["target"]))
-    assert link_data["links"] == [
+    links = get_links(link_data)
+    links.sort(key=lambda n: (n["source"], n["target"]))
+    assert links == [
         {"source": "a", "target": "b", "label": "['kw:foo']"},
         {"source": "b", "target": "a", "label": "['href:a', 'kw:foo']"},
     ]
