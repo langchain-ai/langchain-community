@@ -445,10 +445,36 @@ class PyPDFParser(BaseBlobParser):
                 )
                 if img_filter in _PDF_FILTER_WITHOUT_LOSS:
                     height, width = xObject[obj]["/Height"], xObject[obj]["/Width"]
+                    data = xObject[obj].get_data()
+                    bits_per_component = xObject[obj].get(
+                        "/BitsPerComponent", 8
+                    )
 
-                    np_image = np.frombuffer(
-                        xObject[obj].get_data(), dtype=np.uint8
-                    ).reshape(height, width, -1)
+                    try:
+                        if bits_per_component == 1:
+                            # 1-bit monochrome images pack 8 pixels per byte.
+                            # Each row is padded to a byte boundary.
+                            np_data = np.unpackbits(
+                                np.frombuffer(data, dtype=np.uint8)
+                            )
+                            stride = ((width + 7) // 8) * 8
+                            np_data = np_data.reshape(-1, stride)[
+                                :height, :width
+                            ]
+                            np_image = (np_data * 255).astype(
+                                np.uint8
+                            ).reshape(height, width, 1)
+                        else:
+                            np_image = np.frombuffer(
+                                data, dtype=np.uint8
+                            ).reshape(height, width, -1)
+                    except ValueError:
+                        logger.warning(
+                            "Could not reshape lossless PDF image "
+                            f"({height}x{width}, bpc={bits_per_component}, "
+                            f"data={len(data)} bytes), skipping."
+                        )
+                        continue
                 elif img_filter in _PDF_FILTER_WITH_LOSS:
                     np_image = np.array(Image.open(io.BytesIO(xObject[obj].get_data())))
 
