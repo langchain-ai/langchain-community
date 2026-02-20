@@ -78,6 +78,9 @@ if TYPE_CHECKING:
     from langchain_community.utilities.infobip import (
         InfobipAPIWrapper,
     )
+    from langchain_community.utilities.inspire_hep import (
+        INSPIREHEPAPIWrapper,
+    )
     from langchain_community.utilities.jira import (
         JiraAPIWrapper,
     )
@@ -199,6 +202,7 @@ __all__ = [
     "GoogleTrendsAPIWrapper",
     "GraphQLAPIWrapper",
     "InfobipAPIWrapper",
+    "INSPIREHEPAPIWrapper",
     "JiraAPIWrapper",
     "LambdaWrapper",
     "MaxComputeAPIWrapper",
