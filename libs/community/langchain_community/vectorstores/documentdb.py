@@ -249,12 +249,20 @@ class DocumentDBVectorSearch(VectorStore):
                 f"number of texts ({len(texts_list)})"
             )
 
+
+        # Validate that ids has the same length as texts_list if provided
+        if ids and len(ids) != len(texts_list):
+            raise ValueError(
+                f"Number of ids ({len(ids)}) must match number of texts ({len(texts_list)})"
+            )
+            
         for i, (text, metadata) in enumerate(zip(texts_list, _metadatas_list)):
             texts_batch.append(text)
             metadatas_batch.append(metadata)
             # FIX for issue #507: Add corresponding id to batch if ids provided
             if ids:
                 ids_batch.append(ids[i])
+
 
             if (i + 1) % batch_size == 0:
                 # FIX for issue #507: Pass ids_batch to _insert_texts
