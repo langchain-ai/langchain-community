@@ -1,4 +1,4 @@
-"""Main entrypoint into package."""
+"""Entrypoint into `langchain-community`."""
 
 from importlib import metadata
 
