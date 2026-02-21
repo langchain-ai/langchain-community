@@ -162,7 +162,7 @@ class StarRocks(VectorStore):
         config (StarRocksSettings): Configuration to StarRocks Client
         """
         try:
-            import pymysql  # type: ignore[import-untyped]
+            import pymysql  # type: ignore[import-untyped, unused-ignore]
         except ImportError:
             raise ImportError(
                 "Could not import pymysql python package. "
@@ -190,7 +190,7 @@ class StarRocks(VectorStore):
         dim = len(embedding.embed_query("test"))
 
         self.schema = f"""\
-CREATE TABLE IF NOT EXISTS {self.config.database}.{self.config.table}(    
+CREATE TABLE IF NOT EXISTS {self.config.database}.{self.config.table}(
     {self.config.column_map["id"]} string,
     {self.config.column_map["document"]} string,
     {self.config.column_map["embedding"]} array<float>,
@@ -378,10 +378,10 @@ CREATE TABLE IF NOT EXISTS {self.config.database}.{self.config.table}(
             where_str = ""
 
         q_str = f"""
-            SELECT 
+            SELECT
                 id as id,
-                {self.config.column_map["document"]} as document, 
-                {self.config.column_map["metadata"]} as metadata, 
+                {self.config.column_map["document"]} as document,
+                {self.config.column_map["metadata"]} as metadata,
                 cosine_similarity_norm(array<float>[{q_emb_str}],
                 {self.config.column_map["embedding"]}) as dist,
                 {self.config.column_map["embedding"]} as embedding

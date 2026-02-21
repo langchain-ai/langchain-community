@@ -29,9 +29,6 @@ if TYPE_CHECKING:
         FolderFacebookMessengerChatLoader,
         SingleFileFacebookMessengerChatLoader,
     )
-    from langchain_community.chat_loaders.gmail import (
-        GMailLoader,
-    )
     from langchain_community.chat_loaders.imessage import (
         IMessageChatLoader,
     )
@@ -52,7 +49,6 @@ if TYPE_CHECKING:
 __all__ = [
     "BaseChatLoader",
     "FolderFacebookMessengerChatLoader",
-    "GMailLoader",
     "IMessageChatLoader",
     "LangSmithDatasetChatLoader",
     "LangSmithRunChatLoader",
@@ -65,7 +61,6 @@ __all__ = [
 _module_lookup = {
     "BaseChatLoader": "langchain_core.chat_loaders",
     "FolderFacebookMessengerChatLoader": "langchain_community.chat_loaders.facebook_messenger",  # noqa: E501
-    "GMailLoader": "langchain_community.chat_loaders.gmail",
     "IMessageChatLoader": "langchain_community.chat_loaders.imessage",
     "LangSmithDatasetChatLoader": "langchain_community.chat_loaders.langsmith",
     "LangSmithRunChatLoader": "langchain_community.chat_loaders.langsmith",
