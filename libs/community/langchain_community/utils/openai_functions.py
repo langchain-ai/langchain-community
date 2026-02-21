@@ -1,4 +1,4 @@
-# these stubs are just for backwards compatibility
+# These are just for backwards compatibility
 
 from langchain_core.utils.function_calling import (
     FunctionDescription,
