@@ -103,9 +103,6 @@ if TYPE_CHECKING:
     from langchain_community.retrievers.pubmed import (
         PubMedRetriever,
     )
-    from langchain_community.retrievers.qdrant_sparse_vector_retriever import (
-        QdrantSparseVectorRetriever,
-    )
     from langchain_community.retrievers.rememberizer import (
         RememberizerRetriever,
     )
@@ -178,7 +175,6 @@ _module_lookup = {
     "OutlineRetriever": "langchain_community.retrievers.outline",
     "PineconeHybridSearchRetriever": "langchain_community.retrievers.pinecone_hybrid_search",  # noqa: E501
     "PubMedRetriever": "langchain_community.retrievers.pubmed",
-    "QdrantSparseVectorRetriever": "langchain_community.retrievers.qdrant_sparse_vector_retriever",  # noqa: E501
     "RememberizerRetriever": "langchain_community.retrievers.rememberizer",
     "RemoteLangChainRetriever": "langchain_community.retrievers.remote_retriever",
     "SVMRetriever": "langchain_community.retrievers.svm",
@@ -236,7 +232,6 @@ __all__ = [
     "OutlineRetriever",
     "PineconeHybridSearchRetriever",
     "PubMedRetriever",
-    "QdrantSparseVectorRetriever",
     "RememberizerRetriever",
     "RemoteLangChainRetriever",
     "SVMRetriever",

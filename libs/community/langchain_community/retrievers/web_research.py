@@ -20,7 +20,7 @@ from pydantic import BaseModel, Field
 from langchain_community.document_loaders import AsyncHtmlLoader
 from langchain_community.document_transformers import Html2TextTransformer
 from langchain_community.llms import LlamaCpp
-from langchain_community.utilities import GoogleSearchAPIWrapper
+from langchain_community.utilities.google_search import GoogleSearchAPIWrapper
 
 logger = logging.getLogger(__name__)
 
@@ -82,12 +82,12 @@ class WebResearchRetriever(BaseRetriever):
     )
 
     allow_dangerous_requests: bool = False
-    """A flag to force users to acknowledge the risks of SSRF attacks when using 
+    """A flag to force users to acknowledge the risks of SSRF attacks when using
     this retriever.
-    
+
     Users should set this flag to `True` if they have taken the necessary precautions
     to prevent SSRF attacks when using this retriever.
-    
+
     For example, users can run the requests through a properly configured
     proxy and prevent the crawler from accidentally crawling internal resources.
     """

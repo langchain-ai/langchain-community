@@ -3,20 +3,6 @@
 One of the most common ways to store and search over unstructured data is to
 embed it and store the resulting embedding vectors, and then query the store
 and retrieve the data that are 'most similar' to the embedded query.
-
-**Class hierarchy:**
-
-.. code-block::
-
-    VectorStore --> <name>  # Examples: Annoy, FAISS, Milvus
-
-    BaseRetriever --> VectorStoreRetriever --> <name>Retriever  # Example: VespaRetriever
-
-**Main helpers:**
-
-.. code-block::
-
-    Embeddings, Document
 """  # noqa: E501
 
 import importlib
@@ -95,12 +81,6 @@ if TYPE_CHECKING:
     from langchain_community.vectorstores.dashvector import (
         DashVector,
     )
-    from langchain_community.vectorstores.databricks_vector_search import (
-        DatabricksVectorSearch,
-    )
-    from langchain_community.vectorstores.deeplake import (
-        DeepLake,
-    )
     from langchain_community.vectorstores.dingo import (
         Dingo,
     )
@@ -129,9 +109,6 @@ if TYPE_CHECKING:
     )
     from langchain_community.vectorstores.faiss import (
         FAISS,
-    )
-    from langchain_community.vectorstores.hanavector import (
-        HanaDB,
     )
     from langchain_community.vectorstores.hologres import (
         Hologres,
@@ -166,33 +143,18 @@ if TYPE_CHECKING:
     from langchain_community.vectorstores.marqo import (
         Marqo,
     )
-    from langchain_community.vectorstores.matching_engine import (
-        MatchingEngine,
-    )
     from langchain_community.vectorstores.meilisearch import (
         Meilisearch,
     )
-    from langchain_community.vectorstores.milvus import (
-        Milvus,
-    )
     from langchain_community.vectorstores.momento_vector_index import (
         MomentoVectorIndex,
-    )
-    from langchain_community.vectorstores.mongodb_atlas import (
-        MongoDBAtlasVectorSearch,
     )
     from langchain_community.vectorstores.myscale import (
         MyScale,
         MyScaleSettings,
     )
-    from langchain_community.vectorstores.neo4j_vector import (
-        Neo4jVector,
-    )
     from langchain_community.vectorstores.opensearch_vector_search import (
         OpenSearchVectorSearch,
-    )
-    from langchain_community.vectorstores.oraclevs import (
-        OracleVS,
     )
     from langchain_community.vectorstores.pathway import (
         PathwayVectorClient,
@@ -202,12 +164,6 @@ if TYPE_CHECKING:
     )
     from langchain_community.vectorstores.pgvector import (
         PGVector,
-    )
-    from langchain_community.vectorstores.pinecone import (
-        Pinecone,
-    )
-    from langchain_community.vectorstores.qdrant import (
-        Qdrant,
     )
     from langchain_community.vectorstores.redis import (
         Redis,
@@ -279,9 +235,6 @@ if TYPE_CHECKING:
     from langchain_community.vectorstores.vald import (
         Vald,
     )
-    from langchain_community.vectorstores.vdms import (
-        VDMS,
-    )
     from langchain_community.vectorstores.vearch import (
         Vearch,
     )
@@ -293,9 +246,6 @@ if TYPE_CHECKING:
     )
     from langchain_community.vectorstores.vlite import (
         VLite,
-    )
-    from langchain_community.vectorstores.weaviate import (
-        Weaviate,
     )
     from langchain_community.vectorstores.yellowbrick import (
         Yellowbrick,
@@ -335,8 +285,6 @@ __all__ = [
     "ClickhouseSettings",
     "CouchbaseVectorStore",
     "DashVector",
-    "DatabricksVectorSearch",
-    "DeepLake",
     "Dingo",
     "DistanceStrategy",
     "DocArrayHnswSearch",
@@ -349,7 +297,6 @@ __all__ = [
     "ElasticsearchStore",
     "Epsilla",
     "FAISS",
-    "HanaDB",
     "Hologres",
     "InMemoryVectorStore",
     "InfinispanVS",
@@ -362,23 +309,16 @@ __all__ = [
     "ManticoreSearch",
     "ManticoreSearchSettings",
     "Marqo",
-    "MatchingEngine",
     "Meilisearch",
-    "Milvus",
     "MomentoVectorIndex",
-    "MongoDBAtlasVectorSearch",
     "MyScale",
     "MyScaleSettings",
-    "Neo4jVector",
     "NeuralDBClientVectorStore",
     "NeuralDBVectorStore",
-    "OracleVS",
     "OpenSearchVectorSearch",
     "PGEmbedding",
     "PGVector",
     "PathwayVectorClient",
-    "Pinecone",
-    "Qdrant",
     "Redis",
     "Relyt",
     "Rockset",
@@ -400,14 +340,12 @@ __all__ = [
     "Typesense",
     "UpstashVectorStore",
     "USearch",
-    "VDMS",
     "Vald",
     "Vearch",
     "Vectara",
     "VectorStore",
     "VespaStore",
     "VLite",
-    "Weaviate",
     "Yellowbrick",
     "ZepVectorStore",
     "ZepCloudVectorStore",
@@ -439,8 +377,6 @@ _module_lookup = {
     "ClickhouseSettings": "langchain_community.vectorstores.clickhouse",
     "CouchbaseVectorStore": "langchain_community.vectorstores.couchbase",
     "DashVector": "langchain_community.vectorstores.dashvector",
-    "DatabricksVectorSearch": "langchain_community.vectorstores.databricks_vector_search",  # noqa: E501
-    "DeepLake": "langchain_community.vectorstores.deeplake",
     "Dingo": "langchain_community.vectorstores.dingo",
     "DistanceStrategy": "langchain_community.vectorstores.kinetica",
     "DocArrayHnswSearch": "langchain_community.vectorstores.docarray",
@@ -453,7 +389,6 @@ _module_lookup = {
     "ElasticsearchStore": "langchain_community.vectorstores.elasticsearch",
     "Epsilla": "langchain_community.vectorstores.epsilla",
     "FAISS": "langchain_community.vectorstores.faiss",
-    "HanaDB": "langchain_community.vectorstores.hanavector",
     "Hologres": "langchain_community.vectorstores.hologres",
     "InfinispanVS": "langchain_community.vectorstores.infinispanvs",
     "InMemoryVectorStore": "langchain_community.vectorstores.inmemory",
@@ -466,23 +401,16 @@ _module_lookup = {
     "ManticoreSearch": "langchain_community.vectorstores.manticore_search",
     "ManticoreSearchSettings": "langchain_community.vectorstores.manticore_search",
     "Marqo": "langchain_community.vectorstores.marqo",
-    "MatchingEngine": "langchain_community.vectorstores.matching_engine",
     "Meilisearch": "langchain_community.vectorstores.meilisearch",
-    "Milvus": "langchain_community.vectorstores.milvus",
     "MomentoVectorIndex": "langchain_community.vectorstores.momento_vector_index",
-    "MongoDBAtlasVectorSearch": "langchain_community.vectorstores.mongodb_atlas",
     "MyScale": "langchain_community.vectorstores.myscale",
     "MyScaleSettings": "langchain_community.vectorstores.myscale",
-    "Neo4jVector": "langchain_community.vectorstores.neo4j_vector",
     "NeuralDBClientVectorStore": "langchain_community.vectorstores.thirdai_neuraldb",
     "NeuralDBVectorStore": "langchain_community.vectorstores.thirdai_neuraldb",
     "OpenSearchVectorSearch": "langchain_community.vectorstores.opensearch_vector_search",  # noqa: E501
-    "OracleVS": "langchain_community.vectorstores.oraclevs",
     "PathwayVectorClient": "langchain_community.vectorstores.pathway",
     "PGEmbedding": "langchain_community.vectorstores.pgembedding",
     "PGVector": "langchain_community.vectorstores.pgvector",
-    "Pinecone": "langchain_community.vectorstores.pinecone",
-    "Qdrant": "langchain_community.vectorstores.qdrant",
     "Redis": "langchain_community.vectorstores.redis",
     "Relyt": "langchain_community.vectorstores.relyt",
     "Rockset": "langchain_community.vectorstores.rocksetdb",
@@ -505,13 +433,11 @@ _module_lookup = {
     "UpstashVectorStore": "langchain_community.vectorstores.upstash",
     "USearch": "langchain_community.vectorstores.usearch",
     "Vald": "langchain_community.vectorstores.vald",
-    "VDMS": "langchain_community.vectorstores.vdms",
     "Vearch": "langchain_community.vectorstores.vearch",
     "Vectara": "langchain_community.vectorstores.vectara",
     "VectorStore": "langchain_core.vectorstores",
     "VespaStore": "langchain_community.vectorstores.vespa",
     "VLite": "langchain_community.vectorstores.vlite",
-    "Weaviate": "langchain_community.vectorstores.weaviate",
     "Yellowbrick": "langchain_community.vectorstores.yellowbrick",
     "ZepVectorStore": "langchain_community.vectorstores.zep",
     "ZepCloudVectorStore": "langchain_community.vectorstores.zep_cloud",

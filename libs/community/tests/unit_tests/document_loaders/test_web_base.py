@@ -74,7 +74,7 @@ async def test_alazy_load(mock_get: Any) -> None:
     mock_response.text = mock_text
     mock_get.return_value.__aenter__.return_value = mock_response
 
-    loader = WebBaseLoader(web_paths=["https://www.example.com"])
+    loader = WebBaseLoader(web_paths=["https://www.example.com"], show_progress=False)
     results = []
     async for result in loader.alazy_load():
         results.append(result)
@@ -100,6 +100,7 @@ async def test_alazy_load(mock_get: Any) -> None:
     loader = WebBaseLoader(
         web_paths=["https://www.example.com"],
         bs_kwargs={"parse_only": bs4.SoupStrainer(class_="special-class")},
+        show_progress=False,
     )
     results = []
     async for result in loader.alazy_load():
@@ -121,6 +122,7 @@ def test_aload(mock_get: Any) -> None:
     loader = WebBaseLoader(
         web_paths=["https://www.example.com"],
         header_template={"User-Agent": "test-user-agent"},
+        show_progress=False,
     )
     results = loader.aload()
     assert len(results) == 1

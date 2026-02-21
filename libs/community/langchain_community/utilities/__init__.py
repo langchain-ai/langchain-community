@@ -1,7 +1,7 @@
-"""**Utilities** are the integrations with third-part systems and packages.
+"""**Utilities** are the integrations with third-party systems and packages.
 
-Other LangChain classes use **Utilities** to interact with third-part systems
-and packages.
+Other LangChain classes use **Utilities** to interact with third-party systems and
+packages.
 """
 
 import importlib
@@ -57,14 +57,8 @@ if TYPE_CHECKING:
     from langchain_community.utilities.google_lens import (
         GoogleLensAPIWrapper,
     )
-    from langchain_community.utilities.google_places_api import (
-        GooglePlacesAPIWrapper,
-    )
     from langchain_community.utilities.google_scholar import (
         GoogleScholarAPIWrapper,
-    )
-    from langchain_community.utilities.google_search import (
-        GoogleSearchAPIWrapper,
     )
     from langchain_community.utilities.google_serper import (
         GoogleSerperAPIWrapper,
@@ -109,9 +103,6 @@ if TYPE_CHECKING:
     )
     from langchain_community.utilities.openweathermap import (
         OpenWeatherMapAPIWrapper,
-    )
-    from langchain_community.utilities.oracleai import (
-        OracleSummary,
     )
     from langchain_community.utilities.outline import (
         OutlineAPIWrapper,
@@ -195,9 +186,7 @@ __all__ = [
     "GoogleFinanceAPIWrapper",
     "GoogleJobsAPIWrapper",
     "GoogleLensAPIWrapper",
-    "GooglePlacesAPIWrapper",
     "GoogleScholarAPIWrapper",
-    "GoogleSearchAPIWrapper",
     "GoogleSerperAPIWrapper",
     "GoogleTrendsAPIWrapper",
     "GraphQLAPIWrapper",
@@ -215,7 +204,6 @@ __all__ = [
     "NasaAPIWrapper",
     "NutritionAIAPI",
     "OpenWeatherMapAPIWrapper",
-    "OracleSummary",
     "OutlineAPIWrapper",
     "Portkey",
     "PowerBIDataset",
@@ -260,9 +248,7 @@ _module_lookup = {
     "GoogleFinanceAPIWrapper": "langchain_community.utilities.google_finance",
     "GoogleJobsAPIWrapper": "langchain_community.utilities.google_jobs",
     "GoogleLensAPIWrapper": "langchain_community.utilities.google_lens",
-    "GooglePlacesAPIWrapper": "langchain_community.utilities.google_places_api",
     "GoogleScholarAPIWrapper": "langchain_community.utilities.google_scholar",
-    "GoogleSearchAPIWrapper": "langchain_community.utilities.google_search",
     "GoogleSerperAPIWrapper": "langchain_community.utilities.google_serper",
     "GoogleTrendsAPIWrapper": "langchain_community.utilities.google_trends",
     "GraphQLAPIWrapper": "langchain_community.utilities.graphql",
@@ -279,7 +265,6 @@ _module_lookup = {
     "NasaAPIWrapper": "langchain_community.utilities.nasa",
     "NutritionAIAPI": "langchain_community.utilities.passio_nutrition_ai",
     "OpenWeatherMapAPIWrapper": "langchain_community.utilities.openweathermap",
-    "OracleSummary": "langchain_community.utilities.oracleai",
     "OutlineAPIWrapper": "langchain_community.utilities.outline",
     "Portkey": "langchain_community.utilities.portkey",
     "PowerBIDataset": "langchain_community.utilities.powerbi",

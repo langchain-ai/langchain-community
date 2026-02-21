@@ -19,9 +19,6 @@ import importlib
 from typing import TYPE_CHECKING, Any
 
 if TYPE_CHECKING:
-    from langchain_community.chat_message_histories.astradb import (
-        AstraDBChatMessageHistory,
-    )
     from langchain_community.chat_message_histories.cassandra import (
         CassandraChatMessageHistory,
     )
@@ -48,12 +45,6 @@ if TYPE_CHECKING:
     )
     from langchain_community.chat_message_histories.momento import (
         MomentoChatMessageHistory,
-    )
-    from langchain_community.chat_message_histories.mongodb import (
-        MongoDBChatMessageHistory,
-    )
-    from langchain_community.chat_message_histories.neo4j import (
-        Neo4jChatMessageHistory,
     )
     from langchain_community.chat_message_histories.postgres import (
         PostgresChatMessageHistory,
@@ -90,7 +81,6 @@ if TYPE_CHECKING:
     )
 
 __all__ = [
-    "AstraDBChatMessageHistory",
     "CassandraChatMessageHistory",
     "ChatMessageHistory",
     "CosmosDBChatMessageHistory",
@@ -99,8 +89,6 @@ __all__ = [
     "FileChatMessageHistory",
     "FirestoreChatMessageHistory",
     "MomentoChatMessageHistory",
-    "MongoDBChatMessageHistory",
-    "Neo4jChatMessageHistory",
     "PostgresChatMessageHistory",
     "RedisChatMessageHistory",
     "RocksetChatMessageHistory",
@@ -116,7 +104,6 @@ __all__ = [
 ]
 
 _module_lookup = {
-    "AstraDBChatMessageHistory": "langchain_community.chat_message_histories.astradb",
     "CassandraChatMessageHistory": "langchain_community.chat_message_histories.cassandra",  # noqa: E501
     "ChatMessageHistory": "langchain_community.chat_message_histories.in_memory",
     "CosmosDBChatMessageHistory": "langchain_community.chat_message_histories.cosmos_db",  # noqa: E501
@@ -125,8 +112,6 @@ _module_lookup = {
     "FileChatMessageHistory": "langchain_community.chat_message_histories.file",
     "FirestoreChatMessageHistory": "langchain_community.chat_message_histories.firestore",  # noqa: E501
     "MomentoChatMessageHistory": "langchain_community.chat_message_histories.momento",
-    "MongoDBChatMessageHistory": "langchain_community.chat_message_histories.mongodb",
-    "Neo4jChatMessageHistory": "langchain_community.chat_message_histories.neo4j",
     "PostgresChatMessageHistory": "langchain_community.chat_message_histories.postgres",
     "RedisChatMessageHistory": "langchain_community.chat_message_histories.redis",
     "RocksetChatMessageHistory": "langchain_community.chat_message_histories.rocksetdb",
