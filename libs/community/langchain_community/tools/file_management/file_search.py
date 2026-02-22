@@ -2,7 +2,10 @@ import fnmatch
 import os
 from typing import Optional, Type
 
-from langchain_core.callbacks import CallbackManagerForToolRun
+from langchain_core.callbacks import (
+    AsyncCallbackManagerForToolRun,
+    CallbackManagerForToolRun,
+)
 from langchain_core.tools import BaseTool
 from pydantic import BaseModel, Field
 
@@ -59,4 +62,33 @@ class FileSearchTool(BaseFileToolMixin, BaseTool):
         except Exception as e:
             return "Error: " + str(e)
 
-    # TODO: Add aiofiles method
+    async def _arun(
+        self,
+        pattern: str,
+        dir_path: str = ".",
+        run_manager: Optional[AsyncCallbackManagerForToolRun] = None,
+    ) -> str:
+        try:
+            dir_path_ = self.get_relative_path(dir_path)
+        except FileValidationError:
+            return INVALID_PATH_TEMPLATE.format(arg_name="dir_path", value=dir_path)
+        matches = []
+        try:
+            import asyncio
+
+            def _walk() -> list[str]:
+                result = []
+                for root, _, filenames in os.walk(dir_path_):
+                    for filename in fnmatch.filter(filenames, pattern):
+                        absolute_path = os.path.join(root, filename)
+                        relative_path = os.path.relpath(absolute_path, dir_path_)
+                        result.append(relative_path)
+                return result
+
+            matches = await asyncio.to_thread(_walk)
+            if matches:
+                return "\n".join(matches)
+            else:
+                return f"No files found for pattern {pattern} in directory {dir_path}"
+        except Exception as e:
+            return "Error: " + str(e)

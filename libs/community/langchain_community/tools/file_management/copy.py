@@ -1,7 +1,10 @@
 import shutil
 from typing import Optional, Type
 
-from langchain_core.callbacks import CallbackManagerForToolRun
+from langchain_core.callbacks import (
+    AsyncCallbackManagerForToolRun,
+    CallbackManagerForToolRun,
+)
 from langchain_core.tools import BaseTool
 from pydantic import BaseModel, Field
 
@@ -50,4 +53,30 @@ class CopyFileTool(BaseFileToolMixin, BaseTool):
         except Exception as e:
             return "Error: " + str(e)
 
-    # TODO: Add aiofiles method
+    async def _arun(
+        self,
+        source_path: str,
+        destination_path: str,
+        run_manager: Optional[AsyncCallbackManagerForToolRun] = None,
+    ) -> str:
+        try:
+            source_path_ = self.get_relative_path(source_path)
+        except FileValidationError:
+            return INVALID_PATH_TEMPLATE.format(
+                arg_name="source_path", value=source_path
+            )
+        try:
+            destination_path_ = self.get_relative_path(destination_path)
+        except FileValidationError:
+            return INVALID_PATH_TEMPLATE.format(
+                arg_name="destination_path", value=destination_path
+            )
+        try:
+            import asyncio
+
+            await asyncio.to_thread(
+                shutil.copy2, source_path_, destination_path_, follow_symlinks=False
+            )
+            return f"File copied successfully from {source_path} to {destination_path}."
+        except Exception as e:
+            return "Error: " + str(e)

@@ -226,6 +226,17 @@ class ChatOpenAI(BaseChatModel):
         """Return whether this model can be serialized by Langchain."""
         return True
 
+    def __repr__(self) -> str:
+        """Mask API key in repr to prevent secret leakage."""
+        attrs = {
+            "model_name": self.model_name,
+            "temperature": self.temperature,
+            "openai_api_key": "***" if self.openai_api_key else None,
+            "openai_proxy": self.openai_proxy,
+        }
+        filtered = ", ".join(f"{k}={v!r}" for k, v in attrs.items() if v is not None)
+        return f"ChatOpenAI({filtered})"
+
     client: Any = Field(default=None, exclude=True)
     async_client: Any = Field(default=None, exclude=True)
     model_name: str = Field(default="gpt-3.5-turbo", alias="model")

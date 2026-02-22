@@ -1,6 +1,9 @@
 from typing import Optional, Type
 
-from langchain_core.callbacks import CallbackManagerForToolRun
+from langchain_core.callbacks import (
+    AsyncCallbackManagerForToolRun,
+    CallbackManagerForToolRun,
+)
 from langchain_core.tools import BaseTool
 from pydantic import BaseModel, Field
 
@@ -48,4 +51,24 @@ class WriteFileTool(BaseFileToolMixin, BaseTool):
         except Exception as e:
             return "Error: " + str(e)
 
-    # TODO: Add aiofiles method
+    async def _arun(
+        self,
+        file_path: str,
+        text: str,
+        append: bool = False,
+        run_manager: Optional[AsyncCallbackManagerForToolRun] = None,
+    ) -> str:
+        try:
+            write_path = self.get_relative_path(file_path)
+        except FileValidationError:
+            return INVALID_PATH_TEMPLATE.format(arg_name="file_path", value=file_path)
+        try:
+            import aiofiles
+
+            write_path.parent.mkdir(exist_ok=True, parents=True)
+            mode = "a" if append else "w"
+            async with aiofiles.open(write_path, mode, encoding="utf-8") as f:
+                await f.write(text)
+            return f"File written successfully to {file_path}."
+        except Exception as e:
+            return "Error: " + str(e)
