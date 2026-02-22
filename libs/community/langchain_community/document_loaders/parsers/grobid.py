@@ -47,6 +47,28 @@ class GrobidParser(BaseBlobParser):
                 "`bs4` package not found, please install it with `pip install bs4`"
             )
         soup = BeautifulSoup(xml_data, "xml")
+
+        # Extract header metadata (authors and publication year)
+        header = soup.find("teiHeader")
+        authors: List[str] = []
+        year = None
+        if header:
+            for author in header.find_all("author"):
+                persname = author.find("persName")
+                if persname:
+                    forename = persname.find("forename")
+                    surname = persname.find("surname")
+                    parts: List[str] = []
+                    if forename:
+                        parts.append(forename.text.strip())
+                    if surname:
+                        parts.append(surname.text.strip())
+                    if parts:
+                        authors.append(" ".join(parts))
+            date_tag = header.find("date", {"type": "published"})
+            if date_tag and date_tag.get("when"):
+                year = date_tag["when"][:4]
+
         sections = soup.find_all("div")
         titles = soup.find_all("title")
         if titles:
@@ -115,6 +137,8 @@ class GrobidParser(BaseBlobParser):
                         "section_number": str(chunk["section_number"]),
                         "paper_title": str(title),
                         "file_path": str(file_path),
+                        "authors": ", ".join(authors),
+                        "year": str(year) if year else "",
                     }
                 ),
             )
