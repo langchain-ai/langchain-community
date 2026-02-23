@@ -11,6 +11,9 @@ if TYPE_CHECKING:
     from langchain_community.utilities.alpha_vantage import (
         AlphaVantageAPIWrapper,
     )
+    from langchain_community.utilities.anakin import (
+        AnakinAPIWrapper,
+    )
     from langchain_community.utilities.apify import (
         ApifyWrapper,
     )
@@ -167,6 +170,7 @@ if TYPE_CHECKING:
 
 __all__ = [
     "AlphaVantageAPIWrapper",
+    "AnakinAPIWrapper",
     "ApifyWrapper",
     "ArceeWrapper",
     "ArxivAPIWrapper",
@@ -228,6 +232,7 @@ __all__ = [
 
 _module_lookup = {
     "AlphaVantageAPIWrapper": "langchain_community.utilities.alpha_vantage",
+    "AnakinAPIWrapper": "langchain_community.utilities.anakin",
     "ApifyWrapper": "langchain_community.utilities.apify",
     "ArceeWrapper": "langchain_community.utilities.arcee",
     "ArxivAPIWrapper": "langchain_community.utilities.arxiv",

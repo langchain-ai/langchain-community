@@ -47,6 +47,11 @@ if TYPE_CHECKING:
     from langchain_community.tools.ainetwork.value import (
         AINValueOps,
     )
+    from langchain_community.tools.anakin.tool import (
+        AnakinAgenticSearchTool,
+        AnakinScrapeTool,
+        AnakinSearchTool,
+    )
     from langchain_community.tools.arxiv.tool import (
         ArxivQueryRun,
     )
@@ -349,6 +354,9 @@ __all__ = [
     "AINRuleOps",
     "AINTransfer",
     "AINValueOps",
+    "AnakinAgenticSearchTool",
+    "AnakinScrapeTool",
+    "AnakinSearchTool",
     "AIPluginTool",
     "APIOperation",
     "ArxivQueryRun",
@@ -498,6 +506,9 @@ _module_lookup = {
     "AINRuleOps": "langchain_community.tools.ainetwork.rule",
     "AINTransfer": "langchain_community.tools.ainetwork.transfer",
     "AINValueOps": "langchain_community.tools.ainetwork.value",
+    "AnakinAgenticSearchTool": "langchain_community.tools.anakin.tool",
+    "AnakinScrapeTool": "langchain_community.tools.anakin.tool",
+    "AnakinSearchTool": "langchain_community.tools.anakin.tool",
     "AIPluginTool": "langchain_community.tools.plugin",
     "APIOperation": "langchain_community.tools.openapi.utils.api_models",
     "ArxivQueryRun": "langchain_community.tools.arxiv.tool",
