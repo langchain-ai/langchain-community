@@ -2,13 +2,14 @@
 
 from __future__ import annotations
 
-from unittest.mock import MagicMock, patch
+from unittest.mock import AsyncMock, MagicMock, patch
 
 from langchain_community.tools.anakin.tool import (
     AnakinAgenticSearchTool,
     AnakinScrapeTool,
     AnakinSearchTool,
 )
+from langchain_community.utilities.anakin import AnakinAPIWrapper
 
 # ------------------------------------------------------------------
 # AnakinScrapeTool
@@ -72,6 +73,32 @@ class TestAnakinScrapeTool:
         result = tool.invoke({"url": "https://example.com"})
         assert isinstance(result, str)
         assert "Scraped content." in result
+
+    async def test_arun_returns_markdown(self) -> None:
+        tool = AnakinScrapeTool(api_key="ak-test")
+        mock_ascrape = AsyncMock(
+            return_value={
+                "markdown": "# Async Page\n\nAsync scraped content.",
+            },
+        )
+        with patch.object(AnakinAPIWrapper, "ascrape", mock_ascrape):
+            result = await tool._arun(url="https://example.com")
+
+        assert isinstance(result, str)
+        assert "Async Page" in result
+        assert "Async scraped content." in result
+        mock_ascrape.assert_awaited_once_with("https://example.com", use_browser=False)
+
+    async def test_arun_with_browser(self) -> None:
+        tool = AnakinScrapeTool(api_key="ak-test")
+        mock_ascrape = AsyncMock(
+            return_value={"markdown": "Browser content."},
+        )
+        with patch.object(AnakinAPIWrapper, "ascrape", mock_ascrape):
+            result = await tool._arun(url="https://example.com", use_browser=True)
+
+        assert "Browser content." in result
+        mock_ascrape.assert_awaited_once_with("https://example.com", use_browser=True)
 
 
 # ------------------------------------------------------------------
@@ -147,6 +174,34 @@ class TestAnakinSearchTool:
         tool = AnakinSearchTool(api_key="ak-test")
         result = tool.invoke({"query": "test"})
         assert "Hit" in result
+
+    async def test_arun_returns_formatted_results(self) -> None:
+        tool = AnakinSearchTool(api_key="ak-test")
+        mock_asearch = AsyncMock(
+            return_value=[
+                {
+                    "title": "Async Result",
+                    "snippet": "Found asynchronously",
+                    "url": "https://async.com",
+                },
+            ],
+        )
+        with patch.object(AnakinAPIWrapper, "asearch", mock_asearch):
+            result = await tool._arun(query="async test")
+
+        assert isinstance(result, str)
+        assert "[1] Async Result" in result
+        assert "Found asynchronously" in result
+        assert "https://async.com" in result
+        mock_asearch.assert_awaited_once_with("async test", limit=5)
+
+    async def test_arun_empty_results(self) -> None:
+        tool = AnakinSearchTool(api_key="ak-test")
+        mock_asearch = AsyncMock(return_value=[])
+        with patch.object(AnakinAPIWrapper, "asearch", mock_asearch):
+            result = await tool._arun(query="nothing async")
+
+        assert result == "No results found."
 
 
 # ------------------------------------------------------------------
@@ -231,3 +286,27 @@ class TestAnakinAgenticSearchTool:
         tool = AnakinAgenticSearchTool(api_key="ak-test")
         result = tool.invoke({"query": "deep dive"})
         assert "Report content." in result
+
+    async def test_arun_returns_summary(self) -> None:
+        tool = AnakinAgenticSearchTool(api_key="ak-test")
+        mock_aagentic = AsyncMock(
+            return_value={
+                "generatedJson": {
+                    "summary": "Async deep research findings on the topic.",
+                },
+            },
+        )
+        with patch.object(AnakinAPIWrapper, "aagentic_search", mock_aagentic):
+            result = await tool._arun(query="async research")
+
+        assert isinstance(result, str)
+        assert "Async deep research findings" in result
+        mock_aagentic.assert_awaited_once_with("async research")
+
+    async def test_arun_no_summary_fallback(self) -> None:
+        tool = AnakinAgenticSearchTool(api_key="ak-test")
+        mock_aagentic = AsyncMock(return_value={"generatedJson": {}})
+        with patch.object(AnakinAPIWrapper, "aagentic_search", mock_aagentic):
+            result = await tool._arun(query="empty async")
+
+        assert result == "No summary available."

@@ -73,11 +73,16 @@ class TestAnakinLoaderIntegration:
         """Test deep agentic research.
 
         This is a long-running test (1-5 minutes).
+        The wrapper's built-in timeout (600s) prevents the test from
+        hanging indefinitely — it raises TimeoutError if the job
+        does not complete.
         """
         loader = AnakinLoader(
             query="What are the latest developments in LLM agents?",
             mode="agentic_search",
         )
+        # Explicit timeout guard: raise TimeoutError after 10 min max
+        loader.api_wrapper.timeout = 600
         docs = loader.load()
 
         assert len(docs) == 1
