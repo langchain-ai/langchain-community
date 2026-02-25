@@ -41,6 +41,14 @@ MODEL_COST_PER_1K_TOKENS = {
     # GPT-5-chat-latest output
     "gpt-5-chat-latest-completion": 0.01,
     "gpt-5-chat-latest-2025-08-07-completion": 0.01,
+    # GPT-5.2 input
+    "gpt-5.2": 0.00175,
+    "gpt-5.2-cached": 0.000175,
+    "gpt-5.2-2025-12-11": 0.00175,
+    "gpt-5.2-2025-12-11-cached": 0.000175,
+    # GPT-5.2 output
+    "gpt-5.2-completion": 0.014,
+    "gpt-5.2-2025-12-11-completion": 0.014,
     # GPT-4.1 input
     "gpt-4.1": 0.002,
     "gpt-4.1-2025-04-14": 0.002,
