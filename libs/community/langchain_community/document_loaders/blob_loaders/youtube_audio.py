@@ -1,4 +1,4 @@
-from typing import Iterable, List
+from typing import Iterator, List
 
 from langchain_community.document_loaders.blob_loaders import FileSystemBlobLoader
 from langchain_community.document_loaders.blob_loaders.schema import Blob, BlobLoader
@@ -14,7 +14,7 @@ class YoutubeAudioLoader(BlobLoader):
         self.urls = urls
         self.save_dir = save_dir
 
-    def yield_blobs(self) -> Iterable[Blob]:
+    def yield_blobs(self) -> Iterator[Blob]:
         """Yield audio blobs for each url."""
 
         try:

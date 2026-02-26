@@ -71,9 +71,14 @@ class ChatOctoAI(ChatOpenAI):
             "OCTOAI_API_BASE",
             default=DEFAULT_API_BASE,
         )
-        values["octoai_api_token"] = convert_to_secret_str(
-            get_from_dict_or_env(values, "octoai_api_token", "OCTOAI_API_TOKEN")
-        )
+        octoai_api_token = values.get("octoai_api_token") or ""
+        if isinstance(octoai_api_token, SecretStr):
+            token_str = octoai_api_token.get_secret_value()
+        else:
+            token_str = get_from_dict_or_env(
+                values, "octoai_api_token", "OCTOAI_API_TOKEN"
+            )
+        values["octoai_api_token"] = convert_to_secret_str(token_str)
         values["model_name"] = get_from_dict_or_env(
             values,
             "model_name",

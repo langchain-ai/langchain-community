@@ -115,9 +115,10 @@ class RocksetChatMessageHistory(BaseChatMessageHistory):
     def _wait_until_message_added(self, message_id: str) -> None:
         """Sleeps until a message is added to the messages list"""
         self._wait_until(
-            lambda message_id: len(
-                self._query(
-                    f"""
+            lambda message_id: (
+                len(
+                    self._query(
+                        f"""
                         SELECT * 
                         FROM UNNEST((
                             SELECT {self.messages_key}
@@ -127,11 +128,12 @@ class RocksetChatMessageHistory(BaseChatMessageHistory):
                         WHERE message.data.additional_kwargs.id = :message_id
                         LIMIT 1
                     """,
-                    session_id=self.session_id,
-                    message_id=message_id,
-                ),
-            )
-            != 0,
+                        session_id=self.session_id,
+                        message_id=message_id,
+                    ),
+                )
+                != 0
+            ),
             RocksetChatMessageHistory.ADD_TIMEOUT_MS,
             message_id=message_id,
         )
