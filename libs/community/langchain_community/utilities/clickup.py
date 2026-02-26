@@ -1,6 +1,7 @@
 """Util that calls clickup."""
 
 import json
+import logging
 import warnings
 from dataclasses import asdict, dataclass, fields
 from typing import Any, Dict, List, Mapping, Optional, Tuple, Type, Union
@@ -8,6 +9,8 @@ from typing import Any, Dict, List, Mapping, Optional, Tuple, Type, Union
 import requests
 from langchain_core.utils import get_from_dict_or_env
 from pydantic import BaseModel, ConfigDict, model_validator
+
+logger = logging.getLogger(__name__)
 
 DEFAULT_URL = "https://api.clickup.com/api/v2"
 
@@ -311,12 +314,16 @@ class ClickupAPIWrapper(BaseModel):
         data = response.json()
 
         if "access_token" not in data:
-            print(f"Error: {data}")  # noqa: T201
+            logger.warning(
+                "Failed to retrieve access token: %s",
+                data.get("ECODE", "unknown error"),
+            )
             if "ECODE" in data and data["ECODE"] == "OAUTH_014":
                 url = ClickupAPIWrapper.get_access_code_url(oauth_client_id)
-                print(  # noqa: T201
-                    "You already used this code once. Generate a new one.",
-                    f"Our best guess for the url to get a new code is:\n{url}",
+                logger.warning(
+                    "You already used this code once. Generate a new one. "
+                    "Our best guess for the url to get a new code is:\n%s",
+                    url,
                 )
             return None
 
