@@ -154,12 +154,16 @@ class DeepInfra(LLM):
     ) -> Iterator[GenerationChunk]:
         request = Requests(headers=self._headers())
         response = request.post(
-            url=self._url(), data=self._body(prompt, {**kwargs, "stream": True})
+            url=self._url(),
+            data=self._body(prompt, {**kwargs, "stream": True}),
+            stream=True,  # Enable HTTP-level streaming to prevent buffering
         )
-        response_text = response.text
-        self._handle_body_errors(response_text)
-        self._handle_status(response.status_code, response.text)
+        # Check HTTP status without reading the body (which would consume the stream)
+        self._handle_status(response.status_code, "")
         for line in _parse_stream(response.iter_lines()):
+            # Check for per-chunk errors streamed back by the server
+            if line and "error" in line:
+                self._handle_body_errors(line)
             chunk = _handle_sse_line(line)
             if chunk:
                 if run_manager:
@@ -177,10 +181,12 @@ class DeepInfra(LLM):
         async with request.apost(
             url=self._url(), data=self._body(prompt, {**kwargs, "stream": True})
         ) as response:
-            response_text = await response.text()
-            self._handle_body_errors(response_text)
-            self._handle_status(response.status, response.text)
+            # Check status without reading the body (which would consume the stream)
+            self._handle_status(response.status, "")
             async for line in _parse_stream_async(response.content):
+                # Check for per-chunk errors streamed back by the server
+                if line and "error" in line:
+                    self._handle_body_errors(line)
                 chunk = _handle_sse_line(line)
                 if chunk:
                     if run_manager:
