@@ -133,6 +133,63 @@ if TYPE_CHECKING:
     from langchain_community.tools.financial_datasets.income_statements import (
         IncomeStatements,
     )
+    from langchain_community.tools.insumer.attest import (
+        InsumerAttest,
+    )
+    from langchain_community.tools.insumer.batch_wallet_trust import (
+        InsumerBatchWalletTrust,
+    )
+    from langchain_community.tools.insumer.buy_credits import (
+        InsumerBuyCredits,
+    )
+    from langchain_community.tools.insumer.buy_merchant_credits import (
+        InsumerBuyMerchantCredits,
+    )
+    from langchain_community.tools.insumer.check_discount import (
+        InsumerCheckDiscount,
+    )
+    from langchain_community.tools.insumer.configure_nfts import (
+        InsumerConfigureNfts,
+    )
+    from langchain_community.tools.insumer.configure_settings import (
+        InsumerConfigureSettings,
+    )
+    from langchain_community.tools.insumer.configure_tokens import (
+        InsumerConfigureTokens,
+    )
+    from langchain_community.tools.insumer.confirm_payment import (
+        InsumerConfirmPayment,
+    )
+    from langchain_community.tools.insumer.create_merchant import (
+        InsumerCreateMerchant,
+    )
+    from langchain_community.tools.insumer.credits import (
+        InsumerCredits,
+    )
+    from langchain_community.tools.insumer.get_merchant import (
+        InsumerGetMerchant,
+    )
+    from langchain_community.tools.insumer.jwks import (
+        InsumerJwks,
+    )
+    from langchain_community.tools.insumer.list_merchants import (
+        InsumerListMerchants,
+    )
+    from langchain_community.tools.insumer.list_tokens import (
+        InsumerListTokens,
+    )
+    from langchain_community.tools.insumer.merchant_status import (
+        InsumerMerchantStatus,
+    )
+    from langchain_community.tools.insumer.publish_directory import (
+        InsumerPublishDirectory,
+    )
+    from langchain_community.tools.insumer.verify import (
+        InsumerVerify,
+    )
+    from langchain_community.tools.insumer.wallet_trust import (
+        InsumerWalletTrust,
+    )
     from langchain_community.tools.gmail import (
         GmailCreateDraft,
         GmailGetMessage,
@@ -411,6 +468,25 @@ __all__ = [
     "HumanInputRun",
     "IFTTTWebhook",
     "IncomeStatements",
+    "InsumerAttest",
+    "InsumerBatchWalletTrust",
+    "InsumerBuyCredits",
+    "InsumerBuyMerchantCredits",
+    "InsumerCheckDiscount",
+    "InsumerConfigureNfts",
+    "InsumerConfigureSettings",
+    "InsumerConfigureTokens",
+    "InsumerConfirmPayment",
+    "InsumerCreateMerchant",
+    "InsumerCredits",
+    "InsumerGetMerchant",
+    "InsumerJwks",
+    "InsumerListMerchants",
+    "InsumerListTokens",
+    "InsumerMerchantStatus",
+    "InsumerPublishDirectory",
+    "InsumerVerify",
+    "InsumerWalletTrust",
     "InfoPowerBITool",
     "InfoSQLDatabaseTool",
     "InfoSparkSQLTool",
@@ -562,6 +638,25 @@ _module_lookup = {
     "HumanInputRun": "langchain_community.tools.human.tool",
     "IFTTTWebhook": "langchain_community.tools.ifttt",
     "IncomeStatements": "langchain_community.tools.financial_datasets.income_statements",  # noqa: E501
+    "InsumerAttest": "langchain_community.tools.insumer.attest",
+    "InsumerBatchWalletTrust": "langchain_community.tools.insumer.batch_wallet_trust",
+    "InsumerBuyCredits": "langchain_community.tools.insumer.buy_credits",
+    "InsumerBuyMerchantCredits": "langchain_community.tools.insumer.buy_merchant_credits",  # noqa: E501
+    "InsumerCheckDiscount": "langchain_community.tools.insumer.check_discount",
+    "InsumerConfigureNfts": "langchain_community.tools.insumer.configure_nfts",
+    "InsumerConfigureSettings": "langchain_community.tools.insumer.configure_settings",
+    "InsumerConfigureTokens": "langchain_community.tools.insumer.configure_tokens",
+    "InsumerConfirmPayment": "langchain_community.tools.insumer.confirm_payment",
+    "InsumerCreateMerchant": "langchain_community.tools.insumer.create_merchant",
+    "InsumerCredits": "langchain_community.tools.insumer.credits",
+    "InsumerGetMerchant": "langchain_community.tools.insumer.get_merchant",
+    "InsumerJwks": "langchain_community.tools.insumer.jwks",
+    "InsumerListMerchants": "langchain_community.tools.insumer.list_merchants",
+    "InsumerListTokens": "langchain_community.tools.insumer.list_tokens",
+    "InsumerMerchantStatus": "langchain_community.tools.insumer.merchant_status",
+    "InsumerPublishDirectory": "langchain_community.tools.insumer.publish_directory",
+    "InsumerVerify": "langchain_community.tools.insumer.verify",
+    "InsumerWalletTrust": "langchain_community.tools.insumer.wallet_trust",
     "InfoPowerBITool": "langchain_community.tools.powerbi.tool",
     "InfoSQLDatabaseTool": "langchain_community.tools.sql_database.tool",
     "InfoSparkSQLTool": "langchain_community.tools.spark_sql.tool",

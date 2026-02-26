@@ -45,6 +45,9 @@ if TYPE_CHECKING:
     from langchain_community.utilities.golden_query import (
         GoldenQueryAPIWrapper,
     )
+    from langchain_community.utilities.insumer import (
+        InsumerAPIWrapper,
+    )
     from langchain_community.utilities.google_books import (
         GoogleBooksAPIWrapper,
     )
@@ -179,6 +182,7 @@ __all__ = [
     "DriaAPIWrapper",
     "DuckDuckGoSearchAPIWrapper",
     "GoldenQueryAPIWrapper",
+    "InsumerAPIWrapper",
     "GoogleBooksAPIWrapper",
     "GoogleFinanceAPIWrapper",
     "GoogleJobsAPIWrapper",
@@ -240,6 +244,7 @@ _module_lookup = {
     "DriaAPIWrapper": "langchain_community.utilities.dria_index",
     "DuckDuckGoSearchAPIWrapper": "langchain_community.utilities.duckduckgo_search",
     "GoldenQueryAPIWrapper": "langchain_community.utilities.golden_query",
+    "InsumerAPIWrapper": "langchain_community.utilities.insumer",
     "GoogleBooksAPIWrapper": "langchain_community.utilities.google_books",
     "GoogleFinanceAPIWrapper": "langchain_community.utilities.google_finance",
     "GoogleJobsAPIWrapper": "langchain_community.utilities.google_jobs",
