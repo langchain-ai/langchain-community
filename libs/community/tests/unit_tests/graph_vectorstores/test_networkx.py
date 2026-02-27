@@ -1,8 +1,16 @@
+from typing import Any, Dict, List
+
 import pytest
 from langchain_core.documents import Document
 
 from langchain_community.graph_vectorstores.links import METADATA_LINKS_KEY, Link
 from langchain_community.graph_vectorstores.networkx import documents_to_networkx
+
+
+def _get_edges(link_data: Dict[str, Any]) -> List[Any]:
+    """Get edges from node_link_data, supporting both old and new networkx."""
+    # networkx 3.6+ renamed 'links' to 'edges' in node_link_data output
+    return link_data.get("links", link_data.get("edges"))  # type: ignore[return-value]
 
 
 @pytest.mark.requires("networkx")
@@ -46,8 +54,9 @@ def test_documents_to_networkx() -> None:
         {"id": "tag_2", "label": "href:b"},
         {"id": "tag_3", "label": "kw:bar"},
     ]
-    link_data["links"].sort(key=lambda n: (n["source"], n["target"]))
-    assert link_data["links"] == [
+    edges = _get_edges(link_data)
+    edges.sort(key=lambda n: (n["source"], n["target"]))
+    assert edges == [
         {"source": "a", "target": "tag_1"},
         {"source": "b", "target": "tag_0"},
         {"source": "b", "target": "tag_1"},
@@ -70,8 +79,9 @@ def test_documents_to_networkx() -> None:
         {"id": "b", "text": "<some\n more content>"},
     ]
 
-    link_data["links"].sort(key=lambda n: (n["source"], n["target"]))
-    assert link_data["links"] == [
+    edges = _get_edges(link_data)
+    edges.sort(key=lambda n: (n["source"], n["target"]))
+    assert edges == [
         {"source": "a", "target": "b", "label": "['kw:foo']"},
         {"source": "b", "target": "a", "label": "['href:a', 'kw:foo']"},
     ]

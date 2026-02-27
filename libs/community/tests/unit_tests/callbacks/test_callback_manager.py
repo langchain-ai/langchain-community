@@ -18,7 +18,7 @@ def test_callback_manager_configure_context_vars(
     monkeypatch: pytest.MonkeyPatch,
 ) -> None:
     """Test callback manager configuration."""
-    ls_utils.get_env_var.cache_clear()
+    ls_utils.get_env_var.cache_clear()  # type: ignore[attr-defined]
     ls_utils.get_tracer_project.cache_clear()
     monkeypatch.setenv("LANGCHAIN_TRACING_V2", "true")
     monkeypatch.setenv("LANGCHAIN_TRACING", "false")

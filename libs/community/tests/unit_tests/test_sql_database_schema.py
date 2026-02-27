@@ -46,9 +46,19 @@ company = Table(
 )
 
 
-@pytest.mark.xfail(
-    version.parse(sa.__version__).major == 1, reason="SQLAlchemy 1.x issues"
+_SA_VERSION = version.parse(sa.__version__)
+
+# SQLAlchemy 2.0.45+ added pg_collation reflection queries that duckdb-engine
+# does not support yet. See: https://github.com/Mause/duckdb_engine/issues
+_DUCKDB_SA_COMPAT_XFAIL = pytest.mark.xfail(
+    _SA_VERSION >= version.parse("2.0.45"),
+    reason="duckdb-engine incompatible with SQLAlchemy 2.0.45+ column reflection",
+    strict=False,
 )
+
+
+@_DUCKDB_SA_COMPAT_XFAIL
+@pytest.mark.xfail(_SA_VERSION.major == 1, reason="SQLAlchemy 1.x issues")
 def test_table_info() -> None:
     """Test that table info is constructed properly."""
     engine = create_engine("duckdb:///:memory:")
@@ -71,9 +81,8 @@ def test_table_info() -> None:
     assert sorted(" ".join(output.split())) == sorted(" ".join(expected_output.split()))
 
 
-@pytest.mark.xfail(
-    version.parse(sa.__version__).major == 1, reason="SQLAlchemy 1.x issues"
-)
+@_DUCKDB_SA_COMPAT_XFAIL
+@pytest.mark.xfail(_SA_VERSION.major == 1, reason="SQLAlchemy 1.x issues")
 def test_sql_database_run() -> None:
     """Test that commands can be run successfully and returned in correct format."""
     engine = create_engine("duckdb:///:memory:")
@@ -82,22 +91,7 @@ def test_sql_database_run() -> None:
     with engine.begin() as conn:
         conn.execute(stmt)
 
-    with pytest.warns(Warning) as records:
-        db = SQLDatabase(engine, schema="schema_a")
-
-    # Metadata creation with duckdb raises 3 warnings at the moment about reflection.
-    # As a stop-gap to increase strictness of pytest to fail on warnings, we'll
-    # explicitly catch the warnings and assert that it's the one we expect.
-    # We may need to revisit at a later stage and determine why a warning is being
-    # raised here.
-    for record in records:
-        assert isinstance(record.message, Warning)
-    assert any(
-        isinstance(record.message, Warning)
-        and record.message.args[0]
-        == "duckdb-engine doesn't yet support reflection on indices"
-        for record in records
-    )
+    db = SQLDatabase(engine, schema="schema_a")
 
     command = 'select user_name from "user" where user_id = 13'
     output = db.run(command)
