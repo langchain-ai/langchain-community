@@ -286,9 +286,9 @@ class InsumerAPIWrapper(BaseModel):
     ) -> str:
         """Generate a structured wallet trust fact profile.
 
-        Checks 14 curated conditions across stablecoins (7 chains),
-        governance tokens (4), and NFTs (3). Costs 3 credits (standard)
-        or 6 credits (with proof="merkle").
+        Checks 17 curated conditions across stablecoins (7 chains),
+        governance tokens (4), NFTs (3), and staking (3). Costs 3 credits
+        (standard) or 6 credits (with proof="merkle").
 
         Args:
             wallet: EVM wallet address (0x...) to profile.

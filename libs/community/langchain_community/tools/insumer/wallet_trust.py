@@ -31,8 +31,8 @@ class InsumerWalletTrustSchema(BaseModel):
 class InsumerWalletTrust(BaseTool):
     """Generate a structured, ECDSA-signed wallet trust fact profile.
 
-    Checks 14 curated conditions across stablecoins (7 chains), governance
-    tokens (4), and NFTs (3). Returns per-dimension pass/fail counts.
+    Checks 17 curated conditions across stablecoins (7 chains), governance
+    tokens (4), NFTs (3), and staking (3). Returns per-dimension pass/fail counts.
     Costs 3 credits (standard) or 6 credits (with proof="merkle").
     """
 
@@ -40,8 +40,8 @@ class InsumerWalletTrust(BaseTool):
     name: str = "insumer_wallet_trust"
     description: str = (
         "Generate a wallet trust fact profile across stablecoins, governance "
-        "tokens, and NFTs. Returns 14 curated checks organized by dimension "
-        "with ECDSA-signed evidence. Costs 3 credits (6 with merkle proofs)."
+        "tokens, NFTs, and staking. Returns 17 curated checks organized by "
+        "dimension with ECDSA-signed evidence. Costs 3 credits (6 with merkle proofs)."
     )
     args_schema: Type[InsumerWalletTrustSchema] = InsumerWalletTrustSchema
 
