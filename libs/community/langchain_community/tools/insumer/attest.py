@@ -32,17 +32,19 @@ class InsumerAttestSchema(BaseModel):
     )
     conditions: str = Field(
         description=(
-            'JSON array of conditions. Each condition: {"type": "token_balance" or '
-            '"nft_ownership", "contractAddress": "0x...", "chainId": 1, '
-            '"threshold": 1000, "decimals": 6, "label": "USDC >= 1000"}. '
-            "Supports 31 chains including Ethereum (1), Base (8453), Polygon (137), "
-            'Arbitrum (42161), Solana ("solana"), and more. Max 10 conditions.'
+            'JSON array of conditions. Each condition: {"type": "token_balance", '
+            '"nft_ownership", or "eas_attestation", "contractAddress": "0x...", '
+            '"chainId": 1, "threshold": 1000, "decimals": 6, "label": "..."}. '
+            "For EAS attestations, use type \"eas_attestation\" with either "
+            '"template": "coinbase_verified_account" (or coinbase_verified_country, '
+            'coinbase_one) or raw "schemaId". No contractAddress/threshold needed. '
+            "Supports 31 chains. Max 10 conditions."
         ),
     )
 
 
 class InsumerAttest(BaseTool):
-    """Verify on-chain token balances or NFT ownership with a signed attestation.
+    """Verify on-chain token balances, NFT ownership, or EAS attestations.
 
     Returns only true/false per condition -- never exposes actual balances.
     The response includes an ECDSA P-256 signature for cryptographic proof.
@@ -52,10 +54,11 @@ class InsumerAttest(BaseTool):
     mode: str = "attest"
     name: str = "insumer_attest"
     description: str = (
-        "Verify on-chain conditions (token balances, NFT ownership) across 31 "
-        "blockchains. Returns a cryptographically signed true/false attestation "
-        "without exposing actual wallet balances. Use this when you need to check "
-        "if a wallet holds a specific token or NFT. Costs 1 attestation credit. "
+        "Verify on-chain conditions (token balances, NFT ownership, EAS "
+        "attestations) across 31 blockchains. Returns a cryptographically signed "
+        "true/false attestation without exposing actual wallet balances. For EAS "
+        "attestations (e.g. Coinbase Verifications KYC), use compliance templates "
+        "or raw schema IDs. Costs 1 credit. "
         'Pass proof="merkle" for EIP-1186 Merkle storage proofs (2 credits).'
     )
     args_schema: Type[InsumerAttestSchema] = InsumerAttestSchema

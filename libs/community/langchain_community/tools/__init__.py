@@ -148,6 +148,9 @@ if TYPE_CHECKING:
     from langchain_community.tools.insumer.check_discount import (
         InsumerCheckDiscount,
     )
+    from langchain_community.tools.insumer.compliance_templates import (
+        InsumerComplianceTemplates,
+    )
     from langchain_community.tools.insumer.configure_nfts import (
         InsumerConfigureNfts,
     )
@@ -643,6 +646,7 @@ _module_lookup = {
     "InsumerBuyCredits": "langchain_community.tools.insumer.buy_credits",
     "InsumerBuyMerchantCredits": "langchain_community.tools.insumer.buy_merchant_credits",  # noqa: E501
     "InsumerCheckDiscount": "langchain_community.tools.insumer.check_discount",
+    "InsumerComplianceTemplates": "langchain_community.tools.insumer.compliance_templates",  # noqa: E501
     "InsumerConfigureNfts": "langchain_community.tools.insumer.configure_nfts",
     "InsumerConfigureSettings": "langchain_community.tools.insumer.configure_settings",
     "InsumerConfigureTokens": "langchain_community.tools.insumer.configure_tokens",

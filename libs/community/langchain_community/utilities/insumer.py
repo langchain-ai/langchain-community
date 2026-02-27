@@ -19,8 +19,8 @@ class InsumerAPIWrapper(BaseModel):
     """Wrapper for The Insumer Model Attestation API.
 
     Privacy-preserving on-chain verification across 31 blockchains.
-    Verifies token balances and NFT ownership without exposing actual
-    wallet balances.
+    Verifies token balances, NFT ownership, and EAS attestations
+    without exposing actual wallet balances.
 
     Args:
         insumer_api_key: API key in format ``insr_live_`` + 40 hex chars.
@@ -66,7 +66,8 @@ class InsumerAPIWrapper(BaseModel):
 
         Args:
             conditions: Condition dicts with type, contractAddress, chainId,
-                threshold, decimals, and label fields.
+                threshold, decimals, and label fields. For EAS attestations,
+                use type "eas_attestation" with template or schemaId.
             wallet: EVM wallet address (0x...).
             solana_wallet: Solana wallet address (base58).
             proof: Set to "merkle" for EIP-1186 Merkle storage proofs.
@@ -258,6 +259,21 @@ class InsumerAPIWrapper(BaseModel):
         """
         response = requests.get(
             f"{INSUMER_BASE_URL}/jwks",
+            timeout=30,
+        )
+        return json.dumps(response.json())
+
+    def get_compliance_templates(self) -> str:
+        """List available EAS compliance templates.
+
+        Returns pre-configured schema IDs for KYC/identity providers
+        (e.g. Coinbase Verifications on Base). No auth or credits required.
+
+        Returns:
+            JSON string with available compliance templates.
+        """
+        response = requests.get(
+            f"{INSUMER_BASE_URL}/compliance/templates",
             timeout=30,
         )
         return json.dumps(response.json())
@@ -602,6 +618,8 @@ class InsumerAPIWrapper(BaseModel):
             )
         elif mode == "get_jwks":
             return self.get_jwks()
+        elif mode == "get_compliance_templates":
+            return self.get_compliance_templates()
         elif mode == "wallet_trust":
             return self.wallet_trust(
                 wallet=kwargs["wallet"],

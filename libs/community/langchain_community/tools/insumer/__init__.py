@@ -8,6 +8,9 @@ from langchain_community.tools.insumer.buy_credits import InsumerBuyCredits
 from langchain_community.tools.insumer.buy_merchant_credits import (
     InsumerBuyMerchantCredits,
 )
+from langchain_community.tools.insumer.compliance_templates import (
+    InsumerComplianceTemplates,
+)
 from langchain_community.tools.insumer.check_discount import InsumerCheckDiscount
 from langchain_community.tools.insumer.configure_nfts import InsumerConfigureNfts
 from langchain_community.tools.insumer.configure_settings import (
@@ -32,6 +35,7 @@ __all__ = [
     "InsumerBuyCredits",
     "InsumerBuyMerchantCredits",
     "InsumerCheckDiscount",
+    "InsumerComplianceTemplates",
     "InsumerConfigureNfts",
     "InsumerConfigureSettings",
     "InsumerConfigureTokens",
