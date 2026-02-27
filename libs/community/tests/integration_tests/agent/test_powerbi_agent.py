@@ -2,7 +2,7 @@ import pytest
 from langchain_core.utils import get_from_env
 
 from langchain_community.agent_toolkits import PowerBIToolkit, create_pbi_agent
-from langchain_community.chat_models import ChatOpenAI
+from langchain_community.chat_models.openai import ChatOpenAI
 from langchain_community.utilities.powerbi import PowerBIDataset
 
 
@@ -26,11 +26,9 @@ def test_daxquery() -> None:
     NUM_ROWS = get_from_env("", "POWERBI_NUMROWS")
 
     fast_llm = ChatOpenAI(
-        temperature=0.5, max_tokens=1000, model_name="gpt-3.5-turbo", verbose=True
-    )  # type: ignore[call-arg]
-    smart_llm = ChatOpenAI(
-        temperature=0, max_tokens=100, model_name="gpt-4", verbose=True
-    )  # type: ignore[call-arg]
+        temperature=0.5, max_tokens=1000, model="gpt-3.5-turbo", verbose=True
+    )
+    smart_llm = ChatOpenAI(temperature=0, max_tokens=100, model="gpt-4", verbose=True)
 
     toolkit = PowerBIToolkit(
         powerbi=PowerBIDataset(

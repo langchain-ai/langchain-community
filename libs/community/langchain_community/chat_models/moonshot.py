@@ -8,7 +8,7 @@ from langchain_core.utils import (
     pre_init,
 )
 
-from langchain_community.chat_models import ChatOpenAI
+from langchain_community.chat_models.openai import ChatOpenAI
 from langchain_community.llms.moonshot import MOONSHOT_SERVICE_URL_BASE, MoonshotCommon
 
 

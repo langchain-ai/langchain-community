@@ -13,7 +13,7 @@ from langsmith import Client as Client
 from langsmith.evaluation import run_evaluator
 from langsmith.schemas import DataType, Example, Run
 
-from langchain_community.chat_models import ChatOpenAI
+from langchain_community.chat_models.openai import ChatOpenAI
 from langchain_community.llms.openai import OpenAI
 
 

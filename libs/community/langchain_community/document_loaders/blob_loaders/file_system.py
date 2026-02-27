@@ -114,7 +114,7 @@ class FileSystemBlobLoader(BlobLoader):
 
     def yield_blobs(
         self,
-    ) -> Iterable[Blob]:
+    ) -> Iterator[Blob]:
         """Yield blobs that match the requested pattern."""
         iterator = _make_iterator(
             length_func=self.count_matching_files, show_progress=self.show_progress
