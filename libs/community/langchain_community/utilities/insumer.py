@@ -12,7 +12,7 @@ import requests
 from langchain_core.utils import get_from_dict_or_env
 from pydantic import BaseModel
 
-INSUMER_BASE_URL = "https://us-central1-insumer-merchant.cloudfunctions.net/insumerApi/v1"
+INSUMER_BASE_URL = "https://api.insumermodel.com/v1"
 
 
 class InsumerAPIWrapper(BaseModel):
