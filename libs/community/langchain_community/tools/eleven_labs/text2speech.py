@@ -57,7 +57,7 @@ class ElevenLabsText2SpeechTool(BaseTool):
     ) -> str:
         """Use the tool."""
         elevenlabs = _import_elevenlabs()
-        client = elevenlabs.client.ElevenLabs()
+        client = elevenlabs.ElevenLabs()
         try:
             speech = client.text_to_speech.convert(
                 text=query,
@@ -87,7 +87,7 @@ class ElevenLabsText2SpeechTool(BaseTool):
         """Stream the text as speech as it is generated.
         Play the text in your speakers."""
         elevenlabs = _import_elevenlabs()
-        client = elevenlabs.client.ElevenLabs()
+        client = elevenlabs.ElevenLabs()
         speech_stream = client.text_to_speech.stream(
             text=query, model_id=self.model, voice_id=self.voice
         )
