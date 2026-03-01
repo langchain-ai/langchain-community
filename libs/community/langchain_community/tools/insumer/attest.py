@@ -30,7 +30,7 @@ class InsumerAttestSchema(BaseModel):
         description=(
             'Set to "merkle" to include EIP-1186 Merkle storage proofs in results. '
             "Proofs available for token_balance conditions on RPC chains "
-            "(1, 56, 8453, 43114, 137, 42161, 10, 88888, 1868, 98866). "
+            "(1, 56, 8453, 43114, 137, 42161, 10, 88888, 1868, 98866, 480). "
             "Costs 2 credits instead of 1. Reveals raw balance to caller."
         ),
     )
