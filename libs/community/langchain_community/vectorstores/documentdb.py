@@ -349,7 +349,6 @@ class DocumentDBVectorSearch(VectorStore):
             self.delete_document_by_id(document_id)
         return True
 
-    # FIX for issue #507: Updated to handle both custom string IDs and ObjectId strings
     def delete_document_by_id(self, document_id: Optional[str] = None) -> None:
         """Removes a Specific Document by Id
 
@@ -357,6 +356,7 @@ class DocumentDBVectorSearch(VectorStore):
             document_id: The document identifier
         """
         try:
+            from bson.errors import InvalidId
             from bson.objectid import ObjectId
         except ImportError as e:
             raise ImportError(
@@ -365,10 +365,9 @@ class DocumentDBVectorSearch(VectorStore):
         if document_id is None:
             raise ValueError("No document id provided to delete.")
 
-        # FIX for issue #507: Handle both ObjectId strings & custom IDs (e.g., SHA256)
+        # FIX for issue #507: Handle both ObjectId strings and custom IDs (e.g., SHA256)
         # Try to use ObjectId for 24-character hex strings (backward compatibility)
         # Otherwise use the ID as-is for custom IDs from Indexing API
-
         try:
             if len(document_id) == 24:
                 try:
@@ -378,10 +377,11 @@ class DocumentDBVectorSearch(VectorStore):
                     # Not a valid ObjectId, use as-is
                     self._collection.delete_one({"_id": document_id})
             else:
+                # Use custom ID directly (e.g., SHA256 hash from Indexing API)
                 self._collection.delete_one({"_id": document_id})
         except Exception:
-            # Let other exceptions propagate
-            raise
+            # Fallback: use the ID as-is
+            self._collection.delete_one({"_id": document_id})
 
     def _similarity_search_without_score(
         self,
