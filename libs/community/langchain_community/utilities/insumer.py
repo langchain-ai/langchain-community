@@ -18,7 +18,7 @@ INSUMER_BASE_URL = "https://api.insumermodel.com/v1"
 class InsumerAPIWrapper(BaseModel):
     """Wrapper for The Insumer Model Attestation API.
 
-    Privacy-preserving on-chain verification across 31 blockchains.
+    Privacy-preserving on-chain verification across 32 blockchains.
     Verifies token balances, NFT ownership, and EAS attestations
     without exposing actual wallet balances.
 

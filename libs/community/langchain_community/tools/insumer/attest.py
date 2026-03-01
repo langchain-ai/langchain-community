@@ -38,7 +38,7 @@ class InsumerAttestSchema(BaseModel):
             "For EAS attestations, use type \"eas_attestation\" with either "
             '"template": "coinbase_verified_account" (or coinbase_verified_country, '
             'coinbase_one) or raw "schemaId". No contractAddress/threshold needed. '
-            "Supports 31 chains. Max 10 conditions."
+            "Supports 32 chains. Max 10 conditions."
         ),
     )
 
@@ -55,7 +55,7 @@ class InsumerAttest(BaseTool):
     name: str = "insumer_attest"
     description: str = (
         "Verify on-chain conditions (token balances, NFT ownership, EAS "
-        "attestations) across 31 blockchains. Returns a cryptographically signed "
+        "attestations) across 32 blockchains. Returns a cryptographically signed "
         "true/false attestation without exposing actual wallet balances. For EAS "
         "attestations (e.g. Coinbase Verifications KYC), use compliance templates "
         "or raw schema IDs. Costs 1 credit. "
