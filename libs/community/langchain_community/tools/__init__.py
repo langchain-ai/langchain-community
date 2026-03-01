@@ -133,6 +133,9 @@ if TYPE_CHECKING:
     from langchain_community.tools.financial_datasets.income_statements import (
         IncomeStatements,
     )
+    from langchain_community.tools.insumer.acp_discount import (
+        InsumerAcpDiscount,
+    )
     from langchain_community.tools.insumer.attest import (
         InsumerAttest,
     )
@@ -187,8 +190,20 @@ if TYPE_CHECKING:
     from langchain_community.tools.insumer.publish_directory import (
         InsumerPublishDirectory,
     )
+    from langchain_community.tools.insumer.request_domain_verification import (
+        InsumerRequestDomainVerification,
+    )
+    from langchain_community.tools.insumer.ucp_discount import (
+        InsumerUcpDiscount,
+    )
+    from langchain_community.tools.insumer.validate_code import (
+        InsumerValidateCode,
+    )
     from langchain_community.tools.insumer.verify import (
         InsumerVerify,
+    )
+    from langchain_community.tools.insumer.verify_domain import (
+        InsumerVerifyDomain,
     )
     from langchain_community.tools.insumer.wallet_trust import (
         InsumerWalletTrust,
@@ -471,11 +486,13 @@ __all__ = [
     "HumanInputRun",
     "IFTTTWebhook",
     "IncomeStatements",
+    "InsumerAcpDiscount",
     "InsumerAttest",
     "InsumerBatchWalletTrust",
     "InsumerBuyCredits",
     "InsumerBuyMerchantCredits",
     "InsumerCheckDiscount",
+    "InsumerComplianceTemplates",
     "InsumerConfigureNfts",
     "InsumerConfigureSettings",
     "InsumerConfigureTokens",
@@ -488,7 +505,11 @@ __all__ = [
     "InsumerListTokens",
     "InsumerMerchantStatus",
     "InsumerPublishDirectory",
+    "InsumerRequestDomainVerification",
+    "InsumerUcpDiscount",
+    "InsumerValidateCode",
     "InsumerVerify",
+    "InsumerVerifyDomain",
     "InsumerWalletTrust",
     "InfoPowerBITool",
     "InfoSQLDatabaseTool",
@@ -641,6 +662,7 @@ _module_lookup = {
     "HumanInputRun": "langchain_community.tools.human.tool",
     "IFTTTWebhook": "langchain_community.tools.ifttt",
     "IncomeStatements": "langchain_community.tools.financial_datasets.income_statements",  # noqa: E501
+    "InsumerAcpDiscount": "langchain_community.tools.insumer.acp_discount",
     "InsumerAttest": "langchain_community.tools.insumer.attest",
     "InsumerBatchWalletTrust": "langchain_community.tools.insumer.batch_wallet_trust",
     "InsumerBuyCredits": "langchain_community.tools.insumer.buy_credits",
@@ -659,7 +681,11 @@ _module_lookup = {
     "InsumerListTokens": "langchain_community.tools.insumer.list_tokens",
     "InsumerMerchantStatus": "langchain_community.tools.insumer.merchant_status",
     "InsumerPublishDirectory": "langchain_community.tools.insumer.publish_directory",
+    "InsumerRequestDomainVerification": "langchain_community.tools.insumer.request_domain_verification",  # noqa: E501
+    "InsumerUcpDiscount": "langchain_community.tools.insumer.ucp_discount",
+    "InsumerValidateCode": "langchain_community.tools.insumer.validate_code",
     "InsumerVerify": "langchain_community.tools.insumer.verify",
+    "InsumerVerifyDomain": "langchain_community.tools.insumer.verify_domain",
     "InsumerWalletTrust": "langchain_community.tools.insumer.wallet_trust",
     "InfoPowerBITool": "langchain_community.tools.powerbi.tool",
     "InfoSQLDatabaseTool": "langchain_community.tools.sql_database.tool",

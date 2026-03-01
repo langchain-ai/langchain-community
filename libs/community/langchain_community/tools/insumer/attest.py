@@ -21,6 +21,10 @@ class InsumerAttestSchema(BaseModel):
         default=None,
         description="Solana wallet address (base58) to verify.",
     )
+    xrpl_wallet: Optional[str] = Field(
+        default=None,
+        description="XRPL wallet address (r-address) to verify.",
+    )
     proof: Optional[str] = Field(
         default=None,
         description=(
@@ -73,6 +77,7 @@ class InsumerAttest(BaseTool):
         conditions: str,
         wallet: Optional[str] = None,
         solana_wallet: Optional[str] = None,
+        xrpl_wallet: Optional[str] = None,
         proof: Optional[str] = None,
         run_manager: Optional[CallbackManagerForToolRun] = None,
     ) -> str:
@@ -83,5 +88,6 @@ class InsumerAttest(BaseTool):
             conditions=parsed_conditions,
             wallet=wallet,
             solana_wallet=solana_wallet,
+            xrpl_wallet=xrpl_wallet,
             proof=proof,
         )

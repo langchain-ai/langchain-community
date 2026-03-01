@@ -1,5 +1,6 @@
 """Insumer Model tools for on-chain verification and token-gated commerce."""
 
+from langchain_community.tools.insumer.acp_discount import InsumerAcpDiscount
 from langchain_community.tools.insumer.attest import InsumerAttest
 from langchain_community.tools.insumer.batch_wallet_trust import (
     InsumerBatchWalletTrust,
@@ -26,10 +27,17 @@ from langchain_community.tools.insumer.list_merchants import InsumerListMerchant
 from langchain_community.tools.insumer.list_tokens import InsumerListTokens
 from langchain_community.tools.insumer.merchant_status import InsumerMerchantStatus
 from langchain_community.tools.insumer.publish_directory import InsumerPublishDirectory
+from langchain_community.tools.insumer.request_domain_verification import (
+    InsumerRequestDomainVerification,
+)
+from langchain_community.tools.insumer.ucp_discount import InsumerUcpDiscount
+from langchain_community.tools.insumer.validate_code import InsumerValidateCode
 from langchain_community.tools.insumer.verify import InsumerVerify
+from langchain_community.tools.insumer.verify_domain import InsumerVerifyDomain
 from langchain_community.tools.insumer.wallet_trust import InsumerWalletTrust
 
 __all__ = [
+    "InsumerAcpDiscount",
     "InsumerAttest",
     "InsumerBatchWalletTrust",
     "InsumerBuyCredits",
@@ -48,6 +56,10 @@ __all__ = [
     "InsumerListTokens",
     "InsumerMerchantStatus",
     "InsumerPublishDirectory",
+    "InsumerRequestDomainVerification",
+    "InsumerUcpDiscount",
+    "InsumerValidateCode",
     "InsumerVerify",
+    "InsumerVerifyDomain",
     "InsumerWalletTrust",
 ]

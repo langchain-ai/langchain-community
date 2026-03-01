@@ -56,6 +56,7 @@ class InsumerAPIWrapper(BaseModel):
         conditions: list[dict[str, Any]],
         wallet: Optional[str] = None,
         solana_wallet: Optional[str] = None,
+        xrpl_wallet: Optional[str] = None,
         proof: Optional[str] = None,
     ) -> str:
         """Create a privacy-preserving on-chain attestation.
@@ -70,6 +71,7 @@ class InsumerAPIWrapper(BaseModel):
                 use type "eas_attestation" with template or schemaId.
             wallet: EVM wallet address (0x...).
             solana_wallet: Solana wallet address (base58).
+            xrpl_wallet: XRPL wallet address (r-address).
             proof: Set to "merkle" for EIP-1186 Merkle storage proofs.
                 Available for token_balance conditions on RPC chains only.
                 Costs 2 credits. Reveals raw balance to the caller.
@@ -85,6 +87,8 @@ class InsumerAPIWrapper(BaseModel):
             body["wallet"] = wallet
         if solana_wallet:
             body["solanaWallet"] = solana_wallet
+        if xrpl_wallet:
+            body["xrplWallet"] = xrpl_wallet
         if proof:
             body["proof"] = proof
         response = requests.post(
@@ -191,6 +195,7 @@ class InsumerAPIWrapper(BaseModel):
         merchant_id: str,
         wallet: Optional[str] = None,
         solana_wallet: Optional[str] = None,
+        xrpl_wallet: Optional[str] = None,
     ) -> str:
         """Calculate discount for a wallet at a merchant.
 
@@ -200,6 +205,7 @@ class InsumerAPIWrapper(BaseModel):
             merchant_id: Merchant ID.
             wallet: EVM wallet address.
             solana_wallet: Solana wallet address.
+            xrpl_wallet: XRPL wallet address (r-address).
 
         Returns:
             JSON string with discount calculation.
@@ -209,6 +215,8 @@ class InsumerAPIWrapper(BaseModel):
             params["wallet"] = wallet
         if solana_wallet:
             params["solanaWallet"] = solana_wallet
+        if xrpl_wallet:
+            params["xrplWallet"] = xrpl_wallet
         response = requests.get(
             f"{INSUMER_BASE_URL}/discount/check",
             headers=self._headers,
@@ -222,6 +230,7 @@ class InsumerAPIWrapper(BaseModel):
         merchant_id: str,
         wallet: Optional[str] = None,
         solana_wallet: Optional[str] = None,
+        xrpl_wallet: Optional[str] = None,
     ) -> str:
         """Create a signed discount code (INSR-XXXXX), valid 30 minutes.
 
@@ -231,6 +240,7 @@ class InsumerAPIWrapper(BaseModel):
             merchant_id: Merchant ID.
             wallet: EVM wallet address.
             solana_wallet: Solana wallet address.
+            xrpl_wallet: XRPL wallet address (r-address).
 
         Returns:
             JSON string with verification code and signature.
@@ -240,6 +250,8 @@ class InsumerAPIWrapper(BaseModel):
             body["wallet"] = wallet
         if solana_wallet:
             body["solanaWallet"] = solana_wallet
+        if xrpl_wallet:
+            body["xrplWallet"] = xrpl_wallet
         response = requests.post(
             f"{INSUMER_BASE_URL}/verify",
             headers=self._headers,
@@ -282,6 +294,7 @@ class InsumerAPIWrapper(BaseModel):
         self,
         wallet: str,
         solana_wallet: Optional[str] = None,
+        xrpl_wallet: Optional[str] = None,
         proof: Optional[str] = None,
     ) -> str:
         """Generate a structured wallet trust fact profile.
@@ -293,6 +306,8 @@ class InsumerAPIWrapper(BaseModel):
         Args:
             wallet: EVM wallet address (0x...) to profile.
             solana_wallet: Solana wallet address (base58).
+            xrpl_wallet: XRPL wallet address (r-address). Adds RLUSD and
+                USDC on XRPL checks.
             proof: Set to "merkle" for EIP-1186 Merkle storage proofs.
 
         Returns:
@@ -301,6 +316,8 @@ class InsumerAPIWrapper(BaseModel):
         body: dict[str, Any] = {"wallet": wallet}
         if solana_wallet:
             body["solanaWallet"] = solana_wallet
+        if xrpl_wallet:
+            body["xrplWallet"] = xrpl_wallet
         if proof:
             body["proof"] = proof
         response = requests.post(
@@ -323,7 +340,8 @@ class InsumerAPIWrapper(BaseModel):
 
         Args:
             wallets: List of 1-10 dicts, each with ``wallet`` (required)
-                and optional ``solanaWallet``.
+                and optional ``solanaWallet`` (base58) and ``xrplWallet``
+                (r-address).
             proof: Set to "merkle" for Merkle storage proofs (6 credits/wallet).
 
         Returns:
@@ -572,6 +590,150 @@ class InsumerAPIWrapper(BaseModel):
         )
         return json.dumps(response.json())
 
+    def acp_discount(
+        self,
+        merchant_id: str,
+        wallet: Optional[str] = None,
+        solana_wallet: Optional[str] = None,
+        xrpl_wallet: Optional[str] = None,
+        items: Optional[list[dict[str, Any]]] = None,
+    ) -> str:
+        """Request ACP-format discount for a wallet at a merchant.
+
+        Returns OpenAI/Stripe Agentic Commerce Protocol coupon objects
+        with applied/rejected arrays and per-item allocations.
+        Costs 1 merchant credit.
+
+        Args:
+            merchant_id: Merchant ID.
+            wallet: EVM wallet address (0x...).
+            solana_wallet: Solana wallet address (base58).
+            xrpl_wallet: XRPL wallet address (r-address).
+            items: Cart items for per-item allocation. Each dict has
+                ``path`` (str) and ``amount`` (int, cents).
+
+        Returns:
+            JSON string with ACP discount response and ECDSA signature.
+        """
+        body: dict[str, Any] = {"merchantId": merchant_id}
+        if wallet:
+            body["wallet"] = wallet
+        if solana_wallet:
+            body["solanaWallet"] = solana_wallet
+        if xrpl_wallet:
+            body["xrplWallet"] = xrpl_wallet
+        if items:
+            body["items"] = items
+        response = requests.post(
+            f"{INSUMER_BASE_URL}/acp/discount",
+            headers=self._headers,
+            json=body,
+            timeout=30,
+        )
+        return json.dumps(response.json())
+
+    def ucp_discount(
+        self,
+        merchant_id: str,
+        wallet: Optional[str] = None,
+        solana_wallet: Optional[str] = None,
+        xrpl_wallet: Optional[str] = None,
+        items: Optional[list[dict[str, Any]]] = None,
+    ) -> str:
+        """Request UCP-format discount for a wallet at a merchant.
+
+        Returns Google Universal Commerce Protocol discount objects
+        with title strings and the dev.ucp.shopping.discount extension.
+        Costs 1 merchant credit.
+
+        Args:
+            merchant_id: Merchant ID.
+            wallet: EVM wallet address (0x...).
+            solana_wallet: Solana wallet address (base58).
+            xrpl_wallet: XRPL wallet address (r-address).
+            items: Cart items for per-item allocation. Each dict has
+                ``path`` (str) and ``amount`` (int, cents).
+
+        Returns:
+            JSON string with UCP discount response and ECDSA signature.
+        """
+        body: dict[str, Any] = {"merchantId": merchant_id}
+        if wallet:
+            body["wallet"] = wallet
+        if solana_wallet:
+            body["solanaWallet"] = solana_wallet
+        if xrpl_wallet:
+            body["xrplWallet"] = xrpl_wallet
+        if items:
+            body["items"] = items
+        response = requests.post(
+            f"{INSUMER_BASE_URL}/ucp/discount",
+            headers=self._headers,
+            json=body,
+            timeout=30,
+        )
+        return json.dumps(response.json())
+
+    def request_domain_verification(
+        self,
+        merchant_id: str,
+        domain: str,
+    ) -> str:
+        """Request domain verification for a merchant.
+
+        Returns a DNS TXT record that must be added to the domain.
+
+        Args:
+            merchant_id: Merchant ID.
+            domain: Domain to verify (e.g. "example.com").
+
+        Returns:
+            JSON string with DNS TXT record details.
+        """
+        response = requests.post(
+            f"{INSUMER_BASE_URL}/merchants/{merchant_id}/domain-verification",
+            headers=self._headers,
+            json={"domain": domain},
+            timeout=30,
+        )
+        return json.dumps(response.json())
+
+    def verify_domain(self, merchant_id: str) -> str:
+        """Check domain verification status for a merchant.
+
+        Call after adding the DNS TXT record from request_domain_verification.
+
+        Args:
+            merchant_id: Merchant ID.
+
+        Returns:
+            JSON string with verification status.
+        """
+        response = requests.put(
+            f"{INSUMER_BASE_URL}/merchants/{merchant_id}/domain-verification",
+            headers=self._headers,
+            json={},
+            timeout=30,
+        )
+        return json.dumps(response.json())
+
+    def validate_code(self, code: str) -> str:
+        """Validate a discount code at point of sale.
+
+        No API key required. Merchants call this to verify an INSR-XXXXX code.
+
+        Args:
+            code: Discount code (e.g. "INSR-A7K3M").
+
+        Returns:
+            JSON string with code validity, discount, and expiry.
+        """
+        response = requests.get(
+            f"{INSUMER_BASE_URL}/codes/{code}",
+            timeout=30,
+        )
+        return json.dumps(response.json())
+
     def run(self, mode: str, **kwargs: Any) -> str:
         """Run a specific API operation by mode.
 
@@ -587,6 +749,7 @@ class InsumerAPIWrapper(BaseModel):
                 conditions=kwargs["conditions"],
                 wallet=kwargs.get("wallet"),
                 solana_wallet=kwargs.get("solana_wallet"),
+                xrpl_wallet=kwargs.get("xrpl_wallet"),
                 proof=kwargs.get("proof"),
             )
         elif mode == "get_credits":
@@ -609,12 +772,14 @@ class InsumerAPIWrapper(BaseModel):
                 merchant_id=kwargs["merchant_id"],
                 wallet=kwargs.get("wallet"),
                 solana_wallet=kwargs.get("solana_wallet"),
+                xrpl_wallet=kwargs.get("xrpl_wallet"),
             )
         elif mode == "verify":
             return self.verify(
                 merchant_id=kwargs["merchant_id"],
                 wallet=kwargs.get("wallet"),
                 solana_wallet=kwargs.get("solana_wallet"),
+                xrpl_wallet=kwargs.get("xrpl_wallet"),
             )
         elif mode == "get_jwks":
             return self.get_jwks()
@@ -624,6 +789,7 @@ class InsumerAPIWrapper(BaseModel):
             return self.wallet_trust(
                 wallet=kwargs["wallet"],
                 solana_wallet=kwargs.get("solana_wallet"),
+                xrpl_wallet=kwargs.get("xrpl_wallet"),
                 proof=kwargs.get("proof"),
             )
         elif mode == "batch_wallet_trust":
@@ -681,6 +847,31 @@ class InsumerAPIWrapper(BaseModel):
                 chain_id=kwargs["chain_id"],
                 amount=kwargs["amount"],
             )
+        elif mode == "acp_discount":
+            return self.acp_discount(
+                merchant_id=kwargs["merchant_id"],
+                wallet=kwargs.get("wallet"),
+                solana_wallet=kwargs.get("solana_wallet"),
+                xrpl_wallet=kwargs.get("xrpl_wallet"),
+                items=kwargs.get("items"),
+            )
+        elif mode == "ucp_discount":
+            return self.ucp_discount(
+                merchant_id=kwargs["merchant_id"],
+                wallet=kwargs.get("wallet"),
+                solana_wallet=kwargs.get("solana_wallet"),
+                xrpl_wallet=kwargs.get("xrpl_wallet"),
+                items=kwargs.get("items"),
+            )
+        elif mode == "request_domain_verification":
+            return self.request_domain_verification(
+                merchant_id=kwargs["merchant_id"],
+                domain=kwargs["domain"],
+            )
+        elif mode == "verify_domain":
+            return self.verify_domain(merchant_id=kwargs["merchant_id"])
+        elif mode == "validate_code":
+            return self.validate_code(code=kwargs["code"])
         else:
             msg = f"Invalid mode {mode} for Insumer API."
             raise ValueError(msg)

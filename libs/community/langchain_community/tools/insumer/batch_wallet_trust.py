@@ -16,8 +16,8 @@ class InsumerBatchWalletTrustSchema(BaseModel):
     wallets: str = Field(
         description=(
             "JSON array of 1-10 wallet objects. Each: "
-            '{"wallet": "0x...", "solanaWallet": "..."}. '
-            "solanaWallet is optional. Pass as a JSON string."
+            '{"wallet": "0x...", "solanaWallet": "...", "xrplWallet": "r..."}. '
+            "solanaWallet and xrplWallet are optional. Pass as a JSON string."
         ),
     )
     proof: Optional[str] = Field(

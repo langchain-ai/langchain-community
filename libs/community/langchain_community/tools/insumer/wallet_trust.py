@@ -19,6 +19,10 @@ class InsumerWalletTrustSchema(BaseModel):
         default=None,
         description="Solana wallet address (base58). Adds USDC on Solana check.",
     )
+    xrpl_wallet: Optional[str] = Field(
+        default=None,
+        description="XRPL wallet address (r-address). Adds RLUSD and USDC on XRPL checks.",
+    )
     proof: Optional[str] = Field(
         default=None,
         description=(
@@ -54,6 +58,7 @@ class InsumerWalletTrust(BaseTool):
         self,
         wallet: str,
         solana_wallet: Optional[str] = None,
+        xrpl_wallet: Optional[str] = None,
         proof: Optional[str] = None,
         run_manager: Optional[CallbackManagerForToolRun] = None,
     ) -> str:
@@ -62,5 +67,6 @@ class InsumerWalletTrust(BaseTool):
             mode=self.mode,
             wallet=wallet,
             solana_wallet=solana_wallet,
+            xrpl_wallet=xrpl_wallet,
             proof=proof,
         )
