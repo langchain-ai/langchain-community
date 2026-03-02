@@ -52,7 +52,7 @@ jobs:
       version: ${{ steps.check-version.outputs.version }}
 
     steps:
-      - uses: actions/checkout@v5
+      - uses: actions/checkout@v6
 
       - name: Set up Python + uv
         uses: "./.github/actions/uv_setup"
@@ -75,7 +75,7 @@ jobs:
         working-directory: ${{ inputs.working-directory }}
 
       - name: Upload build
-        uses: actions/upload-artifact@v5
+        uses: actions/upload-artifact@v6
         with:
           name: dist
           path: ${{ inputs.working-directory }}/dist/
@@ -108,9 +108,9 @@ jobs:
       id-token: write
 
     steps:
-      - uses: actions/checkout@v5
+      - uses: actions/checkout@v6
 
-      - uses: actions/download-artifact@v6
+      - uses: actions/download-artifact@v7
         with:
           name: dist
           path: ${{ inputs.working-directory }}/dist/
@@ -138,7 +138,7 @@ jobs:
       contents: read
     timeout-minutes: 20
     steps:
-      - uses: actions/checkout@v5
+      - uses: actions/checkout@v6
 
       # We explicitly *don't* set up caching here. This ensures our tests are
       # maximally sensitive to catching breakage.
@@ -159,7 +159,7 @@ jobs:
         with:
           python-version: ${{ env.PYTHON_VERSION }}
 
-      - uses: actions/download-artifact@v6
+      - uses: actions/download-artifact@v7
         with:
           name: dist
           path: ${{ inputs.working-directory }}/dist/
@@ -248,14 +248,14 @@ jobs:
         working-directory: ${{ inputs.working-directory }}
 
     steps:
-      - uses: actions/checkout@v5
+      - uses: actions/checkout@v6
 
       - name: Set up Python + uv
         uses: "./.github/actions/uv_setup"
         with:
           python-version: ${{ env.PYTHON_VERSION }}
 
-      - uses: actions/download-artifact@v6
+      - uses: actions/download-artifact@v7
         with:
           name: dist
           path: ${{ inputs.working-directory }}/dist/
@@ -287,14 +287,14 @@ jobs:
         working-directory: ${{ inputs.working-directory }}
 
     steps:
-      - uses: actions/checkout@v5
+      - uses: actions/checkout@v6
 
       - name: Set up Python + uv
         uses: "./.github/actions/uv_setup"
         with:
           python-version: ${{ env.PYTHON_VERSION }}
 
-      - uses: actions/download-artifact@v6
+      - uses: actions/download-artifact@v7
         with:
           name: dist
           path: ${{ inputs.working-directory }}/dist/
