@@ -2,7 +2,18 @@ import concurrent
 import logging
 import random
 from pathlib import Path
-from typing import Any, Callable, Iterator, List, Optional, Sequence, Tuple, Type, Union
+from typing import (
+    Any,
+    Callable,
+    Dict,
+    Iterator,
+    List,
+    Optional,
+    Sequence,
+    Tuple,
+    Type,
+    Union,
+)
 
 from langchain_core.documents import Document
 
@@ -43,6 +54,7 @@ class DirectoryLoader(BaseLoader):
         max_concurrency: int = 4,
         *,
         exclude: Union[Sequence[str], str] = (),
+        suffix_loader_map: Union[Dict[str, FILE_LOADER_TYPE], None] = None,
         sample_size: int = 0,
         randomize_sample: bool = False,
         sample_seed: Union[int, None] = None,
@@ -64,6 +76,10 @@ class DirectoryLoader(BaseLoader):
             show_progress: Whether to show a progress bar. Defaults to False.
             use_multithreading: Whether to use multithreading. Defaults to False.
             max_concurrency: The maximum number of threads to use. Defaults to 4.
+            suffix_loader_map: A mapping of file suffixes (including the dot,
+                e.g. ``".rs"``) to loader classes. When a file's suffix matches
+                a key in this map, that loader is used instead of ``loader_cls``.
+                Useful for file types that the default loader cannot auto-detect.
             sample_size: The maximum number of files you would like to load from the
                 directory.
             randomize_sample: Shuffle the files to get a random sample.
@@ -73,6 +89,7 @@ class DirectoryLoader(BaseLoader):
 
             .. code-block:: python
                 from langchain_community.document_loaders import DirectoryLoader
+                from langchain_community.document_loaders.text import TextLoader
 
                 # Load all non-hidden files in a directory.
                 loader = DirectoryLoader("/path/to/directory")
@@ -92,6 +109,14 @@ class DirectoryLoader(BaseLoader):
                 loader = DirectoryLoader(
                     "/path/to/directory", exclude=["*.py", "*.pyc"]
                 )
+
+                # Use TextLoader for .rs files that UnstructuredFileLoader
+                # cannot auto-detect.
+                loader = DirectoryLoader(
+                    "/path/to/directory",
+                    glob="**/*.rs",
+                    suffix_loader_map={".rs": TextLoader},
+                )
         """
         if loader_kwargs is None:
             loader_kwargs = {}
@@ -108,6 +133,7 @@ class DirectoryLoader(BaseLoader):
         self.show_progress = show_progress
         self.use_multithreading = use_multithreading
         self.max_concurrency = max_concurrency
+        self.suffix_loader_map = suffix_loader_map or {}
         self.sample_size = sample_size
         self.randomize_sample = randomize_sample
         self.sample_seed = sample_seed
@@ -218,7 +244,11 @@ class DirectoryLoader(BaseLoader):
             if _is_visible(item.relative_to(path)) or self.load_hidden:
                 try:
                     logger.debug(f"Processing file: {str(item)}")
-                    loader = self.loader_cls(str(item), **self.loader_kwargs)
+                    suffix = item.suffix.lower()
+                    resolved_loader_cls = self.suffix_loader_map.get(
+                        suffix, self.loader_cls
+                    )
+                    loader = resolved_loader_cls(str(item), **self.loader_kwargs)
                     try:
                         for subdoc in loader.lazy_load():
                             yield subdoc

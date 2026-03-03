@@ -98,3 +98,134 @@ def test_directory_loader_glob_multiple() -> None:
 
     for ext in list_extensions:
         assert is_file_type_loaded.get(ext, False)
+
+
+class TrackingLoader(TextLoader):
+    """Loader that records which files it was instantiated with."""
+
+    instances: List[str] = []
+
+    def __init__(self, path: str, **kwargs: Any) -> None:
+        TrackingLoader.instances.append(path)
+        super().__init__(path, **kwargs)
+
+
+class AltTrackingLoader(TextLoader):
+    """Alternative tracking loader to distinguish from TrackingLoader."""
+
+    instances: List[str] = []
+
+    def __init__(self, path: str, **kwargs: Any) -> None:
+        AltTrackingLoader.instances.append(path)
+        super().__init__(path, **kwargs)
+
+
+def test_suffix_loader_map_routes_by_extension(tmp_path: Path) -> None:
+    """Files whose suffix is in the map use the mapped loader."""
+    rs_file = tmp_path / "main.rs"
+    rs_file.write_text("\nfn main() {}\n")
+    txt_file = tmp_path / "readme.txt"
+    txt_file.write_text("hello")
+
+    TrackingLoader.instances = []
+    AltTrackingLoader.instances = []
+
+    loader = DirectoryLoader(
+        str(tmp_path),
+        glob="*",
+        loader_cls=AltTrackingLoader,
+        suffix_loader_map={".rs": TrackingLoader},
+    )
+    docs = loader.load()
+
+    assert len(docs) == 2
+    rs_paths = [p for p in TrackingLoader.instances if p.endswith(".rs")]
+    txt_paths = [p for p in AltTrackingLoader.instances if p.endswith(".txt")]
+    assert len(rs_paths) == 1
+    assert len(txt_paths) == 1
+
+
+def test_suffix_loader_map_default_none_preserves_behavior(tmp_path: Path) -> None:
+    """When suffix_loader_map is not provided, all files use loader_cls."""
+    txt_file = tmp_path / "file.txt"
+    txt_file.write_text("content")
+
+    TrackingLoader.instances = []
+
+    loader = DirectoryLoader(
+        str(tmp_path),
+        glob="*",
+        loader_cls=TrackingLoader,
+    )
+    docs = loader.load()
+
+    assert len(docs) == 1
+    assert any(p.endswith("file.txt") for p in TrackingLoader.instances)
+
+
+def test_suffix_loader_map_multiple_suffixes(tmp_path: Path) -> None:
+    """Multiple suffixes can each map to different loaders."""
+    (tmp_path / "a.rs").write_text("\nfn a() {}")
+    (tmp_path / "b.go").write_text("package main")
+    (tmp_path / "c.txt").write_text("plain text")
+
+    TrackingLoader.instances = []
+    AltTrackingLoader.instances = []
+
+    loader = DirectoryLoader(
+        str(tmp_path),
+        glob="*",
+        loader_cls=TextLoader,
+        suffix_loader_map={
+            ".rs": TrackingLoader,
+            ".go": AltTrackingLoader,
+        },
+    )
+    docs = loader.load()
+
+    assert len(docs) == 3
+    assert any(p.endswith(".rs") for p in TrackingLoader.instances)
+    assert any(p.endswith(".go") for p in AltTrackingLoader.instances)
+    assert not any(p.endswith(".txt") for p in TrackingLoader.instances)
+    assert not any(p.endswith(".txt") for p in AltTrackingLoader.instances)
+
+
+def test_suffix_loader_map_case_insensitive(tmp_path: Path) -> None:
+    """Suffix matching is case-insensitive (lowered before lookup)."""
+    upper_file = tmp_path / "test.RS"
+    upper_file.write_text("fn test() {}")
+
+    TrackingLoader.instances = []
+
+    loader = DirectoryLoader(
+        str(tmp_path),
+        glob="*",
+        loader_cls=TextLoader,
+        suffix_loader_map={".rs": TrackingLoader},
+    )
+    docs = loader.load()
+
+    assert len(docs) == 1
+    assert len(TrackingLoader.instances) == 1
+
+
+def test_suffix_loader_map_with_multithreading(tmp_path: Path) -> None:
+    """suffix_loader_map works correctly with multithreading enabled."""
+    (tmp_path / "main.rs").write_text("\nfn main() {}")
+    (tmp_path / "readme.txt").write_text("hello")
+
+    TrackingLoader.instances = []
+    AltTrackingLoader.instances = []
+
+    loader = DirectoryLoader(
+        str(tmp_path),
+        glob="*",
+        loader_cls=AltTrackingLoader,
+        use_multithreading=True,
+        suffix_loader_map={".rs": TrackingLoader},
+    )
+    docs = loader.load()
+
+    assert len(docs) == 2
+    assert any(p.endswith(".rs") for p in TrackingLoader.instances)
+    assert any(p.endswith(".txt") for p in AltTrackingLoader.instances)

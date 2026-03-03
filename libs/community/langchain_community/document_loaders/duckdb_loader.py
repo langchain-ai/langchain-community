@@ -1,4 +1,4 @@
-from typing import Dict, List, Optional, cast
+from typing import Dict, List, Optional, Union, cast
 
 from langchain_core.documents import Document
 
@@ -19,7 +19,7 @@ class DuckDBLoader(BaseLoader):
         query: str,
         database: str = ":memory:",
         read_only: bool = False,
-        config: Optional[Dict[str, str]] = None,
+        config: Optional[Dict[str, Union[str, bool, int, float, List[str]]]] = None,
         page_content_columns: Optional[List[str]] = None,
         metadata_columns: Optional[List[str]] = None,
     ):
