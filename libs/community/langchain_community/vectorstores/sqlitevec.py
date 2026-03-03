@@ -2,11 +2,13 @@ from __future__ import annotations
 
 import json
 import logging
+import re
 import struct
 import warnings
 from typing import (
     TYPE_CHECKING,
     Any,
+    Dict,
     Iterable,
     List,
     Optional,
@@ -22,6 +24,17 @@ if TYPE_CHECKING:
     import sqlite3
 
 logger = logging.getLogger(__name__)
+
+_VALID_METADATA_KEY_RE = re.compile(r"^[a-zA-Z0-9_.]+$")
+
+_OPERATOR_MAP: Dict[str, str] = {
+    "$eq": "=",
+    "$ne": "!=",
+    "$gt": ">",
+    "$gte": ">=",
+    "$lt": "<",
+    "$lte": "<=",
+}
 
 
 def serialize_f32(vector: List[float]) -> bytes:
@@ -142,26 +155,134 @@ class SQLiteVec(VectorStore):
         )
         return [row["rowid"] for row in results]
 
+    @staticmethod
+    def _build_metadata_filter(
+        filter: Dict[str, Any],
+    ) -> Tuple[str, List[Any]]:
+        """Convert a metadata filter dict to SQL WHERE clauses.
+
+        Uses ``json_extract`` on the ``metadata`` column (aliased as ``e``) to
+        produce parameterized SQL fragments that can be appended to a query.
+
+        Args:
+            filter: Mapping of metadata keys to expected values or operator
+                dicts.  Supported operators: ``$eq``, ``$ne``, ``$gt``,
+                ``$gte``, ``$lt``, ``$lte``, ``$in``, ``$nin``.
+
+        Returns:
+            A ``(sql_fragment, params)`` tuple where *sql_fragment* contains
+            one or more ``AND``-joined conditions and *params* is the list of
+            bind values.
+
+        Raises:
+            ValueError: If a key contains unsafe characters or an unsupported
+                operator is used.
+        """
+        clauses: List[str] = []
+        params: List[Any] = []
+
+        for key, value in filter.items():
+            if not _VALID_METADATA_KEY_RE.match(key):
+                msg = (
+                    f"Invalid metadata filter key: {key!r}. "
+                    "Keys must contain only alphanumeric characters, "
+                    "underscores, and dots."
+                )
+                raise ValueError(msg)
+
+            json_path = f"json_extract(e.metadata, '$.{key}')"
+
+            if isinstance(value, dict):
+                for op, val in value.items():
+                    if op in _OPERATOR_MAP:
+                        clauses.append(f"{json_path} {_OPERATOR_MAP[op]} ?")
+                        params.append(val)
+                    elif op == "$in":
+                        if not isinstance(val, (list, tuple)):
+                            msg = (
+                                "$in operator requires a list, "
+                                f"got {type(val).__name__}"
+                            )
+                            raise ValueError(msg)
+                        placeholders = ", ".join("?" for _ in val)
+                        clauses.append(f"{json_path} IN ({placeholders})")
+                        params.extend(val)
+                    elif op == "$nin":
+                        if not isinstance(val, (list, tuple)):
+                            msg = (
+                                "$nin operator requires a list, "
+                                f"got {type(val).__name__}"
+                            )
+                            raise ValueError(msg)
+                        placeholders = ", ".join("?" for _ in val)
+                        clauses.append(f"{json_path} NOT IN ({placeholders})")
+                        params.extend(val)
+                    else:
+                        msg = f"Unsupported filter operator: {op!r}"
+                        raise ValueError(msg)
+            else:
+                clauses.append(f"{json_path} = ?")
+                params.append(value)
+
+        return " AND ".join(clauses), params
+
     def similarity_search_with_score_by_vector(
-        self, embedding: List[float], k: int = 4, **kwargs: Any
+        self,
+        embedding: List[float],
+        k: int = 4,
+        filter: Optional[Dict[str, Any]] = None,
+        fetch_k: int = 20,
+        **kwargs: Any,
     ) -> List[Tuple[Document, float]]:
+        """Return docs and scores most similar to the embedding vector.
+
+        Args:
+            embedding: Embedding vector to search with.
+            k: Number of documents to return.
+            filter: Optional metadata filter dict.  Keys are metadata field
+                names; values are either literal values (equality check) or
+                operator dicts such as ``{"$gt": 5}``.  Supported operators:
+                ``$eq``, ``$ne``, ``$gt``, ``$gte``, ``$lt``, ``$lte``,
+                ``$in``, ``$nin``.
+            fetch_k: Number of candidates to retrieve from the vector index
+                before applying the metadata filter.  Only used when *filter*
+                is provided.
+
+        Returns:
+            List of ``(Document, distance)`` tuples ordered by distance.
+        """
+        filter_clause = ""
+        filter_params: List[Any] = []
+        limit_clause = ""
+
+        vec_k = k
+        if filter:
+            vec_k = fetch_k
+            where_fragment, filter_params = self._build_metadata_filter(filter)
+            filter_clause = f"AND {where_fragment}"
+            limit_clause = "LIMIT ?"
+
         sql_query = f"""
-            SELECT 
+            SELECT
                 text,
                 metadata,
                 distance
             FROM {self._table} AS e
-            INNER JOIN {self._table}_vec AS v on v.rowid = e.rowid  
+            INNER JOIN {self._table}_vec AS v on v.rowid = e.rowid
             WHERE
                 v.text_embedding MATCH ?
                 AND k = ?
+                {filter_clause}
             ORDER BY distance
+            {limit_clause}
         """
+
+        params: List[Any] = [serialize_f32(embedding), vec_k, *filter_params]
+        if filter:
+            params.append(k)
+
         cursor = self._connection.cursor()
-        cursor.execute(
-            sql_query,
-            [serialize_f32(embedding), k],
-        )
+        cursor.execute(sql_query, params)
         results = cursor.fetchall()
 
         documents = []
@@ -173,30 +294,79 @@ class SQLiteVec(VectorStore):
         return documents
 
     def similarity_search(
-        self, query: str, k: int = 4, **kwargs: Any
+        self,
+        query: str,
+        k: int = 4,
+        filter: Optional[Dict[str, Any]] = None,
+        fetch_k: int = 20,
+        **kwargs: Any,
     ) -> List[Document]:
-        """Return docs most similar to query."""
+        """Return docs most similar to query.
+
+        Args:
+            query: Text to look up similar documents to.
+            k: Number of documents to return.
+            filter: Optional metadata filter dict. See
+                :meth:`similarity_search_with_score_by_vector` for details.
+            fetch_k: Number of candidates to fetch before filtering.
+
+        Returns:
+            List of documents most similar to the query.
+        """
         embedding = self._embedding.embed_query(query)
         documents = self.similarity_search_with_score_by_vector(
-            embedding=embedding, k=k
+            embedding=embedding, k=k, filter=filter, fetch_k=fetch_k
         )
         return [doc for doc, _ in documents]
 
     def similarity_search_with_score(
-        self, query: str, k: int = 4, **kwargs: Any
+        self,
+        query: str,
+        k: int = 4,
+        filter: Optional[Dict[str, Any]] = None,
+        fetch_k: int = 20,
+        **kwargs: Any,
     ) -> List[Tuple[Document, float]]:
-        """Return docs most similar to query."""
+        """Return docs and distance scores most similar to query.
+
+        Args:
+            query: Text to look up similar documents to.
+            k: Number of documents to return.
+            filter: Optional metadata filter dict. See
+                :meth:`similarity_search_with_score_by_vector` for details.
+            fetch_k: Number of candidates to fetch before filtering.
+
+        Returns:
+            List of ``(Document, distance)`` tuples.
+        """
         embedding = self._embedding.embed_query(query)
         documents = self.similarity_search_with_score_by_vector(
-            embedding=embedding, k=k
+            embedding=embedding, k=k, filter=filter, fetch_k=fetch_k
         )
         return documents
 
     def similarity_search_by_vector(
-        self, embedding: List[float], k: int = 4, **kwargs: Any
+        self,
+        embedding: List[float],
+        k: int = 4,
+        filter: Optional[Dict[str, Any]] = None,
+        fetch_k: int = 20,
+        **kwargs: Any,
     ) -> List[Document]:
+        """Return docs most similar to the embedding vector.
+
+        Args:
+            embedding: Embedding vector to search with.
+            k: Number of documents to return.
+            filter: Optional metadata filter dict. See
+                :meth:`similarity_search_with_score_by_vector` for details.
+            fetch_k: Number of candidates to fetch before filtering.
+
+        Returns:
+            List of documents most similar to the embedding.
+        """
         documents = self.similarity_search_with_score_by_vector(
-            embedding=embedding, k=k
+            embedding=embedding, k=k, filter=filter, fetch_k=fetch_k
         )
         return [doc for doc, _ in documents]
 

@@ -59,6 +59,81 @@ def test_sqlitevec_add_extra() -> None:
 
 
 @pytest.mark.requires("sqlite-vec")
+def test_sqlitevec_filter_equality() -> None:
+    """Test similarity search with a simple equality metadata filter."""
+    metadatas = [
+        {"category": "a", "page": 0},
+        {"category": "b", "page": 1},
+        {"category": "a", "page": 2},
+    ]
+    docsearch = _sqlite_vec_from_texts(metadatas=metadatas)
+    output = docsearch.similarity_search("foo", k=3, filter={"category": "a"})
+    assert len(output) == 2
+    assert all(doc.metadata["category"] == "a" for doc in output)
+
+
+@pytest.mark.requires("sqlite-vec")
+def test_sqlitevec_filter_with_score() -> None:
+    """Test similarity_search_with_score respects metadata filter."""
+    texts = ["foo", "bar", "baz"]
+    metadatas = [{"page": i} for i in range(len(texts))]
+    docsearch = _sqlite_vec_from_texts(metadatas=metadatas)
+    output = docsearch.similarity_search_with_score("foo", k=3, filter={"page": 0})
+    assert len(output) == 1
+    doc, _distance = output[0]
+    assert doc.page_content == "foo"
+    assert doc.metadata == {"page": 0}
+
+
+@pytest.mark.requires("sqlite-vec")
+def test_sqlitevec_filter_operator_gt() -> None:
+    """Test similarity search with a $gt operator filter."""
+    texts = ["foo", "bar", "baz"]
+    metadatas = [{"score": i} for i in range(len(texts))]
+    docsearch = _sqlite_vec_from_texts(metadatas=metadatas)
+    output = docsearch.similarity_search("foo", k=3, filter={"score": {"$gt": 0}})
+    assert len(output) == 2
+    assert all(doc.metadata["score"] > 0 for doc in output)
+
+
+@pytest.mark.requires("sqlite-vec")
+def test_sqlitevec_filter_in_operator() -> None:
+    """Test similarity search with the $in operator."""
+    metadatas = [
+        {"color": "red"},
+        {"color": "green"},
+        {"color": "blue"},
+    ]
+    docsearch = _sqlite_vec_from_texts(metadatas=metadatas)
+    output = docsearch.similarity_search(
+        "foo", k=3, filter={"color": {"$in": ["red", "blue"]}}
+    )
+    assert len(output) == 2
+    colors = {doc.metadata["color"] for doc in output}
+    assert colors == {"red", "blue"}
+
+
+@pytest.mark.requires("sqlite-vec")
+def test_sqlitevec_filter_excludes_all() -> None:
+    """Test that a filter matching nothing returns an empty list."""
+    texts = ["foo", "bar", "baz"]
+    metadatas = [{"page": i} for i in range(len(texts))]
+    docsearch = _sqlite_vec_from_texts(metadatas=metadatas)
+    output = docsearch.similarity_search("foo", k=3, filter={"page": 999})
+    assert output == []
+
+
+@pytest.mark.requires("sqlite-vec")
+def test_sqlitevec_filter_no_filter_unchanged() -> None:
+    """Test that omitting filter still works the same as before."""
+    texts = ["foo", "bar", "baz"]
+    metadatas = [{"page": i} for i in range(len(texts))]
+    docsearch = _sqlite_vec_from_texts(metadatas=metadatas)
+    output = docsearch.similarity_search("foo", k=3)
+    assert len(output) == 3
+
+
+@pytest.mark.requires("sqlite-vec")
 def test_sqlitevec_search_multiple_tables() -> None:
     """Test end to end construction and search with multiple tables."""
     docsearch_1 = SQLiteVec.from_texts(
