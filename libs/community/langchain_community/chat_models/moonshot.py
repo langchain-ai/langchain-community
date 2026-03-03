@@ -1,12 +1,18 @@
 """Wrapper around Moonshot chat models."""
 
-from typing import Dict
+from typing import Any, Callable, Dict, Sequence, Type, Union
 
+from langchain_core.language_models import LanguageModelInput
+from langchain_core.messages import AIMessage
+from langchain_core.runnables import Runnable
+from langchain_core.tools import BaseTool
 from langchain_core.utils import (
     convert_to_secret_str,
     get_from_dict_or_env,
     pre_init,
 )
+from langchain_core.utils.function_calling import convert_to_openai_tool
+from pydantic import BaseModel
 
 from langchain_community.chat_models.openai import ChatOpenAI
 from langchain_community.llms.moonshot import MOONSHOT_SERVICE_URL_BASE, MoonshotCommon
@@ -185,3 +191,21 @@ class MoonshotChat(MoonshotCommon, ChatOpenAI):  # type: ignore[misc]
             ).chat.completions
 
         return values
+
+    def bind_tools(
+        self,
+        tools: Sequence[Union[Dict[str, Any], Type[BaseModel], Callable, BaseTool]],
+        **kwargs: Any,
+    ) -> Runnable[LanguageModelInput, AIMessage]:
+        """Bind tool-like objects to this chat model.
+
+        Args:
+            tools: A list of tool definitions to bind to this chat model.
+                Can be a dictionary, pydantic model, callable, or BaseTool. Pydantic
+                models, callables, and BaseTools will be automatically converted to
+                their schema dictionary representation.
+            **kwargs: Any additional parameters to pass to the
+                :class:`~langchain.runnable.Runnable` constructor.
+        """
+        formatted_tools = [convert_to_openai_tool(tool) for tool in tools]
+        return super().bind(tools=formatted_tools, **kwargs)
