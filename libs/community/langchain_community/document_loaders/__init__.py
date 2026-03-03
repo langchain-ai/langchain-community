@@ -38,6 +38,9 @@ if TYPE_CHECKING:
     from langchain_community.document_loaders.airtable import (
         AirtableLoader,
     )
+    from langchain_community.document_loaders.alterlab import (
+        AlterLabLoader,
+    )
     from langchain_community.document_loaders.apify_dataset import (
         ApifyDatasetLoader,
     )
@@ -547,6 +550,7 @@ _module_lookup = {
     "AirbyteTypeformLoader": "langchain_community.document_loaders.airbyte",
     "AirbyteZendeskSupportLoader": "langchain_community.document_loaders.airbyte",
     "AirtableLoader": "langchain_community.document_loaders.airtable",
+    "AlterLabLoader": "langchain_community.document_loaders.alterlab",
     "AmazonTextractPDFLoader": "langchain_community.document_loaders.pdf",
     "ApifyDatasetLoader": "langchain_community.document_loaders.apify_dataset",
     "ArcGISLoader": "langchain_community.document_loaders.arcgis_loader",
@@ -755,6 +759,7 @@ __all__ = [
     "AirbyteTypeformLoader",
     "AirbyteZendeskSupportLoader",
     "AirtableLoader",
+    "AlterLabLoader",
     "AmazonTextractPDFLoader",
     "ApifyDatasetLoader",
     "ArcGISLoader",
