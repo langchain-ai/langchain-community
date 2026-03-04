@@ -319,11 +319,9 @@ class ClickupAPIWrapper(BaseModel):
                 data.get("ECODE", "unknown error"),
             )
             if "ECODE" in data and data["ECODE"] == "OAUTH_014":
-                url = ClickupAPIWrapper.get_access_code_url(oauth_client_id)
                 logger.warning(
-                    "You already used this code once. Generate a new one. "
-                    "Our best guess for the url to get a new code is:\n%s",
-                    url,
+                    "You already used this code once. Generate a new one via your "
+                    "ClickUp OAuth app settings and then retry with the new code."
                 )
             return None
 
