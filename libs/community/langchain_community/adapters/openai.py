@@ -170,7 +170,7 @@ def convert_openai_messages(messages: Sequence[Dict[str, Any]]) -> List[BaseMess
         messages: List of dictionaries representing OpenAI messages
 
     Returns:
-        List of LangChain BaseMessage objects.
+        List of LangChain `BaseMessage` objects.
     """
     return [convert_dict_to_message(m) for m in messages]
 

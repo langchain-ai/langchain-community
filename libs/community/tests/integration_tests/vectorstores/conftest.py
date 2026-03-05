@@ -1,15 +1,7 @@
-import os
 from typing import Union
 
 import pytest
 from vcr.request import Request
-
-# Those environment variables turn on Deep Lake pytest mode.
-# It significantly makes tests run much faster.
-# Need to run before `import deeplake`
-os.environ["BUGGER_OFF"] = "true"
-os.environ["DEEPLAKE_DOWNLOAD_PATH"] = "./testing/local_storage"
-os.environ["DEEPLAKE_PYTEST_ENABLED"] = "true"
 
 
 # This fixture returns a dictionary containing filter_headers options

@@ -590,7 +590,7 @@ def test_faiss_mmr_with_metadatas_and_logical_operators_filter_or_1() -> None:
     )
     assert output[0][1] == 0.0
     assert output == docsearch.max_marginal_relevance_search_with_score_by_vector(
-        query_vec, k=10, lambda_mult=0.1, filter=lambda di: (di["page"] == 0)
+        query_vec, k=10, lambda_mult=0.1, filter=lambda di: di["page"] == 0
     )
 
 
@@ -666,7 +666,7 @@ def test_faiss_mmr_with_metadatas_and_logical_operators_filter_and_1() -> None:
     )
     assert output[0][1] == 0.0
     assert output == docsearch.max_marginal_relevance_search_with_score_by_vector(
-        query_vec, k=10, lambda_mult=0.1, filter=lambda di: (di["page"] == 0)
+        query_vec, k=10, lambda_mult=0.1, filter=lambda di: di["page"] == 0
     )
 
 
@@ -754,8 +754,9 @@ def test_faiss_mmr_with_metadatas_and_nested_logical_operators_filter_1() -> Non
         query_vec,
         k=10,
         lambda_mult=0.1,
-        filter=lambda di: (di["page"] == 1 or di["page"] == 2)
-        and (not di["page"] == 1),
+        filter=lambda di: (
+            (di["page"] == 1 or di["page"] == 2) and (not di["page"] == 1)
+        ),
     )
 
 
@@ -784,8 +785,10 @@ def test_faiss_mmr_with_metadatas_and_nested_logical_operators_filter_2() -> Non
         query_vec,
         k=10,
         lambda_mult=0.1,
-        filter=lambda di: (di["page"] == 1 or di["page"] == 2)
-        and (di["page"] == 3 or di["page"] == 2 or di["page"] == 0),
+        filter=lambda di: (
+            (di["page"] == 1 or di["page"] == 2)
+            and (di["page"] == 3 or di["page"] == 2 or di["page"] == 0)
+        ),
     )
 
 
@@ -811,8 +814,10 @@ def test_faiss_mmr_with_metadatas_and_nested_logical_operators_filter_3() -> Non
         query_vec,
         k=10,
         lambda_mult=0.1,
-        filter=lambda di: (di["page"] == 1 and di["page"] == 2)
-        or (di["page"] == 0 and di["page"] == 2),
+        filter=lambda di: (
+            (di["page"] == 1 and di["page"] == 2)
+            or (di["page"] == 0 and di["page"] == 2)
+        ),
     )
 
 
@@ -894,8 +899,9 @@ def test_faiss_mmr_with_metadatas_and_nested_logical_comparsion_ops_filter_1() -
         query_vec,
         k=10,
         lambda_mult=0.1,
-        filter=lambda di: (di["page"] < 1 or di["page"] > 2)
-        and (di["page"] == 0 or di["page"] == 1),
+        filter=lambda di: (
+            (di["page"] < 1 or di["page"] > 2) and (di["page"] == 0 or di["page"] == 1)
+        ),
     )
 
 
@@ -922,9 +928,11 @@ def test_faiss_mmr_with_metadatas_and_nested_logical_comparsion_ops_filter_2() -
         query_vec,
         k=10,
         lambda_mult=0.1,
-        filter=lambda di: (di["page"] < 1 or di["page"] > 2)
-        and (di["page"] not in [0])
-        and (di["page"] != 3),
+        filter=lambda di: (
+            (di["page"] < 1 or di["page"] > 2)
+            and (di["page"] not in [0])
+            and (di["page"] != 3)
+        ),
     )
 
 
@@ -958,9 +966,11 @@ def test_faiss_mmr_with_metadatas_and_nested_logical_comparsion_ops_filter_3() -
         query_vec,
         k=10,
         lambda_mult=0.1,
-        filter=lambda di: (di["page"] < 1 and di["page"] > 2)
-        or (not di["page"] not in [0])
-        or (di["page"] == 3),
+        filter=lambda di: (
+            (di["page"] < 1 and di["page"] > 2)
+            or (not di["page"] not in [0])
+            or (di["page"] == 3)
+        ),
     )
 
 
@@ -1137,9 +1147,7 @@ def test_faiss_mmr_with_metadatas_and_multiple_nested_logical_operators() -> Non
         query_vec,
         k=10,
         lambda_mult=0.1,
-        filter=lambda di: (
-            (di["page"] == 1 or di["chapter"] > 2) and di["section"] > 5
-        ),
+        filter=lambda di: (di["page"] == 1 or di["chapter"] > 2) and di["section"] > 5,
     )
 
 

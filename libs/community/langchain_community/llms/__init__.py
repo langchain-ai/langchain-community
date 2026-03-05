@@ -168,18 +168,6 @@ def _import_databricks() -> Type[BaseLLM]:
     return Databricks
 
 
-# deprecated / only for back compat - do not add to __all__
-def _import_databricks_chat() -> Any:
-    warn_deprecated(
-        since="0.0.22",
-        removal="1.0",
-        alternative_import="langchain_community.chat_models.ChatDatabricks",
-    )
-    from langchain_community.chat_models.databricks import ChatDatabricks
-
-    return ChatDatabricks
-
-
 def _import_deepinfra() -> Type[BaseLLM]:
     from langchain_community.llms.deepinfra import DeepInfra
 
@@ -1024,7 +1012,6 @@ def get_type_to_cls_dict() -> Dict[str, Callable[[], Type[BaseLLM]]]:
         "ctransformers": _import_ctransformers,
         "ctranslate2": _import_ctranslate2,
         "databricks": _import_databricks,
-        "databricks-chat": _import_databricks_chat,  # deprecated / only for back compat
         "deepinfra": _import_deepinfra,
         "deepsparse": _import_deepsparse,
         "edenai": _import_edenai,
