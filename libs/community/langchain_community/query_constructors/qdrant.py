@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+from datetime import datetime
 from typing import TYPE_CHECKING, Tuple
 
 from langchain_core.structured_query import (
@@ -75,6 +76,12 @@ class QdrantTranslator(Visitor):
                 key=attribute, match=rest.MatchText(text=comparison.value)
             )
         kwargs = {comparison.comparator.value: comparison.value}
+
+        if isinstance(comparison.value, datetime):
+            return rest.FieldCondition(
+                key=attribute, range=rest.DatetimeRange(**kwargs)
+            )
+
         return rest.FieldCondition(key=attribute, range=rest.Range(**kwargs))
 
     def visit_structured_query(
