@@ -47,12 +47,41 @@ class GrobidParser(BaseBlobParser):
                 "`bs4` package not found, please install it with `pip install bs4`"
             )
         soup = BeautifulSoup(xml_data, "xml")
+        header = soup.find("teiHeader")
+        authors = []
+        pub_year = "No publication year found"
+        if header:
+            # Extract authors
+            author_tags = header.find_all("author")
+            for author in author_tags:
+                pers_name = author.find("persName")
+                if pers_name:
+                    forename = pers_name.find("forename", type="first")
+                    surname = pers_name.find("surname")
+                    full_name = []
+                    if forename:
+                        full_name.append(forename.text)
+                    if surname:
+                        full_name.append(surname.text)
+                    if full_name:
+                        authors.append(" ".join(full_name))
+            
+            # Extract publication year
+            date_tag = header.find("date", type="published")
+            if date_tag and date_tag.has_attr("when"):
+                pub_year = date_tag["when"][:4]
+            elif date_tag:
+                pub_year = date_tag.text[:4]
+
         sections = soup.find_all("div")
         titles = soup.find_all("title")
         if titles:
             title = titles[0].text
         else:
             title = "No title found"
+        
+        authors_str = ", ".join(authors) if authors else "No authors found"
+        
         chunks = []
         for section in sections:
             sect = section.find("head")
@@ -114,6 +143,8 @@ class GrobidParser(BaseBlobParser):
                         "section_title": str(chunk["section_title"]),
                         "section_number": str(chunk["section_number"]),
                         "paper_title": str(title),
+                        "authors": authors_str,
+                        "pub_year": str(pub_year),
                         "file_path": str(file_path),
                     }
                 ),
