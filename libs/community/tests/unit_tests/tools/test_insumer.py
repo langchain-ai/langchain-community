@@ -24,93 +24,135 @@ TEST_API_KEY = "insr_live_" + "a" * 40
 # ---------------------------------------------------------------------------
 
 MOCK_ATTEST_RESPONSE = {
-    "attestation": {
-        "conditions": [
-            {
-                "label": "Holds 100 USDC",
-                "result": True,
-                "type": "token_balance",
-            }
-        ],
-        "timestamp": 1740000000,
-        "wallet": "0xd8dA6BF26964aF9D7eEd9e03E53415D37aA96045",
+    "ok": True,
+    "data": {
+        "attestation": {
+            "id": "ATST-12345",
+            "pass": True,
+            "results": [
+                {
+                    "condition": 0,
+                    "label": "Holds 100 USDC",
+                    "met": True,
+                    "type": "token_balance",
+                    "chainId": 1,
+                }
+            ],
+            "passCount": 1,
+            "failCount": 0,
+            "attestedAt": "2026-02-28T12:00:00.000Z",
+            "expiresAt": "2026-02-28T12:30:00.000Z",
+        },
+        "sig": "MEQCIB..." + "A" * 60,
+        "kid": "insumer-attest-v1",
     },
-    "id": "ATT-12345",
-    "kid": "insumer-attest-v1",
-    "signature": "MEQCIB..." + "A" * 60,
+    "meta": {"creditsRemaining": 9, "creditsCharged": 1, "version": "1.0", "timestamp": "2026-02-28T12:00:00.000Z"},
 }
 
 MOCK_TRUST_RESPONSE = {
-    "id": "TRST-99999",
-    "kid": "insumer-attest-v1",
-    "profile": {
-        "dimensions": {
-            "governance": {"pass": 1, "total": 4},
-            "nfts": {"pass": 0, "total": 3},
-            "stablecoins": {"pass": 2, "total": 7},
-            "staking": {"pass": 0, "total": 3},
+    "ok": True,
+    "data": {
+        "trust": {
+            "id": "TRST-99999",
+            "wallet": "0xd8dA6BF26964aF9D7eEd9e03E53415D37aA96045",
+            "conditionSetVersion": "v1",
+            "dimensions": {
+                "stablecoins": {"checks": [{"label": "USDC on Ethereum", "met": True, "chainId": 1}], "passCount": 2, "failCount": 5, "total": 7},
+                "governance": {"checks": [], "passCount": 1, "failCount": 3, "total": 4},
+                "nfts": {"checks": [], "passCount": 0, "failCount": 3, "total": 3},
+                "staking": {"checks": [], "passCount": 0, "failCount": 3, "total": 3},
+            },
+            "summary": {"totalChecks": 17, "totalPassed": 3, "totalFailed": 14, "dimensionsWithActivity": 2, "dimensionsChecked": 4},
+            "profiledAt": "2026-02-28T12:00:00.000Z",
+            "expiresAt": "2026-02-28T12:30:00.000Z",
         },
-        "facts": [
-            {
-                "label": "USDC on Ethereum",
-                "result": True,
-                "type": "token_balance",
-            }
-        ],
-        "wallet": "0xd8dA6BF26964aF9D7eEd9e03E53415D37aA96045",
+        "sig": "MEQCIB..." + "B" * 60,
+        "kid": "insumer-attest-v1",
     },
-    "signature": "MEQCIB..." + "B" * 60,
+    "meta": {"creditsRemaining": 47, "creditsCharged": 3, "version": "1.0", "timestamp": "2026-02-28T12:00:00.000Z"},
 }
 
 MOCK_BATCH_TRUST_RESPONSE = {
-    "results": [
-        {
-            "id": "TRST-11111",
-            "profile": {"dimensions": {}, "facts": [], "wallet": "0xAAA"},
-            "signature": "sig1",
-            "status": "success",
-        }
-    ],
-    "summary": {"failed": 0, "succeeded": 1, "total": 1},
+    "ok": True,
+    "data": {
+        "results": [
+            {
+                "trust": {
+                    "id": "TRST-11111",
+                    "wallet": "0xAAA",
+                    "conditionSetVersion": "v1",
+                    "dimensions": {},
+                    "summary": {"totalChecks": 17, "totalPassed": 0, "totalFailed": 17, "dimensionsWithActivity": 0, "dimensionsChecked": 4},
+                    "profiledAt": "2026-02-28T12:00:00.000Z",
+                    "expiresAt": "2026-02-28T12:30:00.000Z",
+                },
+                "sig": "sig1",
+                "kid": "insumer-attest-v1",
+            }
+        ],
+        "summary": {"requested": 1, "succeeded": 1, "failed": 0},
+    },
+    "meta": {"creditsRemaining": 47, "creditsCharged": 3, "version": "1.0", "timestamp": "2026-02-28T12:00:00.000Z"},
 }
 
 MOCK_CHECK_DISCOUNT_RESPONSE = {
-    "discount": 15,
-    "merchantId": "acme-corp",
-    "tier": "Gold",
-    "wallet": "0xd8dA6BF26964aF9D7eEd9e03E53415D37aA96045",
+    "ok": True,
+    "data": {
+        "eligible": True,
+        "totalDiscount": 15,
+        "discountMode": "highest",
+        "breakdown": [{"symbol": "UNI", "tier": "Gold", "discount": 15, "chain": "Ethereum"}],
+        "merchantId": "acme-corp",
+        "merchantName": "Acme Corp",
+        "chainsChecked": ["Ethereum"],
+    },
+    "meta": {"version": "1.0", "timestamp": "2026-02-28T12:00:00.000Z"},
 }
 
 MOCK_VALIDATE_CODE_RESPONSE = {
-    "code": "INSR-A7K3M",
-    "discount": 15,
-    "expiresAt": 1740030000,
-    "merchantId": "acme-corp",
-    "valid": True,
+    "ok": True,
+    "data": {
+        "valid": True,
+        "code": "INSR-A7K3M",
+        "merchantId": "acme-corp",
+        "discountPercent": 15,
+        "expiresAt": "2026-02-28T12:30:00.000Z",
+        "createdAt": "2026-02-28T12:00:00.000Z",
+    },
+    "meta": {"version": "1.0", "timestamp": "2026-02-28T12:00:00.000Z"},
 }
 
 MOCK_JWKS_RESPONSE = {
-    "keys": [
-        {
-            "alg": "ES256",
-            "crv": "P-256",
-            "kid": "insumer-attest-v1",
-            "kty": "EC",
-            "use": "sig",
-            "x": "AAAA",
-            "y": "BBBB",
-        }
-    ]
+    "ok": True,
+    "data": {
+        "keys": [
+            {
+                "kty": "EC",
+                "crv": "P-256",
+                "x": "JtHPhDPnv8AfP0JSlGutxbOlxreV2Chey27Z76q3V2c",
+                "y": "kn34HaxVSJfn8NxwNEBjjLkcrM_GDw1lgnqyADGuc4c",
+                "use": "sig",
+                "alg": "ES256",
+                "kid": "insumer-attest-v1",
+            }
+        ]
+    },
+    "meta": {"version": "1.0", "timestamp": "2026-02-28T12:00:00.000Z"},
 }
 
 MOCK_COMPLIANCE_TEMPLATES_RESPONSE = {
-    "templates": [
-        {
-            "description": "Coinbase-verified account (KYC)",
-            "name": "coinbase_verified_account",
-            "schemaId": "0xf8b05c79f090979bf4a80270aba232dff11a10d9",
+    "ok": True,
+    "data": {
+        "templates": {
+            "coinbase_verified_account": {
+                "provider": "Coinbase",
+                "description": "Coinbase Verified Account",
+                "chainId": 8453,
+                "chainName": "Base",
+            }
         }
-    ]
+    },
+    "meta": {"version": "1.0", "timestamp": "2026-02-28T12:00:00.000Z"},
 }
 
 TEST_WALLET = "0xd8dA6BF26964aF9D7eEd9e03E53415D37aA96045"
@@ -152,8 +194,8 @@ class TestInsumerAPIWrapper:
             wallet=TEST_WALLET,
         )
         parsed = json.loads(result)
-        assert parsed["id"] == "ATT-12345"
-        assert parsed["attestation"]["conditions"][0]["result"] is True
+        assert parsed["data"]["attestation"]["id"] == "ATST-12345"
+        assert parsed["data"]["attestation"]["results"][0]["met"] is True
 
     @responses.activate
     def test_wallet_trust(self) -> None:
@@ -166,8 +208,8 @@ class TestInsumerAPIWrapper:
         wrapper = self._make_wrapper()
         result = wrapper.wallet_trust(wallet=TEST_WALLET)
         parsed = json.loads(result)
-        assert parsed["id"] == "TRST-99999"
-        assert "dimensions" in parsed["profile"]
+        assert parsed["data"]["trust"]["id"] == "TRST-99999"
+        assert "stablecoins" in parsed["data"]["trust"]["dimensions"]
 
     @responses.activate
     def test_check_discount(self) -> None:
@@ -180,8 +222,8 @@ class TestInsumerAPIWrapper:
         wrapper = self._make_wrapper()
         result = wrapper.check_discount(merchant_id="acme-corp", wallet=TEST_WALLET)
         parsed = json.loads(result)
-        assert parsed["discount"] == 15
-        assert parsed["tier"] == "Gold"
+        assert parsed["data"]["totalDiscount"] == 15
+        assert parsed["data"]["breakdown"][0]["tier"] == "Gold"
 
     @responses.activate
     def test_validate_code(self) -> None:
@@ -194,8 +236,8 @@ class TestInsumerAPIWrapper:
         wrapper = self._make_wrapper()
         result = wrapper.validate_code(code="INSR-A7K3M")
         parsed = json.loads(result)
-        assert parsed["valid"] is True
-        assert parsed["discount"] == 15
+        assert parsed["data"]["valid"] is True
+        assert parsed["data"]["discountPercent"] == 15
 
     @responses.activate
     def test_get_jwks(self) -> None:
@@ -208,8 +250,8 @@ class TestInsumerAPIWrapper:
         wrapper = self._make_wrapper()
         result = wrapper.get_jwks()
         parsed = json.loads(result)
-        assert parsed["keys"][0]["kid"] == "insumer-attest-v1"
-        assert parsed["keys"][0]["alg"] == "ES256"
+        assert parsed["data"]["keys"][0]["kid"] == "insumer-attest-v1"
+        assert parsed["data"]["keys"][0]["alg"] == "ES256"
 
     @responses.activate
     def test_get_compliance_templates(self) -> None:
@@ -222,7 +264,7 @@ class TestInsumerAPIWrapper:
         wrapper = self._make_wrapper()
         result = wrapper.get_compliance_templates()
         parsed = json.loads(result)
-        assert parsed["templates"][0]["name"] == "coinbase_verified_account"
+        assert "coinbase_verified_account" in parsed["data"]["templates"]
 
     @responses.activate
     def test_batch_wallet_trust(self) -> None:
@@ -235,8 +277,8 @@ class TestInsumerAPIWrapper:
         wrapper = self._make_wrapper()
         result = wrapper.batch_wallet_trust(wallets=[{"wallet": TEST_WALLET}])
         parsed = json.loads(result)
-        assert parsed["summary"]["succeeded"] == 1
-        assert len(parsed["results"]) == 1
+        assert parsed["data"]["summary"]["succeeded"] == 1
+        assert len(parsed["data"]["results"]) == 1
 
 
 # ---------------------------------------------------------------------------
@@ -260,7 +302,7 @@ class TestInsumerAttest:
         tool = self._make_tool()
         result = tool._run(conditions=TEST_CONDITIONS, wallet=TEST_WALLET)
         parsed = json.loads(result)
-        assert parsed["id"] == "ATT-12345"
+        assert parsed["data"]["attestation"]["id"] == "ATST-12345"
 
     @responses.activate
     def test_run_xrpl_wallet(self) -> None:
@@ -277,7 +319,7 @@ class TestInsumerAttest:
             ),
             xrpl_wallet="ra8xqX4QhcogFfxpMxMByvFnXyxw9E8rzY",
         )
-        assert json.loads(result)["id"] == "ATT-12345"
+        assert json.loads(result)["data"]["attestation"]["id"] == "ATST-12345"
         # Confirm xrplWallet was sent in the request body
         body = json.loads(responses.calls[0].request.body)
         assert body["xrplWallet"] == "ra8xqX4QhcogFfxpMxMByvFnXyxw9E8rzY"
@@ -304,8 +346,8 @@ class TestInsumerWalletTrust:
         tool = self._make_tool()
         result = tool._run(wallet=TEST_WALLET)
         parsed = json.loads(result)
-        assert parsed["id"] == "TRST-99999"
-        assert "stablecoins" in parsed["profile"]["dimensions"]
+        assert parsed["data"]["trust"]["id"] == "TRST-99999"
+        assert "stablecoins" in parsed["data"]["trust"]["dimensions"]
 
     @responses.activate
     def test_run_with_xrpl(self) -> None:
@@ -346,8 +388,8 @@ class TestInsumerBatchWalletTrust:
         tool = self._make_tool()
         result = tool._run(wallets=json.dumps([{"wallet": TEST_WALLET}]))
         parsed = json.loads(result)
-        assert parsed["summary"]["total"] == 1
-        assert parsed["summary"]["succeeded"] == 1
+        assert parsed["data"]["summary"]["requested"] == 1
+        assert parsed["data"]["summary"]["succeeded"] == 1
 
 
 class TestInsumerCheckDiscount:
@@ -366,8 +408,8 @@ class TestInsumerCheckDiscount:
         tool = self._make_tool()
         result = tool._run(merchant_id="acme-corp", wallet=TEST_WALLET)
         parsed = json.loads(result)
-        assert parsed["tier"] == "Gold"
-        assert parsed["discount"] == 15
+        assert parsed["data"]["breakdown"][0]["tier"] == "Gold"
+        assert parsed["data"]["totalDiscount"] == 15
 
     def test_tool_name(self) -> None:
         tool = self._make_tool()
@@ -390,21 +432,21 @@ class TestInsumerValidateCode:
         tool = self._make_tool()
         result = tool._run(code="INSR-A7K3M")
         parsed = json.loads(result)
-        assert parsed["valid"] is True
-        assert parsed["code"] == "INSR-A7K3M"
+        assert parsed["data"]["valid"] is True
+        assert parsed["data"]["code"] == "INSR-A7K3M"
 
     @responses.activate
     def test_run_invalid_code(self) -> None:
         responses.add(
             responses.GET,
             f"{INSUMER_BASE_URL}/codes/INSR-XXXXX",
-            json={"error": "Code not found", "valid": False},
-            status=404,
+            json={"ok": True, "data": {"valid": False, "code": "INSR-XXXXX", "reason": "not_found"}, "meta": {"version": "1.0", "timestamp": "2026-02-28T12:00:00.000Z"}},
+            status=200,
         )
         tool = self._make_tool()
         result = tool._run(code="INSR-XXXXX")
         parsed = json.loads(result)
-        assert parsed["valid"] is False
+        assert parsed["data"]["valid"] is False
 
 
 class TestInsumerJwks:
@@ -423,8 +465,8 @@ class TestInsumerJwks:
         tool = self._make_tool()
         result = tool._run()
         parsed = json.loads(result)
-        assert "keys" in parsed
-        assert parsed["keys"][0]["alg"] == "ES256"
+        assert "keys" in parsed["data"]
+        assert parsed["data"]["keys"][0]["alg"] == "ES256"
 
     def test_tool_name(self) -> None:
         tool = self._make_tool()
@@ -447,7 +489,7 @@ class TestInsumerComplianceTemplates:
         tool = self._make_tool()
         result = tool._run()
         parsed = json.loads(result)
-        assert parsed["templates"][0]["name"] == "coinbase_verified_account"
+        assert "coinbase_verified_account" in parsed["data"]["templates"]
 
     def test_tool_name(self) -> None:
         tool = self._make_tool()
