@@ -79,8 +79,7 @@ class InsumerAPIWrapper(BaseModel):
         Returns:
             JSON string with attestation results and ECDSA signature.
             When proof="merkle", each result includes a proof object with
-            accountProof, storageProof, storageHash, blockNumber, and
-            mappingSlot fields.
+            accountProof, storageProof, storageHash, and blockNumber fields.
         """
         body: dict[str, Any] = {"conditions": conditions}
         if wallet:
