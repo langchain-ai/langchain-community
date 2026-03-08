@@ -280,6 +280,14 @@ class ChatOpenAI(BaseChatModel):
         populate_by_name=True,
     )
 
+    def __repr_args__(self) -> Any:
+        """Mask API keys in repr to avoid accidental secret leakage in logs."""
+        for name, value in super().__repr_args__():
+            if name == "openai_api_key" and value:
+                yield (name, "**********")
+            else:
+                yield (name, value)
+
     @model_validator(mode="before")
     @classmethod
     def build_extra(cls, values: Dict[str, Any]) -> Any:
