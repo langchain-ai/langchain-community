@@ -207,7 +207,11 @@ class UnstructuredCSVLoader(UnstructuredFileLoader):
     """
 
     def __init__(
-        self, file_path: str, mode: str = "single", **unstructured_kwargs: Any
+        self,
+        file_path: str,
+        mode: str = "single",
+        encoding: Optional[str] = None,
+        **unstructured_kwargs: Any,
     ):
         """
 
@@ -215,12 +219,16 @@ class UnstructuredCSVLoader(UnstructuredFileLoader):
             file_path: The path to the CSV file.
             mode: The mode to use when loading the CSV file.
               Optional. Defaults to "single".
+            encoding: The encoding of the CSV file. Optional. Defaults to None.
             **unstructured_kwargs: Keyword arguments to pass to unstructured.
         """
         validate_unstructured_version(min_unstructured_version="0.6.8")
         super().__init__(file_path=file_path, mode=mode, **unstructured_kwargs)
+        self.encoding = encoding
 
     def _get_elements(self) -> List:
         from unstructured.partition.csv import partition_csv
 
-        return partition_csv(filename=self.file_path, **self.unstructured_kwargs)
+        return partition_csv(
+            filename=self.file_path, encoding=self.encoding, **self.unstructured_kwargs
+        )
