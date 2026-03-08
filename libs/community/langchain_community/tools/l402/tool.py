@@ -127,8 +127,8 @@ class L402FetchTool(BaseTool):
         run_manager: Optional[CallbackManagerForToolRun] = None,
     ) -> str:
         """Fetch a URL with automatic L402 payment handling."""
-        client = self._get_client()
         try:
+            client = self._get_client()
             if method.upper() == "POST":
                 json_body = json.loads(body) if body else None
                 response = client.post(url, json=json_body)

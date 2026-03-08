@@ -76,6 +76,8 @@ EXPECTED_ALL = [
     "JiraAction",
     "JsonGetValueTool",
     "JsonListKeysTool",
+    "L402FetchTool",
+    "L402SpendingTool",
     "ListDirectoryTool",
     "ListPowerBITool",
     "ListSQLDatabaseTool",
