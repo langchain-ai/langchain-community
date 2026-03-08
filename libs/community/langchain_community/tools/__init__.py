@@ -170,6 +170,10 @@ if TYPE_CHECKING:
         JsonGetValueTool,
         JsonListKeysTool,
     )
+    from langchain_community.tools.l402.tool import (
+        L402FetchTool,
+        L402SpendingTool,
+    )
     from langchain_community.tools.merriam_webster.tool import (
         MerriamWebsterQueryRun,
     )
@@ -418,6 +422,8 @@ __all__ = [
     "JinaSearch",
     "JsonGetValueTool",
     "JsonListKeysTool",
+    "L402FetchTool",
+    "L402SpendingTool",
     "ListDirectoryTool",
     "ListPowerBITool",
     "ListSQLDatabaseTool",
@@ -569,6 +575,8 @@ _module_lookup = {
     "JinaSearch": "langchain_community.tools.jina_search.tool",
     "JsonGetValueTool": "langchain_community.tools.json.tool",
     "JsonListKeysTool": "langchain_community.tools.json.tool",
+    "L402FetchTool": "langchain_community.tools.l402.tool",
+    "L402SpendingTool": "langchain_community.tools.l402.tool",
     "ListDirectoryTool": "langchain_community.tools.file_management",
     "ListPowerBITool": "langchain_community.tools.powerbi.tool",
     "ListSQLDatabaseTool": "langchain_community.tools.sql_database.tool",
