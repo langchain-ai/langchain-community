@@ -32,6 +32,9 @@ if TYPE_CHECKING:
     )
     from langchain_core.tools.convert import tool as tool
 
+    from langchain_community.tools.agent_module.tool import (
+        AgentModuleTool,
+    )
     from langchain_community.tools.ainetwork.app import (
         AINAppOps,
     )
@@ -344,6 +347,7 @@ __all__ = [
     "Tool",
     "tool",
     "StructuredTool",
+    "AgentModuleTool",
     "AINAppOps",
     "AINOwnerOps",
     "AINRuleOps",
@@ -493,6 +497,7 @@ __all__ = [
 _DEPRECATED_TOOLS = {"PythonAstREPLTool", "PythonREPLTool"}
 
 _module_lookup = {
+    "AgentModuleTool": "langchain_community.tools.agent_module.tool",
     "AINAppOps": "langchain_community.tools.ainetwork.app",
     "AINOwnerOps": "langchain_community.tools.ainetwork.owner",
     "AINRuleOps": "langchain_community.tools.ainetwork.rule",
