@@ -33,7 +33,16 @@ class AgentModuleTool(BaseTool):
         "Confidence_required: 1.0 — no probabilistic inference. August 2026 enforcement deadline."
     )
     args_schema: Type[BaseModel] = AgentModuleInput
-    am_key: Optional[SecretStr] = Field(default=None, description="Agent Module API key (X-AM-Key header)")
+    am_key: Optional[SecretStr] = Field(
+        default=None,
+        description="Agent Module API key (X-AM-Key header). Get one at agent-module.dev."
+    )
+
+    def _build_headers(self) -> dict:
+        """Build request headers, injecting AM key if present."""
+        if self.am_key:
+            return {"X-AM-Key": self.am_key.get_secret_value()}
+        return {}
 
     def _run(
         self,
@@ -41,20 +50,20 @@ class AgentModuleTool(BaseTool):
         vertical: str = "ethics",
         run_manager: Optional[CallbackManagerForToolRun] = None,
     ) -> str:
-        headers = {}
-        if self.am_key:
-            headers["X-AM-Key"] = self.am_key.get_secret_value()
+        """Query Agent Module knowledge base (sync)."""
         try:
             response = requests.get(
                 "https://api.agent-module.dev/api/demo",
                 params={"vertical": vertical, "module": module},
-                headers=headers,
+                headers=self._build_headers(),
                 timeout=10,
             )
             response.raise_for_status()
             return response.text
-        except Exception as e:
-            return f"Error querying Agent Module: {str(e)}"
+        except requests.HTTPError as e:
+            return f"Agent Module HTTP error ({e.response.status_code}): {str(e)}"
+        except requests.RequestException as e:
+            return f"Agent Module connection error: {str(e)}"
 
     async def _arun(
         self,
@@ -62,18 +71,18 @@ class AgentModuleTool(BaseTool):
         vertical: str = "ethics",
         run_manager: Optional[AsyncCallbackManagerForToolRun] = None,
     ) -> str:
-        headers = {}
-        if self.am_key:
-            headers["X-AM-Key"] = self.am_key.get_secret_value()
+        """Query Agent Module knowledge base (async)."""
         async with httpx.AsyncClient() as client:
             try:
                 response = await client.get(
                     "https://api.agent-module.dev/api/demo",
                     params={"vertical": vertical, "module": module},
-                    headers=headers,
+                    headers=self._build_headers(),
                     timeout=10,
                 )
                 response.raise_for_status()
                 return response.text
-            except Exception as e:
-                return f"Error querying Agent Module: {str(e)}"
+            except httpx.HTTPStatusError as e:
+                return f"Agent Module HTTP error ({e.response.status_code}): {str(e)}"
+            except httpx.RequestError as e:
+                return f"Agent Module connection error: {str(e)}"
