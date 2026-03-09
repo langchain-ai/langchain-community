@@ -9,9 +9,10 @@ import httpx
 class AgentModuleInput(BaseModel):
     module: str = Field(
         description=(
-            "Module identifier. Examples: 'ETH_021' (FRIA), 'ETH_016' (prohibited practices), "
+            "Module identifier in ETH_NNN format. Examples: 'ETH_016' (prohibited practices), "
             "'ETH_015' (high-risk classification), 'ETH_017' (risk management), "
-            "'ETH_013' (conformity assessment), 'ETH_020' (GPAI obligations)."
+            "'ETH_013' (conformity assessment), 'ETH_020' (GPAI obligations). "
+            "ETH_021 (FRIA) and above require a membership key."
         )
     )
     vertical: str = Field(
@@ -27,9 +28,9 @@ class AgentModuleTool(BaseTool):
     description: str = (
         "Query Agent Module for validated, deterministic EU AI Act compliance knowledge. "
         "Returns binary logic gates and specific statutory citations. "
-        "Use for: FRIA requirements (ETH_021/Art.27), prohibited AI practices (ETH_016/Art.5), "
-        "high-risk classification (ETH_015/Annex III), risk management (ETH_017/Art.9), "
-        "conformity assessment (ETH_013/Art.43), GPAI obligations (ETH_020/Art.53-55). "
+        "Use for: prohibited AI practices (ETH_016/Art.5), high-risk classification (ETH_015/Annex III), "
+        "risk management (ETH_017/Art.9), conformity assessment (ETH_013/Art.43-48), "
+        "GPAI obligations (ETH_020/Art.53-55). FRIA (ETH_021/Art.27) requires a membership key. "
         "Confidence_required: 1.0 — no probabilistic inference. August 2026 enforcement deadline."
     )
     args_schema: Type[BaseModel] = AgentModuleInput
@@ -44,6 +45,11 @@ class AgentModuleTool(BaseTool):
             return {"X-AM-Key": self.am_key.get_secret_value()}
         return {}
 
+    def _to_node_id(self, module: str, vertical: str) -> str:
+        """Convert module identifier to full node ID. ETH_013 -> node:ethics:eth013."""
+        node_key = module.lower().replace("_", "").replace("-", "")
+        return f"node:{vertical}:{node_key}"
+
     def _run(
         self,
         module: str,
@@ -54,7 +60,7 @@ class AgentModuleTool(BaseTool):
         try:
             response = requests.get(
                 "https://api.agent-module.dev/api/demo",
-                params={"vertical": vertical, "module": module},
+                params={"vertical": vertical, "node": self._to_node_id(module, vertical)},
                 headers=self._build_headers(),
                 timeout=10,
             )
@@ -76,7 +82,7 @@ class AgentModuleTool(BaseTool):
             try:
                 response = await client.get(
                     "https://api.agent-module.dev/api/demo",
-                    params={"vertical": vertical, "module": module},
+                    params={"vertical": vertical, "node": self._to_node_id(module, vertical)},
                     headers=self._build_headers(),
                     timeout=10,
                 )
