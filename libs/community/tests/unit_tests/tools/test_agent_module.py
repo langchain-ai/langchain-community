@@ -1,4 +1,5 @@
 """Unit tests for AgentModuleTool."""
+
 from unittest.mock import AsyncMock, MagicMock, patch
 
 import pytest
@@ -55,7 +56,8 @@ class TestAgentModuleTool:
 
         with patch("requests.get", return_value=mock_response) as mock_get:
             result = tool._run(module="ETH_016")
-            assert mock_get.call_args.kwargs["headers"] == {"X-AM-Key": "am_test_key_123"}
+            expected_headers = {"X-AM-Key": "am_test_key_123"}
+            assert mock_get.call_args.kwargs["headers"] == expected_headers
             assert result == '{"module": "ETH_016"}'
 
     def test_run_custom_vertical(self) -> None:
