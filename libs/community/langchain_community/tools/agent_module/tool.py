@@ -1,23 +1,30 @@
 from typing import Optional, Type
-from langchain_core.callbacks import CallbackManagerForToolRun, AsyncCallbackManagerForToolRun
+
+import httpx
+import requests
+from langchain_core.callbacks import (
+    AsyncCallbackManagerForToolRun,
+    CallbackManagerForToolRun,
+)
 from langchain_core.tools import BaseTool
 from pydantic import BaseModel, Field, SecretStr
-import requests
-import httpx
 
 
 class AgentModuleInput(BaseModel):
     module: str = Field(
         description=(
-            "Module identifier in ETH_NNN format. Examples: 'ETH_016' (prohibited practices), "
-            "'ETH_015' (high-risk classification), 'ETH_017' (risk management), "
-            "'ETH_013' (conformity assessment), 'ETH_020' (GPAI obligations). "
+            "Module identifier in ETH_NNN format. "
+            "Examples: 'ETH_016' (prohibited practices), "
+            "'ETH_015' (high-risk classification), "
+            "'ETH_017' (risk management), "
+            "'ETH_013' (conformity assessment), "
+            "'ETH_020' (GPAI obligations). "
             "ETH_021 (FRIA) and above require a membership key."
         )
     )
     vertical: str = Field(
         default="ethics",
-        description="Knowledge vertical. Default: 'ethics'."
+        description="Knowledge vertical. Default: 'ethics'.",
     )
 
 
@@ -26,17 +33,23 @@ class AgentModuleTool(BaseTool):
 
     name: str = "agent_module_eu_ai_act"
     description: str = (
-        "Query Agent Module for validated, deterministic EU AI Act compliance knowledge. "
-        "Returns binary logic gates and specific statutory citations. "
-        "Use for: prohibited AI practices (ETH_016/Art.5), high-risk classification (ETH_015/Annex III), "
-        "risk management (ETH_017/Art.9), conformity assessment (ETH_013/Art.43-48), "
-        "GPAI obligations (ETH_020/Art.53-55). FRIA (ETH_021/Art.27) requires a membership key. "
-        "Confidence_required: 1.0 — no probabilistic inference. August 2026 enforcement deadline."
+        "Query Agent Module for validated EU AI Act compliance knowledge. "
+        "Returns deterministic logic gates and specific statutory citations. "
+        "Use for: prohibited AI practices (ETH_016/Art.5), "
+        "high-risk classification (ETH_015/Annex III), "
+        "risk management (ETH_017/Art.9), "
+        "conformity assessment (ETH_013/Art.43-48), "
+        "GPAI obligations (ETH_020/Art.53-55). "
+        "FRIA (ETH_021/Art.27) requires a membership key. "
+        "Confidence_required: 1.0 — no probabilistic inference. "
+        "August 2026 enforcement deadline."
     )
     args_schema: Type[BaseModel] = AgentModuleInput
     am_key: Optional[SecretStr] = Field(
         default=None,
-        description="Agent Module API key (X-AM-Key header). Get one at agent-module.dev."
+        description=(
+            "Agent Module API key (X-AM-Key header). Get one at agent-module.dev."
+        ),
     )
 
     def _build_headers(self) -> dict:
@@ -58,9 +71,10 @@ class AgentModuleTool(BaseTool):
     ) -> str:
         """Query Agent Module knowledge base (sync)."""
         try:
+            node_id = self._to_node_id(module, vertical)
             response = requests.get(
                 "https://api.agent-module.dev/api/demo",
-                params={"vertical": vertical, "node": self._to_node_id(module, vertical)},
+                params={"vertical": vertical, "node": node_id},
                 headers=self._build_headers(),
                 timeout=10,
             )
@@ -80,9 +94,10 @@ class AgentModuleTool(BaseTool):
         """Query Agent Module knowledge base (async)."""
         async with httpx.AsyncClient() as client:
             try:
+                node_id = self._to_node_id(module, vertical)
                 response = await client.get(
                     "https://api.agent-module.dev/api/demo",
-                    params={"vertical": vertical, "node": self._to_node_id(module, vertical)},
+                    params={"vertical": vertical, "node": node_id},
                     headers=self._build_headers(),
                     timeout=10,
                 )
