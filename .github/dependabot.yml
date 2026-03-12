@@ -8,8 +8,7 @@ updates:
   - package-ecosystem: "github-actions"
     directory: "/"
     schedule:
-      interval: "weekly"
-      day: "monday"
+      interval: "monthly"
     groups:
       minor-and-patch:
         patterns:
@@ -26,8 +25,7 @@ updates:
   - package-ecosystem: "uv"
     directory: "/libs/community"
     schedule:
-      interval: "weekly"
-      day: "monday"
+      interval: "monthly"
     groups:
       minor-and-patch:
         patterns:
