@@ -10,7 +10,7 @@ from langchain_community.chains.graph_qa.sparql import GraphSparqlQAChain
 from langchain_community.graphs import RdfGraph
 
 """
-cd libs/langchain/tests/integration_tests/chains/docker-compose-ontotext-graphdb
+cd libs/community/tests/integration_tests/graphs/docker-compose-ontotext-graphdb
 ./start.sh
 """
 

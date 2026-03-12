@@ -7,7 +7,7 @@ from langchain_community.chains.graph_qa.ontotext_graphdb import OntotextGraphDB
 from langchain_community.graphs import OntotextGraphDBGraph
 
 """
-cd libs/langchain/tests/integration_tests/chains/docker-compose-ontotext-graphdb
+cd libs/community/tests/integration_tests/graphs/docker-compose-ontotext-graphdb
 ./start.sh
 """
 
