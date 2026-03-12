@@ -96,12 +96,6 @@ def _import_bananadev() -> Type[BaseLLM]:
     return Banana
 
 
-def _import_baseten() -> Type[BaseLLM]:
-    from langchain_community.llms.baseten import Baseten
-
-    return Baseten
-
-
 def _import_beam() -> Type[BaseLLM]:
     from langchain_community.llms.beam import Beam
 
@@ -691,8 +685,6 @@ def __getattr__(name: str) -> Any:
         return _import_baidu_qianfan_endpoint()
     elif name == "Banana":
         return _import_bananadev()
-    elif name == "Baseten":
-        return _import_baseten()
     elif name == "Beam":
         return _import_beam()
     elif name == "Bedrock":
@@ -896,7 +888,6 @@ __all__ = [
     "AzureOpenAI",
     "BaichuanLLM",
     "Banana",
-    "Baseten",
     "Beam",
     "Bedrock",
     "CTransformers",
@@ -1003,7 +994,6 @@ def get_type_to_cls_dict() -> Dict[str, Callable[[], Type[BaseLLM]]]:
         "azureml_endpoint": _import_azureml_endpoint,
         "baichuan": _import_baichuan,
         "bananadev": _import_bananadev,
-        "baseten": _import_baseten,
         "beam": _import_beam,
         "cerebriumai": _import_cerebriumai,
         "chat_glm": _import_chatglm,
