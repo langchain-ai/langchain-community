@@ -1,8 +1,10 @@
 from __future__ import annotations
 
+import json
 import logging
+import shlex
 import uuid
-from typing import Any, Dict, Iterable, List, Optional, Tuple, Type
+from typing import Any, Dict, Iterable, List, Optional, Sequence, Tuple, Type
 
 from langchain_core.documents import Document
 from langchain_core.embeddings import Embeddings
@@ -11,10 +13,29 @@ from langchain_core.vectorstores import VectorStore
 
 ADA_TOKEN_COUNT = 1536
 _LANGCHAIN_DEFAULT_TABLE_NAME = "langchain_pg_embedding"
+_DEFAULT_SCHEMA = "public"
+_ID_COLUMN = "langchain_id"
+_DOCUMENT_COLUMN = "document"
+_EMBEDDING_COLUMN = "embedding"
+_METADATA_COLUMN = "metadata"
+_HGRAPH_VERSION = 40000
+
+
+def _extract_metadata_value(metadata: Dict[str, Any], key: str) -> Any:
+    """Return a metadata value and normalize nested containers for storage."""
+    value = metadata.get(key)
+    if isinstance(value, str):
+        return value
+    if isinstance(value, (dict, list)) or value is None or isinstance(value, bool):
+        return json.dumps(value, sort_keys=True)
+    return value
 
 
 class Hologres(VectorStore):
-    """`Hologres API` vector store.
+    """`Hologres` vector store with sdk selected by instance version.
+
+    For instances with version < r4.0.0, this class uses `hologres-vector`.
+    For instances with version >= r4.0.0, this class uses `holo-search-sdk`.
 
     - `connection_string` is a hologres connection string.
     - `embedding_function` any embedding function implementing
@@ -46,20 +67,59 @@ class Hologres(VectorStore):
         self.logger = logger or logging.getLogger(__name__)
         self.__post_init__()
 
-    def __post_init__(
-        self,
-    ) -> None:
-        """
-        Initialize the store.
-        """
-        from hologres_vector import HologresVector
+    def __post_init__(self) -> None:
+        """Initialize the store and ensure the table/index exist."""
+        self.holo_version = self.get_holo_version(self.connection_string)
+        self._use_holo_search_sdk = self.holo_version >= _HGRAPH_VERSION
+
+        if self._use_holo_search_sdk:
+            self._init_holo_search_sdk_store()
+        else:
+            self._init_hologres_vector_store()
+
+    def _init_holo_search_sdk_store(self) -> None:
+        try:
+            from holo_search_sdk import connect
+        except ImportError as exc:
+            raise ImportError(
+                "holo-search-sdk is required for Hologres instances with "
+                "version >= r4.0.0."
+            ) from exc
+
+        config = self._parse_connection_string(self.connection_string)
+
+        self.client = connect(
+            host=config["host"],
+            port=config["port"],
+            database=config["database"],
+            access_key_id=config["user"],
+            access_key_secret=config["password"],
+            schema=config["schema"],
+        )
+
+        if self.pre_delete_table:
+            self.client.drop_table(self.table_name)
+
+        self._ensure_table()
+        self.storage = self.client.open_table(self.table_name)
+        self._ensure_vector_index()
+
+    def _init_hologres_vector_store(self) -> None:
+        try:
+            from hologres_vector import HologresVector
+        except ImportError as exc:
+            raise ImportError(
+                "hologres-vector is required for Hologres instances with "
+                "version < r4.0.0."
+            ) from exc
 
         self.storage = HologresVector(
-            self.connection_string,
+            connection_string=self.connection_string,
             ndims=self.ndims,
             table_name=self.table_name,
-            table_schema={"document": "text"},
+            table_schema={_DOCUMENT_COLUMN: "text"},
             pre_delete_table=self.pre_delete_table,
+            logger=self.logger,
         )
 
     @property
@@ -101,6 +161,139 @@ class Hologres(VectorStore):
 
         return store
 
+    def _ensure_table(self) -> None:
+        from psycopg import sql as psql
+
+        if self.client.check_table_exist(self.table_name):
+            return
+
+        create_table_sql = psql.SQL(
+            """
+            CREATE TABLE IF NOT EXISTS {} (
+                {} TEXT PRIMARY KEY,
+                {} TEXT,
+                {} FLOAT4[] CHECK (
+                    array_ndims({}) = 1 AND array_length({}, 1) = {}
+                ),
+                {} JSON
+            );
+            """
+        ).format(
+            psql.Identifier(self.table_name),
+            psql.Identifier(_ID_COLUMN),
+            psql.Identifier(_DOCUMENT_COLUMN),
+            psql.Identifier(_EMBEDDING_COLUMN),
+            psql.Identifier(_EMBEDDING_COLUMN),
+            psql.Identifier(_EMBEDDING_COLUMN),
+            psql.Literal(self.ndims),
+            psql.Identifier(_METADATA_COLUMN),
+        )
+        self.client.execute(create_table_sql, fetch_result=False)
+
+    def _ensure_vector_index(self) -> None:
+        try:
+            self.storage.set_vector_index(
+                _EMBEDDING_COLUMN,
+                "Cosine",
+                "rabitq",
+                use_reorder=True,
+            )
+        except Exception as e:
+            raise RuntimeError("Failed to create vector index") from e
+
+    def _apply_filter(
+        self,
+        query_builder: Any,
+        filter: Optional[dict],
+    ) -> Any:
+        from psycopg import sql as psql
+
+        if not filter:
+            return query_builder
+
+        for key, value in filter.items():
+            query_builder = query_builder.where(
+                psql.SQL("{} ->> {} = {}").format(
+                    psql.Identifier(_METADATA_COLUMN),
+                    psql.Literal(key),
+                    psql.Literal(str(_extract_metadata_value({key: value}, key))),
+                )
+            )
+        return query_builder
+
+    def _rows_to_docs_and_scores(
+        self, rows: Sequence[Tuple[Any, ...]]
+    ) -> List[Tuple[Document, float]]:
+        docs_and_scores: List[Tuple[Document, float]] = []
+        for row in rows:
+            distance = row[0]
+            document = row[1]
+            metadata_raw = row[2]
+            if isinstance(metadata_raw, dict):
+                metadata = metadata_raw
+            elif isinstance(metadata_raw, str):
+                try:
+                    metadata = json.loads(metadata_raw)
+                except json.JSONDecodeError:
+                    metadata = {}
+            else:
+                metadata = {}
+            docs_and_scores.append(
+                (
+                    Document(page_content=document, metadata=metadata),
+                    float(distance),
+                )
+            )
+        return docs_and_scores
+
+    @staticmethod
+    def _parse_connection_string(connection_string: str) -> Dict[str, Any]:
+        """Parse a libpq-style connection string into sdk connection args."""
+        config: Dict[str, str] = {}
+        for token in shlex.split(connection_string):
+            key, _, value = token.partition("=")
+            if not key or not _:
+                continue
+            config[key] = value
+
+        host = config.get("host")
+        database = config.get("dbname") or config.get("database")
+        user = config.get("user")
+        password = config.get("password")
+
+        if not host or not database or not user or password is None:
+            raise ValueError(
+                "Connection string must include host, dbname, user, and password."
+            )
+
+        port = int(config.get("port", "80"))
+        schema = config.get("schema") or _DEFAULT_SCHEMA
+
+        return {
+            "host": host,
+            "port": port,
+            "database": database,
+            "user": user,
+            "password": password,
+            "schema": schema,
+        }
+
+    @staticmethod
+    def get_holo_version(connection_string: str) -> int:
+        """Return the Hologres instance version number."""
+        row: Any
+        import psycopg
+
+        with psycopg.connect(connection_string) as conn:
+            with conn.cursor() as cursor:
+                cursor.execute("select hg_version_num();")
+                row = cursor.fetchone()
+
+        if row is None:
+            raise ValueError("Failed to retrieve Hologres version.")
+
+        return int(row[0])
+
     def add_embeddings(
         self,
         texts: Iterable[str],
@@ -117,6 +310,56 @@ class Hologres(VectorStore):
             metadatas: List of metadatas associated with the texts.
             kwargs: vectorstore specific parameters
         """
+        text_list = list(texts)
+        if not text_list:
+            return
+
+        if self._use_holo_search_sdk:
+            self._add_embeddings_with_holo_search_sdk(
+                text_list, embeddings, metadatas, ids
+            )
+        else:
+            self._add_embeddings_with_hologres_vector(
+                text_list, embeddings, metadatas, ids
+            )
+
+    def _add_embeddings_with_holo_search_sdk(
+        self,
+        texts: List[str],
+        embeddings: List[List[float]],
+        metadatas: List[dict],
+        ids: List[str],
+    ) -> None:
+        rows: List[List[Any]] = []
+        for doc_id, text, embedding, metadata in zip(ids, texts, embeddings, metadatas):
+            rows.append(
+                [
+                    doc_id,
+                    text,
+                    embedding,
+                    json.dumps(metadata, sort_keys=True),
+                ]
+            )
+
+        try:
+            self.storage.upsert_multi(
+                _ID_COLUMN,
+                rows,
+                [_ID_COLUMN, _DOCUMENT_COLUMN, _EMBEDDING_COLUMN, _METADATA_COLUMN],
+                update=True,
+                update_columns=[_DOCUMENT_COLUMN, _EMBEDDING_COLUMN, _METADATA_COLUMN],
+            )
+        except Exception as e:
+            self.logger.exception(e)
+            raise
+
+    def _add_embeddings_with_hologres_vector(
+        self,
+        texts: List[str],
+        embeddings: List[List[float]],
+        metadatas: List[dict],
+        ids: List[str],
+    ) -> None:
         try:
             schema_datas = [{"document": t} for t in texts]
             self.storage.upsert_vectors(embeddings, ids, metadatas, schema_datas)
@@ -140,15 +383,16 @@ class Hologres(VectorStore):
         Returns:
             List of ids from adding the texts into the vectorstore.
         """
+        text_list = list(texts)
         if ids is None:
-            ids = [str(uuid.uuid4()) for _ in texts]
+            ids = [str(uuid.uuid4()) for _ in text_list]
 
-        embeddings = self.embedding_function.embed_documents(list(texts))
+        embeddings = self.embedding_function.embed_documents(text_list)
 
         if not metadatas:
-            metadatas = [{} for _ in texts]
+            metadatas = [{} for _ in text_list]
 
-        self.add_embeddings(texts, embeddings, metadatas, ids, **kwargs)
+        self.add_embeddings(text_list, embeddings, metadatas, ids, **kwargs)
 
         return ids
 
@@ -226,21 +470,64 @@ class Hologres(VectorStore):
         k: int = 4,
         filter: Optional[dict] = None,
     ) -> List[Tuple[Document, float]]:
-        results: List[dict[str, Any]] = self.storage.search(
-            embedding, k=k, select_columns=["document"], metadata_filters=filter
-        )
+        if self._use_holo_search_sdk:
+            return self._similarity_search_with_holo_search_sdk(
+                embedding=embedding,
+                k=k,
+                filter=filter,
+            )
+        else:
+            return self._similarity_search_with_hologres_vector(
+                embedding=embedding,
+                k=k,
+                filter=filter,
+            )
 
-        docs = [
+    def _similarity_search_with_holo_search_sdk(
+        self,
+        embedding: List[float],
+        k: int,
+        filter: Optional[dict],
+    ) -> List[Tuple[Document, float]]:
+        query_builder = self.storage.search_vector(
+            embedding,
+            _EMBEDDING_COLUMN,
+            output_name="distance",
+            distance_method="Cosine",
+        )
+        query_builder = query_builder.select(
+            [
+                (_DOCUMENT_COLUMN, None),
+                (_METADATA_COLUMN, None),
+            ]
+        )
+        query_builder = self._apply_filter(query_builder, filter)
+        query_builder = query_builder.order_by("distance", order="desc").limit(k)
+        rows = query_builder.fetchall()
+        return self._rows_to_docs_and_scores(rows)
+
+    def _similarity_search_with_hologres_vector(
+        self,
+        embedding: List[float],
+        k: int,
+        filter: Optional[dict],
+    ) -> List[Tuple[Document, float]]:
+        results = self.storage.search(
+            vector=embedding,
+            k=k,
+            select_columns=[_DOCUMENT_COLUMN],
+            metadata_filters=filter,
+        )
+        return [
             (
                 Document(
-                    page_content=result["document"],
-                    metadata=result["metadata"],
+                    page_content=result.get(_DOCUMENT_COLUMN) or "",
+                    metadata=result.get(_METADATA_COLUMN) or {},
                 ),
-                result["distance"],
+                float(result["distance"]),
             )
             for result in results
         ]
-        return docs
 
     @classmethod
     def from_texts(
@@ -260,7 +547,7 @@ class Hologres(VectorStore):
         "Either pass it as a parameter
         or set the HOLOGRES_CONNECTION_STRING environment variable.
         Create the connection string by calling
-        HologresVector.connection_string_from_db_params
+        Hologres.connection_string_from_db_params
         """
         embeddings = embedding.embed_documents(list(texts))
 
@@ -337,7 +624,6 @@ class Hologres(VectorStore):
         return the instance of the store without inserting any new
         embeddings
         """
-
         connection_string = cls.get_connection_string(kwargs)
 
         store = cls(
@@ -364,7 +650,7 @@ class Hologres(VectorStore):
                 "Either pass it as a parameter"
                 "or set the HOLOGRES_CONNECTION_STRING environment variable."
                 "Create the connection string by calling"
-                "HologresVector.connection_string_from_db_params"
+                "Hologres.connection_string_from_db_params"
             )
 
         return connection_string
@@ -386,9 +672,8 @@ class Hologres(VectorStore):
         "Either pass it as a parameter
         or set the HOLOGRES_CONNECTION_STRING environment variable.
         Create the connection string by calling
-        HologresVector.connection_string_from_db_params
+        Hologres.connection_string_from_db_params
         """
-
         texts = [d.page_content for d in documents]
         metadatas = [d.metadata for d in documents]
         connection_string = cls.get_connection_string(kwargs)
@@ -397,7 +682,7 @@ class Hologres(VectorStore):
 
         return cls.from_texts(
             texts=texts,
-            pre_delete_collection=pre_delete_collection,
+            pre_delete_table=pre_delete_collection,
             embedding=embedding,
             metadatas=metadatas,
             ids=ids,

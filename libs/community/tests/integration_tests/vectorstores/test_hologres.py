@@ -16,6 +16,7 @@ CONNECTION_STRING = Hologres.connection_string_from_db_params(
     password=os.environ.get("TEST_HOLOGRES_PASSWORD", "postgres"),
 )
 
+USE_HGRAPH = True
 
 ADA_TOKEN_COUNT = 1536
 
@@ -93,7 +94,10 @@ def test_hologres_with_metadatas_with_scores() -> None:
         pre_delete_table=True,
     )
     output = docsearch.similarity_search_with_score("foo", k=1)
-    assert output == [(Document(page_content="foo", metadata={"page": "0"}), 0.0)]
+    if USE_HGRAPH:
+        assert output == [(Document(page_content="foo", metadata={"page": "0"}), 1.0)]
+    else:
+        assert output == [(Document(page_content="foo", metadata={"page": "0"}), 0.0)]
 
 
 def test_hologres_with_filter_match() -> None:
@@ -109,7 +113,10 @@ def test_hologres_with_filter_match() -> None:
         pre_delete_table=True,
     )
     output = docsearch.similarity_search_with_score("foo", k=1, filter={"page": "0"})
-    assert output == [(Document(page_content="foo", metadata={"page": "0"}), 0.0)]
+    if USE_HGRAPH:
+        assert output == [(Document(page_content="foo", metadata={"page": "0"}), 1.0)]
+    else:
+        assert output == [(Document(page_content="foo", metadata={"page": "0"}), 0.0)]
 
 
 def test_hologres_with_filter_distant_match() -> None:
@@ -125,7 +132,12 @@ def test_hologres_with_filter_distant_match() -> None:
         pre_delete_table=True,
     )
     output = docsearch.similarity_search_with_score("foo", k=1, filter={"page": "2"})
-    assert output == [(Document(page_content="baz", metadata={"page": "2"}), 4.0)]
+    if USE_HGRAPH:
+        assert output == [
+            (Document(page_content="baz", metadata={"page": "2"}), 0.998699)
+        ]
+    else:
+        assert output == [(Document(page_content="baz", metadata={"page": "2"}), 4.0)]
 
 
 def test_hologres_with_filter_no_match() -> None:
