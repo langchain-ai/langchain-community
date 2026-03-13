@@ -230,6 +230,9 @@ if TYPE_CHECKING:
     from langchain_community.document_loaders.gutenberg import (
         GutenbergLoader,
     )
+    from langchain_community.document_loaders.hads import (
+        HADSLoader,
+    )
     from langchain_community.document_loaders.hn import (
         HNLoader,
     )
@@ -615,6 +618,7 @@ _module_lookup = {
     "GoogleDriveLoader": "langchain_community.document_loaders.googledrive",
     "GoogleSpeechToTextLoader": "langchain_community.document_loaders.google_speech_to_text",  # noqa: E501
     "GutenbergLoader": "langchain_community.document_loaders.gutenberg",
+    "HADSLoader": "langchain_community.document_loaders.hads",
     "HNLoader": "langchain_community.document_loaders.hn",
     "HuggingFaceDatasetLoader": "langchain_community.document_loaders.hugging_face_dataset",  # noqa: E501
     "HuggingFaceModelLoader": "langchain_community.document_loaders.hugging_face_model",
@@ -823,6 +827,7 @@ __all__ = [
     "GoogleDriveLoader",
     "GoogleSpeechToTextLoader",
     "GutenbergLoader",
+    "HADSLoader",
     "HNLoader",
     "HuggingFaceDatasetLoader",
     "HuggingFaceModelLoader",
