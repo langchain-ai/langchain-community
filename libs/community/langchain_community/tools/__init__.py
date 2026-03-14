@@ -153,6 +153,19 @@ if TYPE_CHECKING:
     from langchain_community.tools.graphql.tool import (
         BaseGraphQLTool,
     )
+    from langchain_community.tools.hipaa_agent.tool import (
+        HIPAAAgentBreachLookup,
+        HIPAAAgentBreachProbability,
+        HIPAAAgentComplianceDelta,
+        HIPAAAgentComplianceScan,
+        HIPAAAgentComplianceScore,
+        HIPAAAgentComplianceState,
+        HIPAAAgentControls,
+        HIPAAAgentToolkit,
+        HIPAAAgentValidateWorkflow,
+        HIPAAAgentVendorRisk,
+        HIPAAAgentWebhookSubscribe,
+    )
     from langchain_community.tools.human.tool import (
         HumanInputRun,
     )
@@ -408,6 +421,17 @@ __all__ = [
     "GoogleCloudTextToSpeechTool",
     "GoogleSerperResults",
     "GoogleSerperRun",
+    "HIPAAAgentBreachLookup",
+    "HIPAAAgentBreachProbability",
+    "HIPAAAgentComplianceDelta",
+    "HIPAAAgentComplianceScan",
+    "HIPAAAgentComplianceScore",
+    "HIPAAAgentComplianceState",
+    "HIPAAAgentControls",
+    "HIPAAAgentToolkit",
+    "HIPAAAgentValidateWorkflow",
+    "HIPAAAgentVendorRisk",
+    "HIPAAAgentWebhookSubscribe",
     "HumanInputRun",
     "IFTTTWebhook",
     "IncomeStatements",
@@ -559,6 +583,17 @@ _module_lookup = {
     "GoogleCloudTextToSpeechTool": "langchain_community.tools.google_cloud.texttospeech",  # noqa: E501
     "GoogleSerperResults": "langchain_community.tools.google_serper.tool",
     "GoogleSerperRun": "langchain_community.tools.google_serper.tool",
+    "HIPAAAgentBreachLookup": "langchain_community.tools.hipaa_agent.tool",
+    "HIPAAAgentBreachProbability": "langchain_community.tools.hipaa_agent.tool",
+    "HIPAAAgentComplianceDelta": "langchain_community.tools.hipaa_agent.tool",
+    "HIPAAAgentComplianceScan": "langchain_community.tools.hipaa_agent.tool",
+    "HIPAAAgentComplianceScore": "langchain_community.tools.hipaa_agent.tool",
+    "HIPAAAgentComplianceState": "langchain_community.tools.hipaa_agent.tool",
+    "HIPAAAgentControls": "langchain_community.tools.hipaa_agent.tool",
+    "HIPAAAgentToolkit": "langchain_community.tools.hipaa_agent.tool",
+    "HIPAAAgentValidateWorkflow": "langchain_community.tools.hipaa_agent.tool",
+    "HIPAAAgentVendorRisk": "langchain_community.tools.hipaa_agent.tool",
+    "HIPAAAgentWebhookSubscribe": "langchain_community.tools.hipaa_agent.tool",
     "HumanInputRun": "langchain_community.tools.human.tool",
     "IFTTTWebhook": "langchain_community.tools.ifttt",
     "IncomeStatements": "langchain_community.tools.financial_datasets.income_statements",  # noqa: E501
