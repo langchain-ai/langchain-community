@@ -47,6 +47,9 @@ if TYPE_CHECKING:
     from langchain_community.tools.ainetwork.value import (
         AINValueOps,
     )
+    from langchain_community.tools.agent101.tool import (
+        Agent101SearchRun,
+    )
     from langchain_community.tools.arxiv.tool import (
         ArxivQueryRun,
     )
@@ -350,6 +353,7 @@ __all__ = [
     "AINTransfer",
     "AINValueOps",
     "AIPluginTool",
+    "Agent101SearchRun",
     "APIOperation",
     "ArxivQueryRun",
     "AskNewsSearch",
@@ -499,6 +503,7 @@ _module_lookup = {
     "AINTransfer": "langchain_community.tools.ainetwork.transfer",
     "AINValueOps": "langchain_community.tools.ainetwork.value",
     "AIPluginTool": "langchain_community.tools.plugin",
+    "Agent101SearchRun": "langchain_community.tools.agent101.tool",
     "APIOperation": "langchain_community.tools.openapi.utils.api_models",
     "ArxivQueryRun": "langchain_community.tools.arxiv.tool",
     "AskNewsSearch": "langchain_community.tools.asknews.tool",
