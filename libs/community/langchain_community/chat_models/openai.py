@@ -226,6 +226,13 @@ class ChatOpenAI(BaseChatModel):
         """Return whether this model can be serialized by Langchain."""
         return True
 
+    def __repr_args__(self) -> Any:
+        """Return repr args with API key masked for security."""
+        args = super().__repr_args__()
+        return [
+            (k, "**********" if k == "openai_api_key" and v else v) for k, v in args
+        ]
+
     client: Any = Field(default=None, exclude=True)
     async_client: Any = Field(default=None, exclude=True)
     model_name: str = Field(default="gpt-3.5-turbo", alias="model")
