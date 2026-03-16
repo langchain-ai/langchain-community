@@ -24,7 +24,7 @@ class TestAgentModuleTool:
 
     def test_build_headers_with_key(self) -> None:
         tool = AgentModuleTool(am_key="am_test_key_123")
-        assert tool._build_headers() == {"X-AM-Key": "am_test_key_123"}
+        assert tool._build_headers() == {"X-Agent-Module-Key": "am_test_key_123"}
 
     def test_to_node_id(self) -> None:
         tool = AgentModuleTool()
@@ -56,7 +56,7 @@ class TestAgentModuleTool:
 
         with patch("requests.get", return_value=mock_response) as mock_get:
             result = tool._run(module="ETH_016")
-            expected_headers = {"X-AM-Key": "am_test_key_123"}
+            expected_headers = {"X-Agent-Module-Key": "am_test_key_123"}
             assert mock_get.call_args.kwargs["headers"] == expected_headers
             assert result == '{"module": "ETH_016"}'
 
