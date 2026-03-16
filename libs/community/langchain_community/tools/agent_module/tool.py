@@ -48,14 +48,14 @@ class AgentModuleTool(BaseTool):
     am_key: Optional[SecretStr] = Field(
         default=None,
         description=(
-            "Agent Module API key (X-AM-Key header). Get one at agent-module.dev."
+            "Agent Module API key (X-Agent-Module-Key header). Get one at agent-module.dev."
         ),
     )
 
     def _build_headers(self) -> dict:
         """Build request headers, injecting AM key if present."""
         if self.am_key:
-            return {"X-AM-Key": self.am_key.get_secret_value()}
+            return {"X-Agent-Module-Key": self.am_key.get_secret_value()}
         return {}
 
     def _to_node_id(self, module: str, vertical: str) -> str:
