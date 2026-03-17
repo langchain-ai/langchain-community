@@ -95,6 +95,11 @@ if TYPE_CHECKING:
         format_tool_to_openai_function,
     )
     from langchain_community.tools.dataherald import DataheraldTextToSQL
+    from langchain_community.tools.dns_aid import (
+        DnsAidDiscoverTool,
+        DnsAidPublishTool,
+        DnsAidUnpublishTool,
+    )
     from langchain_community.tools.ddg_search.tool import (
         DuckDuckGoSearchResults,
         DuckDuckGoSearchRun,
@@ -383,6 +388,9 @@ __all__ = [
     "CurrentWebPageTool",
     "DeleteFileTool",
     "DataheraldTextToSQL",
+    "DnsAidDiscoverTool",
+    "DnsAidPublishTool",
+    "DnsAidUnpublishTool",
     "DuckDuckGoSearchResults",
     "DuckDuckGoSearchRun",
     "E2BDataAnalysisTool",
@@ -534,6 +542,9 @@ _module_lookup = {
     "DataheraldTextToSQL": "langchain_community.tools.dataherald.tool",
     "DeleteFileTool": "langchain_community.tools.file_management",
     "Detector": "langchain_community.tools.zenguard.tool",
+    "DnsAidDiscoverTool": "langchain_community.tools.dns_aid",
+    "DnsAidPublishTool": "langchain_community.tools.dns_aid",
+    "DnsAidUnpublishTool": "langchain_community.tools.dns_aid",
     "DuckDuckGoSearchResults": "langchain_community.tools.ddg_search.tool",
     "DuckDuckGoSearchRun": "langchain_community.tools.ddg_search.tool",
     "E2BDataAnalysisTool": "langchain_community.tools.e2b_data_analysis.tool",
