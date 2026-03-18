@@ -68,6 +68,34 @@ def create_sql_agent(
 ) -> AgentExecutor:
     """Construct a SQL agent from an LLM and toolkit or database.
 
+    !!! warning
+        This agent can execute arbitrary SQL against your database.
+
+        By default, the agent is allowed to generate SQL strings and run them via the
+        database connection. This is powerful, but it also means the agent can generate
+        expensive or dangerous queries (e.g., long-running queries, large scans/joins,
+        locking queries, or unintended writes depending on your database permissions).
+
+        ``create_sql_agent`` returns a ``langchain_classic`` ``AgentExecutor``.
+        ``AgentExecutor`` is an agent abstraction that has long been considered legacy
+        and is not actively supported as the recommended foundation for new production
+        applications.
+
+        For production-grade agent development, prefer building with Deep Agents:
+        https://github.com/langchain-ai/deepagents
+
+        If you use this in production, coordinate with your security/DB teams and apply
+        server-side controls:
+
+        - Use least-privilege database roles (ideally read-only, schema-limited).
+        - Enforce statement timeouts / max execution time and other resource limits at the
+          role or session level.
+        - Apply query guardrails (e.g., restrict accessible schemas/tables, limit
+          concurrency, and monitor/alert on slow queries).
+
+        Client-side timeouts do not always guarantee that a running statement is
+        cancelled on the database server.
+
     Args:
         llm: Language model to use for the agent. If agent_type is "tool-calling" then
             llm is expected to support tool calling.
