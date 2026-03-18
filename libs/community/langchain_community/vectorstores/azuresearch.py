@@ -481,7 +481,9 @@ class AzureSearch(VectorStore):
             user_agent=user_agent,
             cors_options=cors_options,
             async_=True,
-            additional_search_client_options=additional_search_client_options,
+            additional_search_client_options==copy.deepcopy(
+                additional_search_client_options
+            ),
             azure_credential=azure_credential,
             azure_async_credential=azure_async_credential,
         )
