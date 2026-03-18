@@ -831,7 +831,7 @@ class AzureSearch(VectorStore):
         score_threshold: Optional[float] = None,
         **kwargs: Any,
     ) -> List[Tuple[Document, float]]:
-        result = self.vector_search_with_score(query, k=k, **kwargs)
+        result = self.similarity_search_with_score(query, k=k, **kwargs)
         return (
             result
             if score_threshold is None
@@ -846,7 +846,7 @@ class AzureSearch(VectorStore):
         score_threshold: Optional[float] = None,
         **kwargs: Any,
     ) -> List[Tuple[Document, float]]:
-        result = await self.avector_search_with_score(query, k=k, **kwargs)
+        result = await self.asimilarity_search_with_score(query, k=k, **kwargs)
         return (
             result
             if score_threshold is None
