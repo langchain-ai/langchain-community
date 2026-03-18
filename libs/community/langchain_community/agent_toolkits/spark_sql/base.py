@@ -53,8 +53,8 @@ def create_spark_sql_agent(
         server-side controls:
 
         - Use least-privilege roles (ideally read-only, schema-limited).
-        - Enforce statement timeouts / max execution time and other resource limits at the
-          role or session level.
+        - Enforce statement timeouts / max execution time and other resource limits at
+          the role or session level.
         - Apply query guardrails (e.g., restrict accessible schemas/tables, limit
           concurrency, and monitor/alert on slow queries).
 
