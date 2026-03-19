@@ -43,6 +43,9 @@ if TYPE_CHECKING:
     from langchain_community.chat_models.gpt_router import (
         GPTRouter,
     )
+    from langchain_community.chat_models.githubcopilot import (
+        ChatGithubCopilot,
+    )
     from langchain_community.chat_models.human import (
         HumanInputChatModel,
     )
@@ -143,6 +146,7 @@ __all__ = [
     "ChatEdenAI",
     "ChatEverlyAI",
     "ChatFriendli",
+    "ChatGithubCopilot",
     "ChatGooglePalm",
     "ChatHunyuan",
     "ChatJavelinAIGateway",
@@ -192,6 +196,7 @@ _module_lookup = {
     "ChatEverlyAI": "langchain_community.chat_models.everlyai",
     "ChatEdenAI": "langchain_community.chat_models.edenai",
     "ChatFriendli": "langchain_community.chat_models.friendli",
+    "ChatGithubCopilot": "langchain_community.chat_models.githubcopilot",
     "ChatGooglePalm": "langchain_community.chat_models.google_palm",
     "ChatHunyuan": "langchain_community.chat_models.hunyuan",
     "ChatJavelinAIGateway": "langchain_community.chat_models.javelin_ai_gateway",
