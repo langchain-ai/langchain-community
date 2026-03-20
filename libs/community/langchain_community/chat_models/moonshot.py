@@ -1,15 +1,20 @@
 """Wrapper around Moonshot chat models."""
 
-from typing import Dict
-
-from langchain_core.utils import (
-    convert_to_secret_str,
-    get_from_dict_or_env,
-    pre_init,
-)
+import logging
+from typing import (Any, Callable, Dict, List, Literal, Optional, Sequence, Tuple, Type,
+                    Union)
 
 from langchain_community.chat_models.openai import ChatOpenAI
 from langchain_community.llms.moonshot import MOONSHOT_SERVICE_URL_BASE, MoonshotCommon
+from langchain_core.language_models.base import LanguageModelInput
+from langchain_core.messages import AIMessage, BaseMessage
+from langchain_core.runnables import Runnable
+from langchain_core.tools import BaseTool
+from langchain_core.utils import convert_to_secret_str, get_from_dict_or_env, pre_init
+from langchain_core.utils.function_calling import convert_to_openai_tool
+from pydantic import BaseModel, model_validator
+
+logger = logging.getLogger(__name__)
 
 
 class MoonshotChat(MoonshotCommon, ChatOpenAI):  # type: ignore[misc]
@@ -185,3 +190,51 @@ class MoonshotChat(MoonshotCommon, ChatOpenAI):  # type: ignore[misc]
             ).chat.completions
 
         return values
+
+    @model_validator(mode='after')
+    def validate_model(self) -> "MoonshotChat":
+        if self.model_name == 'kimi-k2.5':
+            self.temperature = 1.0
+            logger.warning("overriding temperature to 1.0 as required by kimi-k2.5")
+        return self
+
+    def bind_tools(
+        self,
+        tools: Sequence[Union[Dict[str, Any], Type[BaseModel], Callable, BaseTool]],
+        *,
+        tool_choice: Optional[
+            Union[dict, str, Literal["auto", "any", "none"], bool]
+        ] = None,
+        **kwargs: Any,
+    ) -> Runnable[LanguageModelInput, AIMessage]:
+        """Bind tool-like objects to this chat model.
+        Args:
+            tools: A list of tool definitions to bind to this chat model.
+                Can be  a dictionary, pydantic model, callable, or BaseTool. Pydantic
+                models, callables, and BaseTools will be automatically converted to
+                their schema dictionary representation.
+            tool_choice: Currently this can only be auto for this chat model.
+            **kwargs: Any additional parameters to pass to the
+                :class:`~langchain.runnable.Runnable` constructor.
+        """
+        if tool_choice not in (None, "auto"):
+            raise ValueError("tool_choice must be 'auto' or None for MoonshotChat.")
+        formatted_tools = [convert_to_openai_tool(tool) for tool in tools]
+        return self.bind(tools=formatted_tools, **kwargs)
+
+    def _create_message_dicts(
+        self, messages: List[BaseMessage], stop: Optional[List[str]]
+    ) -> Tuple[List[Dict[str, Any]], Dict[str, Any]]:
+        """Create message dicts for API call, adding reasoning_content for Moonshot."""
+        message_dicts, params = super()._create_message_dicts(messages, stop)
+
+        # Moonshot requires reasoning_content for AIMessages with tool_calls
+        #when thinking is enabled
+        for msg_dict, msg in zip(message_dicts, messages):
+            if isinstance(msg, AIMessage):
+                # AIMessage with tool_calls needs reasoning_content
+                # when thinking is enabled
+                if msg.tool_calls and not msg_dict.get("reasoning_content"):
+                    msg_dict["reasoning_content"] = "."
+
+        return message_dicts, params
