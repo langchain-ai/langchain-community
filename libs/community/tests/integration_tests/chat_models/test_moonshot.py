@@ -35,8 +35,8 @@ def test_chat_moonshot_instantiate_with_alias() -> None:
 
 
 @pytest.mark.skipif(
-        os.getenv("MOONSHOT_API_KEY") is None,
-        reason="MOONSHOT_API_KEY environment variable not set."
+    os.getenv("MOONSHOT_API_KEY") is None,
+    reason="MOONSHOT_API_KEY environment variable not set.",
 )
 @pytest.mark.parametrize("model_name", ["kimi-k2-turbo-preview", "kimi-k2.5"])
 def test_chat_moonshot_tool_call(model_name: str) -> None:
@@ -63,5 +63,3 @@ def test_chat_moonshot_tool_call(model_name: str) -> None:
     conversation.append(tool_message)
     response = cast(AIMessage, chat.invoke(conversation))
     assert "sunny" in response.content.lower()
-
-

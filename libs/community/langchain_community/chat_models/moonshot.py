@@ -15,13 +15,15 @@ from typing import (
 )
 
 from langchain_core.language_models.base import LanguageModelInput
-from langchain_core.messages import AIMessage, BaseMessage
+from langchain_core.messages import AIMessage, BaseMessage, ChatMessage
+from langchain_core.outputs import ChatGeneration, ChatResult
 from langchain_core.runnables import Runnable
 from langchain_core.tools import BaseTool
 from langchain_core.utils import convert_to_secret_str, get_from_dict_or_env, pre_init
 from langchain_core.utils.function_calling import convert_to_openai_tool
 from pydantic import BaseModel, model_validator
 
+from langchain_community.adapters.openai import convert_dict_to_message
 from langchain_community.chat_models.openai import ChatOpenAI
 from langchain_community.llms.moonshot import MOONSHOT_SERVICE_URL_BASE, MoonshotCommon
 
@@ -202,9 +204,9 @@ class MoonshotChat(MoonshotCommon, ChatOpenAI):  # type: ignore[misc]
 
         return values
 
-    @model_validator(mode='after')
+    @model_validator(mode="after")
     def validate_model(self) -> "MoonshotChat":
-        if self.model_name == 'kimi-k2.5':
+        if self.model_name == "kimi-k2.5":
             self.temperature = 1.0
             logger.warning("overriding temperature to 1.0 as required by kimi-k2.5")
         return self
@@ -228,10 +230,36 @@ class MoonshotChat(MoonshotCommon, ChatOpenAI):  # type: ignore[misc]
             **kwargs: Any additional parameters to pass to the
                 :class:`~langchain.runnable.Runnable` constructor.
         """
-        if tool_choice not in (None, "auto"):
-            raise ValueError("tool_choice must be 'auto' or None for MoonshotChat.")
         formatted_tools = [convert_to_openai_tool(tool) for tool in tools]
         return self.bind(tools=formatted_tools, **kwargs)
+
+    def _create_chat_result(self, response: Union[dict, BaseModel]) -> ChatResult:
+        generations = []
+        if not isinstance(response, dict):
+            response = response.model_dump()
+        for res in response["choices"]:
+            message: ChatMessage = convert_dict_to_message(res["message"])
+
+            if "reasoning_content" in res:
+                message.additional_kwargs["reasoning_content"] = res[
+                    "reasoning_content"
+                ]
+
+            generation_info = dict(finish_reason=res.get("finish_reason"))
+            if "logprobs" in res:
+                generation_info["logprobs"] = res["logprobs"]
+            gen = ChatGeneration(
+                message=message,
+                generation_info=generation_info,
+            )
+            generations.append(gen)
+        token_usage = response.get("usage", {})
+        llm_output = {
+            "token_usage": token_usage,
+            "model_name": self.model_name,
+            "system_fingerprint": response.get("system_fingerprint", ""),
+        }
+        return ChatResult(generations=generations, llm_output=llm_output)
 
     def _create_message_dicts(
         self, messages: List[BaseMessage], stop: Optional[List[str]]
@@ -240,7 +268,7 @@ class MoonshotChat(MoonshotCommon, ChatOpenAI):  # type: ignore[misc]
         message_dicts, params = super()._create_message_dicts(messages, stop)
 
         # Moonshot requires reasoning_content for AIMessages with tool_calls
-        #when thinking is enabled
+        # when thinking is enabled
         for msg_dict, msg in zip(message_dicts, messages):
             if isinstance(msg, AIMessage):
                 # AIMessage with tool_calls needs reasoning_content
