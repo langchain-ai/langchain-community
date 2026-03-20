@@ -1,3 +1,1 @@
-"""
-**Utility functions** for LangChain.
-"""
+"""`langchain-community` utilities."""

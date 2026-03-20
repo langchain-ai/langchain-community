@@ -1,4 +1,5 @@
 from typing import List
+from urllib.parse import urlparse
 
 from langchain_core.documents import Document
 
@@ -10,7 +11,8 @@ class GutenbergLoader(BaseLoader):
 
     def __init__(self, file_path: str):
         """Initialize with a file path."""
-        if not file_path.startswith("https://www.gutenberg.org"):
+        parsed = urlparse(file_path)
+        if parsed.scheme != "https" or parsed.hostname != "www.gutenberg.org":
             raise ValueError("file path must start with 'https://www.gutenberg.org'")
 
         if not file_path.endswith(".txt"):

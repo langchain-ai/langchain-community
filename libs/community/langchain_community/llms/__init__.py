@@ -96,12 +96,6 @@ def _import_bananadev() -> Type[BaseLLM]:
     return Banana
 
 
-def _import_baseten() -> Type[BaseLLM]:
-    from langchain_community.llms.baseten import Baseten
-
-    return Baseten
-
-
 def _import_beam() -> Type[BaseLLM]:
     from langchain_community.llms.beam import Beam
 
@@ -166,18 +160,6 @@ def _import_databricks() -> Type[BaseLLM]:
     from langchain_community.llms.databricks import Databricks
 
     return Databricks
-
-
-# deprecated / only for back compat - do not add to __all__
-def _import_databricks_chat() -> Any:
-    warn_deprecated(
-        since="0.0.22",
-        removal="1.0",
-        alternative_import="langchain_community.chat_models.ChatDatabricks",
-    )
-    from langchain_community.chat_models.databricks import ChatDatabricks
-
-    return ChatDatabricks
 
 
 def _import_deepinfra() -> Type[BaseLLM]:
@@ -703,8 +685,6 @@ def __getattr__(name: str) -> Any:
         return _import_baidu_qianfan_endpoint()
     elif name == "Banana":
         return _import_bananadev()
-    elif name == "Baseten":
-        return _import_baseten()
     elif name == "Beam":
         return _import_beam()
     elif name == "Bedrock":
@@ -908,7 +888,6 @@ __all__ = [
     "AzureOpenAI",
     "BaichuanLLM",
     "Banana",
-    "Baseten",
     "Beam",
     "Bedrock",
     "CTransformers",
@@ -1015,7 +994,6 @@ def get_type_to_cls_dict() -> Dict[str, Callable[[], Type[BaseLLM]]]:
         "azureml_endpoint": _import_azureml_endpoint,
         "baichuan": _import_baichuan,
         "bananadev": _import_bananadev,
-        "baseten": _import_baseten,
         "beam": _import_beam,
         "cerebriumai": _import_cerebriumai,
         "chat_glm": _import_chatglm,
@@ -1024,7 +1002,6 @@ def get_type_to_cls_dict() -> Dict[str, Callable[[], Type[BaseLLM]]]:
         "ctransformers": _import_ctransformers,
         "ctranslate2": _import_ctranslate2,
         "databricks": _import_databricks,
-        "databricks-chat": _import_databricks_chat,  # deprecated / only for back compat
         "deepinfra": _import_deepinfra,
         "deepsparse": _import_deepsparse,
         "edenai": _import_edenai,

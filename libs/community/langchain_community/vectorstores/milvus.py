@@ -32,7 +32,7 @@ DEFAULT_MILVUS_CONNECTION = {
     alternative_import="langchain_milvus.MilvusVectorStore",
 )
 class Milvus(VectorStore):
-    """`Milvus` vector store.
+    """`Milvus` vector store. DO NOT USE. KEPT FOR BACKWARDS COMPATIBILITY.
 
     You need to install `pymilvus` and run Milvus.
 

@@ -131,7 +131,7 @@ class AscendEmbeddings(Embeddings, BaseModel):
             texts_ = texts[i : i + self.batch_size]
             emb = self.encode([self.document_instruction + text for text in texts_])
             embedding_list.append(emb)
-        return np.concatenate(embedding_list)
+        return np.concatenate(embedding_list).tolist()
 
     def embed_query(self, text: str) -> List[float]:
         return self.encode([self.query_instruction + text])[0]
