@@ -14,7 +14,7 @@ from pydantic import (
 
 from langchain_community.llms.utils import enforce_stop_tokens
 
-MOONSHOT_SERVICE_URL_BASE = "https://api.moonshot.cn/v1"
+MOONSHOT_SERVICE_URL_BASE = "https://api.moonshot.ai/v1"
 
 
 class _MoonshotClient(BaseModel):
