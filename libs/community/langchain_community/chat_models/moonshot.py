@@ -1,11 +1,19 @@
 """Wrapper around Moonshot chat models."""
 
 import logging
-from typing import (Any, Callable, Dict, List, Literal, Optional, Sequence, Tuple, Type,
-                    Union)
+from typing import (
+    Any,
+    Callable,
+    Dict,
+    List,
+    Literal,
+    Optional,
+    Sequence,
+    Tuple,
+    Type,
+    Union,
+)
 
-from langchain_community.chat_models.openai import ChatOpenAI
-from langchain_community.llms.moonshot import MOONSHOT_SERVICE_URL_BASE, MoonshotCommon
 from langchain_core.language_models.base import LanguageModelInput
 from langchain_core.messages import AIMessage, BaseMessage
 from langchain_core.runnables import Runnable
@@ -13,6 +21,9 @@ from langchain_core.tools import BaseTool
 from langchain_core.utils import convert_to_secret_str, get_from_dict_or_env, pre_init
 from langchain_core.utils.function_calling import convert_to_openai_tool
 from pydantic import BaseModel, model_validator
+
+from langchain_community.chat_models.openai import ChatOpenAI
+from langchain_community.llms.moonshot import MOONSHOT_SERVICE_URL_BASE, MoonshotCommon
 
 logger = logging.getLogger(__name__)
 
