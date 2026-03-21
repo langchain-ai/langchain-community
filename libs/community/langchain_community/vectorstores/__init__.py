@@ -23,6 +23,9 @@ if TYPE_CHECKING:
     from langchain_community.vectorstores.analyticdb import (
         AnalyticDB,
     )
+    from langchain_community.vectorstores.analyticdb_mysql import (
+        AnalyticDBMySQL,
+    )
     from langchain_community.vectorstores.annoy import (
         Annoy,
     )
@@ -265,6 +268,7 @@ __all__ = [
     "AlibabaCloudOpenSearch",
     "AlibabaCloudOpenSearchSettings",
     "AnalyticDB",
+    "AnalyticDBMySQL",
     "Annoy",
     "ApacheDoris",
     "ApertureDB",
@@ -357,6 +361,7 @@ _module_lookup = {
     "AlibabaCloudOpenSearch": "langchain_community.vectorstores.alibabacloud_opensearch",  # noqa: E501
     "AlibabaCloudOpenSearchSettings": "langchain_community.vectorstores.alibabacloud_opensearch",  # noqa: E501
     "AnalyticDB": "langchain_community.vectorstores.analyticdb",
+    "AnalyticDBMySQL": "langchain_community.vectorstores.analyticdb_mysql",
     "Annoy": "langchain_community.vectorstores.annoy",
     "ApacheDoris": "langchain_community.vectorstores.apache_doris",
     "ApertureDB": "langchain_community.vectorstores.aperturedb",
