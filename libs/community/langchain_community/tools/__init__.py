@@ -74,6 +74,11 @@ if TYPE_CHECKING:
         BingSearchResults,
         BingSearchRun,
     )
+    from langchain_community.tools.spix.tool import (
+        SpixCallTool,
+        SpixEmailTool,
+        SpixSMSTool,
+    )
     from langchain_community.tools.brave_search.tool import (
         BraveSearch,
     )
@@ -371,6 +376,9 @@ __all__ = [
     "BearlyInterpreterTool",
     "BingSearchResults",
     "BingSearchRun",
+    "SpixCallTool",
+    "SpixSMSTool",
+    "SpixEmailTool",
     "BraveSearch",
     "CashFlowStatements",
     "ClickTool",
@@ -521,6 +529,9 @@ _module_lookup = {
     "BearlyInterpreterTool": "langchain_community.tools.bearly.tool",
     "BingSearchResults": "langchain_community.tools.bing_search.tool",
     "BingSearchRun": "langchain_community.tools.bing_search.tool",
+    "SpixCallTool": "langchain_community.tools.spix.tool",
+    "SpixSMSTool": "langchain_community.tools.spix.tool",
+    "SpixEmailTool": "langchain_community.tools.spix.tool",
     "BraveSearch": "langchain_community.tools.brave_search.tool",
     "CashFlowStatements": "langchain_community.tools.financial_datasets.cash_flow_statements",  # noqa: E501
     "ClickTool": "langchain_community.tools.playwright",
