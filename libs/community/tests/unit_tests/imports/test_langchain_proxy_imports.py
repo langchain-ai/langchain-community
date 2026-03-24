@@ -7,6 +7,10 @@ def test_all_proxy_llms_are_llm_subclasses() -> None:
     from langchain_core.language_models import BaseLLM
 
     for cls in llms.__all__:
+        if cls in [
+            "Baseten",  # Removed from community
+        ]:
+            continue
         assert issubclass(getattr(llms, cls), BaseLLM)
 
 
