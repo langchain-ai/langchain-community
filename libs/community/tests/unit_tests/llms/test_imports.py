@@ -15,7 +15,6 @@ EXPECT_ALL = [
     "AzureOpenAI",
     "BaichuanLLM",
     "Banana",
-    "Baseten",
     "Beam",
     "Bedrock",
     "CTransformers",
