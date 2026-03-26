@@ -134,6 +134,9 @@ if TYPE_CHECKING:
         CSVLoader,
         UnstructuredCSVLoader,
     )
+    from langchain_community.document_loaders.crw import (
+        CrwLoader,
+    )
     from langchain_community.document_loaders.cube_semantic import (
         CubeSemanticLoader,
     )
@@ -581,6 +584,7 @@ _module_lookup = {
     "ConcurrentLoader": "langchain_community.document_loaders.concurrent",
     "ConfluenceLoader": "langchain_community.document_loaders.confluence",
     "CouchbaseLoader": "langchain_community.document_loaders.couchbase",
+    "CrwLoader": "langchain_community.document_loaders.crw",
     "CubeSemanticLoader": "langchain_community.document_loaders.cube_semantic",
     "DataFrameLoader": "langchain_community.document_loaders.dataframe",
     "DatadogLogsLoader": "langchain_community.document_loaders.datadog_logs",
@@ -789,6 +793,7 @@ __all__ = [
     "ConcurrentLoader",
     "ConfluenceLoader",
     "CouchbaseLoader",
+    "CrwLoader",
     "CubeSemanticLoader",
     "DataFrameLoader",
     "DatadogLogsLoader",
