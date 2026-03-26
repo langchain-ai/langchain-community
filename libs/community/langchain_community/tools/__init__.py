@@ -53,6 +53,13 @@ if TYPE_CHECKING:
     from langchain_community.tools.asknews.tool import (
         AskNewsSearch,
     )
+    from langchain_community.tools.asterpay import (
+        AsterPayKYADeepAnalysis,
+        AsterPayKYATier,
+        AsterPayKYATrustScore,
+        AsterPayKYAVerify,
+        AsterPaySettlementEstimate,
+    )
     from langchain_community.tools.azure_ai_services import (
         AzureAiServicesDocumentIntelligenceTool,
         AzureAiServicesImageAnalysisTool,
@@ -353,6 +360,11 @@ __all__ = [
     "APIOperation",
     "ArxivQueryRun",
     "AskNewsSearch",
+    "AsterPayKYADeepAnalysis",
+    "AsterPayKYATier",
+    "AsterPayKYATrustScore",
+    "AsterPayKYAVerify",
+    "AsterPaySettlementEstimate",
     "AzureAiServicesDocumentIntelligenceTool",
     "AzureAiServicesImageAnalysisTool",
     "AzureAiServicesSpeechToTextTool",
@@ -502,6 +514,11 @@ _module_lookup = {
     "APIOperation": "langchain_community.tools.openapi.utils.api_models",
     "ArxivQueryRun": "langchain_community.tools.arxiv.tool",
     "AskNewsSearch": "langchain_community.tools.asknews.tool",
+    "AsterPayKYADeepAnalysis": "langchain_community.tools.asterpay",
+    "AsterPayKYATier": "langchain_community.tools.asterpay",
+    "AsterPayKYATrustScore": "langchain_community.tools.asterpay",
+    "AsterPayKYAVerify": "langchain_community.tools.asterpay",
+    "AsterPaySettlementEstimate": "langchain_community.tools.asterpay",
     "AzureAiServicesDocumentIntelligenceTool": "langchain_community.tools.azure_ai_services",  # noqa: E501
     "AzureAiServicesImageAnalysisTool": "langchain_community.tools.azure_ai_services",
     "AzureAiServicesSpeechToTextTool": "langchain_community.tools.azure_ai_services",
