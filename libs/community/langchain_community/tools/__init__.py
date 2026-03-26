@@ -206,6 +206,12 @@ if TYPE_CHECKING:
     from langchain_community.tools.openapi.utils.openapi_utils import (
         OpenAPISpec,
     )
+    from langchain_community.tools.oixa_protocol.tool import (
+        OIXACreateAuctionTool,
+        OIXADeliverOutputTool,
+        OIXAListAuctionsTool,
+        OIXAPlaceBidTool,
+    )
     from langchain_community.tools.openweathermap.tool import (
         OpenWeatherMapQueryRun,
     )
@@ -434,6 +440,10 @@ __all__ = [
     "O365SearchEvents",
     "O365SendEvent",
     "O365SendMessage",
+    "OIXACreateAuctionTool",
+    "OIXADeliverOutputTool",
+    "OIXAListAuctionsTool",
+    "OIXAPlaceBidTool",
     "OpenAPISpec",
     "OpenWeatherMapQueryRun",
     "PolygonAggregates",
@@ -585,6 +595,10 @@ _module_lookup = {
     "O365SearchEvents": "langchain_community.tools.office365.events_search",
     "O365SendEvent": "langchain_community.tools.office365.send_event",
     "O365SendMessage": "langchain_community.tools.office365.send_message",
+    "OIXACreateAuctionTool": "langchain_community.tools.oixa_protocol.tool",
+    "OIXADeliverOutputTool": "langchain_community.tools.oixa_protocol.tool",
+    "OIXAListAuctionsTool": "langchain_community.tools.oixa_protocol.tool",
+    "OIXAPlaceBidTool": "langchain_community.tools.oixa_protocol.tool",
     "OpenAPISpec": "langchain_community.tools.openapi.utils.openapi_utils",
     "OpenWeatherMapQueryRun": "langchain_community.tools.openweathermap.tool",
     "PolygonAggregates": "langchain_community.tools.polygon.aggregates",
