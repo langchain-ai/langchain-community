@@ -23,6 +23,9 @@ if TYPE_CHECKING:
     from langchain_community.utilities.asknews import (
         AskNewsAPIWrapper,
     )
+    from langchain_community.utilities.asterpay import (
+        AsterPayAPIWrapper,
+    )
     from langchain_community.utilities.awslambda import (
         LambdaWrapper,
     )
@@ -171,6 +174,7 @@ __all__ = [
     "ArceeWrapper",
     "ArxivAPIWrapper",
     "AskNewsAPIWrapper",
+    "AsterPayAPIWrapper",
     "AudioStream",
     "BibtexparserWrapper",
     "BingSearchAPIWrapper",
@@ -232,6 +236,7 @@ _module_lookup = {
     "ArceeWrapper": "langchain_community.utilities.arcee",
     "ArxivAPIWrapper": "langchain_community.utilities.arxiv",
     "AskNewsAPIWrapper": "langchain_community.utilities.asknews",
+    "AsterPayAPIWrapper": "langchain_community.utilities.asterpay",
     "AudioStream": "langchain_community.utilities.nvidia_riva",
     "BibtexparserWrapper": "langchain_community.utilities.bibtex",
     "BingSearchAPIWrapper": "langchain_community.utilities.bing_search",
