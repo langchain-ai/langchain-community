@@ -134,6 +134,10 @@ class CrwLoader(BaseLoader):
         # Poll for completion
         poll_interval = self.params.get("poll_interval", 2)
         timeout = self.params.get("timeout", 300)
+        if poll_interval <= 0:
+            raise ValueError("poll_interval must be > 0")
+        if timeout <= 0:
+            raise ValueError("timeout must be > 0")
         elapsed = 0.0
 
         while elapsed < timeout:
@@ -215,9 +219,13 @@ class CrwLoader(BaseLoader):
             requests.HTTPError: On 4xx/5xx responses.
         """
         url = f"{self.api_url}{path}"
-        response = self._session.request(method, url, json=json)
+        response = self._session.request(method, url, json=json, timeout=30)
         response.raise_for_status()
-        return response.json()
+        data: dict[str, Any] = response.json()
+        if "success" in data and not data["success"]:
+            error_msg = data.get("error", "Unknown error")
+            raise RuntimeError(f"CRW API error: {error_msg}")
+        return data
 
     @staticmethod
     def _parse_document(page: dict[str, Any]) -> Document:

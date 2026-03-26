@@ -1,10 +1,9 @@
 """Test CrwLoader."""
 
-from typing import Any, Iterator, List
+from typing import Iterator
 from unittest.mock import MagicMock, patch
 
 import pytest
-from langchain_core.documents import Document
 
 from langchain_community.document_loaders import CrwLoader
 
@@ -162,3 +161,97 @@ class TestCrwLoader:
         docs = list(loader.lazy_load())
 
         assert len(docs) == 0
+
+    def test_crawl_missing_job_id(self, mock_session: MagicMock) -> None:
+        """Test that crawl raises when job ID is missing from response."""
+        mock_response = MagicMock()
+        mock_response.json.return_value = {"success": True}
+        mock_response.raise_for_status = MagicMock()
+        mock_session.request.return_value = mock_response
+
+        loader = CrwLoader(url="https://example.com", mode="crawl")
+        with pytest.raises(ValueError, match="did not return a job ID"):
+            list(loader.lazy_load())
+
+    def test_crawl_failed_status(self, mock_session: MagicMock) -> None:
+        """Test that crawl raises on failed job status."""
+        start_response = MagicMock()
+        start_response.json.return_value = {"success": True, "id": "job-456"}
+        start_response.raise_for_status = MagicMock()
+
+        status_response = MagicMock()
+        status_response.json.return_value = {
+            "status": "failed",
+            "error": "Site unreachable",
+        }
+        status_response.raise_for_status = MagicMock()
+
+        mock_session.request.side_effect = [start_response, status_response]
+
+        loader = CrwLoader(url="https://example.com", mode="crawl")
+        with pytest.raises(RuntimeError, match="crawl job 'job-456' failed"):
+            list(loader.lazy_load())
+
+    def test_crawl_timeout(self, mock_session: MagicMock) -> None:
+        """Test that crawl raises TimeoutError when polling exceeds timeout."""
+        start_response = MagicMock()
+        start_response.json.return_value = {"success": True, "id": "job-789"}
+        start_response.raise_for_status = MagicMock()
+
+        pending_response = MagicMock()
+        pending_response.json.return_value = {"status": "scraping"}
+        pending_response.raise_for_status = MagicMock()
+
+        mock_session.request.side_effect = [start_response] + [pending_response] * 10
+
+        loader = CrwLoader(
+            url="https://example.com",
+            mode="crawl",
+            params={"poll_interval": 1, "timeout": 2},
+        )
+        with pytest.raises(TimeoutError, match="timed out after 2s"):
+            list(loader.lazy_load())
+
+    def test_crawl_poll_interval_zero(self, mock_session: MagicMock) -> None:
+        """Test that poll_interval=0 raises ValueError."""
+        start_response = MagicMock()
+        start_response.json.return_value = {"success": True, "id": "job-0"}
+        start_response.raise_for_status = MagicMock()
+        mock_session.request.return_value = start_response
+
+        loader = CrwLoader(
+            url="https://example.com",
+            mode="crawl",
+            params={"poll_interval": 0},
+        )
+        with pytest.raises(ValueError, match="poll_interval must be > 0"):
+            list(loader.lazy_load())
+
+    def test_crawl_timeout_zero(self, mock_session: MagicMock) -> None:
+        """Test that timeout=0 raises ValueError."""
+        start_response = MagicMock()
+        start_response.json.return_value = {"success": True, "id": "job-t0"}
+        start_response.raise_for_status = MagicMock()
+        mock_session.request.return_value = start_response
+
+        loader = CrwLoader(
+            url="https://example.com",
+            mode="crawl",
+            params={"timeout": 0},
+        )
+        with pytest.raises(ValueError, match="timeout must be > 0"):
+            list(loader.lazy_load())
+
+    def test_api_success_false(self, mock_session: MagicMock) -> None:
+        """Test that API response with success=false raises RuntimeError."""
+        mock_response = MagicMock()
+        mock_response.json.return_value = {
+            "success": False,
+            "error": "Rate limit exceeded",
+        }
+        mock_response.raise_for_status = MagicMock()
+        mock_session.request.return_value = mock_response
+
+        loader = CrwLoader(url="https://example.com", mode="scrape")
+        with pytest.raises(RuntimeError, match="Rate limit exceeded"):
+            list(loader.lazy_load())
