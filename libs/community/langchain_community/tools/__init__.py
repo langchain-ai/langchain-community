@@ -282,6 +282,13 @@ if TYPE_CHECKING:
     from langchain_community.tools.sleep.tool import (
         SleepTool,
     )
+    from langchain_community.tools.sail_sql.tool import (
+        BaseSailSQLTool,
+        InfoSailSQLTool,
+        ListSailSQLTool,
+        QuerySailSQLTool,
+        SailQueryCheckerTool,
+    )
     from langchain_community.tools.spark_sql.tool import (
         BaseSparkSQLTool,
         InfoSparkSQLTool,
@@ -367,6 +374,7 @@ __all__ = [
     "BaseGraphQLTool",
     "BaseRequestsTool",
     "BaseSQLDatabaseTool",
+    "BaseSailSQLTool",
     "BaseSparkSQLTool",
     "BearlyInterpreterTool",
     "BingSearchResults",
@@ -413,6 +421,7 @@ __all__ = [
     "IncomeStatements",
     "InfoPowerBITool",
     "InfoSQLDatabaseTool",
+    "InfoSailSQLTool",
     "InfoSparkSQLTool",
     "JiraAction",
     "JinaSearch",
@@ -421,6 +430,7 @@ __all__ = [
     "ListDirectoryTool",
     "ListPowerBITool",
     "ListSQLDatabaseTool",
+    "ListSailSQLTool",
     "ListSparkSQLTool",
     "MerriamWebsterQueryRun",
     "MetaphorSearchResults",
@@ -446,6 +456,7 @@ __all__ = [
     "QuerySQLCheckerTool",
     "QuerySQLDatabaseTool",
     "QuerySQLDataBaseTool",  # Legacy, kept for backwards compatibility.
+    "QuerySailSQLTool",
     "QuerySparkSQLTool",
     "ReadFileTool",
     "RedditSearchRun",
@@ -458,6 +469,7 @@ __all__ = [
     "SceneXplainTool",
     "SearchAPIResults",
     "SearchAPIRun",
+    "SailQueryCheckerTool",
     "SearxSearchResults",
     "SearxSearchRun",
     "ShellTool",
@@ -516,6 +528,7 @@ _module_lookup = {
     "BaseGraphQLTool": "langchain_community.tools.graphql.tool",
     "BaseRequestsTool": "langchain_community.tools.requests.tool",
     "BaseSQLDatabaseTool": "langchain_community.tools.sql_database.tool",
+    "BaseSailSQLTool": "langchain_community.tools.sail_sql.tool",
     "BaseSparkSQLTool": "langchain_community.tools.spark_sql.tool",
     "BaseTool": "langchain_core.tools",
     "BearlyInterpreterTool": "langchain_community.tools.bearly.tool",
@@ -564,6 +577,7 @@ _module_lookup = {
     "IncomeStatements": "langchain_community.tools.financial_datasets.income_statements",  # noqa: E501
     "InfoPowerBITool": "langchain_community.tools.powerbi.tool",
     "InfoSQLDatabaseTool": "langchain_community.tools.sql_database.tool",
+    "InfoSailSQLTool": "langchain_community.tools.sail_sql.tool",
     "InfoSparkSQLTool": "langchain_community.tools.spark_sql.tool",
     "JiraAction": "langchain_community.tools.jira.tool",
     "JinaSearch": "langchain_community.tools.jina_search.tool",
@@ -572,6 +586,7 @@ _module_lookup = {
     "ListDirectoryTool": "langchain_community.tools.file_management",
     "ListPowerBITool": "langchain_community.tools.powerbi.tool",
     "ListSQLDatabaseTool": "langchain_community.tools.sql_database.tool",
+    "ListSailSQLTool": "langchain_community.tools.sail_sql.tool",
     "ListSparkSQLTool": "langchain_community.tools.spark_sql.tool",
     "MerriamWebsterQueryRun": "langchain_community.tools.merriam_webster.tool",
     "MetaphorSearchResults": "langchain_community.tools.metaphor_search",
@@ -598,6 +613,7 @@ _module_lookup = {
     "QuerySQLDatabaseTool": "langchain_community.tools.sql_database.tool",
     # Legacy, kept for backwards compatibility.
     "QuerySQLDataBaseTool": "langchain_community.tools.sql_database.tool",
+    "QuerySailSQLTool": "langchain_community.tools.sail_sql.tool",
     "QuerySparkSQLTool": "langchain_community.tools.spark_sql.tool",
     "ReadFileTool": "langchain_community.tools.file_management",
     "RedditSearchRun": "langchain_community.tools.reddit_search.tool",
@@ -610,6 +626,7 @@ _module_lookup = {
     "SceneXplainTool": "langchain_community.tools.scenexplain.tool",
     "SearchAPIResults": "langchain_community.tools.searchapi.tool",
     "SearchAPIRun": "langchain_community.tools.searchapi.tool",
+    "SailQueryCheckerTool": "langchain_community.tools.sail_sql.tool",
     "SearxSearchResults": "langchain_community.tools.searx_search.tool",
     "SearxSearchRun": "langchain_community.tools.searx_search.tool",
     "ShellTool": "langchain_community.tools.shell.tool",

@@ -78,6 +78,12 @@ if TYPE_CHECKING:
     from langchain_community.agent_toolkits.slack.toolkit import (
         SlackToolkit,
     )
+    from langchain_community.agent_toolkits.sail_sql.base import (
+        create_sail_sql_agent,
+    )
+    from langchain_community.agent_toolkits.sail_sql.toolkit import (
+        SailSQLToolkit,
+    )
     from langchain_community.agent_toolkits.spark_sql.base import (
         create_spark_sql_agent,
     )
@@ -117,6 +123,7 @@ __all__ = [
     "PolygonToolkit",
     "PowerBIToolkit",
     "SQLDatabaseToolkit",
+    "SailSQLToolkit",
     "SlackToolkit",
     "SparkSQLToolkit",
     "SteamToolkit",
@@ -125,6 +132,7 @@ __all__ = [
     "create_openapi_agent",
     "create_pbi_agent",
     "create_pbi_chat_agent",
+    "create_sail_sql_agent",
     "create_spark_sql_agent",
     "create_sql_agent",
 ]
@@ -151,6 +159,7 @@ _module_lookup = {
     "PowerBIToolkit": "langchain_community.agent_toolkits.powerbi.toolkit",
     "SQLDatabaseToolkit": "langchain_community.agent_toolkits.sql.toolkit",
     "SlackToolkit": "langchain_community.agent_toolkits.slack.toolkit",
+    "SailSQLToolkit": "langchain_community.agent_toolkits.sail_sql.toolkit",
     "SparkSQLToolkit": "langchain_community.agent_toolkits.spark_sql.toolkit",
     "SteamToolkit": "langchain_community.agent_toolkits.steam.toolkit",
     "ZapierToolkit": "langchain_community.agent_toolkits.zapier.toolkit",
@@ -158,6 +167,7 @@ _module_lookup = {
     "create_openapi_agent": "langchain_community.agent_toolkits.openapi.base",
     "create_pbi_agent": "langchain_community.agent_toolkits.powerbi.base",
     "create_pbi_chat_agent": "langchain_community.agent_toolkits.powerbi.chat_base",
+    "create_sail_sql_agent": "langchain_community.agent_toolkits.sail_sql.base",
     "create_spark_sql_agent": "langchain_community.agent_toolkits.spark_sql.base",
     "create_sql_agent": "langchain_community.agent_toolkits.sql.base",
 }

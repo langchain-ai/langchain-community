@@ -134,6 +134,9 @@ if TYPE_CHECKING:
     from langchain_community.utilities.serpapi import (
         SerpAPIWrapper,
     )
+    from langchain_community.utilities.sail_sql import (
+        SailSQL,
+    )
     from langchain_community.utilities.spark_sql import (
         SparkSQL,
     )
@@ -212,6 +215,7 @@ __all__ = [
     "SceneXplainAPIWrapper",
     "SearchApiAPIWrapper",
     "SQLDatabase",
+    "SailSQL",
     "SearxSearchWrapper",
     "SerpAPIWrapper",
     "SparkSQL",
@@ -274,6 +278,7 @@ _module_lookup = {
     "SceneXplainAPIWrapper": "langchain_community.utilities.scenexplain",
     "SearchApiAPIWrapper": "langchain_community.utilities.searchapi",
     "SearxSearchWrapper": "langchain_community.utilities.searx_search",
+    "SailSQL": "langchain_community.utilities.sail_sql",
     "SerpAPIWrapper": "langchain_community.utilities.serpapi",
     "SparkSQL": "langchain_community.utilities.spark_sql",
     "StackExchangeAPIWrapper": "langchain_community.utilities.stackexchange",

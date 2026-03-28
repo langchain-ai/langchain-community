@@ -46,6 +46,7 @@ EXPECTED_ALL = [
     "SceneXplainAPIWrapper",
     "SearchApiAPIWrapper",
     "SearxSearchWrapper",
+    "SailSQL",
     "SerpAPIWrapper",
     "SparkSQL",
     "StackExchangeAPIWrapper",
