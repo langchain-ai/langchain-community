@@ -89,6 +89,7 @@ if TYPE_CHECKING:
 
 
 _module_lookup = {
+    "AgentForensicsCallbackHandler": "langchain_community.callbacks.agent_forensics_callback",
     "AimCallbackHandler": "langchain_community.callbacks.aim_callback",
     "ArgillaCallbackHandler": "langchain_community.callbacks.argilla_callback",
     "ArizeCallbackHandler": "langchain_community.callbacks.arize_callback",
@@ -127,6 +128,7 @@ def __getattr__(name: str) -> Any:
 
 
 __all__ = [
+    "AgentForensicsCallbackHandler",
     "AimCallbackHandler",
     "ArgillaCallbackHandler",
     "ArizeCallbackHandler",
