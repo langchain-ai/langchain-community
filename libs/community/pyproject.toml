@@ -57,6 +57,7 @@ test = [
     "langchain-tests>=1.0.0,<2.0.0",
     "toml>=0.10.2,<1.0.0",
     "mypy-extensions>=1.0.0",
+    "sqlglot>=26.0.0,<27.0.0",
 ]
 test_integration = ["vcrpy>=6.0.0"]
 lint = [

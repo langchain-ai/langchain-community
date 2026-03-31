@@ -1,7 +1,7 @@
 # flake8: noqa
 """Tools for interacting with a SQL database."""
 
-from typing import Any, Dict, Optional, Sequence, Type, Union
+from typing import Any, Dict, Optional, Sequence, Set, Type, Union
 
 from sqlalchemy.engine import Result
 
@@ -17,6 +17,34 @@ from langchain_core.prompts import PromptTemplate
 from langchain_community.utilities.sql_database import SQLDatabase
 from langchain_core.tools import BaseTool
 from langchain_community.tools.sql_database.prompt import QUERY_CHECKER
+
+
+def _extract_table_names(query: str, dialect: Optional[str] = None) -> Set[str]:
+    """Extract table names from a SQL query using sqlglot.
+
+    Args:
+        query: The SQL query string to parse.
+        dialect: Optional SQL dialect for parsing.
+
+    Returns:
+        A set of table names referenced in the query.
+
+    Raises:
+        ValueError: If the query cannot be parsed.
+    """
+    try:
+        import sqlglot
+        from sqlglot import errors, exp
+    except ImportError as e:
+        msg = "sqlglot is required for table validation. Install with: pip install sqlglot"
+        raise ImportError(msg) from e
+
+    try:
+        parsed = sqlglot.parse_one(query, dialect=dialect)
+    except errors.ParseError as e:
+        raise ValueError(f"Invalid SQL query: {e}") from e
+
+    return {table.name for table in parsed.find_all(exp.Table) if table.name}
 
 
 class BaseSQLDatabaseTool(BaseModel):
@@ -50,12 +78,43 @@ class QuerySQLDatabaseTool(BaseSQLDatabaseTool, BaseTool):
     """
     args_schema: Type[BaseModel] = _QuerySQLDatabaseToolInput
 
+    def _validate_query_tables(self, query: str) -> Optional[str]:
+        """Validate that the query only accesses allowed tables.
+
+        Args:
+            query: The SQL query to validate.
+
+        Returns:
+            An error message if validation fails, None otherwise.
+        """
+        # If no table restrictions are configured, skip validation
+        if not self.db._ignore_tables and not self.db._include_tables:
+            return None
+
+        try:
+            query_tables = _extract_table_names(query, dialect=self.db.dialect)
+        except ValueError as e:
+            return f"Error: {e}"
+
+        usable_tables = set(self.db.get_usable_table_names())
+        disallowed_tables = query_tables - usable_tables
+
+        if disallowed_tables:
+            return (
+                f"Error: Access to table(s) {disallowed_tables} is not allowed. "
+                f"Allowed tables are: {sorted(usable_tables)}"
+            )
+        return None
+
     def _run(
         self,
         query: str,
         run_manager: Optional[CallbackManagerForToolRun] = None,
     ) -> Union[str, Sequence[Dict[str, Any]], Result]:
         """Execute the query, return the results or an error message."""
+        validation_error = self._validate_query_tables(query)
+        if validation_error:
+            return validation_error
         return self.db.run_no_throw(query)
 
 
