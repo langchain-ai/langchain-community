@@ -41,7 +41,7 @@ class ContextCallbackHandler(BaseCallbackHandler):
         ImportError: if the `context-python` package is not installed.
 
     Chat Example:
-        >>> from langchain_community.llms import ChatOpenAI
+        >>> from langchain_openai import ChatOpenAI
         >>> from langchain_community.callbacks import ContextCallbackHandler
         >>> context_callback = ContextCallbackHandler(
         ...     token="<CONTEXT_TOKEN_HERE>",
@@ -60,7 +60,7 @@ class ContextCallbackHandler(BaseCallbackHandler):
 
     Chain Example:
         >>> from langchain_classic.chains import LLMChain
-        >>> from langchain_community.chat_models import ChatOpenAI
+        >>> from langchain_openai import ChatOpenAI
         >>> from langchain_community.callbacks import ContextCallbackHandler
         >>> context_callback = ContextCallbackHandler(
         ...     token="<CONTEXT_TOKEN_HERE>",

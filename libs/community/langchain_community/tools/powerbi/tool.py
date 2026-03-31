@@ -11,7 +11,6 @@ from langchain_core.callbacks import (
 from langchain_core.tools import BaseTool
 from pydantic import ConfigDict, Field, model_validator
 
-from langchain_community.chat_models.openai import _import_tiktoken
 from langchain_community.tools.powerbi.prompt import (
     BAD_REQUEST_RESPONSE,
     DEFAULT_FEWSHOT_EXAMPLES,
@@ -20,6 +19,18 @@ from langchain_community.tools.powerbi.prompt import (
 from langchain_community.utilities.powerbi import PowerBIDataset, json_to_md
 
 logger = logging.getLogger(__name__)
+
+
+def _import_tiktoken() -> Any:
+    try:
+        import tiktoken
+    except ImportError:
+        raise ImportError(
+            "Could not import tiktoken python package. "
+            "This is needed in order to calculate get_token_ids. "
+            "Please install it with `pip install tiktoken`."
+        )
+    return tiktoken
 
 
 class QueryPowerBITool(BaseTool):

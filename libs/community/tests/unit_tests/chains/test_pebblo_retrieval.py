@@ -23,7 +23,7 @@ from langchain_community.chains.pebblo_retrieval.models import (
     ChainInput,
     SemanticContext,
 )
-from langchain_community.vectorstores.pinecone import Pinecone
+from langchain_community.vectorstores.pgvector import PGVector
 from tests.unit_tests.llms.fake_llm import FakeLLM
 
 
@@ -56,8 +56,8 @@ def retriever() -> FakeRetriever:
     """
     retriever = FakeRetriever()
     retriever.search_kwargs = {}
-    # Set the class of vectorstore to Pinecone
-    retriever.vectorstore.__class__ = Pinecone
+    # Set the class of vectorstore to PGVector
+    retriever.vectorstore.__class__ = PGVector
     return retriever
 
 
@@ -107,7 +107,7 @@ def test_validate_vectorstore(retriever: FakeRetriever) -> None:
     Test vectorstore validation
     """
 
-    # No exception should be raised for supported vectorstores (Pinecone)
+    # No exception should be raised for supported vectorstores (PGVector)
     _ = PebbloRetrievalQA.from_chain_type(
         llm=FakeLLM(),
         chain_type="stuff",
