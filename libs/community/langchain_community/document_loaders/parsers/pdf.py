@@ -1141,7 +1141,7 @@ class PyMuPDFParser(BaseBlobParser):
         import pymupdf
 
         tables_list = list(
-            pymupdf.table.find_tables(page, **self.extract_tables_settings)
+            pymupdf.table.find_tables(page, **(self.extract_tables_settings or {}))
         )
         if tables_list:
             if self.extract_tables == "markdown":

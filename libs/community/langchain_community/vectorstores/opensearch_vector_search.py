@@ -513,7 +513,7 @@ class OpenSearchVectorSearch(VectorStore):
         **kwargs: Any,
     ) -> List[str]:
         bulk_size = bulk_size if bulk_size is not None else self.bulk_size
-        _validate_embeddings_and_bulk_size(len(embeddings), bulk_size)
+        _validate_embeddings_and_bulk_size(len(embeddings), int(bulk_size))
         index_name = kwargs.get("index_name", self.index_name)
         if self.index_name is None:
             raise ValueError("index_name must be provided.")
@@ -565,7 +565,7 @@ class OpenSearchVectorSearch(VectorStore):
         **kwargs: Any,
     ) -> List[str]:
         bulk_size = bulk_size if bulk_size is not None else self.bulk_size
-        _validate_embeddings_and_bulk_size(len(embeddings), bulk_size)
+        _validate_embeddings_and_bulk_size(len(embeddings), int(bulk_size))
         index_name = kwargs.get("index_name", self.index_name)
         if self.index_name is None:
             raise ValueError("index_name must be provided.")
@@ -1596,10 +1596,10 @@ class OpenSearchVectorSearch(VectorStore):
             "is_aoss",
             "routing",
         ]
-        bulk_size = (
-            bulk_size if bulk_size is not None else getattr(cls, "bulk_size", 500)
+        effective_bulk_size: int = (
+            bulk_size if bulk_size is not None else int(getattr(cls, "bulk_size", 500))
         )
-        _validate_embeddings_and_bulk_size(len(embeddings), bulk_size)
+        _validate_embeddings_and_bulk_size(len(embeddings), effective_bulk_size)
         dim = len(embeddings[0])
         # Get the index name from either from kwargs or ENV Variable
         # before falling back to random generation
@@ -1745,10 +1745,10 @@ class OpenSearchVectorSearch(VectorStore):
             "is_aoss",
             "routing",
         ]
-        bulk_size = (
-            bulk_size if bulk_size is not None else getattr(cls, "bulk_size", 500)
+        effective_bulk_size: int = (
+            bulk_size if bulk_size is not None else int(getattr(cls, "bulk_size", 500))
         )
-        _validate_embeddings_and_bulk_size(len(embeddings), bulk_size)
+        _validate_embeddings_and_bulk_size(len(embeddings), effective_bulk_size)
         dim = len(embeddings[0])
         # Get the index name from either from kwargs or ENV Variable
         # before falling back to random generation

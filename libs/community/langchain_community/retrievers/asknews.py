@@ -78,7 +78,7 @@ class AskNewsRetriever(BaseRetriever):
             doc_start_delimiter="<doc>",
             doc_end_delimiter="</doc>",
             return_type="both",
-            **self.kwargs,
+            **(self.kwargs or {}),
         )
 
         return self._extract_documents(response)
@@ -118,7 +118,7 @@ class AskNewsRetriever(BaseRetriever):
             return_type="both",
             doc_start_delimiter="<doc>",
             doc_end_delimiter="</doc>",
-            **self.kwargs,
+            **(self.kwargs or {}),
         )
 
         return self._extract_documents(response)

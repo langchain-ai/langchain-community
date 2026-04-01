@@ -35,7 +35,7 @@ class MetalRetriever(BaseRetriever):
     def _get_relevant_documents(
         self, query: str, *, run_manager: CallbackManagerForRetrieverRun
     ) -> List[Document]:
-        results = self.client.search({"text": query}, **self.params)
+        results = self.client.search({"text": query}, **(self.params or {}))
         final_results = []
         for r in results["data"]:
             metadata = {k: v for k, v in r.items() if k != "text"}
