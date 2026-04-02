@@ -72,10 +72,10 @@ class You(LLM):
     - Cites the specific web page snippet relevant to the claim
 
     To connect to the You.com api requires an API key which
-    you can get at https://api.you.com.
+    you can get at https://you.com/platform.
 
     For more information, check out the documentations at
-    https://documentation.you.com/api-reference/.
+    https://docs.you.com/api-reference/.
 
     Args:
         endpoint: You.com conversational endpoints. Choose from "smart" or "research"
@@ -90,7 +90,7 @@ class You(LLM):
     )
     ydc_api_key: Optional[str] = Field(
         None,
-        description="You.com API key, if `YDC_API_KEY` is not set in the envrioment",
+        description="You.com API key, if `YDC_API_KEY` is not set in the environment",
     )
 
     def _call(

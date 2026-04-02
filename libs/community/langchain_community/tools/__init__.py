@@ -324,6 +324,7 @@ if TYPE_CHECKING:
         YahooFinanceNewsTool,
     )
     from langchain_community.tools.you.tool import (
+        YouContentsTool,
         YouSearchTool,
     )
     from langchain_community.tools.youtube.search import (
@@ -478,6 +479,7 @@ __all__ = [
     "WolframAlphaQueryRun",
     "WriteFileTool",
     "YahooFinanceNewsTool",
+    "YouContentsTool",
     "YouSearchTool",
     "YouTubeSearchTool",
     "ZapierNLAListActions",
@@ -632,6 +634,7 @@ _module_lookup = {
     "WolframAlphaQueryRun": "langchain_community.tools.wolfram_alpha.tool",
     "WriteFileTool": "langchain_community.tools.file_management",
     "YahooFinanceNewsTool": "langchain_community.tools.yahoo_finance_news",
+    "YouContentsTool": "langchain_community.tools.you.tool",
     "YouSearchTool": "langchain_community.tools.you.tool",
     "YouTubeSearchTool": "langchain_community.tools.youtube.search",
     "ZapierNLAListActions": "langchain_community.tools.zapier.tool",
