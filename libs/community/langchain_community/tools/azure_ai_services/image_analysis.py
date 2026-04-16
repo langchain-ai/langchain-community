@@ -3,6 +3,7 @@ from __future__ import annotations
 import logging
 from typing import Any, Dict, Optional
 
+from langchain_core._api.deprecation import deprecated
 from langchain_core.callbacks import CallbackManagerForToolRun
 from langchain_core.tools import BaseTool
 from langchain_core.utils import get_from_dict_or_env
@@ -15,6 +16,11 @@ from langchain_community.tools.azure_ai_services.utils import (
 logger = logging.getLogger(__name__)
 
 
+@deprecated(
+    since="0.4.1",
+    removal="1.0",
+    alternative_import="langchain_azure_ai.tools.AzureAIImageAnalysisTool",
+)
 class AzureAiServicesImageAnalysisTool(BaseTool):
     """Tool that queries the Azure AI Services Image Analysis API.
 

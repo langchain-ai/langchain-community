@@ -1,5 +1,6 @@
 """Tests for the Azure AI Services Image Analysis Tool."""
 
+import warnings
 from pathlib import Path
 from typing import Any
 
@@ -23,9 +24,13 @@ def test_content_safety(mocker: Any) -> None:
     key = "key"
     endpoint = "endpoint"
 
-    tool = AzureAiServicesImageAnalysisTool(
-        azure_ai_services_key=key, azure_ai_services_endpoint=endpoint
-    )
+    with warnings.catch_warnings(record=True) as caught_warnings:
+        warnings.simplefilter("always")
+        tool = AzureAiServicesImageAnalysisTool(
+            azure_ai_services_key=key, azure_ai_services_endpoint=endpoint
+        )
+        assert any(issubclass(w.category, DeprecationWarning) for w in caught_warnings)
+
     assert tool.azure_ai_services_key == key
     assert tool.azure_ai_services_endpoint == endpoint
 
@@ -42,11 +47,13 @@ def test_local_image_analysis(mocker: Any) -> None:
         return_value="local",
     )
 
-    tool = AzureAiServicesImageAnalysisTool(
-        azure_ai_services_key=key,
-        azure_ai_services_endpoint=endpoint,
-        visual_features=["CAPTION"],
-    )
+    with warnings.catch_warnings(record=True):
+        warnings.simplefilter("always")
+        tool = AzureAiServicesImageAnalysisTool(
+            azure_ai_services_key=key,
+            azure_ai_services_endpoint=endpoint,
+            visual_features=["CAPTION"],
+        )
 
     mock_content_client = mocker.Mock()
     mock_content_client.analyze.return_value = mocker.Mock()
@@ -80,11 +87,13 @@ def test_local_image_different_features(mocker: Any) -> None:
         return_value="local",
     )
 
-    tool = AzureAiServicesImageAnalysisTool(
-        azure_ai_services_key=key,
-        azure_ai_services_endpoint=endpoint,
-        visual_features=["PEOPLE", "CAPTION", "SMARTCROPS"],
-    )
+    with warnings.catch_warnings(record=True):
+        warnings.simplefilter("always")
+        tool = AzureAiServicesImageAnalysisTool(
+            azure_ai_services_key=key,
+            azure_ai_services_endpoint=endpoint,
+            visual_features=["PEOPLE", "CAPTION", "SMARTCROPS"],
+        )
 
     mock_content_client = mocker.Mock()
     mock_content_client.analyze.return_value = mocker.Mock()

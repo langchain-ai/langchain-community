@@ -4,6 +4,7 @@ import logging
 import time
 from typing import Any, Dict, Optional
 
+from langchain_core._api.deprecation import deprecated
 from langchain_core.callbacks import CallbackManagerForToolRun
 from langchain_core.tools import BaseTool
 from langchain_core.utils import get_from_dict_or_env
@@ -17,6 +18,14 @@ from langchain_community.tools.azure_ai_services.utils import (
 logger = logging.getLogger(__name__)
 
 
+@deprecated(
+    since="0.4.1",
+    removal="1.0",
+    message=(
+        "AzureAiServicesSpeechToTextTool has been deprecated. "
+        "Use `langchain-azure-ai` package instead."
+    ),
+)
 class AzureAiServicesSpeechToTextTool(BaseTool):
     """Tool that queries the Azure AI Services Speech to Text API.
 

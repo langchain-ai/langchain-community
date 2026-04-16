@@ -2,6 +2,7 @@ from __future__ import annotations
 
 from typing import List
 
+from langchain_core._api.deprecation import deprecated
 from langchain_core.tools import BaseTool
 from langchain_core.tools.base import BaseToolkit
 
@@ -14,6 +15,11 @@ from langchain_community.tools.azure_ai_services import (
 )
 
 
+@deprecated(
+    since="0.4.1",
+    removal="1.0",
+    alternative_import="langchain_azure_ai.tools.AIServicesToolkit",
+)
 class AzureAiServicesToolkit(BaseToolkit):
     """Toolkit for Azure AI Services."""
 
