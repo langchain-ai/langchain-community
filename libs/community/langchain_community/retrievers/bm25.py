@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from typing import Any, Callable, Dict, Iterable, List, Optional
+from typing import Any, Callable, Dict, Iterable, List, Literal, Optional
 
 from langchain_core.callbacks import CallbackManagerForRetrieverRun
 from langchain_core.documents import Document
@@ -34,12 +34,15 @@ class BM25Retriever(BaseRetriever):
         texts: Iterable[str],
         metadatas: Optional[Iterable[dict]] = None,
         ids: Optional[Iterable[str]] = None,
+        bm25_variant: Literal["okapi", "plus"] = "okapi",
         bm25_params: Optional[Dict[str, Any]] = None,
         preprocess_func: Callable[[str], List[str]] = default_preprocessing_func,
         **kwargs: Any,
     ) -> BM25Retriever:
         """
         Create a BM25Retriever from a list of texts.
+        Supports both BM25Okapi (default) and BM25Plus variants via `bm25_variant`.
+
         Args:
             texts: A list of texts to vectorize.
             metadatas: A list of metadata dicts to associate with each text.
@@ -52,7 +55,7 @@ class BM25Retriever(BaseRetriever):
             A BM25Retriever instance.
         """
         try:
-            from rank_bm25 import BM25Okapi
+            from rank_bm25 import BM25Okapi, BM25Plus
         except ImportError:
             raise ImportError(
                 "Could not import rank_bm25, please install with `pip install "
@@ -61,7 +64,14 @@ class BM25Retriever(BaseRetriever):
 
         texts_processed = [preprocess_func(t) for t in texts]
         bm25_params = bm25_params or {}
-        vectorizer = BM25Okapi(texts_processed, **bm25_params)
+        # vectorizer = BM25Okapi(texts_processed, **bm25_params)
+        if bm25_variant == "okapi":
+            vectorizer = BM25Okapi(texts_processed, **bm25_params)
+        elif bm25_variant == "plus":
+            vectorizer = BM25Plus(texts_processed, **bm25_params)
+        else:
+            raise ValueError(f"Unsupported bm25_variant: {bm25_variant}")
+
         metadatas = metadatas or ({} for _ in texts)
         if ids:
             docs = [
@@ -81,12 +91,15 @@ class BM25Retriever(BaseRetriever):
         cls,
         documents: Iterable[Document],
         *,
+        bm25_variant: Literal["okapi", "plus"] = "okapi",
         bm25_params: Optional[Dict[str, Any]] = None,
         preprocess_func: Callable[[str], List[str]] = default_preprocessing_func,
         **kwargs: Any,
     ) -> BM25Retriever:
         """
         Create a BM25Retriever from a list of Documents.
+        Supports both BM25Okapi (default) and BM25Plus variants via `bm25_variant`.
+
         Args:
             documents: A list of Documents to vectorize.
             bm25_params: Parameters to pass to the BM25 vectorizer.
@@ -101,6 +114,7 @@ class BM25Retriever(BaseRetriever):
         )
         return cls.from_texts(
             texts=texts,
+            bm25_variant=bm25_variant,
             bm25_params=bm25_params,
             metadatas=metadatas,
             ids=ids,

@@ -82,3 +82,42 @@ def test_doc_id() -> None:
             assert doc.id == "3"
         else:
             raise ValueError("Unexpected document")
+
+@pytest.mark.requires("rank_bm25")
+def test_bm25_plus_prefers_shorter_exact_match() -> None:
+    """
+    BM25Plus reduces the bias against short documents by ensuring
+    matched terms always contribute a positive score.
+    """
+
+    docs = [
+        Document(
+            page_content=(
+                "LangChain provides tools for building applications with large language models. "
+                "It supports retrieval augmented generation and agents."
+            )
+        ),
+        Document(page_content="LangChain retrieval augmented generation"),
+    ]
+
+    bm25_okapi = BM25Retriever.from_documents(
+        documents=docs,
+        bm25_variant="okapi",
+    )
+
+    bm25_plus = BM25Retriever.from_documents(
+        documents=docs,
+        bm25_variant="plus",
+        bm25_params={"delta": 0.5},
+    )
+
+    query = "retrieval augmented generation"
+
+    okapi_top = bm25_okapi.invoke(query)[0].page_content
+    plus_top = bm25_plus.invoke(query)[0].page_content
+
+    # BM25Plus should favor the shorter, more exact match
+    assert okapi_top != plus_top
+    assert plus_top == "LangChain retrieval augmented generation"
+
+
