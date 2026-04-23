@@ -21,10 +21,7 @@ logger = logging.getLogger(__name__)
 @deprecated(
     since="0.4.1",
     removal="1.0",
-    message=(
-        "AzureAiServicesSpeechToTextTool has been deprecated. "
-        "Use `langchain-azure-ai` package instead."
-    ),
+    alternative_import="langchain_azure_ai.tools.AzureAISpeechToTextTool",
 )
 class AzureAiServicesSpeechToTextTool(BaseTool):
     """Tool that queries the Azure AI Services Speech to Text API.
