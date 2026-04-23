@@ -3,6 +3,7 @@ from __future__ import annotations
 import logging
 from typing import Any, Dict, Optional
 
+from langchain_core._api import deprecated
 from langchain_core.callbacks import CallbackManagerForToolRun
 from langchain_core.tools import BaseTool
 from langchain_core.utils import get_from_dict_or_env
@@ -15,8 +16,23 @@ from langchain_community.tools.azure_cognitive_services.utils import (
 logger = logging.getLogger(__name__)
 
 
+@deprecated(
+    since="0.4.1",
+    message=(
+        "This tool is deprecated and will be removed in a future version. "
+        "Please use AzureAIImageAnalysisTool from the langchain-azure-ai "
+        "package instead. "
+        "See https://aka.ms/azureai/langchain for details."
+    ),
+    alternative="from langchain_azure_ai.tools import AzureAIImageAnalysisTool",
+    pending=False,
+)
 class AzureCogsImageAnalysisTool(BaseTool):
     """Tool that queries the Azure Cognitive Services Image Analysis API.
+
+    .. deprecated:: 0.4.1
+        This tool is deprecated. Use
+        :class:`langchain_azure_ai.tools.AzureAIImageAnalysisTool` instead.
 
     In order to set this up, follow instructions at:
     https://learn.microsoft.com/en-us/azure/cognitive-services/computer-vision/quickstarts-sdk/image-analysis-client-library-40
