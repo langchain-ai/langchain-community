@@ -20,8 +20,13 @@ logger = logging.getLogger(__name__)
 
 @deprecated(
     since="0.4.1",
-    removal="a future version",
+    message=(
+        "This class is pending deprecation and may be removed in a future version. "
+        "Use AzureAISpeechToTextTool from the langchain-azure-ai package "
+        "instead. See https://aka.ms/azureai/langchain for details."
+    ),
     alternative_import="langchain_azure_ai.tools.AzureAISpeechToTextTool",
+    pending=True,
 )
 class AzureCogsSpeech2TextTool(BaseTool):
     """Tool that queries the Azure Cognitive Services Speech2Text API.

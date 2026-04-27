@@ -18,8 +18,13 @@ logger = logging.getLogger(__name__)
 
 @deprecated(
     since="0.4.1",
-    removal="a future version",
+    message=(
+        "This class is pending deprecation and may be removed in a future version. "
+        "Use AzureAIImageAnalysisTool from the langchain-azure-ai package "
+        "instead. See https://aka.ms/azureai/langchain for details."
+    ),
     alternative_import="langchain_azure_ai.tools.AzureAIImageAnalysisTool",
+    pending=True,
 )
 class AzureCogsImageAnalysisTool(BaseTool):
     """Tool that queries the Azure Cognitive Services Image Analysis API.
