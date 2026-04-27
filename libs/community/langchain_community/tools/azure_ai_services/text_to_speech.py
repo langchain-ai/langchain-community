@@ -16,7 +16,7 @@ logger = logging.getLogger(__name__)
 @deprecated(
     since="0.4.1",
     message=(
-        "This class is pending deprecation and may be removed in a future version. "
+        "This class is deprecated and will be removed in a future version. "
         "Use AzureAITextToSpeechTool from the langchain-azure-ai package "
         "instead. See https://aka.ms/azureai/langchain for details."
     ),
