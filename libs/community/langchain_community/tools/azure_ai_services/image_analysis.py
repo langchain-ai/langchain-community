@@ -18,7 +18,7 @@ logger = logging.getLogger(__name__)
 
 @deprecated(
     since="0.4.1",
-    removal="1.0",
+    removal="a future version",
     alternative_import="langchain_azure_ai.tools.AzureAIImageAnalysisTool",
 )
 class AzureAiServicesImageAnalysisTool(BaseTool):

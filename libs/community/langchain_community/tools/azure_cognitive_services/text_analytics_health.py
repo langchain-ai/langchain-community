@@ -14,23 +14,11 @@ logger = logging.getLogger(__name__)
 
 @deprecated(
     since="0.4.1",
-    message=(
-        "This tool is deprecated and will be removed in a future version. "
-        "Please use AzureAITextAnalyticsHealthTool from the langchain-azure-ai "
-        "package instead. "
-        "See https://aka.ms/azureai/langchain for details."
-    ),
-    alternative=(
-        "from langchain_azure_ai.tools import AzureAITextAnalyticsHealthTool"
-    ),
-    pending=False,
+    removal="a future version",
+    alternative_import="langchain_azure_ai.tools.AzureAITextAnalyticsHealthTool",
 )
 class AzureCogsTextAnalyticsHealthTool(BaseTool):
     """Tool that queries the Azure Cognitive Services Text Analytics for Health API.
-
-    .. deprecated:: 0.4.1
-        This tool is deprecated. Use
-        :class:`langchain_azure_ai.tools.AzureAITextAnalyticsHealthTool` instead.
 
     In order to set this up, follow instructions at:
     https://learn.microsoft.com/en-us/azure/ai-services/language-service/text-analytics-for-health/quickstart?tabs=windows&pivots=programming-language-python
