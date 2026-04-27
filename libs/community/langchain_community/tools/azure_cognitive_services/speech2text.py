@@ -26,13 +26,17 @@ logger = logging.getLogger(__name__)
         "instead. See https://aka.ms/azureai/langchain for details."
     ),
     alternative_import="langchain_azure_ai.tools.AzureAISpeechToTextTool",
-    pending=True,
 )
 class AzureCogsSpeech2TextTool(BaseTool):
     """Tool that queries the Azure Cognitive Services Speech2Text API.
 
     In order to set this up, follow instructions at:
     https://learn.microsoft.com/en-us/azure/cognitive-services/speech-service/get-started-speech-to-text?pivots=programming-language-python
+
+    .. deprecated:: 0.4.1
+        This class is deprecated and will be removed in a future version.
+        Use AzureAISpeechToTextTool from the langchain-azure-ai package instead.
+        See https://aka.ms/azureai/langchain for details.
     """
 
     azure_cogs_key: str = ""

@@ -24,13 +24,17 @@ logger = logging.getLogger(__name__)
         "instead. See https://aka.ms/azureai/langchain for details."
     ),
     alternative_import="langchain_azure_ai.tools.AzureAIDocumentIntelligenceTool",
-    pending=True,
 )
 class AzureAiServicesDocumentIntelligenceTool(BaseTool):
     """Tool that queries the Azure AI Services Document Intelligence API.
 
     In order to set this up, follow instructions at:
     https://learn.microsoft.com/en-us/azure/ai-services/document-intelligence/quickstarts/get-started-sdks-rest-api?view=doc-intel-4.0.0&pivots=programming-language-python
+
+    .. deprecated:: 0.4.1
+        This class is deprecated and will be removed in a future version.
+        Use AzureAIDocumentIntelligenceTool from the langchain-azure-ai package instead.
+        See https://aka.ms/azureai/langchain for details.
     """
 
     azure_ai_services_key: str = ""
