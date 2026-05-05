@@ -20,7 +20,11 @@ logger = logging.getLogger(__name__)
 
 @deprecated(
     since="0.4.1",
-    removal="1.0",
+    message=(
+        "This class is deprecated and will be removed in a future version. "
+        "Use AzureAISpeechToTextTool from the langchain-azure-ai package "
+        "instead. See https://aka.ms/azureai/langchain for details."
+    ),
     alternative_import="langchain_azure_ai.tools.AzureAISpeechToTextTool",
 )
 class AzureAiServicesSpeechToTextTool(BaseTool):
@@ -28,6 +32,11 @@ class AzureAiServicesSpeechToTextTool(BaseTool):
 
     In order to set this up, follow instructions at:
     https://learn.microsoft.com/en-us/azure/ai-services/speech-service/get-started-speech-to-text?pivots=programming-language-python
+
+    .. deprecated:: 0.4.1
+        This class is deprecated and will be removed in a future version.
+        Use AzureAISpeechToTextTool from the langchain-azure-ai package instead.
+        See https://aka.ms/azureai/langchain for details.
     """
 
     azure_ai_services_key: str = ""

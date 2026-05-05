@@ -14,7 +14,11 @@ logger = logging.getLogger(__name__)
 
 @deprecated(
     since="0.4.1",
-    removal="1.0",
+    message=(
+        "This class is deprecated and will be removed in a future version. "
+        "Use AzureAITextAnalyticsHealthTool from the langchain-azure-ai package "
+        "instead. See https://aka.ms/azureai/langchain for details."
+    ),
     alternative_import="langchain_azure_ai.tools.AzureAITextAnalyticsHealthTool",
 )
 class AzureAiServicesTextAnalyticsForHealthTool(BaseTool):
@@ -22,6 +26,11 @@ class AzureAiServicesTextAnalyticsForHealthTool(BaseTool):
 
     In order to set this up, follow instructions at:
     https://learn.microsoft.com/en-us/azure/ai-services/language-service/text-analytics-for-health/quickstart?pivots=programming-language-python
+
+    .. deprecated:: 0.4.1
+        This class is deprecated and will be removed in a future version.
+        Use AzureAITextAnalyticsHealthTool from the langchain-azure-ai package instead.
+        See https://aka.ms/azureai/langchain for details.
     """
 
     azure_ai_services_key: str = ""

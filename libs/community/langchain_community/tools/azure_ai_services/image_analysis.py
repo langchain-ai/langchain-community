@@ -18,7 +18,11 @@ logger = logging.getLogger(__name__)
 
 @deprecated(
     since="0.4.1",
-    removal="1.0",
+    message=(
+        "This class is deprecated and will be removed in a future version. "
+        "Use AzureAIImageAnalysisTool from the langchain-azure-ai package "
+        "instead. See https://aka.ms/azureai/langchain for details."
+    ),
     alternative_import="langchain_azure_ai.tools.AzureAIImageAnalysisTool",
 )
 class AzureAiServicesImageAnalysisTool(BaseTool):
@@ -38,6 +42,11 @@ class AzureAiServicesImageAnalysisTool(BaseTool):
     name (str): The name of the tool.
     description (str): A description of the tool,
         including its purpose and expected input.
+
+    .. deprecated:: 0.4.1
+        This class is deprecated and will be removed in a future version.
+        Use AzureAIImageAnalysisTool from the langchain-azure-ai package instead.
+        See https://aka.ms/azureai/langchain for details.
     """
 
     azure_ai_services_key: Optional[str] = None

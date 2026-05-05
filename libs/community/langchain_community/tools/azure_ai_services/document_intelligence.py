@@ -18,7 +18,11 @@ logger = logging.getLogger(__name__)
 
 @deprecated(
     since="0.4.1",
-    removal="1.0",
+    message=(
+        "This class is deprecated and will be removed in a future version. "
+        "Use AzureAIDocumentIntelligenceTool from the langchain-azure-ai package "
+        "instead. See https://aka.ms/azureai/langchain for details."
+    ),
     alternative_import="langchain_azure_ai.tools.AzureAIDocumentIntelligenceTool",
 )
 class AzureAiServicesDocumentIntelligenceTool(BaseTool):
@@ -26,6 +30,11 @@ class AzureAiServicesDocumentIntelligenceTool(BaseTool):
 
     In order to set this up, follow instructions at:
     https://learn.microsoft.com/en-us/azure/ai-services/document-intelligence/quickstarts/get-started-sdks-rest-api?view=doc-intel-4.0.0&pivots=programming-language-python
+
+    .. deprecated:: 0.4.1
+        This class is deprecated and will be removed in a future version.
+        Use AzureAIDocumentIntelligenceTool from the langchain-azure-ai package instead.
+        See https://aka.ms/azureai/langchain for details.
     """
 
     azure_ai_services_key: str = ""

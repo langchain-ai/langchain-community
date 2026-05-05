@@ -19,25 +19,22 @@ logger = logging.getLogger(__name__)
 @deprecated(
     since="0.4.1",
     message=(
-        "This tool is deprecated and will be removed in a future version. "
-        "Please use AzureAIDocumentIntelligenceTool from the langchain-azure-ai "
-        "package instead. "
-        "See https://aka.ms/azureai/langchain for details."
+        "This class is deprecated and will be removed in a future version. "
+        "Use AzureAIDocumentIntelligenceTool from the langchain-azure-ai package "
+        "instead. See https://aka.ms/azureai/langchain for details."
     ),
-    alternative=(
-        "from langchain_azure_ai.tools import AzureAIDocumentIntelligenceTool"
-    ),
-    pending=False,
+    alternative_import="langchain_azure_ai.tools.AzureAIDocumentIntelligenceTool",
 )
 class AzureCogsFormRecognizerTool(BaseTool):
     """Tool that queries the Azure Cognitive Services Form Recognizer API.
 
-    .. deprecated:: 0.4.1
-        This tool is deprecated. Use
-        :class:`langchain_azure_ai.tools.AzureAIDocumentIntelligenceTool` instead.
-
     In order to set this up, follow instructions at:
     https://learn.microsoft.com/en-us/azure/applied-ai-services/form-recognizer/quickstarts/get-started-sdks-rest-api?view=form-recog-3.0.0&pivots=programming-language-python
+
+    .. deprecated:: 0.4.1
+        This class is deprecated and will be removed in a future version.
+        Use AzureAIDocumentIntelligenceTool from the langchain-azure-ai package instead.
+        See https://aka.ms/azureai/langchain for details.
     """
 
     azure_cogs_key: str = ""

@@ -16,23 +16,22 @@ logger = logging.getLogger(__name__)
 @deprecated(
     since="0.4.1",
     message=(
-        "This tool is deprecated and will be removed in a future version. "
-        "Please use AzureAITextToSpeechTool from the langchain-azure-ai "
-        "package instead. "
-        "See https://aka.ms/azureai/langchain for details."
+        "This class is deprecated and will be removed in a future version. "
+        "Use AzureAITextToSpeechTool from the langchain-azure-ai package "
+        "instead. See https://aka.ms/azureai/langchain for details."
     ),
-    alternative="from langchain_azure_ai.tools import AzureAITextToSpeechTool",
-    pending=False,
+    alternative_import="langchain_azure_ai.tools.AzureAITextToSpeechTool",
 )
 class AzureCogsText2SpeechTool(BaseTool):
     """Tool that queries the Azure Cognitive Services Text2Speech API.
 
-    .. deprecated:: 0.4.1
-        This tool is deprecated. Use
-        :class:`langchain_azure_ai.tools.AzureAITextToSpeechTool` instead.
-
     In order to set this up, follow instructions at:
     https://learn.microsoft.com/en-us/azure/cognitive-services/speech-service/get-started-text-to-speech?pivots=programming-language-python
+
+    .. deprecated:: 0.4.1
+        This class is deprecated and will be removed in a future version.
+        Use AzureAITextToSpeechTool from the langchain-azure-ai package instead.
+        See https://aka.ms/azureai/langchain for details.
     """
 
     azure_cogs_key: str = ""
