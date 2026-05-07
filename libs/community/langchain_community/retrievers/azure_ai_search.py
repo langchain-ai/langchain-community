@@ -153,7 +153,7 @@ class AzureAISearchRetriever(BaseRetriever):
             protocol = "https"
             remaining = self.service_name
             has_protocol = False
-        if url_suffix in remaining:
+        if remaining.endswith(url_suffix):
             base_url = (
                 f"{protocol}://{remaining}/"
                 if not has_protocol
