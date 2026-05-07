@@ -146,13 +146,6 @@ if TYPE_CHECKING:
     from langchain_community.tools.google_cloud.texttospeech import (
         GoogleCloudTextToSpeechTool,
     )
-    from langchain_community.tools.google_places.tool import (
-        GooglePlacesTool,
-    )
-    from langchain_community.tools.google_search.tool import (
-        GoogleSearchResults,
-        GoogleSearchRun,
-    )
     from langchain_community.tools.google_serper.tool import (
         GoogleSerperResults,
         GoogleSerperRun,
@@ -413,9 +406,6 @@ __all__ = [
     "GmailSendMessage",
     "GoogleBooksQueryRun",
     "GoogleCloudTextToSpeechTool",
-    "GooglePlacesTool",
-    "GoogleSearchResults",
-    "GoogleSearchRun",
     "GoogleSerperResults",
     "GoogleSerperRun",
     "HumanInputRun",
@@ -567,9 +557,6 @@ _module_lookup = {
     "GmailSendMessage": "langchain_community.tools.gmail",
     "GoogleBooksQueryRun": "langchain_community.tools.google_books",
     "GoogleCloudTextToSpeechTool": "langchain_community.tools.google_cloud.texttospeech",  # noqa: E501
-    "GooglePlacesTool": "langchain_community.tools.google_places.tool",
-    "GoogleSearchResults": "langchain_community.tools.google_search.tool",
-    "GoogleSearchRun": "langchain_community.tools.google_search.tool",
     "GoogleSerperResults": "langchain_community.tools.google_serper.tool",
     "GoogleSerperRun": "langchain_community.tools.google_serper.tool",
     "HumanInputRun": "langchain_community.tools.human.tool",

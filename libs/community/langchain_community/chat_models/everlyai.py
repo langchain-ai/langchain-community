@@ -25,7 +25,6 @@ from pydantic import Field, model_validator
 from langchain_community.adapters.openai import convert_message_to_dict
 from langchain_community.chat_models.openai import (
     ChatOpenAI,
-    _import_tiktoken,
 )
 
 if TYPE_CHECKING:
@@ -36,6 +35,18 @@ logger = logging.getLogger(__name__)
 
 DEFAULT_API_BASE = "https://everlyai.xyz/hosted"
 DEFAULT_MODEL = "meta-llama/Llama-2-7b-chat-hf"
+
+
+def _import_tiktoken() -> Any:
+    try:
+        import tiktoken
+    except ImportError:
+        raise ImportError(
+            "Could not import tiktoken python package. "
+            "This is needed in order to calculate get_token_ids. "
+            "Please install it with `pip install tiktoken`."
+        )
+    return tiktoken
 
 
 class ChatEverlyAI(ChatOpenAI):

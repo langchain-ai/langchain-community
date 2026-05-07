@@ -41,13 +41,13 @@ class CTranslate2(BaseLLM):
     sampling_temperature: float = 1
     """Sampling temperature to generate more random samples."""
 
-    client: Any = None  #: :meta private:
+    client: Any = None
 
-    tokenizer: Any = None  #: :meta private:
+    tokenizer: Any = None
 
     ctranslate2_kwargs: Dict[str, Any] = Field(default_factory=dict)
     """
-    Holds any model parameters valid for `ctranslate2.Generator` call not 
+    Holds any model parameters valid for `ctranslate2.Generator` call not
     explicitly specified.
     """
 

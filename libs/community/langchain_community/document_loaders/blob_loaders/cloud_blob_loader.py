@@ -208,7 +208,7 @@ class CloudBlobLoader(BlobLoader):
 
     def yield_blobs(
         self,
-    ) -> Iterable[Blob]:
+    ) -> Iterator[Blob]:
         """Yield blobs that match the requested pattern."""
         iterator = _make_iterator(
             length_func=self.count_matching_files, show_progress=self.show_progress
@@ -261,7 +261,7 @@ class CloudBlobLoader(BlobLoader):
                   If no scheme is provided, it is assumed to be a local file.
             encoding: Encoding to use if decoding the bytes into a string
             mime_type: if provided, will be set as the mime-type of the data
-            guess_type: If True, the mimetype will be guessed from the file extension,
+            guess_type: If True, the MIME type will be guessed from the file extension,
                         if a mime-type was not provided
             metadata: Metadata to associate with the blob
 

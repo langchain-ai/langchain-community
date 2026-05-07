@@ -145,8 +145,8 @@ def convert_to_reka_messages(messages: List[BaseMessage]) -> List[Dict[str, Any]
 class ChatReka(BaseChatModel):
     """Reka chat large language models."""
 
-    client: Any = None  #: :meta private:
-    async_client: Any = None  #: :meta private:
+    client: Any = None
+    async_client: Any = None
     model: str = Field(default=DEFAULT_REKA_MODEL)
     max_tokens: int = Field(default=256)
     temperature: Optional[float] = None

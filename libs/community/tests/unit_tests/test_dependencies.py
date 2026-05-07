@@ -34,7 +34,6 @@ def test_required_dependencies(uv_conf: Mapping[str, Any]) -> None:
             "PyYAML",
             "SQLAlchemy",
             "aiohttp",
-            "dataclasses-json",
             "httpx-sse",
             "langchain-core",
             "langsmith",
@@ -65,6 +64,7 @@ def test_test_group_dependencies(uv_conf: Mapping[str, Any]) -> None:
             "freezegun",
             "langchain-tests",
             "lark",
+            "mypy-extensions",
             "pandas",
             "pytest",
             "pytest-asyncio",
@@ -91,7 +91,7 @@ def test_imports() -> None:
     from langchain_core.prompts import BasePromptTemplate  # noqa: F401
 
     from langchain_community.callbacks import OpenAICallbackHandler  # noqa: F401
-    from langchain_community.chat_models import ChatOpenAI  # noqa: F401
+    from langchain_community.chat_models.openai import ChatOpenAI  # noqa: F401
     from langchain_community.document_loaders import BSHTMLLoader  # noqa: F401
     from langchain_community.embeddings import OpenAIEmbeddings  # noqa: F401
     from langchain_community.llms import OpenAI  # noqa: F401

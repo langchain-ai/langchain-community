@@ -11,7 +11,7 @@ import pytest
 from langchain_classic.agents import AgentType, initialize_agent
 
 from langchain_community.agent_toolkits.ainetwork.toolkit import AINetworkToolkit
-from langchain_community.chat_models import ChatOpenAI
+from langchain_community.chat_models.openai import ChatOpenAI
 from langchain_community.tools.ainetwork.utils import authenticate
 
 
