@@ -1,5 +1,5 @@
 from abc import abstractmethod
-from typing import TYPE_CHECKING, List
+from typing import TYPE_CHECKING, Any, List, Optional, Tuple
 
 from langchain_community.document_loaders.parsers.language.code_segmenter import (
     CodeSegmenter,
@@ -7,6 +7,34 @@ from langchain_community.document_loaders.parsers.language.code_segmenter import
 
 if TYPE_CHECKING:
     from tree_sitter import Language, Node, Parser
+
+
+def _collect_ordered_captures(query_captures: Any) -> List[Tuple[Any, Optional[str]]]:
+    """Normalize tree-sitter captures to a flat, ordered list.
+
+    `tree-sitter` 0.23+ returns captures grouped by capture name, while older
+    releases returned a flat `(node, capture_name)` sequence in document order.
+    LangChain's segmenters deduplicate overlapping chunks by line number, so
+    nested nodes must be processed after their containing nodes.
+
+    Args:
+        query_captures: Output of `query.captures(...)`.
+
+    Returns:
+        A flat list of `(node, capture_name)` tuples in source order.
+    """
+    if isinstance(query_captures, dict):
+        flat_captures = [
+            (node, capture_name)
+            for capture_name, nodes in query_captures.items()
+            for node in nodes
+        ]
+        return sorted(
+            flat_captures,
+            key=lambda pair: (pair[0].start_byte, -pair[0].end_byte),
+        )
+
+    return list(query_captures)
 
 
 class TreeSitterSegmenter(CodeSegmenter):
@@ -48,7 +76,7 @@ class TreeSitterSegmenter(CodeSegmenter):
 
         parser = self.get_parser()
         tree = parser.parse(bytes(self.code, encoding="UTF-8"))
-        query_captures: dict[str, list[Node]] = query_cursor.captures(tree.root_node)
+        captures = _collect_ordered_captures(query.captures(tree.root_node))
 
         processed_lines: set[int] = set()
         chunks: List[str] = []
@@ -80,23 +108,23 @@ class TreeSitterSegmenter(CodeSegmenter):
         processed_lines = set()
 
         simplified_lines = self.source_lines[:]
-        captures: dict[str, list[Node]] = query_cursor.captures(tree.root_node)
-        for capture_name, nodes in captures.items():
-            for node in nodes:
-                start_line = node.start_point[0]
-                end_line = node.end_point[0]
 
-                lines = list(range(start_line, end_line + 1))
-                if any(line in processed_lines for line in lines):
-                    continue
+        captures = _collect_ordered_captures(query.captures(tree.root_node))
+        for node, name in captures:
+            start_line = node.start_point[0]
+            end_line = node.end_point[0]
 
-                simplified_lines[start_line] = self.make_line_comment(
-                    f"Code for: {self.source_lines[start_line]}"
-                )
-                for line_num in range(start_line + 1, end_line + 1):
-                    simplified_lines[line_num] = None  # type: ignore[call-overload]
+            lines = list(range(start_line, end_line + 1))
+            if any(line in processed_lines for line in lines):
+                continue
 
-                processed_lines.update(lines)
+            simplified_lines[start_line] = self.make_line_comment(
+                f"Code for: {self.source_lines[start_line]}"
+            )
+            for line_num in range(start_line + 1, end_line + 1):
+                simplified_lines[line_num] = None  # type: ignore[call-overload]
+
+            processed_lines.update(lines)
 
         return "\n".join(line for line in simplified_lines if line is not None)
 
