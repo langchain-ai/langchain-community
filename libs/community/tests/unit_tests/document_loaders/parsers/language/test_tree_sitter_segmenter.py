@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import textwrap
 from typing import Any
 
 from langchain_community.document_loaders.parsers.language import (
@@ -101,13 +102,6 @@ auto T::bar() const -> int {
 
 
 def test_collect_ordered_captures_returns_list_sorted_by_source_position() -> None:
-    """_collect_ordered_captures must return a list in source order.
-
-    tree-sitter 0.23+ returns captures grouped by capture name (dict) rather
-    than a flat sequence.  This test verifies that the helper normalizes both
-    shapes and that the result is always a list sorted by start_byte so
-    containers appear before nested children.
-    """
     container = _FakeNode("container", 0, 3, 0, 40)
     nested = _FakeNode("nested", 1, 2, 10, 25)
     separate = _FakeNode("separate", 5, 6, 50, 70)
@@ -136,4 +130,37 @@ def test_collect_ordered_captures_returns_list_sorted_by_source_position() -> No
     assert isinstance(result_legacy, list)
     assert result_legacy == legacy_captures, (
         "Legacy sequence must be returned as-is (original order preserved)"
+    )
+
+
+def test_simplify_code_collapses_outer_scope_with_dict_captures() -> None:
+    code = textwrap.dedent("""\
+        class T {
+          void baz(U) {
+          }
+        };
+
+        int free_fn() {
+          return 0;
+        }""").strip()
+    # class spans lines 0-3, nested method spans lines 1-2, free function lines 5-7
+    class_node = _FakeNode("class T {\n  void baz(U) {\n  }\n};", 0, 3, 0, 34)
+    method_node = _FakeNode("void baz(U) {\n  }", 1, 2, 10, 25)
+    fn_node = _FakeNode("int free_fn() {\n  return 0;\n}", 5, 7, 36, 65)
+
+    # dict-shaped captures: inner group listed before outer in dict iteration order
+    captures: Any = {
+        "function": [method_node, fn_node],
+        "class": [class_node],
+    }
+
+    segmenter = _TestTreeSitterSegmenter(code, captures)
+    simplified = segmenter.simplify_code()
+
+    # The class is the outermost node (line 0); it must win the dedup race.
+    # Lines 1-3 (method body + closing brace) are nulled out.
+    # Line 4 is a blank line between top-level nodes; it is preserved (not None).
+    # Line 5 (free_fn) becomes a comment; lines 6-7 are nulled out.
+    assert simplified == ("// Code for: class T {\n\n// Code for: int free_fn() {"), (
+        repr(simplified)
     )

@@ -1,5 +1,5 @@
 from abc import abstractmethod
-from typing import TYPE_CHECKING, Any, List, Optional, Tuple
+from typing import TYPE_CHECKING, Any, List, Tuple
 
 from langchain_community.document_loaders.parsers.language.code_segmenter import (
     CodeSegmenter,
@@ -9,19 +9,14 @@ if TYPE_CHECKING:
     from tree_sitter import Language, Node, Parser
 
 
-def _collect_ordered_captures(query_captures: Any) -> List[Tuple[Any, Optional[str]]]:
-    """Normalize tree-sitter captures to a flat, ordered list.
+def _collect_ordered_captures(query_captures: Any) -> List[Tuple[Any, str]]:
+    """Normalize tree-sitter captures to a flat list in source order.
 
-    `tree-sitter` 0.23+ returns captures grouped by capture name, while older
-    releases returned a flat `(node, capture_name)` sequence in document order.
-    LangChain's segmenters deduplicate overlapping chunks by line number, so
-    nested nodes must be processed after their containing nodes.
-
-    Args:
-        query_captures: Output of `query.captures(...)`.
-
-    Returns:
-        A flat list of `(node, capture_name)` tuples in source order.
+    ``tree-sitter`` 0.23+ returns captures grouped by capture name as a
+    dict; older releases returned a flat ``(node, capture_name)`` sequence
+    in document order. Sorting by ``(start_byte, -end_byte)`` ensures
+    containing nodes come before their nested children, which the
+    line-based dedup in segmenters depends on.
     """
     if isinstance(query_captures, dict):
         flat_captures = [
