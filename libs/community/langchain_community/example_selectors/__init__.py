@@ -1,10 +1,13 @@
-"""**Example selector** implements logic for selecting examples to include them
-in prompts.
+"""**Example selector** implements logic for selecting examples to include them in
+prompts.
+
 This allows us to select examples that are most relevant to the input.
 
-There could be multiple strategies for selecting examples. For example, one could
-select examples based on the similarity of the input to the examples. Another
-strategy could be to select examples based on the diversity of the examples.
+There could be multiple strategies for selecting examples.
+
+For example, one could select examples based on the similarity of the input to the
+examples. Another strategy could be to select examples based on the diversity of the
+examples.
 """
 
 from langchain_community.example_selectors.ngram_overlap import (

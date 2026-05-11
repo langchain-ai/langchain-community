@@ -1,4 +1,4 @@
-"""Select and order examples based on ngram overlap score (sentence_bleu score).
+"""Select and order examples based on ngram overlap score (`sentence_bleu` score).
 
 https://www.nltk.org/_modules/nltk/translate/bleu_score.html
 https://aclanthology.org/P02-1040.pdf
@@ -13,11 +13,13 @@ from pydantic import BaseModel, model_validator
 
 
 def ngram_overlap_score(source: List[str], example: List[str]) -> float:
-    """Compute ngram overlap score of source and example as sentence_bleu score
+    """Compute ngram overlap score of source and example as `sentence_bleu` score
     from NLTK package.
 
-    Use sentence_bleu with method1 smoothing function and auto reweighting.
+    Use `sentence_bleu` with `method1` smoothing function and auto reweighting.
+
     Return float value between 0.0 and 1.0 inclusive.
+
     https://www.nltk.org/_modules/nltk/translate/bleu_score.html
     https://aclanthology.org/P02-1040.pdf
     """
@@ -40,7 +42,7 @@ def ngram_overlap_score(source: List[str], example: List[str]) -> float:
 
 
 class NGramOverlapExampleSelector(BaseExampleSelector, BaseModel):
-    """Select and order examples based on ngram overlap score (sentence_bleu score
+    """Select and order examples based on ngram overlap score (`sentence_bleu` score
     from NLTK package).
 
     https://www.nltk.org/_modules/nltk/translate/bleu_score.html

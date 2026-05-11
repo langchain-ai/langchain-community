@@ -109,7 +109,14 @@ class DeepSparse(LLM):
             text = combined_output
         else:
             text = (
-                self.pipeline(sequences=prompt, **self.generation_config)
+                self.pipeline(
+                    sequences=prompt,
+                    **(
+                        self.generation_config
+                        if isinstance(self.generation_config, dict)
+                        else {}
+                    ),
+                )
                 .generations[0]
                 .text
             )
@@ -147,7 +154,14 @@ class DeepSparse(LLM):
             text = combined_output
         else:
             text = (
-                self.pipeline(sequences=prompt, **self.generation_config)
+                self.pipeline(
+                    sequences=prompt,
+                    **(
+                        self.generation_config
+                        if isinstance(self.generation_config, dict)
+                        else {}
+                    ),
+                )
                 .generations[0]
                 .text
             )
@@ -186,7 +200,13 @@ class DeepSparse(LLM):
                     print(chunk, end='', flush=True)  # noqa: T201
         """
         inference = self.pipeline(
-            sequences=prompt, streaming=True, **self.generation_config
+            sequences=prompt,
+            streaming=True,
+            **(
+                self.generation_config
+                if isinstance(self.generation_config, dict)
+                else {}
+            ),
         )
         for token in inference:
             chunk = GenerationChunk(text=token.generations[0].text)
@@ -224,7 +244,13 @@ class DeepSparse(LLM):
                     print(chunk, end='', flush=True)  # noqa: T201
         """
         inference = self.pipeline(
-            sequences=prompt, streaming=True, **self.generation_config
+            sequences=prompt,
+            streaming=True,
+            **(
+                self.generation_config
+                if isinstance(self.generation_config, dict)
+                else {}
+            ),
         )
         for token in inference:
             chunk = GenerationChunk(text=token.generations[0].text)

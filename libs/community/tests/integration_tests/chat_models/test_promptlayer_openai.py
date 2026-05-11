@@ -1,7 +1,6 @@
 """Test PromptLayerChatOpenAI wrapper."""
 
 import pytest
-from langchain_core.callbacks import CallbackManager
 from langchain_core.messages import BaseMessage, HumanMessage, SystemMessage
 from langchain_core.outputs import ChatGeneration, ChatResult, LLMResult
 
@@ -11,7 +10,7 @@ from tests.unit_tests.callbacks.fake_callback_handler import FakeCallbackHandler
 
 def test_promptlayer_chat_openai() -> None:
     """Test PromptLayerChatOpenAI wrapper."""
-    chat = PromptLayerChatOpenAI(max_tokens=10)  # type: ignore[call-arg]
+    chat = PromptLayerChatOpenAI(max_tokens=10)
     message = HumanMessage(content="Hello")
     response = chat.invoke([message])
     assert isinstance(response, BaseMessage)
@@ -20,7 +19,7 @@ def test_promptlayer_chat_openai() -> None:
 
 def test_promptlayer_chat_openai_system_message() -> None:
     """Test PromptLayerChatOpenAI wrapper with system message."""
-    chat = PromptLayerChatOpenAI(max_tokens=10)  # type: ignore[call-arg]
+    chat = PromptLayerChatOpenAI(max_tokens=10)
     system_message = SystemMessage(content="You are to chat with the user.")
     human_message = HumanMessage(content="Hello")
     response = chat.invoke([system_message, human_message])
@@ -30,7 +29,7 @@ def test_promptlayer_chat_openai_system_message() -> None:
 
 def test_promptlayer_chat_openai_generate() -> None:
     """Test PromptLayerChatOpenAI wrapper with generate."""
-    chat = PromptLayerChatOpenAI(max_tokens=10, n=2)  # type: ignore[call-arg]
+    chat = PromptLayerChatOpenAI(max_tokens=10, n=2)
     message = HumanMessage(content="Hello")
     response = chat.generate([[message], [message]])
     assert isinstance(response, LLMResult)
@@ -45,7 +44,7 @@ def test_promptlayer_chat_openai_generate() -> None:
 
 def test_promptlayer_chat_openai_multiple_completions() -> None:
     """Test PromptLayerChatOpenAI wrapper with multiple completions."""
-    chat = PromptLayerChatOpenAI(max_tokens=10, n=5)  # type: ignore[call-arg]
+    chat = PromptLayerChatOpenAI(max_tokens=10, n=5)
     message = HumanMessage(content="Hello")
     response = chat._generate([message])
     assert isinstance(response, ChatResult)
@@ -58,12 +57,11 @@ def test_promptlayer_chat_openai_multiple_completions() -> None:
 def test_promptlayer_chat_openai_streaming() -> None:
     """Test that streaming correctly invokes on_llm_new_token callback."""
     callback_handler = FakeCallbackHandler()
-    callback_manager = CallbackManager([callback_handler])
-    chat = PromptLayerChatOpenAI(  # type: ignore[call-arg]
+    chat = PromptLayerChatOpenAI(
         max_tokens=10,
         streaming=True,
         temperature=0,
-        callback_manager=callback_manager,
+        callbacks=[callback_handler],
         verbose=True,
     )
     message = HumanMessage(content="Hello")
@@ -75,7 +73,7 @@ def test_promptlayer_chat_openai_streaming() -> None:
 def test_promptlayer_chat_openai_invalid_streaming_params() -> None:
     """Test that streaming correctly invokes on_llm_new_token callback."""
     with pytest.raises(ValueError):
-        PromptLayerChatOpenAI(  # type: ignore[call-arg]
+        PromptLayerChatOpenAI(
             max_tokens=10,
             streaming=True,
             temperature=0,
@@ -85,7 +83,7 @@ def test_promptlayer_chat_openai_invalid_streaming_params() -> None:
 
 async def test_async_promptlayer_chat_openai() -> None:
     """Test async generation."""
-    chat = PromptLayerChatOpenAI(max_tokens=10, n=2)  # type: ignore[call-arg]
+    chat = PromptLayerChatOpenAI(max_tokens=10, n=2)
     message = HumanMessage(content="Hello")
     response = await chat.agenerate([[message], [message]])
     assert isinstance(response, LLMResult)
@@ -101,12 +99,11 @@ async def test_async_promptlayer_chat_openai() -> None:
 async def test_async_promptlayer_chat_openai_streaming() -> None:
     """Test that streaming correctly invokes on_llm_new_token callback."""
     callback_handler = FakeCallbackHandler()
-    callback_manager = CallbackManager([callback_handler])
-    chat = PromptLayerChatOpenAI(  # type: ignore[call-arg]
+    chat = PromptLayerChatOpenAI(
         max_tokens=10,
         streaming=True,
         temperature=0,
-        callback_manager=callback_manager,
+        callbacks=[callback_handler],
         verbose=True,
     )
     message = HumanMessage(content="Hello")

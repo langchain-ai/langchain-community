@@ -4,7 +4,7 @@ from langchain_core.callbacks import CallbackManagerForToolRun
 from langchain_core.language_models import BaseLanguageModel
 from pydantic import BaseModel, Field, model_validator
 
-from langchain_community.chat_models import ChatOpenAI
+from langchain_community.chat_models.openai import ChatOpenAI
 from langchain_community.tools.amadeus.base import AmadeusBaseTool
 
 

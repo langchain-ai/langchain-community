@@ -10,7 +10,7 @@ from langchain_core.callbacks import (
 from langchain_core.messages import BaseMessage
 from langchain_core.outputs import ChatResult
 
-from langchain_community.chat_models import ChatOpenAI
+from langchain_community.chat_models.openai import ChatOpenAI
 
 
 class PromptLayerChatOpenAI(ChatOpenAI):
@@ -37,7 +37,7 @@ class PromptLayerChatOpenAI(ChatOpenAI):
             openai = PromptLayerChatOpenAI(model="gpt-3.5-turbo")
     """
 
-    pl_tags: Optional[List[str]]
+    pl_tags: Optional[List[str]] = None
     return_pl_id: Optional[bool] = False
 
     @classmethod
