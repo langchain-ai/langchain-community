@@ -1,4 +1,4 @@
-"""Util that calls Google Search."""
+"""DO NOT USE. Kept for backward compatibility for web search retriever."""
 
 from typing import Any, Dict, List, Optional
 

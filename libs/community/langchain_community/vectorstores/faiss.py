@@ -1426,7 +1426,7 @@ class FAISS(VectorStore):
                         bool: True if the document's field value satisfies all
                             operator conditions, False otherwise.
                     """
-                    doc_value = doc.get(field)
+                    doc_value: Any = doc.get(field)
                     return all(op(doc_value, value) for op, value in operators)
 
                 return filter_fn
