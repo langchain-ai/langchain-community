@@ -36,7 +36,7 @@ jobs:
     name: "Pydantic ~=${{ inputs.pydantic-version }}"
     steps:
       - name: "📋 Checkout Code"
-        uses: actions/checkout@v6
+        uses: actions/checkout@v7
 
       - name: "🐍 Set up Python ${{ inputs.python-version }} + UV"
         uses: "./.github/actions/uv_setup"
