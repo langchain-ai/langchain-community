@@ -1,0 +1,18 @@
+README.md
+  h_9f69767fa5fabf 19
+libs/community/langchain_community/__init__.py
+  h_9f69767fa5fabf 14
+libs/community/README.md
+  h_9f69767fa5fabf 9
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.9",
+  "base_commit_sha": "285b6102e3714c0623ba7203c7e1a767bd628f59",
+  "prompts": {},
+  "humans": {
+    "h_9f69767fa5fabf": {
+      "author": "Mason Daugherty <github@mdrxy.com>"
+    }
+  }
+}
