@@ -6,7 +6,7 @@
 [![Twitter](https://img.shields.io/twitter/url/https/twitter.com/langchainai.svg?style=social&label=Follow%20%40LangChainAI)](https://twitter.com/langchainai)
 
 > [!WARNING]
-> **`langchain-community` is being sunset.** See [#674](https://github.com/langchain-ai/langchain-community/issues/674) for details and guidance. Thank you to everyone who has contributed integrations, fixes, reviews, and maintenance over the years.
+> **`langchain-community` has been sunset.** See [#674](https://github.com/langchain-ai/langchain-community/issues/674) for details and guidance. Thank you to everyone who has contributed integrations, fixes, reviews, and maintenance over the years.
 
 Looking for the JS/TS community library? Check out [LangChain.js](https://github.com/langchain-ai/langchainjs/tree/main/libs/langchain-community).
 

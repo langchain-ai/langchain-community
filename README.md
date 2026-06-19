@@ -16,7 +16,7 @@
 This repository contains community-maintained LangChain integrations in the [`langchain-community`](https://pypi.org/project/langchain-community/) package.
 
 > [!WARNING]
-> **`langchain-community` is being sunset.** See [#674](https://github.com/langchain-ai/langchain-community/issues/674) for details and guidance. Thank you to everyone who has contributed integrations, fixes, reviews, and maintenance over the years.
+> **`langchain-community` has been sunset.** See [#674](https://github.com/langchain-ai/langchain-community/issues/674) for details and guidance. Thank you to everyone who has contributed integrations, fixes, reviews, and maintenance over the years.
 
 **Documentation**:
 
